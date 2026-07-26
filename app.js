@@ -159,6 +159,10 @@ var TIMETABLE = {
     ["12:00","12:30","PE"], ["12:30","13:00","CL"]
   ]
 };
+/* One timetable per child. SC is in kindergarten — put the hours here
+   when you have them and they will appear on the Schedule automatically. */
+var TIMETABLES = { tc: TIMETABLE, sc: null };
+
 var TT_KEY = "MA maths · CL 华文 · EL English · SS social studies · " +
              "LSP learning support · PAL active learning · " +
              "CCE character &amp; citizenship · FTGP form teacher time";
@@ -783,10 +787,11 @@ function vWeek(){
       ';grid-row:'+(a+rowOffset)+'/span '+(z-a)+'"'+(extra||"")+'>'+label+'</span>';
   }
 
-  /* school — only the child who has a timetable */
-  if(who()==="tc"){
+  /* school, for whichever child has a timetable saved */
+  var tt = TIMETABLES[who()];
+  if(tt){
     ["Monday","Tuesday","Wednesday","Thursday","Friday"].forEach(function(d,i){
-      TIMETABLE[d].forEach(function(bk){
+      (tt[d]||[]).forEach(function(bk){
         g+=block(i, bk[0], bk[1], bk[2], "sch "+subjCls(bk[2]));
       });
     });
@@ -818,7 +823,9 @@ function vWeek(){
     '<div class="wknav"><button class="btn soft" id="wkPrev">‹</button>'+
     '<span class="wkrange">'+dates[0].toLocaleDateString("en-GB",{day:"numeric",month:"short"})+
     ' – '+dates[6].toLocaleDateString("en-GB",{day:"numeric",month:"short"})+'</span>'+
-    '<button class="btn soft" id="wkNext">›</button></div>'+g;
+    '<button class="btn soft" id="wkNext">›</button></div>'+
+    (tt ? '' : '<p class="empty" style="margin-bottom:10px">No school timetable saved for '+
+      esc(pname(who()))+' yet — after-school and events still show below.</p>')+g;
 
   /* add an activity */
   var dayOpts=DAYS.map(function(d){ return '<option value="'+d+'">'+d+'</option>'; }).join("");
@@ -834,13 +841,12 @@ function vWeek(){
     '<div class="btnrow"><button class="btn go" id="aAdd">Add</button>'+
     '<button class="btn soft" id="aCancel">Cancel</button></div></div>';
 
-  head+='<div class="key"><span class="dot s-core"></span> maths &amp; English &nbsp;'+
+  head+='<div class="key">'+(tt?'<span class="dot s-core"></span> maths &amp; English &nbsp;'+
     '<span class="dot s-cl"></span> 华文 &nbsp;'+
     '<span class="dot s-fun"></span> PE, music, art &nbsp;'+
     '<span class="dot s-other"></span> LSP, PAL, CCE, FTGP, SS &nbsp;'+
-    '<span class="dot s-rec"></span> recess<br>'+
-    'Blocks with a coloured edge are after school — tap one to remove it.<br>'+
-    TT_KEY+'</div></div>';
+    '<span class="dot s-rec"></span> recess<br>'+TT_KEY+'<br>':'')+
+    'Blocks with a coloured edge are after school — tap one to remove it.</div></div>';
   return head;
 }
 
