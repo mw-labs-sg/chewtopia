@@ -281,7 +281,10 @@ function say(t,rate,lang){
   lang=lang||"en-GB";
   var u=new SpeechSynthesisUtterance(t), v=bestVoice(lang);
   if(v){ u.voice=v; u.lang=v.lang; } else u.lang=lang;
-  u.rate=rate||0.85; u.pitch=1.05; speechSynthesis.speak(u);
+  var base=parseFloat(S("rate","0.85"));
+  if(isNaN(base)) base=0.85;
+  u.rate = rate ? Math.max(0.4, Math.min(1.3, rate * (base/0.85))) : base;
+  u.pitch=1.05; speechSynthesis.speak(u);
 }
 function hush(){ try{ speechSynthesis.cancel(); }catch(e){} }
 function voiceBox(lang){
@@ -435,44 +438,84 @@ function wHome(){
 /* ==========================================================================
    TESTS
    ========================================================================== */
+function pFilter(){ return S("pfilter","all"); }
+
 function vTests(){
+  var f=pFilter();
+  var opts=[["all","Everything"],["en","English"],["zh","华文"],["ma","Maths"]]
+    .map(function(o){ return '<option value="'+o[0]+'"'+(f===o[0]?" selected":"")+'>'+o[1]+'</option>'; }).join("");
+
   var s='<div class="panel"><h2><span class="em">📝</span> Practice'+
-        '<span class="side">'+esc(pname(who()))+'</span></h2>';
-  if(who()==="tc"){
-    s+='<div class="sub">English spelling</div>';
-    Object.keys(TC_SPELL).forEach(function(k){
-      s+='<button class="test" data-t="en|'+k+'"><span><span class="nm">List '+k+'</span>'+
-        '<span class="mt">'+TC_SPELL[k][0]+' · '+TC_SPELL[k][1].length+' questions</span></span>'+
-        pill(lastFor("Spelling "+k))+'</button>'; });
-    s+='<div class="sub">华文 · 汉语拼音</div>';
-    Object.keys(TC_PINYIN).forEach(function(k){
-      s+='<button class="test" data-t="zh|'+k+'"><span><span class="nm">'+k+'</span>'+
-        '<span class="mt">'+TC_PINYIN[k].length+' words</span></span>'+pill(lastFor(k))+'</button>'; });
-  } else {
-    s+='<div class="sub">华文听写</div>';
-    Object.keys(SC_TINGXIE).forEach(function(k){
-      s+='<button class="test" data-t="zh|'+k+'"><span><span class="nm">'+k+'</span>'+
-        '<span class="mt">'+SC_TINGXIE[k].length+' words</span></span>'+pill(lastFor(k))+'</button>'; });
-    s+='<div class="sub">English spelling</div>';
-    Object.keys(SC_SPELL).forEach(function(k){
-      s+='<button class="test" data-t="es|'+k+'"><span><span class="nm">'+k+'</span>'+
-        '<span class="mt">'+SC_SPELL[k][1].length+' questions</span></span>'+pill(lastFor(k))+'</button>'; });
+        '<span class="side">'+esc(pname(who()))+'</span></h2>'+
+        '<div class="lbl">Subject</div><select id="pf">'+opts+'</select><div style="height:14px"></div>';
+
+  var any=false;
+
+  if(f==="all"||f==="en"){
+    s+='<div class="sub">English spelling</div>'; any=true;
+    if(who()==="tc"){
+      Object.keys(TC_SPELL).forEach(function(k){
+        s+='<button class="test" data-t="en|'+k+'"><span><span class="nm">List '+k+'</span>'+
+          '<span class="mt">'+TC_SPELL[k][0]+' · '+TC_SPELL[k][1].length+' questions</span></span>'+
+          pill(lastFor("Spelling "+k))+'</button>'; });
+    } else {
+      Object.keys(SC_SPELL).forEach(function(k){
+        s+='<button class="test" data-t="es|'+k+'"><span><span class="nm">'+k+'</span>'+
+          '<span class="mt">'+SC_SPELL[k][1].length+' questions</span></span>'+pill(lastFor(k))+'</button>'; });
+    }
   }
-  s+='<div class="sub">Maths</div>'+
-     '<button class="test" data-t="ma|easy"><span><span class="nm">Warm up</span>'+
-       '<span class="mt">Add and take away to 20</span></span>'+pill(lastFor("Math · Warm up"))+'</button>'+
-     '<button class="test" data-t="ma|times"><span><span class="nm">Times tables</span>'+
-       '<span class="mt">2 to 10</span></span>'+pill(lastFor("Math · Times tables"))+'</button>'+
-     '<button class="test" data-t="ma|hard"><span><span class="nm">Challenge</span>'+
-       '<span class="mt">Bigger numbers and division</span></span>'+pill(lastFor("Math · Challenge"))+'</button>'+
-     '</div>'+
-     '<div class="panel"><h2><span class="em">🔊</span> Voices</h2>'+
-     voiceBox("en-GB")+voiceBox("zh-CN")+'</div>';
+
+  if(f==="all"||f==="zh"){
+    var bank = who()==="tc" ? TC_PINYIN : SC_TINGXIE;
+    s+='<div class="sub">'+(who()==="tc"?"华文 · 汉语拼音":"华文听写")+'</div>'; any=true;
+    Object.keys(bank).forEach(function(k){
+      s+='<button class="test" data-t="zh|'+k+'"><span><span class="nm">'+k+'</span>'+
+        '<span class="mt">'+bank[k].length+' words</span></span>'+pill(lastFor(k))+'</button>'; });
+  }
+
+  if(f==="all"||f==="ma"){
+    s+='<div class="sub">Maths</div>'; any=true;
+    s+='<button class="test" data-t="ma|easy"><span><span class="nm">Warm up</span>'+
+        '<span class="mt">Add and take away to 20</span></span>'+pill(lastFor("Math · Warm up"))+'</button>'+
+       '<button class="test" data-t="ma|times"><span><span class="nm">Times tables</span>'+
+        '<span class="mt">2 to 10</span></span>'+pill(lastFor("Math · Times tables"))+'</button>'+
+       '<button class="test" data-t="ma|hard"><span><span class="nm">Challenge</span>'+
+        '<span class="mt">Bigger numbers and division</span></span>'+pill(lastFor("Math · Challenge"))+'</button>';
+  }
+
+  if(!any) s+='<p class="empty">Nothing here yet.</p>';
+  s+='</div>';
+
+  /* voice settings */
+  var sp=parseFloat(S("rate","0.85"));
+  s+='<div class="panel"><h2><span class="em">🔊</span> Voice</h2>'+
+     voiceBox("en-GB")+voiceBox("zh-CN")+
+     '<div class="lbl">Speaking speed</div>'+
+     '<input type="range" id="rate" min="0.5" max="1.1" step="0.05" value="'+sp+'">'+
+     '<div class="rateval" id="rateVal">'+(sp<0.7?"Slow":sp<0.95?"Normal":"Quick")+'</div>'+
+     '<div class="btnrow"><button class="btn soft" id="vTest">Hear a sample</button></div>'+
+     '<p class="empty" style="margin-top:10px">Voices marked ✨ are the good ones. '+
+     'If the list is short, see the note below.</p>'+
+     '<div class="key">More voices: on Windows open the site in <b>Edge</b> for Sonia and Libby. '+
+     'On iPad go to Settings → Accessibility → Spoken Content → Voices → English and download '+
+     '<b>Serena</b> or <b>Martha</b>.</div></div>';
   return s;
 }
 function wTests(){
   document.querySelectorAll("[data-t]").forEach(function(b){ b.onclick=function(){ start(b.dataset.t); }; });
+  var f=document.getElementById("pf");
+  if(f) f.onchange=function(){ W("pfilter", f.value); render(); };
   wireVoices();
+  var r=document.getElementById("rate");
+  if(r){
+    r.oninput=function(){
+      W("rate", r.value);
+      var v=parseFloat(r.value);
+      document.getElementById("rateVal").textContent = v<0.7?"Slow":v<0.95?"Normal":"Quick";
+    };
+  }
+  var t=document.getElementById("vTest");
+  if(t) t.onclick=function(){ say("Spell, mischievous. John read a book about three mischievous children.",0,"en-GB"); };
 }
 
 function rnd(a,b){ return Math.floor(Math.random()*(b-a+1))+a; }
