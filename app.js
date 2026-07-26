@@ -195,6 +195,7 @@ function seedOnce(){
   W("seed","v3");
 }
 
+var DAYS = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
 var TABS = [["home","Upcoming"],["schedule","Schedule"],["meals","Meals"],["practice","Practice"],["results","Results"]];
 var tab="home", quiz=null, showAdd=false;
 function go(id){ tab=id; quiz=null; showAdd=false; hush(); render(); scrollTo(0,0); }
@@ -351,8 +352,9 @@ function vHome(){
       s+='<div class="ev'+((st.live||st.start<=2)?" soon":"")+'">'+
         '<span class="cd '+whoCls(e.w)+'"><b>'+dnum(e.d)+(e.d2?"–"+dnum(e.d2):"")+'</b>'+
         '<i>'+dmon(e.d)+'</i></span>'+
-        '<span class="tx">'+esc(e.t)+'<small>'+evWhen(e)+' · '+
-          (e.w?esc(pname(e.w)):"Everyone")+(e.time?" · "+e.time:"")+'</small></span>'+
+        '<span class="tx"><span class="tag '+whoCls(e.w)+'">'+
+          (e.w?esc(pname(e.w)):"All")+'</span> '+esc(e.t)+
+          '<small>'+evWhen(e)+(e.time?" · "+e.time:"")+'</small></span>'+
         '<button class="x" data-del="'+e.id+'">&times;</button></div>';
     });
   } else s+='<p class="empty">Nothing coming up.</p>';
