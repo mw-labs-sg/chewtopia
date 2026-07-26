@@ -129,14 +129,24 @@
     font-weight:700;margin:16px 0 8px}
   .sub:first-of-type{margin-top:0}
 
-  /* ---- timetable ---- */
-  .slots{display:flex;flex-wrap:wrap;gap:5px}
-  .slot{font-size:13px;font-weight:700;border-radius:9px;padding:5px 10px;
-    background:var(--sky);color:var(--blue)}
-  .slot.rec{background:#FFF1D6;color:#8A6100}
-  .slot.cl{background:#FFE3DC;color:#B03A22}
-  .slot.o{background:#F0EAFE;color:var(--grape)}
-  .key{font-size:13px;color:var(--soft);line-height:1.9;margin-top:12px}
+  /* ---- timetable grid ---- */
+  .ttwrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 -4px;padding:0 4px 4px}
+  .ttgrid{display:grid;grid-template-columns:52px repeat(5,minmax(84px,1fr));
+    gap:3px;min-width:520px}
+  .tthead{font-size:13px;font-weight:700;color:var(--soft);text-align:center;
+    align-self:center;letter-spacing:.04em}
+  .tthead.now{color:var(--coral)}
+  .tcorner{grid-column:1;grid-row:1}
+  .ttime{grid-column:1;font-size:11.5px;color:var(--soft);text-align:right;
+    padding-right:6px;align-self:start;line-height:1.1;padding-top:2px}
+  .ttb{border-radius:9px;display:flex;align-items:center;justify-content:center;
+    font-size:13.5px;font-weight:700;text-align:center;padding:2px 4px;line-height:1.2}
+  .ttb.core{background:var(--sky);color:var(--blue)}
+  .ttb.cl{background:#FFE3DC;color:#B03A22}
+  .ttb.rec{background:#FFF1D6;color:#8A6100}
+  .ttb.o{background:#F0EAFE;color:var(--grape)}
+  .ttb.today{outline:2px solid rgba(255,111,82,.45);outline-offset:-2px}
+  .key{font-size:13px;color:var(--soft);line-height:1.9;margin-top:14px}
 
   /* ---- quiz ---- */
   .qtop{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:11px}
@@ -184,7 +194,11 @@
   .run.low{background:#FFE3DC;color:#B03A22}
   .arw{color:#C3D2DF;font-size:15px}
   .foot{text-align:center;margin-top:16px;color:var(--soft);font-size:12px;line-height:1.7}
-  @media(min-width:700px){ .day{grid-template-columns:80px 1fr} }
+  @media(min-width:700px){
+    .day{grid-template-columns:80px 1fr}
+    .twoup{display:grid;grid-template-columns:1fr 1fr;gap:0 22px}
+    .twoup .day{border-bottom:1px solid var(--line)}
+  }
   @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -196,6 +210,6 @@
   <div id="view"></div>
   <div class="foot">Saved on this device</div>
 </div>
-<script src="app.js?v=5"></script>
+<script src="app.js?v=7"></script>
 </body>
 </html>

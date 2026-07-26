@@ -128,16 +128,40 @@ var SC_SPELL = {
 };
 
 /* --- TC's school timetable --- */
+/* School timetable. Each entry is [start, end, subject].
+   Times come from the printed timetable — check them against the original. */
+var TIMES = ["7:30","8:00","8:30","9:00","9:30","10:00","10:30",
+             "11:00","11:30","12:00","12:30","13:00","13:30","14:15"];
 var TIMETABLE = {
-  Monday:    ["MA","CL","CL","Recess","LSP","PAL","EL"],
-  Tuesday:   ["MA","ART","CL","Recess","CL","LSP","EL","PE"],
-  Wednesday: ["LSP","EL","CCE","Recess","CL","MA","FTGP"],
-  Thursday:  ["LSP","CL","Assembly","Recess","MA","PE","EL","SS"],
-  Friday:    ["MA","MUSIC","EL","Recess","LSP","CL","PE","CL"]
+  Monday: [
+    ["7:30","8:00","MA"], ["8:00","8:30","CL"], ["8:30","9:30","CL"],
+    ["10:00","10:30","Recess"], ["10:30","11:00","LSP"],
+    ["11:00","12:30","PAL"], ["12:30","13:30","EL"]
+  ],
+  Tuesday: [
+    ["7:30","8:00","MA"], ["8:00","9:00","ART"], ["9:00","9:30","CL"],
+    ["10:00","10:30","Recess"], ["10:30","11:30","CL"], ["11:30","12:00","LSP"],
+    ["12:00","13:00","EL"], ["13:00","13:30","PE"]
+  ],
+  Wednesday: [
+    ["7:30","8:00","LSP"], ["8:00","8:30","EL"], ["8:30","9:30","CCE"],
+    ["10:00","10:30","Recess"], ["10:30","11:30","CL"],
+    ["11:30","12:30","MA"], ["12:30","13:30","FTGP"]
+  ],
+  Thursday: [
+    ["7:30","8:00","LSP"], ["8:00","9:00","CL"], ["9:30","10:00","Assembly"],
+    ["10:00","10:30","Recess"], ["10:30","11:30","MA"], ["11:30","12:00","PE"],
+    ["12:00","12:30","EL"], ["13:00","13:30","SS"]
+  ],
+  Friday: [
+    ["7:30","8:00","MA"], ["8:00","8:30","MUSIC"], ["8:30","9:30","EL"],
+    ["10:00","10:30","Recess"], ["10:30","11:00","LSP"], ["11:00","12:00","CL"],
+    ["12:00","12:30","PE"], ["12:30","13:00","CL"]
+  ]
 };
 var TT_KEY = "MA maths · CL 华文 · EL English · SS social studies · " +
-             "LSP learning support · PAL active learning · CCE character &amp; citizenship · " +
-             "FTGP form teacher time";
+             "LSP learning support · PAL active learning · " +
+             "CCE character &amp; citizenship · FTGP form teacher time";
 
 var MEALS_DEFAULT = {
   Monday:"Steamed codfish with ginger, spring onion, light soy\nSunny-side eggs for the boys\nStir-fried mixed vegetables\nLong bean + black fungus, minced pork, chilli & peppercorn",
@@ -148,33 +172,23 @@ var MEALS_DEFAULT = {
   Saturday:"", Sunday:""
 };
 
-/* Events pre-loaded the first time only. Delete any of them in the app and
-   they stay deleted. d = start date, d2 = end date for trips. */
+/* Test dates and family events, loaded on first open only.
+   Delete any of them in the app and they stay deleted. */
 var SEED_EVENTS = [
-  {id:"s1", t:"Hai Di Lao 🍲",     d:"2026-08-01", w:"sc"},
-  {id:"s2", t:"Birthday party 🎂", d:"2026-08-08", w:"sc"},
-  {id:"s3", t:"Chiang Mai ✈️",     d:"2026-09-04", d2:"2026-09-07"}
+  {id:"e1", t:"Spelling test",  d:"2026-07-28", w:"tc"},
+  {id:"e2", t:"华文听写",        d:"2026-07-30", w:"tc"},
+  {id:"e3", t:"Hai Di Lao",     d:"2026-08-01", w:"sc"},
+  {id:"e4", t:"华文听写",        d:"2026-08-06", w:"sc"},
+  {id:"e5", t:"Birthday party", d:"2026-08-08", w:"sc"},
+  {id:"e6", t:"Spelling test",  d:"2026-08-12", w:"sc"},
+  {id:"e7", t:"Chiang Mai",     d:"2026-09-04", d2:"2026-09-07"}
 ];
 function seedOnce(){
-  if(S("seeded","")==="1") return;
-  var a = SJ("events", []);
-  var have = {}; a.forEach(function(e){ have[e.id]=1; });
-  SEED_EVENTS.forEach(function(e){ if(!have[e.id]) a.push(e); });
-  WJ("events", a); W("seeded","1");
-}
-
-
-var SEED_EVENTS = [
-  {id:"s1", t:"Hai Di Lao 🍲",     d:"2026-08-01", w:"sc"},
-  {id:"s2", t:"Birthday party 🎂", d:"2026-08-08", w:"sc"},
-  {id:"s3", t:"Chiang Mai ✈️",     d:"2026-09-04", d2:"2026-09-07"}
-];
-function seedOnce(){
-  if(S("seeded","")==="1") return;
+  if(S("seeded2","")==="1") return;
   var a=SJ("events",[]), have={};
   a.forEach(function(e){ have[e.id]=1; });
   SEED_EVENTS.forEach(function(e){ if(!have[e.id]) a.push(e); });
-  WJ("events",a); W("seeded","1");
+  WJ("events",a); W("seeded2","1");
 }
 
 var DAYS = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
@@ -217,16 +231,37 @@ function pill(r){ if(!r) return '<span class="pill">Not tried</span>';
 var voices=[];
 function loadVoices(){ try{ voices=speechSynthesis.getVoices()||[]; }catch(e){ voices=[]; } }
 if(window.speechSynthesis){ loadVoices(); speechSynthesis.onvoiceschanged=loadVoices; }
-var FEM=/samantha|serena|sonia|kate|karen|moira|tessa|fiona|libby|maisie|hazel|aria|jenny|zira|ava|allison|susan|female|woman|xiaoxiao|huihui|tingting|meijia|sinji|yaoyao|lili/i;
-function bestVoice(lang){
+/* Voice ranking. Modern neural voices first, then known female names.
+   Windows' old SAPI voices (Zira, David, Hazel) are pushed to the bottom. */
+var NEURAL=/natural|online|google|siri|premium|enhanced/i;
+var FEM=/samantha|serena|sonia|libby|maisie|aria|jenny|ava|allison|susan|kate|karen|moira|tessa|fiona|martha|female|woman|xiaoxiao|huihui|tingting|meijia|sinji|yaoyao|lili/i;
+var OLD=/zira|david|hazel|mark|george|james|ravi|desktop/i;
+
+function voiceScore(v){
+  var n=v.name||"", x=0;
+  if(NEURAL.test(n)) x+=100;
+  if(FEM.test(n))    x+=40;
+  if(OLD.test(n))    x-=60;
+  return x;
+}
+function langVoices(lang){
   if(!voices.length) loadVoices();
-  var saved=S("voice:"+lang,""), hit=voices.filter(function(v){return v.name===saved;})[0];
-  if(hit) return hit;
   var base=lang.split("-")[0];
-  var ex=voices.filter(function(v){ return v.lang&&v.lang.replace("_","-")===lang; });
-  var nr=voices.filter(function(v){ return v.lang&&v.lang.replace("_","-").indexOf(base)===0; });
-  return ex.filter(function(v){return FEM.test(v.name);})[0]
-      || nr.filter(function(v){return FEM.test(v.name);})[0] || ex[0] || nr[0] || null;
+  return voices.filter(function(v){
+    return v.lang && v.lang.replace("_","-").toLowerCase().indexOf(base)===0;
+  }).sort(function(x,y){
+    var d=voiceScore(y)-voiceScore(x);
+    if(d) return d;
+    var xe=((x.lang||"").replace("_","-")===lang)?1:0;
+    var ye=((y.lang||"").replace("_","-")===lang)?1:0;
+    return ye-xe;
+  });
+}
+function bestVoice(lang){
+  var saved=S("voice:"+lang,"");
+  var hit=voices.filter(function(v){ return v.name===saved; })[0];
+  if(hit) return hit;
+  return langVoices(lang)[0] || null;
 }
 function say(t,rate,lang){
   if(!window.speechSynthesis) return;
@@ -237,16 +272,28 @@ function say(t,rate,lang){
 }
 function hush(){ try{ speechSynthesis.cancel(); }catch(e){} }
 function voiceBox(lang){
-  if(!voices.length) loadVoices();
-  var o=voices.filter(function(v){ return v.lang&&v.lang.replace("_","-").indexOf(lang.split("-")[0])===0; });
-  if(!o.length) return '<p class="empty">No '+(lang==="zh-CN"?"Chinese":"English")+' voice on this device.</p>';
-  var cur=bestVoice(lang), h='<div class="lbl">Teacher voice</div><select id="vp">';
-  o.forEach(function(v){ h+='<option value="'+esc(v.name)+'"'+(cur&&v.name===cur.name?" selected":"")+'>'+esc(v.name)+'</option>'; });
+  var o=langVoices(lang);
+  var label = lang==="zh-CN" ? "Chinese voice" : "English voice";
+  if(!o.length) return '<div class="lbl">'+label+'</div>'+
+    '<p class="empty">No '+(lang==="zh-CN"?"Chinese":"English")+' voice installed on this device.</p>';
+  var cur=bestVoice(lang);
+  var h='<div class="lbl">'+label+'</div><select data-voice="'+lang+'">';
+  o.forEach(function(v){
+    var tag = NEURAL.test(v.name) ? "  ✨" : OLD.test(v.name) ? "  (old)" : "";
+    h+='<option value="'+esc(v.name)+'"'+((cur&&v.name===cur.name)?" selected":"")+'>'+
+       esc(v.name)+tag+'</option>';
+  });
   return h+'</select>';
 }
-function wireVoice(lang){ var e=document.getElementById("vp"); if(!e) return;
-  e.onchange=function(){ W("voice:"+lang,e.value);
-    say(lang==="zh-CN"?"你好":"Hello, I am your teacher.",0.85,lang); }; }
+function wireVoices(){
+  document.querySelectorAll("[data-voice]").forEach(function(sel){
+    sel.onchange=function(){
+      var lg=sel.dataset.voice;
+      W("voice:"+lg, sel.value);
+      say(lg==="zh-CN" ? "你好，我是老师。" : "Hello. I am your teacher.", 0.85, lg);
+    };
+  });
+}
 
 /* ==========================================================================
    render
@@ -331,12 +378,12 @@ function vHome(){
 
   /* --- meals --- */
   var m=SJ("meals:"+monKey(),null)||MEALS_DEFAULT;
-  s+='<div class="panel"><h2><span class="em">🍜</span> Dinner</h2>';
+  s+='<div class="panel"><h2><span class="em">🍜</span> Dinner</h2><div class="twoup">';
   DAYS.forEach(function(d,i){
     s+='<div class="day'+(i===todayIdx()?" now":"")+'"><span class="d">'+d.slice(0,3)+'</span>'+
       '<textarea class="cell" data-meal="'+d+'" placeholder="—">'+esc(m[d]||"")+'</textarea></div>';
   });
-  s+='<div class="btnrow"><button class="btn soft" id="mR">Reset to usual plan</button></div>'+
+  s+='</div><div class="btnrow"><button class="btn soft" id="mR">Reset to usual plan</button></div>'+
      '<div class="saved" id="mS"></div></div>'+
      '<div class="panel"><h2><span class="em">🛒</span> Groceries</h2>'+
      '<textarea class="cell" id="gr" style="min-height:110px" placeholder="What to buy">'+
@@ -414,9 +461,7 @@ function vTests(){
 }
 function wTests(){
   document.querySelectorAll("[data-t]").forEach(function(b){ b.onclick=function(){ start(b.dataset.t); }; });
-  var sel=document.querySelectorAll("#vp");
-  if(sel[0]){ sel[0].onchange=function(){ W("voice:en-GB",sel[0].value); say("Hello, I am your teacher.",0.85,"en-GB"); }; }
-  if(sel[1]){ sel[1].id="vp2"; sel[1].onchange=function(){ W("voice:zh-CN",sel[1].value); say("你好",0.85,"zh-CN"); }; }
+  wireVoices();
 }
 
 function rnd(a,b){ return Math.floor(Math.random()*(b-a+1))+a; }
@@ -606,15 +651,36 @@ function wResults(){
    SCHOOL TIMETABLE
    ========================================================================== */
 function vSchool(){
-  var s='<div class="panel"><h2><span class="em">🏫</span> School week'+
-        '<span class="side">'+esc(pname("tc"))+'</span></h2>';
-  ["Monday","Tuesday","Wednesday","Thursday","Friday"].forEach(function(d,i){
-    s+='<div class="day'+(i===todayIdx()?" now":"")+'"><span class="d">'+d.slice(0,3)+'</span>'+
-      '<span class="slots">'+TIMETABLE[d].map(function(x){
-        var c=x==="Recess"?"rec":x==="CL"?"cl":(["MA","EL"].indexOf(x)>=0?"":"o");
-        return '<span class="slot '+c+'">'+x+'</span>'; }).join("")+'</span></div>';
+  var days=["Monday","Tuesday","Wednesday","Thursday","Friday"];
+  var rows=TIMES.length-1;
+  var g='<div class="ttwrap"><div class="ttgrid" style="grid-template-rows:26px repeat('+rows+',38px)">';
+
+  g+='<span class="tthead tcorner"></span>';
+  days.forEach(function(d,i){
+    g+='<span class="tthead'+(i===todayIdx()?" now":"")+'" style="grid-column:'+(i+2)+';grid-row:1">'+
+       d.slice(0,3)+'</span>';
   });
-  return s+'<div class="key">'+TT_KEY+'</div></div>';
+
+  TIMES.slice(0,rows).forEach(function(t,i){
+    g+='<span class="ttime" style="grid-row:'+(i+2)+'">'+t+'</span>';
+  });
+
+  days.forEach(function(d,di){
+    TIMETABLE[d].forEach(function(b){
+      var a=TIMES.indexOf(b[0]), z=TIMES.indexOf(b[1]);
+      if(a<0||z<0||z<=a) return;
+      var c = b[2]==="Recess" ? "rec" : b[2]==="CL" ? "cl" :
+              (["MA","EL"].indexOf(b[2])>=0 ? "core" : "o");
+      g+='<span class="ttb '+c+(di===todayIdx()?" today":"")+'" '+
+         'style="grid-column:'+(di+2)+';grid-row:'+(a+2)+'/span '+(z-a)+'">'+b[2]+'</span>';
+    });
+  });
+  g+='</div></div>';
+
+  return '<div class="panel"><h2><span class="em">🏫</span> School week'+
+    '<span class="side">'+esc(pname("tc"))+'</span></h2>'+
+    '<p class="empty" style="margin-bottom:10px">Swipe sideways to see Thursday and Friday.</p>'+
+    g+'<div class="key">'+TT_KEY+'</div></div>';
 }
 function wSchool(){}
 
