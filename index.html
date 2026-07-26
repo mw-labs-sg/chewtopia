@@ -93,6 +93,16 @@
   .cell:focus{outline:none;background:var(--sky)}
   textarea.cell{min-height:34px;overflow:hidden}
 
+  /* ---- meals: one day per block, full width ---- */
+  .mealday{padding:12px 0;border-bottom:1px solid var(--line)}
+  .mealday:last-of-type{border-bottom:0}
+  .mealday .mh{font-family:'Baloo 2',cursive;font-size:18px;margin-bottom:2px}
+  .mealday .mh em{font-style:normal;font-size:13px;font-weight:400;
+    font-family:'Lexend',sans-serif;color:var(--soft);margin-left:5px}
+  .mealday.now{background:#FFF8F6;margin:0 -10px;padding:12px 10px;border-radius:12px;border-bottom:0}
+  .mealday.now .mh{color:var(--coral)}
+  .mealday .cell{padding:4px 0}
+
   /* ---- buttons ---- */
   .btn{border:none;border-radius:14px;padding:13px 18px;font-family:'Baloo 2',cursive;
     font-weight:700;font-size:17px;cursor:pointer}
@@ -158,9 +168,14 @@
   .wkb{border-radius:7px;display:flex;align-items:center;justify-content:center;
     font-size:12px;font-weight:700;text-align:center;padding:1px 3px;line-height:1.15;
     overflow:hidden;cursor:default}
-  .wkb.school{background:#EDF2F7;color:#5C7186}
-  .wkb.school.rec{background:#FFF6E3;color:#8A6100}
-  .wkb.c-tc,.wkb.c-sc,.wkb.c-all{cursor:pointer}
+  /* school subjects */
+  .s-core{background:var(--sky);color:var(--blue)}
+  .s-cl{background:#FFE3DC;color:#B03A22}
+  .s-rec{background:#FFF1D6;color:#8A6100}
+  .s-fun{background:#DFF3E4;color:#2F7A45}
+  .s-other{background:#F0EAFE;color:var(--grape)}
+  /* after-school blocks: child colour plus a solid edge */
+  .wkb.own{cursor:pointer;box-shadow:inset 3px 0 0 currentColor;font-weight:800}
   .wkallday-label{grid-column:1;font-size:10px;color:var(--soft);text-align:right;
     padding-right:5px;align-self:center;line-height:1.1}
   .wkallday{display:flex;flex-wrap:wrap;gap:2px;align-content:center;padding:2px 0}
@@ -216,8 +231,6 @@
   .foot{text-align:center;margin-top:16px;color:var(--soft);font-size:12px;line-height:1.7}
   @media(min-width:700px){
     .day{grid-template-columns:80px 1fr}
-    .twoup{display:grid;grid-template-columns:1fr 1fr;gap:0 22px}
-    .twoup .day{border-bottom:1px solid var(--line)}
   }
   @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -230,6 +243,6 @@
   <div id="view"></div>
   <div class="foot">Saved on this device</div>
 </div>
-<script src="app.js?v=9"></script>
+<script src="app.js?v=11"></script>
 </body>
 </html>

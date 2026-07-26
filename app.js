@@ -201,6 +201,14 @@ var tab="home", quiz=null, showAdd=false;
 function go(id){ tab=id; quiz=null; showAdd=false; hush(); render(); scrollTo(0,0); }
 
 /* ---------- helpers ---------- */
+/* Subject colours on the school timetable */
+function subjCls(x){
+  if(x==="Recess") return "s-rec";
+  if(x==="CL")     return "s-cl";
+  if(x==="MA"||x==="EL") return "s-core";
+  if(x==="PE"||x==="MUSIC"||x==="ART") return "s-fun";
+  return "s-other";
+}
 function whoCls(w){ return w==="tc" ? "c-tc" : w==="sc" ? "c-sc" : "c-all"; }
 function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 function todayIdx(){ return (new Date().getDay()+6)%7; }
@@ -379,12 +387,15 @@ function vHome(){
 
 function vMeals(){
   var m=SJ("meals:"+monKey(),null)||MEALS_DEFAULT;
-  var s='<div class="panel"><h2><span class="em">🍜</span> Dinner this week</h2><div class="twoup">';
+  var dt=weekDates();
+  var s='<div class="panel"><h2><span class="em">🍜</span> Dinner this week</h2>';
   DAYS.forEach(function(d,i){
-    s+='<div class="day'+(i===todayIdx()?" now":"")+'"><span class="d">'+d.slice(0,3)+'</span>'+
-      '<textarea class="cell" data-meal="'+d+'" placeholder="—">'+esc(m[d]||"")+'</textarea></div>';
+    s+='<div class="mealday'+(i===todayIdx()?" now":"")+'">'+
+       '<div class="mh">'+d+' <em>'+dt[i].getDate()+' '+
+         dt[i].toLocaleDateString("en-GB",{month:"short"})+'</em></div>'+
+       '<textarea class="cell" data-meal="'+d+'" placeholder="—">'+esc(m[d]||"")+'</textarea></div>';
   });
-  return s+'</div><div class="btnrow"><button class="btn soft" id="mR">Reset to usual plan</button></div>'+
+  return s+'<div class="btnrow"><button class="btn soft" id="mR">Reset to usual plan</button></div>'+
     '<div class="saved" id="mS"></div></div>'+
     '<div class="panel"><h2><span class="em">🛒</span> Groceries</h2>'+
     '<textarea class="cell" id="gr" style="min-height:130px" placeholder="What to buy">'+
@@ -733,7 +744,7 @@ function vWeek(){
   if(who()==="tc"){
     ["Monday","Tuesday","Wednesday","Thursday","Friday"].forEach(function(d,i){
       TIMETABLE[d].forEach(function(bk){
-        g+=block(i, bk[0], bk[1], bk[2], "school"+(bk[2]==="Recess"?" rec":""));
+        g+=block(i, bk[0], bk[1], bk[2], "sch "+subjCls(bk[2]));
       });
     });
   }
@@ -741,7 +752,7 @@ function vWeek(){
   /* after school, recurring */
   acts().filter(function(a){ return !a.who || a.who==="all" || a.who===who(); }).forEach(function(a){
     var i=DAYS.indexOf(a.day); if(i<0) return;
-    g+=block(i, a.from, a.to, esc(a.t), whoCls(a.who==='all'?'':a.who), ' data-act="'+a.id+'"');
+    g+=block(i, a.from, a.to, esc(a.t), 'own '+whoCls(a.who==='all'?'':a.who), ' data-act="'+a.id+'"');
   });
 
   /* timed events this week */
@@ -750,7 +761,7 @@ function vWeek(){
     DAYS.forEach(function(_,i){
       if(iso(dates[i])!==e.d) return;
       var end=String(Math.min(20,(+e.time.split(":")[0])+1)).padStart(2,"0")+":"+e.time.split(":")[1];
-      g+=block(i, e.time, end, esc(e.t), whoCls(e.w));
+      g+=block(i, e.time, end, esc(e.t), 'own '+whoCls(e.w));
     });
   });
 
@@ -780,7 +791,13 @@ function vWeek(){
     '<div class="btnrow"><button class="btn go" id="aAdd">Add</button>'+
     '<button class="btn soft" id="aCancel">Cancel</button></div></div>';
 
-  head+='<div class="key">Tap a coloured block to remove it. '+TT_KEY+'</div></div>';
+  head+='<div class="key"><span class="dot s-core"></span> maths &amp; English &nbsp;'+
+    '<span class="dot s-cl"></span> 华文 &nbsp;'+
+    '<span class="dot s-fun"></span> PE, music, art &nbsp;'+
+    '<span class="dot s-other"></span> LSP, PAL, CCE, FTGP, SS &nbsp;'+
+    '<span class="dot s-rec"></span> recess<br>'+
+    'Blocks with a coloured edge are after school — tap one to remove it.<br>'+
+    TT_KEY+'</div></div>';
   return head;
 }
 
