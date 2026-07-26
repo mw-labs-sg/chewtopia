@@ -3,361 +3,221 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Chewtopia</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Lexend:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Lexend:wght@400;600;700&family=Noto+Sans+SC:wght@700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --sauce:#2E1F24;
-    --sauce-2:#4A3038;
-    --paper:#FFF8EE;
-    --ink:#2E1F24;
-    --pineapple:#F5B93B;
-    --cucumber:#7FB069;
-    --ginger:#E05B7A;
-    --peanut:#C9803F;
-    --muted:#8A7A72;
-    --line:#EDE0D2;
+    --sauce:#2E1F24; --sauce-2:#4A3038;
+    --paper:#FFF8EE; --ink:#2E1F24;
+    --pineapple:#F5B93B; --cucumber:#7FB069;
+    --ginger:#E05B7A; --peanut:#C9803F;
+    --muted:#8A7A72; --line:#EDE0D2;
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   html,body{margin:0;padding:0;min-height:100%}
   body{
-    font-family:'Lexend',system-ui,-apple-system,sans-serif;
-    color:#fff;
+    font-family:'Lexend',system-ui,-apple-system,sans-serif;color:#fff;
     background:
       radial-gradient(circle at 12% 16%,rgba(245,185,59,.16) 0 7px,transparent 8px),
       radial-gradient(circle at 84% 24%,rgba(127,176,105,.16) 0 6px,transparent 7px),
       radial-gradient(circle at 70% 82%,rgba(224,91,122,.15) 0 8px,transparent 9px),
       radial-gradient(circle at 26% 74%,rgba(201,128,63,.16) 0 5px,transparent 6px),
-      linear-gradient(170deg,var(--sauce-2),var(--sauce) 75%);
+      linear-gradient(170deg,var(--sauce-2),var(--sauce) 78%);
     background-attachment:fixed;
     display:flex;justify-content:center;
-    padding:20px 14px calc(34px + env(safe-area-inset-bottom));
+    padding:16px 13px calc(34px + env(safe-area-inset-bottom));
   }
-  .wrap{width:100%;max-width:560px}
+  .shell{width:100%;max-width:620px}
 
-  .brand{text-align:center;margin-bottom:6px}
-  .brand .kicker{font-size:11px;letter-spacing:.28em;text-transform:uppercase;
-    color:var(--pineapple);font-weight:700}
-  .brand h1{
-    font-family:'Baloo 2',cursive;font-weight:800;font-size:clamp(34px,10vw,52px);line-height:1;
-    margin:2px 0 0;letter-spacing:-.01em
-  }
-  .brand h1 span:nth-child(4n+1){color:var(--pineapple)}
-  .brand h1 span:nth-child(4n+2){color:var(--cucumber)}
-  .brand h1 span:nth-child(4n+3){color:var(--ginger)}
-  .brand h1 span:nth-child(4n+4){color:var(--peanut)}
-  .brand .tag{color:rgba(255,255,255,.55);font-size:13px;margin-top:6px}
+  /* ---- masthead ---- */
+  .mast{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+  .mark{font-family:'Baloo 2',cursive;font-weight:800;font-size:30px;line-height:1;
+    background:none;border:none;padding:0;cursor:pointer;letter-spacing:-.01em}
+  .mark span:nth-child(4n+1){color:var(--pineapple)}
+  .mark span:nth-child(4n+2){color:var(--cucumber)}
+  .mark span:nth-child(4n+3){color:var(--ginger)}
+  .mark span:nth-child(4n+4){color:var(--peanut)}
+  .mast .who{margin-left:auto;display:flex;gap:6px}
+  .chip{border:2px solid rgba(255,255,255,.2);background:rgba(255,255,255,.07);
+    color:rgba(255,255,255,.7);border-radius:999px;padding:6px 13px;
+    font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap}
+  .chip.on{background:var(--pineapple);border-color:var(--pineapple);color:#3A2A00}
 
-  .kidbar{display:flex;gap:9px;justify-content:center;margin:18px 0 20px;flex-wrap:wrap}
-  .kid{
-    border:2px solid rgba(255,255,255,.22);background:rgba(255,255,255,.07);
-    color:rgba(255,255,255,.7);border-radius:999px;padding:9px 20px;
-    font-family:inherit;font-size:15px;font-weight:700;cursor:pointer
-  }
-  .kid.on{background:var(--pineapple);border-color:var(--pineapple);color:#3A2A00}
+  /* ---- tabs ---- */
+  .tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:9px;margin-bottom:12px;
+    scrollbar-width:none}
+  .tabs::-webkit-scrollbar{display:none}
+  .tab{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);
+    color:rgba(255,255,255,.62);border-radius:999px;padding:8px 15px;
+    font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap}
+  .tab.on{background:var(--paper);border-color:var(--paper);color:var(--ink)}
 
-  .tiles{display:grid;grid-template-columns:1fr 1fr;gap:13px}
-  .tile{
-    display:block;text-align:left;text-decoration:none;cursor:pointer;
-    background:var(--paper);color:var(--ink);border:none;border-radius:22px;
-    padding:20px 18px;box-shadow:0 9px 0 rgba(0,0,0,.28);font-family:inherit;
-    transition:transform .08s,box-shadow .08s
-  }
-  .tile:active{transform:translateY(6px);box-shadow:0 3px 0 rgba(0,0,0,.28)}
-  .tile .ico{font-size:32px;line-height:1;display:block}
-  .tile .name{display:block;font-family:'Baloo 2',cursive;font-size:22px;font-weight:700;margin-top:8px}
-  .tile .sub{display:block;font-size:12px;color:var(--muted);margin-top:2px;line-height:1.5}
-  .tile.wide{grid-column:1 / -1}
-  .tile.k .name{color:var(--ginger)}
-  .tile.c .name{color:var(--cucumber)}
-  .tile.m .name{color:var(--peanut)}
-  .tile.r .name{color:var(--pineapple)}
-
-  .panel{
-    background:var(--paper);color:var(--ink);border-radius:22px;padding:20px 18px;
-    box-shadow:0 12px 34px rgba(0,0,0,.3)
-  }
-  .panel h2{font-family:'Baloo 2',cursive;font-size:24px;margin:0 0 2px}
-  .panel .lead{font-size:13px;color:var(--muted);margin:0 0 16px}
-  .back{
-    background:none;border:none;color:rgba(255,255,255,.6);font-family:inherit;
-    font-size:14px;font-weight:600;cursor:pointer;padding:6px 0;margin-bottom:10px
-  }
+  /* ---- panels ---- */
+  .panel{background:var(--paper);color:var(--ink);border-radius:22px;
+    padding:19px 17px;box-shadow:0 12px 34px rgba(0,0,0,.28);margin-bottom:12px}
+  .panel h2{font-family:'Baloo 2',cursive;font-size:23px;margin:0 0 2px}
+  .panel .lead{font-size:13px;color:var(--muted);margin:0 0 15px;line-height:1.6}
   .hidden{display:none!important}
 
-  .day{display:grid;grid-template-columns:52px 1fr;gap:10px;align-items:start;
+  /* ---- buttons ---- */
+  .btn{border:none;border-radius:15px;padding:14px 18px;font-family:'Baloo 2',cursive;
+    font-weight:700;font-size:18px;cursor:pointer;width:100%;transition:transform .07s,box-shadow .07s}
+  .btn:active{transform:translateY(4px)}
+  .btn.play{background:var(--ginger);color:#fff;box-shadow:0 5px 0 #A73E58}
+  .btn.play:active{box-shadow:0 1px 0 #A73E58}
+  .btn.go{background:var(--cucumber);color:#1B3210;box-shadow:0 5px 0 #57804A}
+  .btn.go:active{box-shadow:0 1px 0 #57804A}
+  .btn.mini{background:#F2EAE1;color:var(--ink);box-shadow:0 4px 0 #DCCDBD;
+    width:auto;font-size:15px;padding:10px 15px}
+  .btn.mini:active{box-shadow:0 1px 0 #DCCDBD}
+  .btn:focus-visible{outline:3px solid var(--pineapple);outline-offset:3px}
+  .btnrow{display:flex;gap:9px;margin-top:11px;flex-wrap:wrap}
+  .btnrow .btn{flex:1}
+
+  input[type=text],input[type=date],textarea,select{
+    width:100%;border:2px solid var(--line);border-radius:13px;padding:12px;
+    font-family:inherit;font-size:16px;color:var(--ink);background:#fff}
+  textarea{min-height:78px;resize:vertical;line-height:1.6}
+  input:focus,textarea:focus,select:focus{outline:none;border-color:var(--pineapple)}
+  .lbl{font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);
+    font-weight:700;margin:14px 0 6px}
+  .lbl:first-child{margin-top:0}
+  .saved{font-size:12px;color:#4E7A3C;font-weight:700;height:15px;margin-top:9px}
+
+  /* ---- home tiles ---- */
+  .tiles{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+  .tile{text-align:left;cursor:pointer;background:var(--paper);color:var(--ink);
+    border:none;border-radius:19px;padding:16px 15px;box-shadow:0 8px 0 rgba(0,0,0,.26);
+    font-family:inherit;transition:transform .08s,box-shadow .08s}
+  .tile:active{transform:translateY(5px);box-shadow:0 3px 0 rgba(0,0,0,.26)}
+  .tile .ico{font-size:26px;line-height:1;display:block}
+  .tile .nm{display:block;font-family:'Baloo 2',cursive;font-size:19px;font-weight:700;margin-top:6px}
+  .tile .sb{display:block;font-size:11.5px;color:var(--muted);margin-top:1px;line-height:1.5}
+  .tile.a .nm{color:var(--ginger)} .tile.b .nm{color:var(--cucumber)}
+  .tile.c .nm{color:var(--peanut)} .tile.d .nm{color:#C79A18}
+
+  /* ---- next-up strip ---- */
+  .nextup{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);
+    border-radius:17px;padding:13px 15px;margin-bottom:12px}
+  .nextup .t{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--pineapple);font-weight:700;margin-bottom:7px}
+  .nextup .row{display:flex;gap:10px;align-items:baseline;font-size:14px;padding:3px 0}
+  .nextup .when{color:var(--cucumber);font-weight:700;font-size:12px;min-width:64px}
+  .nextup .none{font-size:13px;color:rgba(255,255,255,.45)}
+
+  /* ---- lists / rows ---- */
+  .row2{display:grid;grid-template-columns:56px 1fr;gap:10px;align-items:start;
     padding:9px 0;border-bottom:1px solid var(--line)}
-  .day:last-child{border-bottom:0}
-  .day .dl{font-weight:700;font-size:13px;padding-top:11px}
-  .day .dl small{display:block;font-weight:400;color:var(--muted);font-size:11px}
-  .day.today .dl{color:var(--ginger)}
-  .day input{
-    width:100%;border:2px solid var(--line);border-radius:11px;padding:9px 11px;
-    font-family:inherit;font-size:15px;color:var(--ink);background:#fff
-  }
-  .day input:focus{outline:none;border-color:var(--pineapple)}
+  .row2:last-child{border-bottom:0}
+  .row2 .d{font-weight:700;font-size:13px;padding-top:12px}
+  .row2 .d small{display:block;font-weight:400;color:var(--muted);font-size:11px}
+  .row2.today .d{color:var(--ginger)}
 
-  .saved{font-size:12px;color:var(--cucumber);font-weight:700;height:16px;margin-top:10px}
-  .listbox{
-    width:100%;min-height:110px;border:2px solid var(--line);border-radius:13px;
-    padding:11px;font-family:inherit;font-size:15px;color:var(--ink);resize:vertical
-  }
-  .listbox:focus{outline:none;border-color:var(--pineapple)}
-  .lbl{font-size:11px;letter-spacing:.14em;text-transform:uppercase;
-    color:var(--muted);font-weight:700;margin:16px 0 6px}
+  .ev{display:flex;gap:11px;align-items:center;padding:11px 0;border-bottom:1px solid var(--line)}
+  .ev:last-child{border-bottom:0}
+  .ev .cd{background:#F2EAE1;border-radius:11px;padding:7px 9px;text-align:center;min-width:52px}
+  .ev .cd b{display:block;font-family:'Baloo 2',cursive;font-size:19px;line-height:1}
+  .ev .cd i{font-style:normal;font-size:10px;text-transform:uppercase;color:var(--muted);font-weight:700}
+  .ev.soon .cd{background:#FBE7EC}
+  .ev .tx{flex:1;font-weight:700;font-size:15px}
+  .ev .tx small{display:block;font-weight:400;color:var(--muted);font-size:12px;margin-top:1px}
+  .ev .x{background:none;border:none;color:var(--muted);font-size:19px;cursor:pointer;padding:4px 6px}
 
-  .runrow{padding:13px 0;border-bottom:1px solid var(--line)}
+  .test{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;
+    background:#F7F1E8;border:none;border-radius:14px;padding:13px 15px;margin-bottom:8px;
+    font-family:inherit;cursor:pointer;text-align:left;color:var(--ink)}
+  .test:active{transform:translateY(2px)}
+  .test .nm{font-weight:700;font-size:15px}
+  .test .mt{font-size:11.5px;color:var(--muted);margin-top:1px}
+  .pill{font-size:12.5px;font-weight:700;border-radius:999px;padding:4px 10px;
+    background:#EAE0D4;color:var(--muted);white-space:nowrap}
+  .pill.good{background:#E4F2DC;color:#3D6B2A}
+  .pill.mid{background:#FDF0DA;color:#8A5A00}
+  .pill.low{background:#FBE7EC;color:#9D2440}
+
+  /* ---- quiz ---- */
+  .qtop{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:11px}
+  .qtop .sc{font-size:13px;color:var(--muted);font-weight:700}
+  .meter{height:9px;border-radius:999px;background:#EFE5D9;overflow:hidden;margin-bottom:15px}
+  .meter i{display:block;height:100%;background:var(--cucumber);border-radius:999px;transition:width .25s}
+  .kind{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--ginger);font-weight:700}
+  .qq{font-family:'Baloo 2',cursive;font-size:25px;margin:5px 0 3px}
+  .hanzi{font-family:'Noto Sans SC',serif;font-size:84px;font-weight:700;text-align:center;
+    line-height:1.1;margin:6px 0 4px}
+  .tip{font-size:12.5px;color:var(--muted);margin-bottom:14px;line-height:1.6}
+  .fb{margin-top:13px;padding:13px;border-radius:13px;font-weight:700;font-size:15px;line-height:1.6}
+  .fb.ok{background:#E4F2DC;color:#2F5A20}
+  .fb.no{background:#FBE7EC;color:#9D2440}
+  .fb .big{font-family:'Baloo 2',cursive;font-size:19px;display:block;margin-bottom:3px}
+  .tiles2{display:flex;gap:3px;justify-content:center;flex-wrap:wrap;margin-top:9px}
+  .lt{min-width:26px;padding:6px 3px;border-radius:7px;font-weight:700;font-size:17px;
+    background:#EFE5D9;color:var(--ink);text-align:center}
+  .lt.h{background:#8FC97A;color:#1B3210}
+  .lt.s{background:#E8879C;color:#fff}
+
+  .done{text-align:center}
+  .done .big{font-family:'Baloo 2',cursive;font-size:50px;margin:6px 0 0;color:var(--cucumber)}
+  .done .st{font-size:25px;letter-spacing:.08em;margin:2px 0 4px}
+  .done .rk{font-family:'Baloo 2',cursive;font-size:20px;margin:0 0 10px}
+  .done .again{font-size:13.5px;line-height:1.8;color:var(--ink);margin-top:10px}
+  .done .again b{color:var(--ginger)}
+
+  /* ---- results ---- */
+  .runrow{padding:12px 0;border-bottom:1px solid var(--line)}
   .runrow:last-of-type{border-bottom:0}
-  .runhead{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:9px}
-  .runname{font-weight:700;font-size:15px}
+  .runhead{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:8px}
+  .runname{font-weight:700;font-size:14.5px}
   .runbest{margin-left:auto;font-size:12px;color:var(--muted)}
   .trend{font-size:11px;font-weight:700;border-radius:999px;padding:3px 9px}
-  .trend.up{background:#E9F5E3;color:#3D6B2A}
-  .trend.down{background:#FBE7EC;color:#9D2440}
-  .trend.flat{background:#F2EAE1;color:#8A7A72}
-  .runline{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-  .run{display:inline-flex;flex-direction:column;align-items:center;
-    border-radius:12px;padding:8px 12px;min-width:62px}
-  .run b{font-size:17px;font-weight:800;line-height:1.1}
-  .run i{font-style:normal;font-size:11px;opacity:.75}
-  .run.good{background:#E9F5E3;color:#3D6B2A}
+  .trend.up{background:#E4F2DC;color:#3D6B2A}
+  .trend.dn{background:#FBE7EC;color:#9D2440}
+  .trend.fl{background:#F2EAE1;color:var(--muted)}
+  .runline{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+  .run{display:inline-flex;flex-direction:column;align-items:center;border-radius:11px;
+    padding:7px 11px;min-width:58px}
+  .run b{font-size:16px;font-weight:800;line-height:1.1}
+  .run i{font-style:normal;font-size:10.5px;opacity:.75}
+  .run.good{background:#E4F2DC;color:#3D6B2A}
   .run.mid{background:#FDF0DA;color:#8A5A00}
   .run.low{background:#FBE7EC;color:#9D2440}
   .arrow{color:#CDBBA9}
-  .empty{color:var(--muted);font-size:14px;line-height:1.7}
+  .bars{display:grid;gap:9px;margin-bottom:4px}
+  .brow{display:grid;grid-template-columns:70px 1fr 44px;align-items:center;gap:9px}
+  .brow .n{font-weight:700;font-size:13.5px}
+  .brow .p{font-weight:700;font-size:13.5px;text-align:right}
+  .bar{height:11px;border-radius:999px;background:#EFE5D9;overflow:hidden}
+  .bar i{display:block;height:100%;border-radius:999px;background:var(--cucumber)}
+  .bar i.mid{background:var(--pineapple)} .bar i.low{background:var(--ginger)}
+  .empty{color:var(--muted);font-size:13.5px;line-height:1.8}
 
-  .foot{text-align:center;margin-top:16px;color:rgba(255,255,255,.4);font-size:11px;line-height:1.7}
-  @media(max-width:370px){.tiles{grid-template-columns:1fr}}
+  .foot{text-align:center;margin-top:14px;color:rgba(255,255,255,.35);
+    font-size:11px;line-height:1.7}
+  @media(max-width:380px){.tiles{grid-template-columns:1fr}}
   @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
 <body>
-<div class="wrap">
+<div class="shell">
 
-  <!-- ===== HOME ===== -->
-  <div id="home">
-    <div class="brand">
-      <div class="kicker">The Chew household</div>
-      <h1 id="mark"></h1>
-      <div class="tag">Everything the boys need, all in one place</div>
-    </div>
-
-    <div class="kidbar" id="kidbar"></div>
-
-    <div class="tiles">
-      <a class="tile k" href="spelling.html">
-        <span class="ico">📚</span>
-        <span class="name">Spelling</span>
-        <span class="sub">Lists 3.3 – 3.6, read aloud</span>
-      </a>
-      <button class="tile r" type="button" onclick="show('results')">
-        <span class="ico">📈</span>
-        <span class="name">Results</span>
-        <span class="sub">How the scores are going</span>
-      </button>
-      <button class="tile c" type="button" onclick="show('cal')">
-        <span class="ico">🗓️</span>
-        <span class="name">Week</span>
-        <span class="sub">What's on each day</span>
-      </button>
-      <button class="tile m" type="button" onclick="show('makan')">
-        <span class="ico">🍜</span>
-        <span class="name">Makan</span>
-        <span class="sub">Dinners and the grocery list</span>
-      </button>
-    </div>
-
-    <div class="foot">Everything is saved on this device.<br>Add to Home Screen for an app icon.</div>
+  <div class="mast">
+    <button class="mark" id="mark" onclick="go('home')" title="Home"></button>
+    <div class="who" id="who"></div>
   </div>
 
-  <!-- ===== RESULTS ===== -->
-  <div id="results" class="hidden">
-    <button class="back" onclick="show('home')">&larr; Chewtopia</button>
-    <div class="panel">
-      <h2 id="resWho"></h2>
-      <p class="lead">Each list shows every try, oldest first</p>
-      <div id="resBox"></div>
-    </div>
-  </div>
+  <div class="tabs" id="tabs"></div>
 
-  <!-- ===== WEEK ===== -->
-  <div id="cal" class="hidden">
-    <button class="back" onclick="show('home')">&larr; Chewtopia</button>
-    <div class="panel">
-      <h2>This week</h2>
-      <p class="lead" id="weekLead"></p>
-      <div id="days"></div>
-      <div class="saved" id="calSaved"></div>
-    </div>
-  </div>
+  <div id="view"></div>
 
-  <!-- ===== MAKAN ===== -->
-  <div id="makan" class="hidden">
-    <button class="back" onclick="show('home')">&larr; Chewtopia</button>
-    <div class="panel">
-      <h2>Makan</h2>
-      <p class="lead">Dinner for each night, and what to buy</p>
-      <div id="meals"></div>
-      <div class="lbl">Grocery list</div>
-      <textarea class="listbox" id="groceries" placeholder="Eggs&#10;Chicken thigh&#10;Bok choy"></textarea>
-      <div class="saved" id="makanSaved"></div>
-    </div>
+  <div class="foot">
+    Saved on this device &middot; Add to Home Screen for an app icon
   </div>
-
 </div>
 
-<script>
-/* ---------- tiny storage helpers ---------- */
-function get(k,d){ try{ var v=localStorage.getItem(k); return v===null?d:v; }catch(e){ return d; } }
-function set(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
-function getJSON(k,d){ try{ var v=JSON.parse(localStorage.getItem(k)); return v||d; }catch(e){ return d; } }
-
-var KIDS = ["Tristan","Sebastian"];
-function kid(){ return get("rojak-kid","Tristan"); }
-
-function paintKids(){
-  var bar = document.getElementById("kidbar");
-  bar.innerHTML = "";
-  KIDS.forEach(function(n){
-    var b = document.createElement("button");
-    b.className = "kid" + (n===kid() ? " on" : "");
-    b.textContent = n;
-    b.onclick = function(){ set("rojak-kid", n); paintKids(); paintResults(); };
-    bar.appendChild(b);
-  });
-}
-
-function show(id){
-  ["home","results","cal","makan"].forEach(function(v){
-    document.getElementById(v).classList.toggle("hidden", v!==id);
-  });
-  if(id==="results") paintResults();
-  window.scrollTo(0,0);
-}
-
-/* ---------- results: read what spelling.html saved ---------- */
-function fmtDay(ts){
-  return new Date(ts).toLocaleDateString("en-GB",{day:"numeric",month:"short"});
-}
-function paintResults(){
-  document.getElementById("resWho").textContent = kid();
-  var all = getJSON("nanyang-history",[]);
-  var mine = all.filter(function(r){ return (r.child||"Tristan")===kid(); })
-                .slice().sort(function(a,b){ return a.ts-b.ts; });
-  var box = document.getElementById("resBox");
-
-  if(!mine.length){
-    box.innerHTML = '<p class="empty">' + kid() + ' hasn\'t finished a spelling list yet.<br>' +
-                    'Scores show up here straight after a test.</p>';
-    return;
-  }
-
-  var html = "";
-  ["3.3","3.4","3.5","3.6"].forEach(function(name){
-    var runs = mine.filter(function(r){ return r.list===name; });
-    if(!runs.length) return;
-    var first = runs[0], last = runs[runs.length-1];
-    var best = runs.reduce(function(a,b){ return b.score>a.score ? b : a; }, runs[0]);
-    var move = last.score - first.score;
-
-    var trend = '<span class="trend flat">First try</span>';
-    if(runs.length>1){
-      trend = move>0 ? '<span class="trend up">&#9650; up '+move+'</span>'
-            : move<0 ? '<span class="trend down">&#9660; down '+Math.abs(move)+'</span>'
-            : '<span class="trend flat">no change</span>';
-    }
-    var chips = "";
-    runs.forEach(function(r,n){
-      var cls = r.pct>=80 ? "good" : r.pct>=50 ? "mid" : "low";
-      if(n) chips += '<span class="arrow">&rarr;</span>';
-      chips += '<span class="run '+cls+'"><b>'+r.score+'/'+r.total+'</b><i>'+fmtDay(r.ts)+'</i></span>';
-    });
-    html += '<div class="runrow"><div class="runhead">'+
-              '<span class="runname">List '+name+'</span>'+trend+
-              '<span class="runbest">Best '+best.score+'/'+best.total+'</span>'+
-            '</div><div class="runline">'+chips+'</div></div>';
-  });
-  box.innerHTML = html;
-}
-
-/* ---------- week + makan ---------- */
-var DAYS = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
-
-function weekKey(){
-  var d = new Date();
-  var day = (d.getDay()+6)%7;              // Monday = 0
-  d.setDate(d.getDate()-day);
-  return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate();
-}
-function weekDates(){
-  var d = new Date();
-  d.setDate(d.getDate()-((d.getDay()+6)%7));
-  return DAYS.map(function(_,i){
-    var x = new Date(d); x.setDate(d.getDate()+i); return x;
-  });
-}
-
-function buildRows(hostId, storeKey, savedId, placeholder){
-  var host = document.getElementById(hostId);
-  var dates = weekDates();
-  var today = new Date().toDateString();
-  var saved = getJSON(storeKey+":"+weekKey(), {});
-  host.innerHTML = "";
-
-  DAYS.forEach(function(name,i){
-    var row = document.createElement("div");
-    row.className = "day" + (dates[i].toDateString()===today ? " today" : "");
-    row.innerHTML =
-      '<div class="dl">'+name.slice(0,3)+
-        '<small>'+dates[i].getDate()+' '+dates[i].toLocaleDateString("en-GB",{month:"short"})+'</small>'+
-      '</div>'+
-      '<input type="text" placeholder="'+placeholder+'">';
-    var inp = row.querySelector("input");
-    inp.value = saved[name] || "";
-    inp.addEventListener("input", function(){
-      var cur = getJSON(storeKey+":"+weekKey(), {});
-      cur[name] = inp.value;
-      set(storeKey+":"+weekKey(), JSON.stringify(cur));
-      flash(savedId);
-    });
-    host.appendChild(row);
-  });
-}
-
-var flashTimer = {};
-function flash(id){
-  var el = document.getElementById(id);
-  el.textContent = "Saved";
-  clearTimeout(flashTimer[id]);
-  flashTimer[id] = setTimeout(function(){ el.textContent=""; }, 1200);
-}
-
-function initWeek(){
-  var d = weekDates();
-  document.getElementById("weekLead").textContent =
-    d[0].toLocaleDateString("en-GB",{day:"numeric",month:"short"}) + " – " +
-    d[6].toLocaleDateString("en-GB",{day:"numeric",month:"short"}) +
-    " · saved automatically";
-  buildRows("days","rojak-week","calSaved","Tuition, swimming, birthday…");
-  buildRows("meals","rojak-meals","makanSaved","Chicken rice, pasta…");
-
-  var g = document.getElementById("groceries");
-  g.value = get("rojak-groceries:"+weekKey(), "");
-  g.addEventListener("input", function(){
-    set("rojak-groceries:"+weekKey(), g.value);
-    flash("makanSaved");
-  });
-}
-
-document.getElementById("mark").innerHTML =
-  "CHEWTOPIA".split("").map(function(c){ return "<span>"+c+"</span>"; }).join("");
-
-paintKids();
-initWeek();
-</script>
+<script src="app.js"></script>
 </body>
 </html>
