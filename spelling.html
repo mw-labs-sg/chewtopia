@@ -1,0 +1,526 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Chewtopia - Spelling</title>
+<style>
+  :root{
+    --yellow:#ffd84d;
+    --yellow2:#fff3a6;
+    --blue:#3f65c9;
+    --blue2:#dfe8ff;
+    --ink:#23252b;
+    --muted:#6e7280;
+    --card:#ffffff;
+    --ok:#198754;
+    --bad:#d64545;
+    --line:#e7e9ef;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family:"Trebuchet MS",Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+    background:
+      radial-gradient(circle at 12% 10%, #fff8c8 0 110px, transparent 111px),
+      radial-gradient(circle at 88% 18%, #e7edff 0 130px, transparent 131px),
+      linear-gradient(180deg,#fffdf2 0%,#f5f7ff 100%);
+    color:var(--ink);
+    min-height:100vh;
+  }
+  .wrap{max-width:1000px;margin:0 auto;padding:24px}
+  .top{
+    display:flex;justify-content:space-between;align-items:center;gap:16px;
+    margin-bottom:22px;
+  }
+  h1{
+    font-size:34px;margin:0;font-weight:900;letter-spacing:-.02em;
+  }
+  .sub{color:var(--muted);font-size:15px}
+  .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+  .card{
+    background:rgba(255,255,255,.96);
+    border:3px solid #20232a;
+    border-radius:24px;
+    padding:22px;
+    box-shadow:8px 8px 0 rgba(63,101,201,.16);
+  }
+  .tile{
+    cursor:pointer;
+    transition:.15s ease;
+    position:relative;
+    overflow:hidden;
+  }
+  .tile:before{
+    content:"";
+    position:absolute;
+    right:-28px; top:-28px;
+    width:110px;height:110px;border-radius:50%;
+    background:var(--yellow);
+    border:8px solid #2b2e35;
+    box-shadow:inset 0 0 0 18px #d9dde6;
+    opacity:.95;
+  }
+  .tile:after{
+    content:"";
+    position:absolute;
+    right:12px; top:15px;
+    width:28px;height:28px;border-radius:50%;
+    background:#fff;
+    border:6px solid #2b2e35;
+  }
+  .tile:hover{transform:translateY(-3px) rotate(-.3deg)}
+  .tile h2{
+    margin:0 0 6px;
+    font-size:29px;
+    color:var(--blue);
+  }
+  .meta{color:var(--muted);font-size:14px;max-width:70%}
+  button{
+    border:3px solid #23252b;
+    border-radius:16px;
+    padding:12px 17px;
+    font-size:16px;
+    font-weight:800;
+    cursor:pointer;
+    box-shadow:3px 4px 0 #23252b;
+    transition:.08s;
+  }
+  button:active{transform:translate(2px,2px);box-shadow:1px 2px 0 #23252b}
+  .primary{background:var(--yellow);color:#222}
+  .ghost{background:var(--blue2);color:#27335d}
+  .ok{background:#e8f7ed;color:#126c35}
+  .bad{background:#fdecec;color:#9d2424}
+  .hidden{display:none!important}
+  .quiz{max-width:780px;margin:0 auto}
+  .row{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+  .progress{
+    height:16px;background:#edf0f6;border:3px solid #23252b;border-radius:999px;
+    overflow:hidden;margin:16px 0 22px;
+  }
+  .bar{
+    height:100%;width:0;
+    background:repeating-linear-gradient(135deg,var(--yellow),var(--yellow) 18px,#ffef8a 18px,#ffef8a 36px);
+  }
+  .qtype{
+    display:inline-block;
+    padding:7px 11px;
+    border-radius:999px;
+    background:var(--blue2);
+    color:#33468a;
+    font-size:13px;font-weight:900;letter-spacing:.05em;text-transform:uppercase;
+    border:2px solid #33468a;
+  }
+  .prompt{font-size:28px;line-height:1.32;margin:14px 0 12px;font-weight:900}
+  .hint{
+    color:var(--muted);font-size:14px;margin-bottom:16px;
+    background:#fff9cd;border:2px dashed #d4b52a;border-radius:14px;padding:10px 12px;
+  }
+  input,textarea{
+    width:100%;
+    border:3px solid #23252b;
+    border-radius:16px;
+    padding:15px 16px;
+    font-size:22px;
+    outline:none;
+    background:#fff;
+    box-shadow:inset 0 -3px 0 #eef0f5;
+  }
+  textarea{min-height:125px;resize:vertical}
+  input:focus,textarea:focus{border-color:var(--blue);box-shadow:0 0 0 4px #dfe8ff}
+  .actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:15px}
+  .feedback{
+    margin-top:16px;padding:15px;border-radius:14px;font-weight:900;
+    border:2px solid currentColor;
+  }
+  .scorebox{
+    font-size:15px;color:#343947;font-weight:800;
+    background:#f2f4fa;border:2px solid #d8dce7;border-radius:999px;padding:8px 12px;
+  }
+  .finish{text-align:center;padding:30px}
+  .finish h2{font-size:40px;margin-bottom:8px}
+  .bigscore{
+    font-size:62px;font-weight:1000;margin:16px 0;color:var(--blue);
+    text-shadow:3px 3px 0 var(--yellow);
+  }
+  h3{
+    margin:22px 0 12px;
+    display:inline-block;
+    background:var(--yellow);
+    border:3px solid #23252b;
+    border-radius:14px;
+    padding:8px 14px;
+    box-shadow:3px 4px 0 #23252b;
+  }
+  .runrow{padding:14px 0;border-bottom:1px solid var(--line)}
+  .runrow:last-of-type{border-bottom:0}
+  .runhead{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+  .runname{font-weight:700;font-size:16px}
+  .runbest{margin-left:auto;font-size:13px;color:var(--muted)}
+  .trend{font-size:12px;font-weight:700;border-radius:999px;padding:3px 9px}
+  .trend.up{background:#e8f7ed;color:#126c35}
+  .trend.down{background:#fdecec;color:#9d2424}
+  .trend.flat{background:#eef0f7;color:#667085}
+  .runline{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+  .run{display:inline-flex;flex-direction:column;align-items:center;gap:1px;
+       border-radius:12px;padding:8px 12px;min-width:64px}
+  .run b{font-size:17px;font-weight:800;line-height:1.1}
+  .run i{font-style:normal;font-size:11px;opacity:.75}
+  .run.good{background:#e8f7ed;color:#126c35}
+  .run.mid{background:#fff5e5;color:#8a5a00}
+  .run.low{background:#fdecec;color:#9d2424}
+  .arrow{color:#b9bfd0;font-size:15px}
+  @media(max-width:700px){
+    .grid{grid-template-columns:1fr}
+    .wrap{padding:15px}
+    h1{font-size:29px}
+    .prompt{font-size:23px}
+    .meta{max-width:72%}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div id="hub">
+    <div class="top">
+      <div>
+        <h1>🍌 Nanyang Quest: Spelling Lab</h1>
+        <div class="sub">Pick a mission, listen carefully, and collect points.</div>
+      </div>
+    </div>
+
+    <h3>Unit 9</h3>
+    <div class="grid">
+      <div class="card tile" onclick="startList('3.3')">
+        <h2>List 3.3</h2>
+        <div class="meta">8 spelling items + 2 dictation sentences</div>
+        <div class="meta" id="status-3.3"></div>
+      </div>
+      <div class="card tile" onclick="startList('3.4')">
+        <h2>List 3.4</h2>
+        <div class="meta">8 spelling items + 2 dictation sentences</div>
+        <div class="meta" id="status-3.4"></div>
+      </div>
+    </div>
+
+    <h3 style="margin-top:26px">Unit 10</h3>
+    <div class="grid">
+      <div class="card tile" onclick="startList('3.5')">
+        <h2>List 3.5</h2>
+        <div class="meta">7 spelling items + 3 dictation sentences</div>
+        <div class="meta" id="status-3.5"></div>
+      </div>
+      <div class="card tile" onclick="startList('3.6')">
+        <h2>List 3.6</h2>
+        <div class="meta">7 spelling items + 3 dictation sentences</div>
+        <div class="meta" id="status-3.6"></div>
+      </div>
+    </div>
+
+    <h3 style="margin-top:30px">History</h3>
+    <div class="card">
+      <div id="historyBox"></div>
+    </div>
+  </div>
+
+  <div id="quiz" class="quiz hidden">
+    <div class="card">
+      <div class="row">
+        <button class="ghost" onclick="backToHub()">← Back</button>
+        <div class="scorebox"><span id="listName"></span> · <span id="scoreText"></span></div>
+      </div>
+      <div class="progress"><div id="bar" class="bar"></div></div>
+      <div id="qtype" class="qtype"></div>
+      <div id="prompt" class="prompt"></div>
+      <div id="hint" class="hint"></div>
+      <div class="actions">
+        <button class="primary" onclick="speakQuestion()">🔊 Play sentence</button>
+        <button class="ghost" onclick="speakTarget()" id="spellBtn">🔤 Spell word</button>
+      </div>
+      <div style="margin-top:16px">
+        <input id="answer" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Type your answer"/>
+        <textarea id="dictation" class="hidden" spellcheck="false" placeholder="Type the full sentence"></textarea>
+      </div>
+      <div class="actions">
+        <button class="primary" onclick="submitAnswer()">Check answer</button>
+      </div>
+      <div id="feedback" class="feedback hidden"></div>
+    </div>
+  </div>
+
+  <div id="finish" class="finish hidden">
+    <div class="card">
+      <h2>Mission Complete! ⭐🍌</h2>
+      <div id="finishList" class="sub"></div>
+      <div id="bigscore" class="bigscore"></div>
+      <div id="percent" class="sub"></div>
+      <div class="actions" style="justify-content:center;margin-top:24px">
+        <button class="primary" onclick="backToHub()">Back to spelling lists</button>
+        <button class="ghost" onclick="restartCurrent()">Try again</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const lists = {
+  "3.3": [
+    {type:"spell", sentence:"I cannot find my keys. They have completely disappeared!", answer:"disappeared"},
+    {type:"spell", sentence:"John read a book about three mischievous children.", answer:"mischievous"},
+    {type:"spell", sentence:"There was something strange about that tree.", answer:"strange"},
+    {type:"spell", sentence:"Uncle Lim propped the ladder against the tree.", answer:"propped"},
+    {type:"spell", sentence:"He picked something up from the ground.", answer:"ground"},
+    {type:"spell", sentence:"Were his eyes playing a trick on him?", answer:"playing a trick"},
+    {type:"spell", sentence:"He thought of climbing the tall sturdy tree.", answer:"sturdy"},
+    {type:"spell", sentence:"John hid behind the bushes.", answer:"behind"},
+    {type:"dictation", sentence:"He frowned with concern.", answer:"He frowned with concern."},
+    {type:"dictation", sentence:"He scratched his head over the tricky question.", answer:"He scratched his head over the tricky question."}
+  ],
+  "3.4": [
+    {type:"spell", sentence:"He returned to the tree with Uncle Lim and his ladder.", answer:"returned"},
+    {type:"spell", sentence:"“That tree!” he told Uncle Lim as he pointed at it.", answer:"pointed at"},
+    {type:"spell", sentence:"Whenever anyone stood under the tree, odd things happened.", answer:"odd"},
+    {type:"spell", sentence:"Its nest was decorated with Mary’s ribbon and many other shiny things.", answer:"decorated with"},
+    {type:"spell", sentence:"They went closer and looked very carefully up into the tree.", answer:"closer"},
+    {type:"spell", sentence:"They saw a bird with Peter’s coin in its beak.", answer:"coin"},
+    {type:"spell", sentence:"They were both puzzled by what happened.", answer:"puzzled"},
+    {type:"spell", sentence:"She ambled, grinning from ear to ear.", answer:"grinning from ear to ear"},
+    {type:"dictation", sentence:"She looked at the floor with a sheepish grin.", answer:"She looked at the floor with a sheepish grin."},
+    {type:"dictation", sentence:"She finally realised what had happened.", answer:"She finally realised what had happened."}
+  ],
+  "3.5": [
+    {type:"spell", sentence:"He had forgotten to bring his pencil case to school.", answer:"forgotten"},
+    {type:"spell", sentence:"She loves eating vegetables.", answer:"vegetables"},
+    {type:"spell", sentence:"Those tomatoes are red and juicy.", answer:"tomatoes"},
+    {type:"spell", sentence:"The cat might eat the mouse.", answer:"might"},
+    {type:"spell", sentence:"The snake is huge and green.", answer:"huge"},
+    {type:"spell", sentence:"My aunt arrived at my party in a limousine.", answer:"arrived"},
+    {type:"spell", sentence:"It is dangerous to cycle on the road without a helmet.", answer:"dangerous"},
+    {type:"dictation", sentence:"He lost his balance and fell with a thud.", answer:"He lost his balance and fell with a thud."},
+    {type:"dictation", sentence:"Tears welled up in her eyes.", answer:"Tears welled up in her eyes."},
+    {type:"dictation", sentence:"His knees were grazed but he quickly got up.", answer:"His knees were grazed but he quickly got up."}
+  ],
+  "3.6": [
+    {type:"spell", sentence:"“Please be quiet in the library,” whispered the librarian.", answer:"whispered"},
+    {type:"spell", sentence:"That aeroplane looks like a gigantic bird.", answer:"gigantic"},
+    {type:"spell", sentence:"The gardener used the hose to water the plants.", answer:"hose"},
+    {type:"spell", sentence:"The smell of the garbage over there is terrible.", answer:"garbage"},
+    {type:"spell", sentence:"He called for extra men to help him move the table.", answer:"extra"},
+    {type:"spell", sentence:"That truck is carrying many baskets of watermelons.", answer:"truck"},
+    {type:"spell", sentence:"Grandfather noticed something moving behind the bushes.", answer:"noticed"},
+    {type:"dictation", sentence:"The boy tripped because he missed the ball.", answer:"The boy tripped because he missed the ball."},
+    {type:"dictation", sentence:"He slid and fell as the wet grass was slippery.", answer:"He slid and fell as the wet grass was slippery."},
+    {type:"dictation", sentence:"He clutched his leg as it was painful.", answer:"He clutched his leg as it was painful."}
+  ]
+};
+
+let currentList = null, index = 0, score = 0, answered = false;
+
+function normalize(s){
+  return s.trim().toLowerCase().replace(/[“”"'.!,?]/g,"").replace(/\s+/g," ");
+}
+function startList(name){
+  currentList = name; index = 0; score = 0; answered = false;
+  document.getElementById("hub").classList.add("hidden");
+  document.getElementById("finish").classList.add("hidden");
+  document.getElementById("quiz").classList.remove("hidden");
+  render();
+}
+function backToHub(){
+  speechSynthesis.cancel();
+  document.getElementById("quiz").classList.add("hidden");
+  document.getElementById("finish").classList.add("hidden");
+  document.getElementById("hub").classList.remove("hidden");
+  loadStatuses();
+}
+function restartCurrent(){ startList(currentList); }
+function render(){
+  answered = false;
+  const q = lists[currentList][index];
+  const total = lists[currentList].length;
+  document.getElementById("listName").textContent = "List " + currentList;
+  document.getElementById("scoreText").textContent = `Score ${score}/${index}`;
+  document.getElementById("bar").style.width = `${(index/total)*100}%`;
+  document.getElementById("feedback").classList.add("hidden");
+  document.getElementById("feedback").textContent = "";
+  document.getElementById("prompt").textContent =
+    q.type === "spell" ? `Question ${index+1} of ${total}` : `Dictation ${index+1} of ${total}`;
+  document.getElementById("qtype").textContent = q.type === "spell" ? "Spelling" : "Dictation";
+  document.getElementById("hint").textContent =
+    q.type === "spell"
+      ? "Listen to the sentence, then tap “Spell word”. The answer is spoken, never shown."
+      : "Listen carefully and type the whole sentence.";
+  document.getElementById("answer").value = "";
+  document.getElementById("dictation").value = "";
+  const isDict = q.type === "dictation";
+  document.getElementById("answer").classList.toggle("hidden", isDict);
+  document.getElementById("dictation").classList.toggle("hidden", !isDict);
+  document.getElementById("spellBtn").classList.toggle("hidden", isDict);
+}
+function preferredVoice(){
+  const voices = speechSynthesis.getVoices();
+  return voices.find(v => /female|samantha|victoria|karen|serena|ava|zoe/i.test(v.name) && /^en/i.test(v.lang))
+      || voices.find(v => /^en-SG/i.test(v.lang))
+      || voices.find(v => /^en-GB/i.test(v.lang))
+      || voices.find(v => /^en/i.test(v.lang))
+      || null;
+}
+function speak(text, rate=0.88){
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  const v = preferredVoice();
+  if(v) u.voice = v;
+  u.lang = v?.lang || "en-SG";
+  u.rate = rate; u.pitch = 1.05;
+  speechSynthesis.speak(u);
+}
+function speakQuestion(){ speak(lists[currentList][index].sentence); }
+function speakTarget(){
+  const q = lists[currentList][index];
+  speak(`Spell: ${q.answer}`, 0.82);
+}
+function submitAnswer(){
+  if(answered) return;
+  const q = lists[currentList][index];
+  const el = q.type === "dictation" ? document.getElementById("dictation") : document.getElementById("answer");
+  const user = el.value;
+  const fb = document.getElementById("feedback");
+  fb.classList.remove("hidden","ok","bad");
+  if(!user.trim()){
+    fb.classList.add("bad");
+    fb.textContent = "Type an answer first.";
+    return;
+  }
+  const correct = normalize(user) === normalize(q.answer);
+  answered = true;
+  if(correct){
+    score++;
+    fb.classList.add("ok");
+    fb.textContent = "✅ Correct! +1 point";
+    speak("Correct! Well done.", 0.95);
+  }else{
+    fb.classList.add("bad");
+    fb.textContent = `❌ Not quite. Correct answer: ${q.answer}`;
+    speak("Not quite. Let's keep going.", 0.95);
+  }
+  setTimeout(() => {
+    index++;
+    if(index >= lists[currentList].length) finishList();
+    else render();
+  }, 1200);
+}
+const HKEY = "nanyang-history";
+function whoIsPlaying(){
+  try{ return localStorage.getItem("rojak-kid") || "Tristan"; }catch(e){ return "Tristan"; }
+}
+function getHistory(){
+  try{
+    const h = JSON.parse(localStorage.getItem(HKEY));
+    if(!Array.isArray(h)) return [];
+    const me = whoIsPlaying();
+    return h.filter(r => (r.child || "Tristan") === me);
+  }catch(e){ return []; }
+}
+function saveAttempt(rec){
+  try{
+    const h = getHistory();
+    h.unshift(rec);
+    localStorage.setItem(HKEY, JSON.stringify(h.slice(0,300)));
+  }catch(e){}
+}
+function fmtDay(ts){
+  return new Date(ts).toLocaleDateString("en-GB",{day:"numeric",month:"short"});
+}
+function fmtDate(ts){
+  const d = new Date(ts);
+  return d.toLocaleDateString("en-GB",{day:"numeric",month:"short"}) + " " +
+         d.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"});
+}
+
+function finishList(){
+  const total = lists[currentList].length;
+  const pct = Math.round(score/total*100);
+  saveAttempt({child:whoIsPlaying(), list:currentList, score:score, wrong:total-score, total:total, pct:pct, ts:Date.now()});
+  document.getElementById("quiz").classList.add("hidden");
+  document.getElementById("finish").classList.remove("hidden");
+  document.getElementById("finishList").textContent = `List ${currentList}`;
+  document.getElementById("bigscore").textContent = `${score}/${total}`;
+  document.getElementById("percent").textContent = `${pct}%`;
+  speak(pct >= 80 ? "Excellent work!" : "Good effort. Keep practising!", 0.95);
+}
+function loadStatuses(){
+  const h = getHistory();
+  ["3.3","3.4","3.5","3.6"].forEach(name=>{
+    const el = document.getElementById(`status-${name}`);
+    const mine = h.filter(r => r.list === name);
+    if(!mine.length){ el.textContent = "Not attempted"; return; }
+    const last = mine[0];
+    el.textContent = `Last: ${last.score} right, ${last.wrong} wrong (${last.pct}%) · ` +
+                     `${mine.length} ${mine.length===1?"try":"tries"}`;
+  });
+  renderHistory();
+}
+
+function renderHistory(){
+  const h = getHistory();
+  const box = document.getElementById("historyBox");
+
+  if(!h.length){
+    box.innerHTML = '<div class="meta">No tests finished yet. Scores appear here after a list is completed.</div>';
+    return;
+  }
+
+  let html = "";
+  ["3.3","3.4","3.5","3.6"].forEach(name => {
+    // oldest first, so the run reads left to right the way it happened
+    const runs = h.filter(r => r.list === name).slice().reverse();
+    if(!runs.length) return;
+
+    const first = runs[0], last = runs[runs.length-1];
+    const best  = runs.reduce((a,b) => b.score > a.score ? b : a, runs[0]);
+    const move  = last.score - first.score;
+
+    let trend = '<span class="trend flat">First try</span>';
+    if(runs.length > 1){
+      trend = move > 0 ? `<span class="trend up">▲ up ${move}</span>`
+            : move < 0 ? `<span class="trend down">▼ down ${Math.abs(move)}</span>`
+            : '<span class="trend flat">no change</span>';
+    }
+
+    let chips = "";
+    runs.forEach((r,n) => {
+      const cls = r.pct >= 80 ? "good" : r.pct >= 50 ? "mid" : "low";
+      if(n) chips += '<span class="arrow">&rarr;</span>';
+      chips += `<span class="run ${cls}">
+                  <b>${r.score}/${r.total}</b>
+                  <i>${fmtDay(r.ts)}</i>
+                </span>`;
+    });
+
+    html += `<div class="runrow">
+      <div class="runhead">
+        <span class="runname">List ${name}</span>
+        ${trend}
+        <span class="runbest">Best ${best.score}/${best.total}</span>
+      </div>
+      <div class="runline">${chips}</div>
+    </div>`;
+  });
+
+  box.innerHTML = html + `
+    <div class="actions" style="margin-top:6px">
+      <button class="ghost" onclick="clearHistory()">Clear history</button>
+    </div>`;
+}
+
+function clearHistory(){
+  if(!confirm("Delete every saved result on this device?")) return;
+  try{ localStorage.removeItem(HKEY); }catch(e){}
+  loadStatuses();
+}
+document.getElementById("whoNow").textContent = "Playing as " + whoIsPlaying();
+speechSynthesis.onvoiceschanged = ()=>{};
+loadStatuses();
+</script>
+</body>
+</html>
