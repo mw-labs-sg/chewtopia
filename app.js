@@ -155,6 +155,21 @@ var MEALS_DEFAULT = {
   Saturday:"", Sunday:""
 };
 
+/* Events pre-loaded the first time only. Delete any of them in the app and
+   they stay deleted. d = start date, d2 = end date for trips. */
+var SEED_EVENTS = [
+  {id:"s1", t:"Hai Di Lao 🍲",     d:"2026-08-01", w:"sc"},
+  {id:"s2", t:"Birthday party 🎂", d:"2026-08-08", w:"sc"},
+  {id:"s3", t:"Chiang Mai ✈️",     d:"2026-09-04", d2:"2026-09-07"}
+];
+function seedOnce(){
+  if(S("seeded","")==="1") return;
+  var a = SJ("events", []);
+  var have = {}; a.forEach(function(e){ have[e.id]=1; });
+  SEED_EVENTS.forEach(function(e){ if(!have[e.id]) a.push(e); });
+  WJ("events", a); W("seeded","1");
+}
+
 var DAYS = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
 var TABS = [
   ["home","Home"],["events","Events"],["timetable","Timetable"],["meals","Meals"],
@@ -176,6 +191,23 @@ function weekDates(){ var d=new Date(); d.setDate(d.getDate()-todayIdx());
 function daysTo(iso){ var t=new Date(); t.setHours(0,0,0,0);
   return Math.round((new Date(iso+"T00:00:00")-t)/86400000); }
 function whenLbl(n){ return n===0?"Today":n===1?"Tomorrow":"in "+n+" days"; }
+function evState(e){
+  var a = daysTo(e.d), b = e.d2 ? daysTo(e.d2) : a;
+  return {start:a, end:b, live:(a<=0 && b>=0), gone:(b<0)};
+}
+function evWhen(e){
+  var st = evState(e);
+  if(st.live) return e.d2 ? "On now" : "Today";
+  return whenLbl(st.start);
+}
+function dnum(iso){ return new Date(iso+"T00:00:00").getDate(); }
+function dmon(iso){ return new Date(iso+"T00:00:00").toLocaleDateString("en-GB",{month:"short"}); }
+function evDates(e){
+  if(!e.d2) return dnum(e.d)+" "+dmon(e.d);
+  return dmon(e.d)===dmon(e.d2)
+    ? dnum(e.d)+"–"+dnum(e.d2)+" "+dmon(e.d)
+    : dnum(e.d)+" "+dmon(e.d)+" – "+dnum(e.d2)+" "+dmon(e.d2);
+}
 var ft={};
 function flash(id){ var e=document.getElementById(id); if(!e) return;
   e.textContent="Saved"; clearTimeout(ft[id]); ft[id]=setTimeout(function(){e.textContent="";},1100); }
@@ -272,12 +304,12 @@ function render(){
 
 /* ---------- home ---------- */
 function vHome(){
-  var evs=SJ("events",[]).map(function(e){ return {e:e,n:daysTo(e.d)}; })
-    .filter(function(x){ return x.n>=0; }).sort(function(a,b){ return a.n-b.n; }).slice(0,4);
+  var evs=SJ("events",[]).filter(function(e){ return !evState(e).gone; })
+    .sort(function(a,b){ return evState(a).start-evState(b).start; }).slice(0,4);
   var s='<div class="up"><div class="t">Coming up</div>';
-  if(evs.length) evs.forEach(function(x){
-    s+='<div class="r"><span class="w">'+whenLbl(x.n)+'</span><span>'+esc(x.e.t)+
-       (x.e.w?' <b style="color:var(--blue)">'+esc(pname(x.e.w))+'</b>':'')+'</span></div>'; });
+  if(evs.length) evs.forEach(function(e){
+    s+='<div class="r"><span class="w">'+evWhen(e)+'</span><span>'+esc(e.t)+
+       (e.w?' <b style="color:var(--blue)">'+esc(pname(e.w))+'</b>':'')+'</span></div>'; });
   else s+='<div class="none">Nothing yet. Add the next test under Events.</div>';
   s+='</div>';
 
@@ -302,21 +334,24 @@ function wHome(){ document.querySelectorAll("[data-go]").forEach(function(b){
 
 /* ---------- events ---------- */
 function vEvents(){
-  var l=SJ("events",[]).map(function(e){ return {e:e,n:daysTo(e.d)}; })
-        .filter(function(x){ return x.n>=0; }).sort(function(a,b){ return a.n-b.n; });
-  var rows=l.map(function(x){
-    var d=new Date(x.e.d+"T00:00:00");
-    return '<div class="ev'+(x.n<=2?" soon":"")+'">'+
-      '<span class="cd"><b>'+d.getDate()+'</b><i>'+d.toLocaleDateString("en-GB",{month:"short"})+'</i></span>'+
-      '<span class="tx">'+esc(x.e.t)+'<small>'+whenLbl(x.n)+(x.e.w?' · '+esc(pname(x.e.w)):'')+'</small></span>'+
-      '<button class="x" data-del="'+x.e.id+'">&times;</button></div>';
+  var l=SJ("events",[]).filter(function(e){ return !evState(e).gone; })
+        .sort(function(a,b){ return evState(a).start-evState(b).start; });
+  var rows=l.map(function(e){
+    var st=evState(e);
+    return '<div class="ev'+((st.live||st.start<=2)?" soon":"")+'">'+
+      '<span class="cd"><b>'+dnum(e.d)+(e.d2?'–'+dnum(e.d2):'')+'</b><i>'+dmon(e.d)+'</i></span>'+
+      '<span class="tx">'+esc(e.t)+'<small>'+evWhen(e)+' · '+evDates(e)+
+        (e.w?' · '+esc(pname(e.w)):'')+'</small></span>'+
+      '<button class="x" data-del="'+e.id+'">&times;</button></div>';
   }).join("");
-  var opts=KIDS.map(function(k){ return '<option value="'+k.id+'"'+(k.id===who()?" selected":"")+'>'+esc(pname(k.id))+'</option>'; }).join("");
+  var opts='<option value="">Everyone</option>'+
+    KIDS.map(function(k){ return '<option value="'+k.id+'"'+(k.id===who()?" selected":"")+'>'+esc(pname(k.id))+'</option>'; }).join("");
   return '<div class="panel"><h2>Coming up</h2><p class="lead">Tests, birthdays, trips</p>'+
     (rows||'<p class="empty">Nothing yet.</p>')+'</div>'+
     '<div class="panel"><h2>Add something</h2>'+
     '<div class="lbl">What</div><input type="text" id="eT" maxlength="60" placeholder="华文听写 Week 6">'+
     '<div class="lbl">When</div><input type="date" id="eD">'+
+    '<div class="lbl">Until (only for trips)</div><input type="date" id="eD2">'+
     '<div class="lbl">Who</div><select id="eW">'+opts+'</select>'+
     '<div class="btnrow"><button class="btn go" id="eAdd">Add</button></div></div>';
 }
@@ -324,7 +359,11 @@ function wEvents(){
   document.getElementById("eAdd").onclick=function(){
     var t=document.getElementById("eT").value.trim(), d=document.getElementById("eD").value;
     if(!t||!d){ alert("Needs a name and a date."); return; }
-    var a=SJ("events",[]); a.push({id:Date.now()+"",t:t.slice(0,60),d:d,w:document.getElementById("eW").value});
+    var d2=document.getElementById("eD2").value;
+    var a=SJ("events",[]);
+    var rec={id:Date.now()+"",t:t.slice(0,60),d:d,w:document.getElementById("eW").value};
+    if(d2 && d2>=d) rec.d2=d2;
+    a.push(rec);
     WJ("events",a); render();
   };
   document.querySelectorAll("[data-del]").forEach(function(b){
@@ -657,4 +696,5 @@ function wResults(){
     if(confirm("Delete every saved score on this device?")){ WJ("results",[]); render(); } };
 }
 
+seedOnce();
 render();
