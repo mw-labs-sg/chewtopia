@@ -239,7 +239,14 @@ var TIMETABLE = {
 };
 /* One timetable per child. SC is in kindergarten — put the hours here
    when you have them and they will appear on the Schedule automatically. */
-var TIMETABLES = { tc: TIMETABLE, sc: null };
+var SC_SCHOOL = {
+  Monday:    [["08:15","14:15","School"]],
+  Tuesday:   [["08:15","14:15","School"]],
+  Wednesday: [["08:15","14:15","School"]],
+  Thursday:  [["08:15","14:15","School"]],
+  Friday:    [["08:15","14:15","School"]]
+};
+var TIMETABLES = { tc: TIMETABLE, sc: SC_SCHOOL };
 
 var TT_KEY = "MA maths · CL 华文 · EL English · SS social studies · " +
              "LSP learning support · PAL active learning · " +
@@ -266,15 +273,26 @@ var SEED_EVENTS = [
   {id:"e7", t:"Chiang Mai",     d:"2026-09-04", d2:"2026-09-07"}
 ];
 var SEED_ACTS = [
-  {id:"a1", who:"all", day:"Saturday", from:"08:00", to:"10:00", t:"Berries"},
-  {id:"a2", who:"all", day:"Sunday",   from:"09:00", to:"11:00", t:"Coach Lee"}
+  /* SC — from the printed weekly schedule */
+  {id:"sa1", who:"sc", day:"Monday",    from:"16:00", to:"17:00", t:"Phonics"},
+  {id:"sa2", who:"sc", day:"Tuesday",   from:"14:15", to:"15:15", t:"Art"},
+  {id:"sa3", who:"sc", day:"Wednesday", from:"14:45", to:"15:45", t:"Teacher Denise"},
+  {id:"sa4", who:"sc", day:"Thursday",  from:"15:00", to:"16:45", t:"Learning Lab"},
+  {id:"sa5", who:"sc", day:"Thursday",  from:"17:00", to:"17:45", t:"Swimming"},
+  {id:"sa6", who:"sc", day:"Friday",    from:"14:15", to:"15:15", t:"Speech & Drama"},
+  {id:"sa7", who:"all", day:"Saturday", from:"08:30", to:"10:15", t:"Berries"},
+  {id:"sa8", who:"sc", day:"Saturday",  from:"13:00", to:"14:00", t:"Golf"},
+  {id:"sa9", who:"sc", day:"Sunday",    from:"09:00", to:"10:45", t:"Swimming & Tennis"},
+  /* TC */
+  {id:"ta1", who:"tc", day:"Sunday",    from:"09:00", to:"11:00", t:"Coach Lee"}
 ];
+
 function seedOnce(){
   /* Bump this string to reload the lists below and clear the old ones. */
-  if(S("seed","")==="v3") return;
+  if(S("seed","")==="v5") return;
   WJ("events", SEED_EVENTS.slice());
   WJ("acts",   SEED_ACTS.slice());
-  W("seed","v3");
+  W("seed","v5");
 }
 
 var DAYS = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
@@ -980,11 +998,13 @@ function wResults(){
 var WK_FROM="07:00", WK_TO="20:00", wkOff=0;
 
 function toMin(t){ var p=String(t).split(":"); return (+p[0])*60 + (+p[1]||0); }
-function slotOf(t){ return Math.round((toMin(t)-toMin(WK_FROM))/30); }
-function slotCount(){ return Math.round((toMin(WK_TO)-toMin(WK_FROM))/30); }
+function slotOf(t){ return Math.round((toMin(t)-toMin(WK_FROM))/15); }
+function slotCount(){ return Math.round((toMin(WK_TO)-toMin(WK_FROM))/15); }
 function slotLabel(i){
-  var m=toMin(WK_FROM)+i*30, h=Math.floor(m/60), mm=m%60;
-  return (mm===0) ? (h>12?h-12:h)+(h>=12?"pm":"am") : "";
+  var m=toMin(WK_FROM)+i*15, h=Math.floor(m/60), mm=m%60;
+  if(mm!==0) return "";
+  var hh = h===0?12 : h>12?h-12 : h;
+  return hh+(h>=12?"pm":"am");
 }
 function weekStart(off){
   var d=new Date(); d.setHours(0,0,0,0);
