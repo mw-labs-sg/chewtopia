@@ -129,23 +129,41 @@
     font-weight:700;margin:16px 0 8px}
   .sub:first-of-type{margin-top:0}
 
-  /* ---- timetable grid ---- */
-  .ttwrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 -4px;padding:0 4px 4px}
-  .ttgrid{display:grid;grid-template-columns:52px repeat(5,minmax(84px,1fr));
-    gap:3px;min-width:520px}
-  .tthead{font-size:13px;font-weight:700;color:var(--soft);text-align:center;
-    align-self:center;letter-spacing:.04em}
-  .tthead.now{color:var(--coral)}
-  .tcorner{grid-column:1;grid-row:1}
-  .ttime{grid-column:1;font-size:11.5px;color:var(--soft);text-align:right;
-    padding-right:6px;align-self:start;line-height:1.1;padding-top:2px}
-  .ttb{border-radius:9px;display:flex;align-items:center;justify-content:center;
-    font-size:13.5px;font-weight:700;text-align:center;padding:2px 4px;line-height:1.2}
-  .ttb.core{background:var(--sky);color:var(--blue)}
-  .ttb.cl{background:#FFE3DC;color:#B03A22}
-  .ttb.rec{background:#FFF1D6;color:#8A6100}
-  .ttb.o{background:#F0EAFE;color:var(--grape)}
-  .ttb.today{outline:2px solid rgba(255,111,82,.45);outline-offset:-2px}
+  /* ---- child colours ---- */
+  .c-tc{background:var(--sky)!important;color:var(--blue)!important}
+  .c-sc{background:#F0EAFE!important;color:var(--grape)!important}
+  .c-all{background:#E4F2DC!important;color:#3D7A45!important}
+  .c-tc b,.c-sc b,.c-all b{color:inherit!important}
+  .dot{display:inline-block;width:11px;height:11px;border-radius:4px;
+    vertical-align:-1px;margin-right:3px}
+
+  /* ---- week grid ---- */
+  .wknav{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+  .wknav .btn{padding:8px 15px;font-size:19px;line-height:1}
+  .wkrange{font-weight:700;font-size:14px;color:var(--soft)}
+  .wkwrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 -4px;padding:0 4px 6px}
+  .wkgrid{display:grid;grid-template-columns:44px repeat(7,minmax(74px,1fr));
+    gap:2px;min-width:620px;position:relative}
+  .wkh{font-size:12.5px;font-weight:700;color:var(--soft);text-align:center;
+    align-self:center;letter-spacing:.03em}
+  .wkh em{font-style:normal;font-weight:400;opacity:.75}
+  .wkh.now{color:var(--coral)}
+  .corner{grid-column:1;grid-row:1}
+  .wkt{grid-column:1;font-size:10.5px;color:var(--soft);text-align:right;
+    padding-right:5px;align-self:start;line-height:1;padding-top:1px}
+  .wkrule{grid-column:2/-1;border-top:1px solid var(--line);height:0;align-self:start;
+    pointer-events:none}
+  .wkb{border-radius:7px;display:flex;align-items:center;justify-content:center;
+    font-size:12px;font-weight:700;text-align:center;padding:1px 3px;line-height:1.15;
+    overflow:hidden;cursor:default}
+  .wkb.school{background:#EDF2F7;color:#5C7186}
+  .wkb.school.rec{background:#FFF6E3;color:#8A6100}
+  .wkb.c-tc,.wkb.c-sc,.wkb.c-all{cursor:pointer}
+  .wkallday-label{grid-column:1;font-size:10px;color:var(--soft);text-align:right;
+    padding-right:5px;align-self:center;line-height:1.1}
+  .wkallday{display:flex;flex-wrap:wrap;gap:2px;align-content:center;padding:2px 0}
+  .wkallday .chip{font-size:11px;font-weight:700;border-radius:6px;padding:3px 6px;
+    width:100%;text-align:center;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
   .key{font-size:13px;color:var(--soft);line-height:1.9;margin-top:14px}
 
   /* ---- quiz ---- */
@@ -210,6 +228,6 @@
   <div id="view"></div>
   <div class="foot">Saved on this device</div>
 </div>
-<script src="app.js?v=7"></script>
+<script src="app.js?v=8"></script>
 </body>
 </html>

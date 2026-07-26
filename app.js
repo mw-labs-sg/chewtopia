@@ -183,20 +183,24 @@ var SEED_EVENTS = [
   {id:"e6", t:"Spelling test",  d:"2026-08-12", w:"sc"},
   {id:"e7", t:"Chiang Mai",     d:"2026-09-04", d2:"2026-09-07"}
 ];
+var SEED_ACTS = [
+  {id:"a1", who:"all", day:"Saturday", from:"08:00", to:"10:00", t:"Berries"},
+  {id:"a2", who:"all", day:"Sunday",   from:"09:00", to:"11:00", t:"Coach Lee"}
+];
 function seedOnce(){
-  if(S("seeded2","")==="1") return;
-  var a=SJ("events",[]), have={};
-  a.forEach(function(e){ have[e.id]=1; });
-  SEED_EVENTS.forEach(function(e){ if(!have[e.id]) a.push(e); });
-  WJ("events",a); W("seeded2","1");
+  /* Bump this string to reload the lists below and clear the old ones. */
+  if(S("seed","")==="v3") return;
+  WJ("events", SEED_EVENTS.slice());
+  WJ("acts",   SEED_ACTS.slice());
+  W("seed","v3");
 }
 
-var DAYS = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
-var TABS = [["home","Home"],["tests","Tests"],["results","Results"],["timetable","School"]];
+var TABS = [["home","Upcoming"],["schedule","Schedule"],["meals","Meals"],["practice","Practice"],["results","Results"]];
 var tab="home", quiz=null, showAdd=false;
 function go(id){ tab=id; quiz=null; showAdd=false; hush(); render(); scrollTo(0,0); }
 
 /* ---------- helpers ---------- */
+function whoCls(w){ return w==="tc" ? "c-tc" : w==="sc" ? "c-sc" : "c-all"; }
 function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 function todayIdx(){ return (new Date().getDay()+6)%7; }
 function monKey(){ var d=new Date(); d.setDate(d.getDate()-todayIdx());
@@ -328,8 +332,8 @@ function render(){
 
   var v=document.getElementById("view");
   if(quiz){ v.innerHTML=quizHTML(); wireQuiz(); return; }
-  var V={home:vHome,tests:vTests,results:vResults,timetable:vSchool};
-  var Wr={home:wHome,tests:wTests,results:wResults,timetable:wSchool};
+  var V={home:vHome,schedule:vWeek,meals:vMeals,practice:vTests,results:vResults};
+  var Wr={home:wHome,schedule:wWeek,meals:wMeals,practice:wTests,results:wResults};
   v.innerHTML=V[tab](); Wr[tab]();
   document.querySelectorAll("textarea.cell").forEach(grow);
 }
@@ -338,16 +342,17 @@ function render(){
    HOME = coming up + schedule + meals
    ========================================================================== */
 function vHome(){
-  /* --- coming up --- */
   var evs=SJ("events",[]).filter(function(e){ return !evState(e).gone; })
     .sort(function(a,b){ return evState(a).start-evState(b).start; });
-  var s='<div class="panel"><h2><span class="em">📅</span> Coming up</h2>';
+  var s='<div class="panel"><h2><span class="em">📅</span> Upcoming</h2>';
   if(evs.length){
     evs.forEach(function(e){
       var st=evState(e);
       s+='<div class="ev'+((st.live||st.start<=2)?" soon":"")+'">'+
-        '<span class="cd"><b>'+dnum(e.d)+(e.d2?"–"+dnum(e.d2):"")+'</b><i>'+dmon(e.d)+'</i></span>'+
-        '<span class="tx">'+esc(e.t)+'<small>'+evWhen(e)+(e.w?" · "+esc(pname(e.w)):"")+'</small></span>'+
+        '<span class="cd '+whoCls(e.w)+'"><b>'+dnum(e.d)+(e.d2?"–"+dnum(e.d2):"")+'</b>'+
+        '<i>'+dmon(e.d)+'</i></span>'+
+        '<span class="tx">'+esc(e.t)+'<small>'+evWhen(e)+' · '+
+          (e.w?esc(pname(e.w)):"Everyone")+(e.time?" · "+e.time:"")+'</small></span>'+
         '<button class="x" data-del="'+e.id+'">&times;</button></div>';
     });
   } else s+='<p class="empty">Nothing coming up.</p>';
@@ -357,60 +362,33 @@ function vHome(){
       return '<option value="'+k.id+'"'+(k.id===who()?" selected":"")+'>'+esc(pname(k.id))+'</option>'; }).join("");
     s+='<div class="lbl">What</div><input type="text" id="eT" maxlength="60" placeholder="华文听写 Week 6">'+
        '<div class="lbl">When</div><input type="date" id="eD">'+
+       '<div class="lbl">Time (optional)</div><input type="time" id="eTm">'+
        '<div class="lbl">Until (trips only)</div><input type="date" id="eD2">'+
        '<div class="lbl">Who</div><select id="eW">'+opts+'</select>'+
        '<div class="btnrow"><button class="btn go" id="eAdd">Add</button>'+
        '<button class="btn soft" id="eCancel">Cancel</button></div>';
-  } else {
-    s+='<button class="addlink" id="eShow">+ Add something</button>';
-  }
-  s+='</div>';
+  } else s+='<button class="addlink" id="eShow">+ Add something</button>';
 
-  /* --- schedule --- */
-  var sch=SJ("sched:"+who(),{}), dt=weekDates();
-  s+='<div class="panel"><h2><span class="em">⏰</span> This week'+
-     '<span class="side">'+esc(pname(who()))+'</span></h2>';
-  DAYS.forEach(function(d,i){
-    s+='<div class="day'+(i===todayIdx()?" now":"")+'"><span class="d">'+d.slice(0,3)+' '+dt[i].getDate()+'</span>'+
-      '<input class="cell" type="text" data-day="'+d+'" value="'+esc(sch[d]||"")+'" placeholder="—"></div>';
-  });
-  s+='<div class="saved" id="schS"></div></div>';
+  return s+'<div class="key" style="margin-top:14px">'+
+    '<span class="dot c-tc"></span> '+esc(pname("tc"))+' &nbsp; '+
+    '<span class="dot c-sc"></span> '+esc(pname("sc"))+' &nbsp; '+
+    '<span class="dot c-all"></span> Everyone</div></div>';
+}
 
-  /* --- meals --- */
+function vMeals(){
   var m=SJ("meals:"+monKey(),null)||MEALS_DEFAULT;
-  s+='<div class="panel"><h2><span class="em">🍜</span> Dinner</h2><div class="twoup">';
+  var s='<div class="panel"><h2><span class="em">🍜</span> Dinner this week</h2><div class="twoup">';
   DAYS.forEach(function(d,i){
     s+='<div class="day'+(i===todayIdx()?" now":"")+'"><span class="d">'+d.slice(0,3)+'</span>'+
       '<textarea class="cell" data-meal="'+d+'" placeholder="—">'+esc(m[d]||"")+'</textarea></div>';
   });
-  s+='</div><div class="btnrow"><button class="btn soft" id="mR">Reset to usual plan</button></div>'+
-     '<div class="saved" id="mS"></div></div>'+
-     '<div class="panel"><h2><span class="em">🛒</span> Groceries</h2>'+
-     '<textarea class="cell" id="gr" style="min-height:110px" placeholder="What to buy">'+
-     esc(S("groc:"+monKey(),""))+'</textarea><div class="saved" id="gS"></div></div>';
-  return s;
+  return s+'</div><div class="btnrow"><button class="btn soft" id="mR">Reset to usual plan</button></div>'+
+    '<div class="saved" id="mS"></div></div>'+
+    '<div class="panel"><h2><span class="em">🛒</span> Groceries</h2>'+
+    '<textarea class="cell" id="gr" style="min-height:130px" placeholder="What to buy">'+
+    esc(S("groc:"+monKey(),""))+'</textarea><div class="saved" id="gS"></div></div>';
 }
-
-function wHome(){
-  document.querySelectorAll("[data-del]").forEach(function(b){
-    b.onclick=function(){ WJ("events",SJ("events",[]).filter(function(e){return e.id!==b.dataset.del;})); render(); }; });
-  var sh=document.getElementById("eShow");
-  if(sh) sh.onclick=function(){ showAdd=true; render(); };
-  var cx=document.getElementById("eCancel");
-  if(cx) cx.onclick=function(){ showAdd=false; render(); };
-  var ad=document.getElementById("eAdd");
-  if(ad) ad.onclick=function(){
-    var t=document.getElementById("eT").value.trim(), d=document.getElementById("eD").value;
-    if(!t||!d){ alert("Needs a name and a date."); return; }
-    var d2=document.getElementById("eD2").value;
-    var rec={id:Date.now()+"",t:t.slice(0,60),d:d,w:document.getElementById("eW").value};
-    if(d2&&d2>=d) rec.d2=d2;
-    var a=SJ("events",[]); a.push(rec); WJ("events",a);
-    showAdd=false; render();
-  };
-  document.querySelectorAll("[data-day]").forEach(function(i){
-    i.oninput=function(){ var s=SJ("sched:"+who(),{}); s[i.dataset.day]=i.value;
-      WJ("sched:"+who(),s); flash("schS"); }; });
+function wMeals(){
   document.querySelectorAll("[data-meal]").forEach(function(t){
     t.oninput=function(){ grow(t);
       var m=SJ("meals:"+monKey(),null)||JSON.parse(JSON.stringify(MEALS_DEFAULT));
@@ -421,11 +399,31 @@ function wHome(){
   g.oninput=function(){ grow(g); W("groc:"+monKey(),g.value); flash("gS"); };
 }
 
+function wHome(){
+  document.querySelectorAll("[data-del]").forEach(function(b){
+    b.onclick=function(){
+      WJ("events",SJ("events",[]).filter(function(e){return e.id!==b.dataset.del;})); render(); }; });
+  var sh=document.getElementById("eShow");
+  if(sh) sh.onclick=function(){ showAdd=true; render(); };
+  var cx=document.getElementById("eCancel");
+  if(cx) cx.onclick=function(){ showAdd=false; render(); };
+  var ad=document.getElementById("eAdd");
+  if(ad) ad.onclick=function(){
+    var t=document.getElementById("eT").value.trim(), d=document.getElementById("eD").value;
+    if(!t||!d){ alert("Needs a name and a date."); return; }
+    var rec={id:Date.now()+"",t:t.slice(0,60),d:d,w:document.getElementById("eW").value};
+    var tm=document.getElementById("eTm").value; if(tm) rec.time=tm;
+    var d2=document.getElementById("eD2").value; if(d2&&d2>=d) rec.d2=d2;
+    var a=SJ("events",[]); a.push(rec); WJ("events",a);
+    showAdd=false; render();
+  };
+}
+
 /* ==========================================================================
    TESTS
    ========================================================================== */
 function vTests(){
-  var s='<div class="panel"><h2><span class="em">📝</span> Tests'+
+  var s='<div class="panel"><h2><span class="em">📝</span> Practice'+
         '<span class="side">'+esc(pname(who()))+'</span></h2>';
   if(who()==="tc"){
     s+='<div class="sub">English spelling</div>';
@@ -544,12 +542,12 @@ function quizHTML(){
 function wireQuiz(){
   var q=quiz;
   if(q.done){
-    document.getElementById("dBack").onclick=function(){ go("tests"); };
+    document.getElementById("dBack").onclick=function(){ go("practice"); };
     document.getElementById("dAgain").onclick=function(){ hush(); start(q.code); };
     return;
   }
   var it=q.items[q.i];
-  document.getElementById("qB").onclick=function(){ go("tests"); };
+  document.getElementById("qB").onclick=function(){ go("practice"); };
   var p=document.getElementById("qP"); if(p) p.onclick=function(){ speakIt(it); };
   var g=document.getElementById("qG");
   g.onclick=function(){ q.graded?next():grade(); };
@@ -610,7 +608,7 @@ function doneHTML(){
     '<div class="big">'+q.score+' / '+q.items.length+'</div><div class="st">'+st+'</div>'+
     '<div class="rk">'+rk+'</div>'+
     (q.missed.length?'<div class="again">Practise again: <b>'+esc(q.missed.join(", "))+'</b></div>':'')+
-    '<div class="btnrow"><button class="btn soft" id="dBack">Back to tests</button>'+
+    '<div class="btnrow"><button class="btn soft" id="dBack">Back to practice</button>'+
     '<button class="btn go" id="dAgain">Try again</button></div></div>';
 }
 
@@ -650,39 +648,162 @@ function wResults(){
 /* ==========================================================================
    SCHOOL TIMETABLE
    ========================================================================== */
-function vSchool(){
-  var days=["Monday","Tuesday","Wednesday","Thursday","Friday"];
-  var rows=TIMES.length-1;
-  var g='<div class="ttwrap"><div class="ttgrid" style="grid-template-rows:26px repeat('+rows+',38px)">';
+/* ==========================================================================
+   WEEK — school, after school and events on one grid
+   ========================================================================== */
+var WK_FROM="07:00", WK_TO="20:00", wkOff=0;
 
-  g+='<span class="tthead tcorner"></span>';
-  days.forEach(function(d,i){
-    g+='<span class="tthead'+(i===todayIdx()?" now":"")+'" style="grid-column:'+(i+2)+';grid-row:1">'+
-       d.slice(0,3)+'</span>';
-  });
+function toMin(t){ var p=String(t).split(":"); return (+p[0])*60 + (+p[1]||0); }
+function slotOf(t){ return Math.round((toMin(t)-toMin(WK_FROM))/30); }
+function slotCount(){ return Math.round((toMin(WK_TO)-toMin(WK_FROM))/30); }
+function slotLabel(i){
+  var m=toMin(WK_FROM)+i*30, h=Math.floor(m/60), mm=m%60;
+  return (mm===0) ? (h>12?h-12:h)+(h>=12?"pm":"am") : "";
+}
+function weekStart(off){
+  var d=new Date(); d.setHours(0,0,0,0);
+  d.setDate(d.getDate()-todayIdx()+(off||0)*7);
+  return d;
+}
+function iso(d){
+  return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+}
+function acts(){ return SJ("acts",[]); }
 
-  TIMES.slice(0,rows).forEach(function(t,i){
-    g+='<span class="ttime" style="grid-row:'+(i+2)+'">'+t+'</span>';
-  });
+function vWeek(){
+  var start=weekStart(wkOff), dates=DAYS.map(function(_,i){
+    var x=new Date(start); x.setDate(start.getDate()+i); return x; });
+  var isThis = wkOff===0;
+  var rows=slotCount();
 
-  days.forEach(function(d,di){
-    TIMETABLE[d].forEach(function(b){
-      var a=TIMES.indexOf(b[0]), z=TIMES.indexOf(b[1]);
-      if(a<0||z<0||z<=a) return;
-      var c = b[2]==="Recess" ? "rec" : b[2]==="CL" ? "cl" :
-              (["MA","EL"].indexOf(b[2])>=0 ? "core" : "o");
-      g+='<span class="ttb '+c+(di===todayIdx()?" today":"")+'" '+
-         'style="grid-column:'+(di+2)+';grid-row:'+(a+2)+'/span '+(z-a)+'">'+b[2]+'</span>';
+  /* all-day events falling in this week */
+  var allday=[];
+  SJ("events",[]).forEach(function(e){
+    DAYS.forEach(function(_,i){
+      var day=iso(dates[i]);
+      var inRange = e.d2 ? (day>=e.d && day<=e.d2) : (day===e.d);
+      if(inRange && !e.time) allday.push({col:i, e:e});
     });
   });
+
+  var g='<div class="wkwrap"><div class="wkgrid" style="grid-template-rows:24px '+
+        (allday.length?"auto ":"")+'repeat('+rows+',26px)">';
+
+  /* header */
+  g+='<span class="wkh corner"></span>';
+  DAYS.forEach(function(d,i){
+    var today = isThis && i===todayIdx();
+    g+='<span class="wkh'+(today?" now":"")+'" style="grid-column:'+(i+2)+';grid-row:1">'+
+       d.slice(0,3)+' <em>'+dates[i].getDate()+'</em></span>';
+  });
+
+  /* all-day strip */
+  var rowOffset=2;
+  if(allday.length){
+    g+='<span class="wkallday-label" style="grid-row:2">all day</span>';
+    var byCol={};
+    allday.forEach(function(x){ (byCol[x.col]=byCol[x.col]||[]).push(x.e); });
+    Object.keys(byCol).forEach(function(c){
+      g+='<span class="wkallday" style="grid-column:'+(+c+2)+';grid-row:2">'+
+         byCol[c].map(function(e){
+           return '<span class="chip '+whoCls(e.w)+'">'+esc(e.t)+'</span>'; }).join("")+'</span>';
+    });
+    rowOffset=3;
+  }
+
+  /* time labels */
+  for(var i=0;i<rows;i++){
+    var lb=slotLabel(i);
+    g+='<span class="wkt" style="grid-row:'+(i+rowOffset)+'">'+lb+'</span>';
+    if(lb) g+='<span class="wkrule" style="grid-row:'+(i+rowOffset)+'"></span>';
+  }
+
+  function block(colIdx, from, to, label, cls, extra){
+    var a=slotOf(from), z=slotOf(to);
+    if(z<=a) z=a+1;
+    if(z<=0 || a>=rows) return "";
+    a=Math.max(0,a); z=Math.min(rows,z);
+    return '<span class="wkb '+cls+'" style="grid-column:'+(colIdx+2)+
+      ';grid-row:'+(a+rowOffset)+'/span '+(z-a)+'"'+(extra||"")+'>'+label+'</span>';
+  }
+
+  /* school — only the child who has a timetable */
+  if(who()==="tc"){
+    ["Monday","Tuesday","Wednesday","Thursday","Friday"].forEach(function(d,i){
+      TIMETABLE[d].forEach(function(bk){
+        g+=block(i, bk[0], bk[1], bk[2], "school"+(bk[2]==="Recess"?" rec":""));
+      });
+    });
+  }
+
+  /* after school, recurring */
+  acts().filter(function(a){ return !a.who || a.who==="all" || a.who===who(); }).forEach(function(a){
+    var i=DAYS.indexOf(a.day); if(i<0) return;
+    g+=block(i, a.from, a.to, esc(a.t), whoCls(a.who==='all'?'':a.who), ' data-act="'+a.id+'"');
+  });
+
+  /* timed events this week */
+  SJ("events",[]).forEach(function(e){
+    if(!e.time) return;
+    DAYS.forEach(function(_,i){
+      if(iso(dates[i])!==e.d) return;
+      var end=String(Math.min(20,(+e.time.split(":")[0])+1)).padStart(2,"0")+":"+e.time.split(":")[1];
+      g+=block(i, e.time, end, esc(e.t), whoCls(e.w));
+    });
+  });
+
   g+='</div></div>';
 
-  return '<div class="panel"><h2><span class="em">🏫</span> School week'+
-    '<span class="side">'+esc(pname("tc"))+'</span></h2>'+
-    '<p class="empty" style="margin-bottom:10px">Swipe sideways to see Thursday and Friday.</p>'+
-    g+'<div class="key">'+TT_KEY+'</div></div>';
+  var lbl = isThis ? "This week" : (wkOff===1?"Next week":wkOff===-1?"Last week":
+    dates[0].toLocaleDateString("en-GB",{day:"numeric",month:"short"}));
+
+  var head='<div class="panel"><h2><span class="em">🗓️</span> '+lbl+
+    '<span class="side">'+esc(pname(who()))+'</span></h2>'+
+    '<div class="wknav"><button class="btn soft" id="wkPrev">‹</button>'+
+    '<span class="wkrange">'+dates[0].toLocaleDateString("en-GB",{day:"numeric",month:"short"})+
+    ' – '+dates[6].toLocaleDateString("en-GB",{day:"numeric",month:"short"})+'</span>'+
+    '<button class="btn soft" id="wkNext">›</button></div>'+g;
+
+  /* add an activity */
+  var dayOpts=DAYS.map(function(d){ return '<option value="'+d+'">'+d+'</option>'; }).join("");
+  head+='<button class="addlink" id="aShow">+ Add something weekly</button>'+
+    '<div id="aForm" class="hidden">'+
+    '<div class="lbl">What</div><input type="text" id="aT" maxlength="40" placeholder="Swimming">'+
+    '<div class="lbl">Day</div><select id="aD">'+dayOpts+'</select>'+
+    '<div class="lbl">Who</div><select id="aW"><option value="all">Everyone</option>'+
+      KIDS.map(function(k){ return '<option value="'+k.id+'"'+(k.id===who()?" selected":"")+'>'+esc(pname(k.id))+'</option>'; }).join("")+
+    '</select>'+
+    '<div class="pair"><span class="f1"><div class="lbl">From</div><input type="time" id="aF" value="16:00"></span>'+
+    '<span class="f1"><div class="lbl">To</div><input type="time" id="aTo" value="17:00"></span></div>'+
+    '<div class="btnrow"><button class="btn go" id="aAdd">Add</button>'+
+    '<button class="btn soft" id="aCancel">Cancel</button></div></div>';
+
+  head+='<div class="key">Tap a coloured block to remove it. '+TT_KEY+'</div></div>';
+  return head;
 }
-function wSchool(){}
+
+function wWeek(){
+  document.getElementById("wkPrev").onclick=function(){ wkOff--; render(); };
+  document.getElementById("wkNext").onclick=function(){ wkOff++; render(); };
+  var sh=document.getElementById("aShow"), fm=document.getElementById("aForm");
+  sh.onclick=function(){ fm.classList.toggle("hidden"); };
+  document.getElementById("aCancel").onclick=function(){ fm.classList.add("hidden"); };
+  document.getElementById("aAdd").onclick=function(){
+    var t=document.getElementById("aT").value.trim();
+    if(!t){ alert("Give it a name."); return; }
+    var a=acts();
+    a.push({id:Date.now()+"", who:document.getElementById("aW").value, day:document.getElementById("aD").value,
+            from:document.getElementById("aF").value, to:document.getElementById("aTo").value,
+            t:t.slice(0,40)});
+    WJ("acts",a); render();
+  };
+  document.querySelectorAll("[data-act]").forEach(function(b){
+    b.onclick=function(){
+      if(!confirm("Remove "+b.textContent+"?")) return;
+      WJ("acts", acts().filter(function(x){ return x.id!==b.dataset.act; })); render();
+    };
+  });
+}
 
 seedOnce();
 render();
