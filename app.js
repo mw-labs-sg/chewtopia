@@ -1,717 +1,660 @@
 /* ==========================================================================
-   CHEWTOPIA
-   Everything lives on the device. Nothing is sent anywhere.
+   CHEWTOPIA — everything is stored on the device, nothing is sent anywhere.
 
-   TO EDIT CONTENT:
-     - spelling lists  -> SPELLING below
-     - chinese         -> PINYIN below
-     - default meals   -> MEALS_DEFAULT below
+   WHERE TO EDIT:
+     TESTS.tc / TESTS.sc   → the tests for each child
+     TIMETABLE             → the school timetable
+     MEALS_DEFAULT         → the usual dinner plan
    ========================================================================== */
 
-/* ---------- storage ---------- */
 function S(k,d){ try{ var v=localStorage.getItem("chew:"+k); return v===null?d:v; }catch(e){ return d; } }
 function W(k,v){ try{ localStorage.setItem("chew:"+k,v); }catch(e){} }
-function SJ(k,d){ try{ var v=JSON.parse(localStorage.getItem("chew:"+k)); return v===null||v===undefined?d:v; }catch(e){ return d; } }
+function SJ(k,d){ try{ var v=JSON.parse(localStorage.getItem("chew:"+k)); return (v===null||v===undefined)?d:v; }catch(e){ return d; } }
 function WJ(k,v){ W(k, JSON.stringify(v)); }
 
-/* ---------- players (names typed here, never in the code) ---------- */
-function pname(slot){ return S("name:"+slot, slot==="p1" ? "Player 1" : "Player 2"); }
-function slot(){ return S("slot","p1"); }
+/* ---------- the two players ---------- */
+var KIDS = [
+  {id:"tc", init:"TC", level:"Primary 2"},
+  {id:"sc", init:"SC", level:"Kindergarten"}
+];
+function pname(id){ var k=KIDS.filter(function(x){return x.id===id;})[0]; return S("name:"+id, k.init); }
+function who(){ return S("who","tc"); }
 
-function paintWho(){
-  var box = document.getElementById("who");
-  box.innerHTML = "";
-  ["p1","p2"].forEach(function(sl){
-    var b = document.createElement("button");
-    b.className = "chip" + (sl===slot() ? " on" : "");
-    b.textContent = pname(sl);
-    b.onclick = function(){
-      if(sl === slot()){
-        var n = prompt("Name for this player", pname(sl));
-        if(n && n.trim()) W("name:"+sl, n.trim().slice(0,18));
-      } else {
-        W("slot", sl);
-      }
-      paintWho(); render();
-    };
-    box.appendChild(b);
-  });
-}
+/* ==========================================================================
+   CONTENT
+   ========================================================================== */
 
-/* ---------- content ---------- */
-var SPELLING = {
-  "3.3": { unit:"Unit 9", items:[
-    {t:"spell", s:"I cannot find my keys. They have completely disappeared!", a:"disappeared"},
-    {t:"spell", s:"John read a book about three mischievous children.", a:"mischievous"},
-    {t:"spell", s:"There was something strange about that tree.", a:"strange"},
-    {t:"spell", s:"Uncle Lim propped the ladder against the tree.", a:"propped"},
-    {t:"spell", s:"He picked something up from the ground.", a:"ground"},
-    {t:"spell", s:"Were his eyes playing a trick on him?", a:"playing a trick"},
-    {t:"spell", s:"He thought of climbing the tall sturdy tree.", a:"sturdy"},
-    {t:"spell", s:"John hid behind the bushes.", a:"behind"},
-    {t:"dict",  s:"He frowned with concern.", a:"He frowned with concern."},
-    {t:"dict",  s:"He scratched his head over the tricky question.", a:"He scratched his head over the tricky question."}
-  ]},
-  "3.4": { unit:"Unit 9", items:[
-    {t:"spell", s:"He returned to the tree with Uncle Lim and his ladder.", a:"returned"},
-    {t:"spell", s:"That tree! he told Uncle Lim as he pointed at it.", a:"pointed at"},
-    {t:"spell", s:"Whenever anyone stood under the tree, odd things happened.", a:"odd"},
-    {t:"spell", s:"Its nest was decorated with Mary's ribbon and many other shiny things.", a:"decorated with"},
-    {t:"spell", s:"They went closer and looked very carefully up into the tree.", a:"closer"},
-    {t:"spell", s:"They saw a bird with Peter's coin in its beak.", a:"coin"},
-    {t:"spell", s:"They were both puzzled by what happened.", a:"puzzled"},
-    {t:"spell", s:"She ambled, grinning from ear to ear.", a:"grinning from ear to ear"},
-    {t:"dict",  s:"She looked at the floor with a sheepish grin.", a:"She looked at the floor with a sheepish grin."},
-    {t:"dict",  s:"She finally realised what had happened.", a:"She finally realised what had happened."}
-  ]},
-  "3.5": { unit:"Unit 10", items:[
-    {t:"spell", s:"He had forgotten to bring his pencil case to school.", a:"forgotten"},
-    {t:"spell", s:"She loves eating vegetables.", a:"vegetables"},
-    {t:"spell", s:"Those tomatoes are red and juicy.", a:"tomatoes"},
-    {t:"spell", s:"The cat might eat the mouse.", a:"might"},
-    {t:"spell", s:"The snake is huge and green.", a:"huge"},
-    {t:"spell", s:"My aunt arrived at my party in a limousine.", a:"arrived"},
-    {t:"spell", s:"It is dangerous to cycle on the road without a helmet.", a:"dangerous"},
-    {t:"dict",  s:"He lost his balance and fell with a thud.", a:"He lost his balance and fell with a thud."},
-    {t:"dict",  s:"Tears welled up in her eyes.", a:"Tears welled up in her eyes."},
-    {t:"dict",  s:"His knees were grazed but he quickly got up.", a:"His knees were grazed but he quickly got up."}
-  ]},
-  "3.6": { unit:"Unit 10", items:[
-    {t:"spell", s:"Please be quiet in the library, whispered the librarian.", a:"whispered"},
-    {t:"spell", s:"That aeroplane looks like a gigantic bird.", a:"gigantic"},
-    {t:"spell", s:"The gardener used the hose to water the plants.", a:"hose"},
-    {t:"spell", s:"The smell of the garbage over there is terrible.", a:"garbage"},
-    {t:"spell", s:"He called for extra men to help him move the table.", a:"extra"},
-    {t:"spell", s:"That truck is carrying many baskets of watermelons.", a:"truck"},
-    {t:"spell", s:"Grandfather noticed something moving behind the bushes.", a:"noticed"},
-    {t:"dict",  s:"The boy tripped because he missed the ball.", a:"The boy tripped because he missed the ball."},
-    {t:"dict",  s:"He slid and fell as the wet grass was slippery.", a:"He slid and fell as the wet grass was slippery."},
-    {t:"dict",  s:"He clutched his leg as it was painful.", a:"He clutched his leg as it was painful."}
-  ]}
+/* --- TC, Primary 2 --- */
+var TC_SPELL = {
+  "3.3": ["Unit 9", [
+    ["spell","I cannot find my keys. They have completely disappeared!","disappeared"],
+    ["spell","John read a book about three mischievous children.","mischievous"],
+    ["spell","There was something strange about that tree.","strange"],
+    ["spell","Uncle Lim propped the ladder against the tree.","propped"],
+    ["spell","He picked something up from the ground.","ground"],
+    ["spell","Were his eyes playing a trick on him?","playing a trick"],
+    ["spell","He thought of climbing the tall sturdy tree.","sturdy"],
+    ["spell","John hid behind the bushes.","behind"],
+    ["dict","He frowned with concern.","He frowned with concern."],
+    ["dict","He scratched his head over the tricky question.","He scratched his head over the tricky question."]
+  ]],
+  "3.4": ["Unit 9", [
+    ["spell","He returned to the tree with Uncle Lim and his ladder.","returned"],
+    ["spell","That tree! he told Uncle Lim as he pointed at it.","pointed at"],
+    ["spell","Whenever anyone stood under the tree, odd things happened.","odd"],
+    ["spell","Its nest was decorated with Mary's ribbon and many other shiny things.","decorated with"],
+    ["spell","They went closer and looked very carefully up into the tree.","closer"],
+    ["spell","They saw a bird with Peter's coin in its beak.","coin"],
+    ["spell","They were both puzzled by what happened.","puzzled"],
+    ["spell","She ambled, grinning from ear to ear.","grinning from ear to ear"],
+    ["dict","She looked at the floor with a sheepish grin.","She looked at the floor with a sheepish grin."],
+    ["dict","She finally realised what had happened.","She finally realised what had happened."]
+  ]],
+  "3.5": ["Unit 10", [
+    ["spell","He had forgotten to bring his pencil case to school.","forgotten"],
+    ["spell","She loves eating vegetables.","vegetables"],
+    ["spell","Those tomatoes are red and juicy.","tomatoes"],
+    ["spell","The cat might eat the mouse.","might"],
+    ["spell","The snake is huge and green.","huge"],
+    ["spell","My aunt arrived at my party in a limousine.","arrived"],
+    ["spell","It is dangerous to cycle on the road without a helmet.","dangerous"],
+    ["dict","He lost his balance and fell with a thud.","He lost his balance and fell with a thud."],
+    ["dict","Tears welled up in her eyes.","Tears welled up in her eyes."],
+    ["dict","His knees were grazed but he quickly got up.","His knees were grazed but he quickly got up."]
+  ]],
+  "3.6": ["Unit 10", [
+    ["spell","Please be quiet in the library, whispered the librarian.","whispered"],
+    ["spell","That aeroplane looks like a gigantic bird.","gigantic"],
+    ["spell","The gardener used the hose to water the plants.","hose"],
+    ["spell","The smell of the garbage over there is terrible.","garbage"],
+    ["spell","He called for extra men to help him move the table.","extra"],
+    ["spell","That truck is carrying many baskets of watermelons.","truck"],
+    ["spell","Grandfather noticed something moving behind the bushes.","noticed"],
+    ["dict","The boy tripped because he missed the ball.","The boy tripped because he missed the ball."],
+    ["dict","He slid and fell as the wet grass was slippery.","He slid and fell as the wet grass was slippery."],
+    ["dict","He clutched his leg as it was painful.","He clutched his leg as it was painful."]
+  ]]
 };
 
-var PINYIN = [
-  ["永","yong","3","forever","永远 yǒng yuǎn"], ["轻","qing","1","light / gentle","轻轻 qīng qīng"],
-  ["命","ming","4","life / fate","生命 shēng mìng"], ["百","bai","3","hundred","一百 yì bǎi"],
-  ["健","jian","4","healthy","健康 jiàn kāng"], ["康","kang","1","well-being","健康 jiàn kāng"],
-  ["幸","xing","4","fortunate","幸福 xìng fú"], ["愿","yuan","4","wish","愿望 yuàn wàng"],
-  ["吹","chui","1","to blow","吹风 chuī fēng"], ["糕","gao","1","cake","蛋糕 dàn gāo"],
-  ["首","shou","3","first / measure word","一首歌 yì shǒu gē"], ["张","zhang","1","measure word","一张纸 yì zhāng zhǐ"],
-  ["卡","ka","3","card","卡片 kǎ piàn"], ["影","ying","3","shadow","电影 diàn yǐng"],
-  ["票","piao","4","ticket","电影票 diàn yǐng piào"], ["礼","li","3","gift / courtesy","礼物 lǐ wù"],
-  ["厅","ting","1","hall","客厅 kè tīng"], ["奇","qi","2","strange","奇怪 qí guài"],
-  ["怪","guai","4","weird","奇怪 qí guài"], ["活","huo","2","to live","生活 shēng huó"],
-  ["宝","bao","3","treasure","宝贝 bǎo bèi"]
-];
+/* 拼音 — hear the word, write the pinyin and the tone number.
+   [character, word it is used in, pinyin, tone, meaning] */
+var TC_PINYIN = {
+  "Lesson 12": [
+    ["永","永远","yong","3","forever"], ["轻","轻轻","qing","1","light / gently"],
+    ["命","生命","ming","4","life"],   ["百","一百","bai","3","hundred"],
+    ["健","健康","jian","4","healthy"],["康","健康","kang","1","well-being"],
+    ["幸","幸福","xing","4","fortunate"],["愿","愿望","yuan","4","wish"],
+    ["吹","吹风","chui","1","to blow"],["糕","蛋糕","gao","1","cake"],
+    ["首","一首歌","shou","3","measure word for songs"],["张","一张纸","zhang","1","measure word"],
+    ["卡","卡片","ka","3","card"],     ["影","电影","ying","3","shadow / film"],
+    ["票","电影票","piao","4","ticket"],["礼","礼物","li","3","gift"],
+    ["厅","客厅","ting","1","hall"],   ["奇","奇怪","qi","2","strange"],
+    ["怪","奇怪","guai","4","weird"],  ["活","生活","huo","2","to live"],
+    ["宝","宝贝","bao","3","treasure"]
+  ],
+  "复习 12 字": [
+    ["宝","宝贝","bao","3","treasure"], ["些","一些","xie","1","some"],
+    ["写","写字","xie","3","to write"], ["桌","桌子","zhuo","1","table"],
+    ["礼","礼物","li","3","gift"],      ["卡","卡片","ka","3","card"],
+    ["张","一张","zhang","1","measure word"],["吹","吹风","chui","1","to blow"],
+    ["康","健康","kang","1","well-being"],["健","健康","jian","4","healthy"],
+    ["百","一百","bai","3","hundred"],  ["永","永远","yong","3","forever"]
+  ]
+};
+
+/* --- SC, Kindergarten K2 --- */
+var SC_TINGXIE = {
+  "Week 6 · 6 Aug": [
+    ["去","去学校","qu","4","to go"], ["来","过来","lai","2","to come"],
+    ["爱","爱心","ai","4","love"],   ["快乐","快乐","kuai le","",  "happy"],
+    ["马儿跑得快","马儿跑得快。","ma er pao de kuai","","The horse runs fast."]
+  ],
+  "Week 8 · 20 Aug": [
+    ["狼","大灰狼","lang","2","wolf"], ["蛇","小蛇","she","2","snake"],
+    ["鸭子","小鸭子","ya zi","","duck"], ["乌龟","小乌龟","wu gui","","tortoise"],
+    ["小花猫","小花猫","xiao hua mao","","little tabby cat"]
+  ]
+};
+var SC_SPELL = {
+  "Week 7 · 12 Aug": ["English Spelling", [
+    ["spell","A seed grows into a plant.","seed"],
+    ["spell","The root takes in water from the soil.","root"],
+    ["spell","The stem holds the plant up.","stem"],
+    ["spell","The flower is pink and pretty.","flower"],
+    ["spell","A green leaf grew on the branch.","leaf"],
+    ["dict","We eat fruits daily.","We eat fruits daily."]
+  ]],
+  "Week 9 · 26 Aug": ["English Spelling", [
+    ["spell","We baked cookies for tea.","cookies"],
+    ["spell","Let us bake a cake today.","bake"],
+    ["spell","She drank a glass of orange juice.","juice"],
+    ["spell","Put the buns on the tray.","tray"],
+    ["spell","Add the flour into the bowl.","flour"],
+    ["dict","She mixes the batter to bake a cake.","She mixes the batter to bake a cake."]
+  ]]
+};
+
+/* --- TC's school timetable --- */
+var TIMETABLE = {
+  Monday:    ["MA","CL","CL","Recess","LSP","PAL","EL"],
+  Tuesday:   ["MA","ART","CL","Recess","CL","LSP","EL","PE"],
+  Wednesday: ["LSP","EL","CCE","Recess","CL","MA","FTGP"],
+  Thursday:  ["LSP","CL","Assembly","Recess","MA","PE","EL","SS"],
+  Friday:    ["MA","MUSIC","EL","Recess","LSP","CL","PE","CL"]
+};
+var TT_KEY = "MA maths · CL 华文 · EL English · SS social studies · " +
+             "LSP learning support · PAL active learning · CCE character &amp; citizenship · " +
+             "FTGP form teacher time";
 
 var MEALS_DEFAULT = {
-  Monday:    "Steamed codfish with ginger, spring onion, light soy\nSunny-side eggs for the boys\nStir-fried mixed vegetables\nLong bean + black fungus, minced pork, chilli & peppercorn",
-  Tuesday:   "Salmon rice\nChicken fillet salad (adults)\nSoup",
-  Wednesday: "Garlic prawns\nBraised pork belly with carrot, potato & egg\nBlanched vegetables with fried shallots\nSteamed otah",
-  Thursday:  "Macaroni soup with minced beef",
-  Friday:    "Beef burger, caramelised onion, cheese, fried egg\nBlanched vegetables on the side",
-  Saturday:  "",
-  Sunday:    ""
+  Monday:"Steamed codfish with ginger, spring onion, light soy\nSunny-side eggs for the boys\nStir-fried mixed vegetables\nLong bean + black fungus, minced pork, chilli & peppercorn",
+  Tuesday:"Salmon rice\nChicken fillet salad (adults)\nSoup",
+  Wednesday:"Garlic prawns\nBraised pork belly with carrot, potato & egg\nBlanched vegetables with fried shallots\nSteamed otah",
+  Thursday:"Macaroni soup with minced beef",
+  Friday:"Beef burger, caramelised onion, cheese, fried egg\nBlanched vegetables on the side",
+  Saturday:"", Sunday:""
 };
 
 var DAYS = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
-
-/* ---------- tabs ---------- */
 var TABS = [
-  {id:"home",     label:"Home"},
-  {id:"events",   label:"Events"},
-  {id:"schedule", label:"Schedule"},
-  {id:"meals",    label:"Meals"},
-  {id:"english",  label:"English"},
-  {id:"chinese",  label:"中文"},
-  {id:"math",     label:"Math"},
-  {id:"results",  label:"Results"}
+  ["home","Home"],["events","Events"],["timetable","Timetable"],["meals","Meals"],
+  ["english","English"],["chinese","华文"],["math","Math"],["results","Results"]
 ];
-var tab = "home";
-var quiz = null;
 
-function go(id){ tab = id; quiz = null; render(); window.scrollTo(0,0); }
+var tab="home", quiz=null;
+function go(id){ tab=id; quiz=null; hush(); render(); scrollTo(0,0); }
 
-function paintTabs(){
-  var t = document.getElementById("tabs");
-  t.innerHTML = "";
-  TABS.forEach(function(x){
-    var b = document.createElement("button");
-    b.className = "tab" + (x.id===tab ? " on" : "");
-    b.textContent = x.label;
-    b.onclick = function(){ go(x.id); };
-    t.appendChild(b);
-  });
-}
-
-/* ---------- helpers ---------- */
+/* ==========================================================================
+   helpers
+   ========================================================================== */
 function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
-function dayIndexToday(){ return (new Date().getDay()+6)%7; }
-function mondayKey(){
-  var d = new Date(); d.setDate(d.getDate()-dayIndexToday());
-  return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate();
-}
-function weekDates(){
-  var d = new Date(); d.setDate(d.getDate()-dayIndexToday());
-  return DAYS.map(function(_,i){ var x=new Date(d); x.setDate(d.getDate()+i); return x; });
-}
-function daysUntil(iso){
-  var t = new Date(); t.setHours(0,0,0,0);
-  var d = new Date(iso+"T00:00:00");
-  return Math.round((d-t)/86400000);
-}
-function whenLabel(n){
-  return n<0 ? "past" : n===0 ? "Today" : n===1 ? "Tomorrow" : "in "+n+" days";
-}
-var flashT = {};
-function flash(id){
-  var el = document.getElementById(id); if(!el) return;
-  el.textContent = "Saved";
-  clearTimeout(flashT[id]);
-  flashT[id] = setTimeout(function(){ el.textContent=""; }, 1100);
-}
+function todayIdx(){ return (new Date().getDay()+6)%7; }
+function monKey(){ var d=new Date(); d.setDate(d.getDate()-todayIdx());
+  return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate(); }
+function weekDates(){ var d=new Date(); d.setDate(d.getDate()-todayIdx());
+  return DAYS.map(function(_,i){ var x=new Date(d); x.setDate(d.getDate()+i); return x; }); }
+function daysTo(iso){ var t=new Date(); t.setHours(0,0,0,0);
+  return Math.round((new Date(iso+"T00:00:00")-t)/86400000); }
+function whenLbl(n){ return n===0?"Today":n===1?"Tomorrow":"in "+n+" days"; }
+var ft={};
+function flash(id){ var e=document.getElementById(id); if(!e) return;
+  e.textContent="Saved"; clearTimeout(ft[id]); ft[id]=setTimeout(function(){e.textContent="";},1100); }
 
-/* ---------- results store ---------- */
-function results(){ return SJ("results", []); }
-function addResult(r){ var a = results(); a.unshift(r); WJ("results", a.slice(0,500)); }
-function myRuns(sl){
-  return results().filter(function(r){ return (r.slot||"p1") === (sl||slot()); })
-                  .slice().sort(function(a,b){ return a.ts-b.ts; });
-}
-function lastFor(test){
-  var a = myRuns().filter(function(r){ return r.test===test; });
-  return a.length ? a[a.length-1] : null;
-}
-function pill(r){
-  if(!r) return '<span class="pill">Not tried</span>';
-  var p = Math.round(r.score/r.total*100);
-  var c = p>=80 ? "good" : p>=50 ? "mid" : "low";
-  return '<span class="pill '+c+'">'+r.score+'/'+r.total+'</span>';
-}
+function results(){ return SJ("results",[]); }
+function addResult(r){ var a=results(); a.unshift(r); WJ("results",a.slice(0,600)); }
+function runsFor(id){ return results().filter(function(r){ return r.who===(id||who()); })
+  .slice().sort(function(a,b){ return a.ts-b.ts; }); }
+function lastFor(test){ var a=runsFor().filter(function(r){ return r.test===test; });
+  return a.length?a[a.length-1]:null; }
+function pill(r){ if(!r) return '<span class="pill">Not tried</span>';
+  var p=Math.round(r.score/r.total*100), c=p>=80?"good":p>=50?"mid":"low";
+  return '<span class="pill '+c+'">'+r.score+'/'+r.total+'</span>'; }
 
 /* ---------- speech ---------- */
-var voices = [];
-function loadVoices(){ try{ voices = speechSynthesis.getVoices()||[]; }catch(e){ voices=[]; } }
-if(window.speechSynthesis){ loadVoices(); speechSynthesis.onvoiceschanged = loadVoices; }
-
-var FEM = /samantha|serena|sonia|kate|karen|moira|tessa|fiona|libby|maisie|hazel|aria|jenny|zira|ava|allison|susan|female|woman|嘉|xiaoxiao|huihui|tingting|mei/i;
-
+var voices=[];
+function loadVoices(){ try{ voices=speechSynthesis.getVoices()||[]; }catch(e){ voices=[]; } }
+if(window.speechSynthesis){ loadVoices(); speechSynthesis.onvoiceschanged=loadVoices; }
+var FEM=/samantha|serena|sonia|kate|karen|moira|tessa|fiona|libby|maisie|hazel|aria|jenny|zira|ava|allison|susan|female|woman|xiaoxiao|huihui|tingting|meijia|sinji|yaoyao|lili/i;
 function bestVoice(lang){
   if(!voices.length) loadVoices();
-  var saved = S("voice:"+lang, "");
-  var hit = voices.filter(function(v){ return v.name===saved; })[0];
+  var saved=S("voice:"+lang,""), hit=voices.filter(function(v){return v.name===saved;})[0];
   if(hit) return hit;
-  var base = lang.split("-")[0];
-  var exact = voices.filter(function(v){ return v.lang && v.lang.replace("_","-")===lang; });
-  var near  = voices.filter(function(v){ return v.lang && v.lang.replace("_","-").indexOf(base)===0; });
-  return exact.filter(function(v){ return FEM.test(v.name); })[0]
-      || near.filter(function(v){ return FEM.test(v.name); })[0]
-      || exact[0] || near[0] || null;
+  var base=lang.split("-")[0];
+  var ex=voices.filter(function(v){ return v.lang&&v.lang.replace("_","-")===lang; });
+  var nr=voices.filter(function(v){ return v.lang&&v.lang.replace("_","-").indexOf(base)===0; });
+  return ex.filter(function(v){return FEM.test(v.name);})[0]
+      || nr.filter(function(v){return FEM.test(v.name);})[0] || ex[0] || nr[0] || null;
 }
-function say(text, rate, lang){
+function say(t,rate,lang){
   if(!window.speechSynthesis) return;
-  lang = lang || "en-GB";
-  var u = new SpeechSynthesisUtterance(text);
-  var v = bestVoice(lang);
-  if(v){ u.voice = v; u.lang = v.lang; } else { u.lang = lang; }
-  u.rate = rate || 0.85; u.pitch = 1.06;
+  lang=lang||"en-GB";
+  var u=new SpeechSynthesisUtterance(t), v=bestVoice(lang);
+  if(v){ u.voice=v; u.lang=v.lang; } else u.lang=lang;
+  u.rate=rate||0.85; u.pitch=1.05;
   speechSynthesis.speak(u);
 }
 function hush(){ try{ speechSynthesis.cancel(); }catch(e){} }
-
-function voicePicker(lang){
+function voiceBox(lang){
   if(!voices.length) loadVoices();
-  var opts = voices.filter(function(v){
-    return v.lang && v.lang.replace("_","-").indexOf(lang.split("-")[0])===0;
-  });
-  if(!opts.length) return "";
-  var cur = bestVoice(lang);
-  var html = '<div class="lbl">Teacher voice</div><select id="vpick">';
-  opts.forEach(function(v){
-    html += '<option value="'+esc(v.name)+'"'+(cur && v.name===cur.name?" selected":"")+'>'+esc(v.name)+'</option>';
-  });
-  return html + '</select>';
+  var opts=voices.filter(function(v){ return v.lang&&v.lang.replace("_","-").indexOf(lang.split("-")[0])===0; });
+  if(!opts.length) return '<p class="empty">This device has no '+(lang==="zh-CN"?"Chinese":"English")+' voice installed.</p>';
+  var cur=bestVoice(lang), h='<div class="lbl">Teacher voice</div><select id="vp">';
+  opts.forEach(function(v){ h+='<option value="'+esc(v.name)+'"'+(cur&&v.name===cur.name?" selected":"")+'>'+esc(v.name)+'</option>'; });
+  return h+'</select>';
 }
-function wireVoicePicker(lang){
-  var el = document.getElementById("vpick");
-  if(!el) return;
-  el.onchange = function(){
-    W("voice:"+lang, el.value);
-    say("Hello, I am your spelling teacher.", 0.85, lang);
-  };
+function wireVoice(lang){
+  var e=document.getElementById("vp"); if(!e) return;
+  e.onchange=function(){ W("voice:"+lang,e.value);
+    say(lang==="zh-CN"?"你好，我是老师。":"Hello, I am your teacher.",0.85,lang); };
 }
 
 /* ==========================================================================
-   VIEWS
+   render
    ========================================================================== */
 function render(){
   document.getElementById("mark").innerHTML =
-    "CHEWTOPIA".split("").map(function(c){ return "<span>"+c+"</span>"; }).join("");
-  paintWho();
-  paintTabs();
-  var v = document.getElementById("view");
-  if(quiz){ v.innerHTML = quizHTML(); wireQuiz(); return; }
-  v.innerHTML = ({
-    home: viewHome, events: viewEvents, schedule: viewSchedule, meals: viewMeals,
-    english: viewEnglish, chinese: viewChinese, math: viewMath, results: viewResults
-  })[tab]();
-  ({ events: wireEvents, schedule: wireSchedule, meals: wireMeals,
-     english: wireTests, chinese: wireTests, math: wireMath, results: wireResults,
-     home: wireHome })[tab]();
+    "CHEWTOPIA".split("").map(function(c){return "<span>"+c+"</span>";}).join("");
+
+  var wb=document.getElementById("who"); wb.innerHTML="";
+  KIDS.forEach(function(k,n){
+    var b=document.createElement("button");
+    b.className="kid"+(n?" b":"")+(k.id===who()?" on":"");
+    b.innerHTML='<span class="av">'+esc(pname(k.id).slice(0,2).toUpperCase())+'</span>'+
+      '<span class="nm">'+esc(pname(k.id))+'<small>'+k.level+'</small></span>';
+    b.onclick=function(){
+      if(k.id===who()){
+        var n2=prompt("Name for this player (kept on this device only)",pname(k.id));
+        if(n2&&n2.trim()) W("name:"+k.id,n2.trim().slice(0,16));
+      } else W("who",k.id);
+      quiz=null; render();
+    };
+    wb.appendChild(b);
+  });
+
+  var tb=document.getElementById("tabs"); tb.innerHTML="";
+  TABS.forEach(function(t){
+    var b=document.createElement("button");
+    b.className="tab"+(t[0]===tab?" on":"");
+    b.textContent=t[1];
+    b.onclick=function(){ go(t[0]); };
+    tb.appendChild(b);
+  });
+
+  var v=document.getElementById("view");
+  if(quiz){ v.innerHTML=quizHTML(); wireQuiz(); return; }
+  var views={home:vHome,events:vEvents,timetable:vTime,meals:vMeals,
+             english:vEnglish,chinese:vChinese,math:vMath,results:vResults};
+  var wires={home:wHome,events:wEvents,timetable:wTime,meals:wMeals,
+             english:wTests,chinese:wTests,math:wTests,results:wResults};
+  v.innerHTML=views[tab]();
+  wires[tab]();
 }
 
 /* ---------- home ---------- */
-function viewHome(){
-  var evs = SJ("events", []).map(function(e){ return {e:e, n:daysUntil(e.d)}; })
-              .filter(function(x){ return x.n>=0; })
-              .sort(function(a,b){ return a.n-b.n; }).slice(0,3);
-  var sch = SJ("schedule", {});
-  var todayName = DAYS[dayIndexToday()];
-  var todaySch = (sch[todayName]||"").trim();
+function vHome(){
+  var evs=SJ("events",[]).map(function(e){ return {e:e,n:daysTo(e.d)}; })
+    .filter(function(x){ return x.n>=0; }).sort(function(a,b){ return a.n-b.n; }).slice(0,4);
+  var s='<div class="up"><div class="t">Coming up</div>';
+  if(evs.length) evs.forEach(function(x){
+    s+='<div class="r"><span class="w">'+whenLbl(x.n)+'</span><span>'+esc(x.e.t)+
+       (x.e.w?' <b style="color:var(--blue)">'+esc(pname(x.e.w))+'</b>':'')+'</span></div>'; });
+  else s+='<div class="none">Nothing yet. Add the next test under Events.</div>';
+  s+='</div>';
 
-  var strip = '<div class="nextup"><div class="t">Coming up</div>';
-  if(todaySch) strip += '<div class="row"><span class="when">Today</span><span>'+esc(todaySch)+'</span></div>';
-  evs.forEach(function(x){
-    strip += '<div class="row"><span class="when">'+whenLabel(x.n)+'</span><span>'+esc(x.e.t)+'</span></div>';
-  });
-  if(!todaySch && !evs.length) strip += '<div class="none">Nothing scheduled. Add something under Events.</div>';
-  strip += '</div>';
-
-  return strip + '<div class="tiles">'+
-    tile("a","📚","English","Spelling lists 3.3 – 3.6","english")+
-    tile("b","汉","中文","拼音 Lesson 12","chinese")+
-    tile("c","🔢","Math","Quick number drills","math")+
-    tile("d","📈","Results","Who is improving","results")+
-    tile("b","🗓️","Events","What is coming up","events")+
-    tile("c","⏰","Schedule","The weekly routine","schedule")+
-    tile("a","🍜","Meals","Dinner plan for the week","meals")+
-    tile("d","🏆","Badges","What you have unlocked","results")+
+  return s+'<div class="tiles">'+
+    tl("t1","🔤","English","Spelling tests","english")+
+    tl("t2","汉","华文","听写 &amp; 拼音","chinese")+
+    tl("t3","🔢","Math","Number drills","math")+
+    tl("t4","🧪","Results","Who is improving","results")+
+  '</div><div class="tiles" style="margin-top:10px">'+
+    tl("t2","📅","Events","Tests and birthdays","events")+
+    tl("t1","🏫","Timetable","School week","timetable")+
+    tl("t3","🍜","Meals","Dinner plan","meals")+
+    tl("t4","🏆","Badges","What you unlocked","results")+
   '</div>';
 }
-function tile(cls,ico,nm,sb,go){
-  return '<button class="tile '+cls+'" data-go="'+go+'">'+
-    '<span class="ico">'+ico+'</span><span class="nm">'+nm+'</span>'+
-    '<span class="sb">'+sb+'</span></button>';
+function tl(c,i,n,s,g){
+  return '<button class="tile '+c+'" data-go="'+g+'"><span class="ico">'+i+'</span>'+
+    '<span class="nm">'+n+'</span><span class="sb">'+s+'</span></button>';
 }
-function wireHome(){
-  document.querySelectorAll("[data-go]").forEach(function(b){
-    b.onclick = function(){ go(b.dataset.go); };
-  });
-}
+function wHome(){ document.querySelectorAll("[data-go]").forEach(function(b){
+  b.onclick=function(){ go(b.dataset.go); }; }); }
 
 /* ---------- events ---------- */
-function viewEvents(){
-  var list = SJ("events", []).map(function(e){ return {e:e,n:daysUntil(e.d)}; })
-               .sort(function(a,b){ return a.n-b.n; });
-  var upcoming = list.filter(function(x){ return x.n>=0; });
-
-  var rows = upcoming.map(function(x,i){
-    var d = new Date(x.e.d+"T00:00:00");
+function vEvents(){
+  var l=SJ("events",[]).map(function(e){ return {e:e,n:daysTo(e.d)}; })
+        .filter(function(x){ return x.n>=0; }).sort(function(a,b){ return a.n-b.n; });
+  var rows=l.map(function(x){
+    var d=new Date(x.e.d+"T00:00:00");
     return '<div class="ev'+(x.n<=2?" soon":"")+'">'+
       '<span class="cd"><b>'+d.getDate()+'</b><i>'+d.toLocaleDateString("en-GB",{month:"short"})+'</i></span>'+
-      '<span class="tx">'+esc(x.e.t)+'<small>'+whenLabel(x.n)+'</small></span>'+
-      '<button class="x" data-del="'+x.e.id+'" title="Remove">&times;</button></div>';
+      '<span class="tx">'+esc(x.e.t)+'<small>'+whenLbl(x.n)+(x.e.w?' · '+esc(pname(x.e.w)):'')+'</small></span>'+
+      '<button class="x" data-del="'+x.e.id+'">&times;</button></div>';
   }).join("");
-
-  return '<div class="panel"><h2>Coming up</h2>'+
-    '<p class="lead">One-off things: tests, birthdays, trips, holidays</p>'+
-    (rows || '<p class="empty">Nothing yet. Add the next spelling test or a birthday below.</p>')+
-    '</div>'+
+  var opts=KIDS.map(function(k){ return '<option value="'+k.id+'"'+(k.id===who()?" selected":"")+'>'+esc(pname(k.id))+'</option>'; }).join("");
+  return '<div class="panel"><h2>Coming up</h2><p class="lead">Tests, birthdays, trips</p>'+
+    (rows||'<p class="empty">Nothing yet.</p>')+'</div>'+
     '<div class="panel"><h2>Add something</h2>'+
-      '<div class="lbl">What is it</div>'+
-      '<input type="text" id="evT" placeholder="Spelling test List 3.7" maxlength="60">'+
-      '<div class="lbl">When</div><input type="date" id="evD">'+
-      '<div class="btnrow"><button class="btn go" id="evAdd">Add to the list</button></div>'+
-    '</div>';
+    '<div class="lbl">What</div><input type="text" id="eT" maxlength="60" placeholder="华文听写 Week 6">'+
+    '<div class="lbl">When</div><input type="date" id="eD">'+
+    '<div class="lbl">Who</div><select id="eW">'+opts+'</select>'+
+    '<div class="btnrow"><button class="btn go" id="eAdd">Add</button></div></div>';
 }
-function wireEvents(){
-  var add = document.getElementById("evAdd");
-  add.onclick = function(){
-    var t = document.getElementById("evT").value.trim();
-    var d = document.getElementById("evD").value;
-    if(!t || !d){ alert("Needs a name and a date."); return; }
-    var a = SJ("events", []);
-    a.push({id:Date.now()+"", t:t.slice(0,60), d:d});
-    WJ("events", a);
-    render();
+function wEvents(){
+  document.getElementById("eAdd").onclick=function(){
+    var t=document.getElementById("eT").value.trim(), d=document.getElementById("eD").value;
+    if(!t||!d){ alert("Needs a name and a date."); return; }
+    var a=SJ("events",[]); a.push({id:Date.now()+"",t:t.slice(0,60),d:d,w:document.getElementById("eW").value});
+    WJ("events",a); render();
   };
   document.querySelectorAll("[data-del]").forEach(function(b){
-    b.onclick = function(){
-      WJ("events", SJ("events",[]).filter(function(e){ return e.id !== b.dataset.del; }));
-      render();
-    };
+    b.onclick=function(){ WJ("events",SJ("events",[]).filter(function(e){return e.id!==b.dataset.del;})); render(); };
   });
 }
 
-/* ---------- schedule ---------- */
-function viewSchedule(){
-  var sch = SJ("schedule", {});
-  var rows = DAYS.map(function(d,i){
-    return '<div class="row2'+(i===dayIndexToday()?" today":"")+'">'+
-      '<span class="d">'+d.slice(0,3)+'</span>'+
-      '<input type="text" data-day="'+d+'" value="'+esc(sch[d]||"")+'" '+
-      'placeholder="Swimming 4pm, tuition 6pm"></div>';
-  }).join("");
-  return '<div class="panel"><h2>Weekly routine</h2>'+
-    '<p class="lead">The things that repeat every week. Today is highlighted.</p>'+
-    rows + '<div class="saved" id="schSaved"></div></div>';
+/* ---------- timetable ---------- */
+function vTime(){
+  var s='<div class="panel"><h2>School week</h2><p class="lead">'+esc(pname("tc"))+' · Primary 2</p>';
+  ["Monday","Tuesday","Wednesday","Thursday","Friday"].forEach(function(d,i){
+    s+='<div class="tt'+(i===todayIdx()?" now":"")+'"><div class="day">'+d+'</div><div class="slots">'+
+      TIMETABLE[d].map(function(x){
+        var c = x==="Recess" ? "rec" : x==="CL" ? "cl" :
+                (["MA","EL"].indexOf(x)>=0 ? "" : "other");
+        return '<span class="slot '+c+'">'+x+'</span>';
+      }).join("")+'</div></div>';
+  });
+  s+='<div class="key">'+TT_KEY+'</div></div>';
+
+  var sch=SJ("sched:"+who(),{});
+  s+='<div class="panel"><h2>After school</h2><p class="lead">Weekly routine for '+esc(pname(who()))+'</p>';
+  DAYS.forEach(function(d,i){
+    s+='<div class="r2'+(i===todayIdx()?" now":"")+'"><span class="d">'+d.slice(0,3)+'</span>'+
+      '<input type="text" data-day="'+d+'" value="'+esc(sch[d]||"")+'" placeholder="Swimming 4pm"></div>';
+  });
+  return s+'<div class="saved" id="schS"></div></div>';
 }
-function wireSchedule(){
-  document.querySelectorAll("[data-day]").forEach(function(inp){
-    inp.oninput = function(){
-      var s = SJ("schedule", {}); s[inp.dataset.day] = inp.value; WJ("schedule", s);
-      flash("schSaved");
-    };
+function wTime(){
+  document.querySelectorAll("[data-day]").forEach(function(i){
+    i.oninput=function(){ var s=SJ("sched:"+who(),{}); s[i.dataset.day]=i.value;
+      WJ("sched:"+who(),s); flash("schS"); };
   });
 }
 
 /* ---------- meals ---------- */
-function viewMeals(){
-  var m = SJ("meals:"+mondayKey(), null) || MEALS_DEFAULT;
-  var dates = weekDates();
-  var rows = DAYS.map(function(d,i){
-    return '<div class="row2'+(i===dayIndexToday()?" today":"")+'">'+
-      '<span class="d">'+d.slice(0,3)+'<small>'+dates[i].getDate()+'</small></span>'+
+function vMeals(){
+  var m=SJ("meals:"+monKey(),null)||MEALS_DEFAULT, dt=weekDates();
+  var s='<div class="panel"><h2>Dinner this week</h2><p class="lead">Edit anything; it saves as you type</p>';
+  DAYS.forEach(function(d,i){
+    s+='<div class="r2'+(i===todayIdx()?" now":"")+'"><span class="d">'+d.slice(0,3)+
+      '<small>'+dt[i].getDate()+'</small></span>'+
       '<textarea data-meal="'+d+'" placeholder="Dinner">'+esc(m[d]||"")+'</textarea></div>';
-  }).join("");
-  return '<div class="panel"><h2>Dinner this week</h2>'+
-    '<p class="lead">Starts from your usual plan. Edit anything; it saves as you type.</p>'+
-    rows +
-    '<div class="btnrow"><button class="btn mini" id="mReset">Back to the usual plan</button></div>'+
-    '<div class="saved" id="mealSaved"></div></div>'+
-    '<div class="panel"><h2>Groceries</h2>'+
-    '<p class="lead">What to buy for the week</p>'+
-    '<textarea id="groc" style="min-height:130px" placeholder="Codfish&#10;Salmon&#10;Pork belly&#10;Long bean">'+
-      esc(S("groc:"+mondayKey(),"")) + '</textarea>'+
-    '<div class="saved" id="grocSaved"></div></div>';
-}
-function wireMeals(){
-  document.querySelectorAll("[data-meal]").forEach(function(ta){
-    ta.oninput = function(){
-      var m = SJ("meals:"+mondayKey(), null) || JSON.parse(JSON.stringify(MEALS_DEFAULT));
-      m[ta.dataset.meal] = ta.value;
-      WJ("meals:"+mondayKey(), m);
-      flash("mealSaved");
-    };
   });
-  document.getElementById("mReset").onclick = function(){
-    if(!confirm("Replace this week's dinners with the usual plan?")) return;
-    WJ("meals:"+mondayKey(), MEALS_DEFAULT); render();
-  };
-  var g = document.getElementById("groc");
-  g.oninput = function(){ W("groc:"+mondayKey(), g.value); flash("grocSaved"); };
+  s+='<div class="btnrow"><button class="btn mini" id="mR">Back to the usual plan</button></div>'+
+     '<div class="saved" id="mS"></div></div>'+
+     '<div class="panel"><h2>Groceries</h2><textarea id="gr" style="min-height:130px" '+
+     'placeholder="Codfish&#10;Salmon&#10;Pork belly">'+esc(S("groc:"+monKey(),""))+'</textarea>'+
+     '<div class="saved" id="gS"></div></div>';
+  return s;
+}
+function wMeals(){
+  document.querySelectorAll("[data-meal]").forEach(function(t){
+    t.oninput=function(){ var m=SJ("meals:"+monKey(),null)||JSON.parse(JSON.stringify(MEALS_DEFAULT));
+      m[t.dataset.meal]=t.value; WJ("meals:"+monKey(),m); flash("mS"); };
+  });
+  document.getElementById("mR").onclick=function(){
+    if(confirm("Replace this week's dinners with the usual plan?")){ WJ("meals:"+monKey(),MEALS_DEFAULT); render(); } };
+  var g=document.getElementById("gr");
+  g.oninput=function(){ W("groc:"+monKey(),g.value); flash("gS"); };
 }
 
 /* ---------- subject menus ---------- */
-function viewEnglish(){
-  var units = {};
-  Object.keys(SPELLING).forEach(function(k){
-    (units[SPELLING[k].unit] = units[SPELLING[k].unit] || []).push(k);
-  });
-  var html = "";
-  Object.keys(units).forEach(function(u){
-    html += '<div class="panel"><h2>'+u+'</h2><p class="lead">Listen, then type the word. Starred sentences are dictation.</p>';
-    units[u].forEach(function(k){
-      var n = SPELLING[k].items.length;
-      html += '<button class="test" data-test="en|'+k+'">'+
-        '<span><span class="nm">List '+k+'</span><span class="mt">'+n+' questions</span></span>'+
-        pill(lastFor("Spelling "+k))+'</button>';
+function vEnglish(){
+  var s="";
+  if(who()==="tc"){
+    var units={};
+    Object.keys(TC_SPELL).forEach(function(k){ (units[TC_SPELL[k][0]]=units[TC_SPELL[k][0]]||[]).push(k); });
+    Object.keys(units).forEach(function(u){
+      s+='<div class="panel"><h2>'+u+'</h2><p class="lead">Listen, then type the word. Starred sentences are dictation.</p>';
+      units[u].forEach(function(k){
+        s+='<button class="test" data-t="en|'+k+'"><span><span class="nm">List '+k+'</span>'+
+          '<span class="mt">'+TC_SPELL[k][1].length+' questions</span></span>'+pill(lastFor("Spelling "+k))+'</button>';
+      });
+      s+='</div>';
     });
-    html += '</div>';
-  });
-  return html + '<div class="panel">'+voicePicker("en-GB")+
+  } else {
+    s+='<div class="panel"><h2>English Spelling</h2><p class="lead">K2 · Term 3</p>';
+    Object.keys(SC_SPELL).forEach(function(k){
+      s+='<button class="test" data-t="es|'+k+'"><span><span class="nm">'+k+'</span>'+
+        '<span class="mt">'+SC_SPELL[k][1].length+' questions</span></span>'+pill(lastFor(k))+'</button>';
+    });
+    s+='</div>';
+  }
+  return s+'<div class="panel">'+voiceBox("en-GB")+
     '<p class="lead" style="margin:9px 0 0">Pick whichever sounds most like a teacher. Changing it plays a sample.</p></div>';
 }
-function viewChinese(){
-  return '<div class="panel"><h2>汉语拼音</h2>'+
-    '<p class="lead">Lesson 12 · type the pinyin and the tone number</p>'+
-    '<button class="test" data-test="zh|L12"><span><span class="nm">拼音 Lesson 12</span>'+
-    '<span class="mt">21 characters</span></span>'+pill(lastFor("拼音 Lesson 12"))+'</button></div>'+
-    '<div class="panel">'+voicePicker("zh-CN")+
-    '<p class="lead" style="margin:9px 0 0">Chinese voices vary by device. If none are listed, this device has none installed.</p></div>';
-}
-function wireTests(){
-  document.querySelectorAll("[data-test]").forEach(function(b){
-    b.onclick = function(){ startTest(b.dataset.test); };
+function vChinese(){
+  var s='<div class="panel"><h2>'+(who()==="tc"?"汉语拼音":"华文听写")+'</h2>'+
+        '<p class="lead">You hear the word. Type the pinyin and the tone number — the character stays hidden until you answer.</p>';
+  var bank = who()==="tc" ? TC_PINYIN : SC_TINGXIE;
+  Object.keys(bank).forEach(function(k){
+    s+='<button class="test" data-t="zh|'+k+'"><span><span class="nm">'+k+'</span>'+
+      '<span class="mt">'+bank[k].length+' words</span></span>'+pill(lastFor(k))+'</button>';
   });
-  wireVoicePicker(tab==="chinese" ? "zh-CN" : "en-GB");
+  return s+'</div><div class="panel">'+voiceBox("zh-CN")+'</div>';
+}
+function vMath(){
+  return '<div class="panel"><h2>Number drills</h2><p class="lead">Ten questions, fresh every time</p>'+
+    '<button class="test" data-t="ma|easy"><span><span class="nm">Warm up</span>'+
+      '<span class="mt">Add and take away to 20</span></span>'+pill(lastFor("Math · Warm up"))+'</button>'+
+    '<button class="test" data-t="ma|times"><span><span class="nm">Times tables</span>'+
+      '<span class="mt">2 to 10</span></span>'+pill(lastFor("Math · Times tables"))+'</button>'+
+    '<button class="test" data-t="ma|hard"><span><span class="nm">Challenge</span>'+
+      '<span class="mt">Bigger numbers and division</span></span>'+pill(lastFor("Math · Challenge"))+'</button></div>';
+}
+function wTests(){
+  document.querySelectorAll("[data-t]").forEach(function(b){ b.onclick=function(){ start(b.dataset.t); }; });
+  wireVoice(tab==="chinese"?"zh-CN":"en-GB");
 }
 
-/* ---------- math ---------- */
-function viewMath(){
-  return '<div class="panel"><h2>Number drills</h2>'+
-    '<p class="lead">Ten questions, made fresh each time</p>'+
-    '<button class="test" data-m="easy"><span><span class="nm">Warm up</span>'+
-      '<span class="mt">Adding and taking away up to 20</span></span>'+pill(lastFor("Math · Warm up"))+'</button>'+
-    '<button class="test" data-m="times"><span><span class="nm">Times tables</span>'+
-      '<span class="mt">2 to 10</span></span>'+pill(lastFor("Math · Times tables"))+'</button>'+
-    '<button class="test" data-m="hard"><span><span class="nm">Challenge</span>'+
-      '<span class="mt">Bigger numbers and division</span></span>'+pill(lastFor("Math · Challenge"))+'</button>'+
-    '</div>';
-}
-function wireMath(){
-  document.querySelectorAll("[data-m]").forEach(function(b){
-    b.onclick = function(){ startTest("ma|"+b.dataset.m); };
-  });
-}
 function rnd(a,b){ return Math.floor(Math.random()*(b-a+1))+a; }
 function mathItems(kind){
-  var out = [];
+  var o=[];
   for(var i=0;i<10;i++){
     var a,b,q,ans;
     if(kind==="easy"){
-      a=rnd(2,18); b=rnd(1,18-Math.min(a,17));
+      a=rnd(2,18); b=rnd(1,Math.max(1,18-a));
       if(Math.random()<0.5){ q=a+" + "+b; ans=a+b; }
-      else { if(b>a){ var t=a;a=b;b=t; } q=a+" − "+b; ans=a-b; }
-    } else if(kind==="times"){
-      a=rnd(2,10); b=rnd(2,10); q=a+" × "+b; ans=a*b;
-    } else {
-      var r=Math.random();
+      else { if(b>a){var t=a;a=b;b=t;} q=a+" − "+b; ans=a-b; }
+    } else if(kind==="times"){ a=rnd(2,10); b=rnd(2,10); q=a+" × "+b; ans=a*b; }
+    else { var r=Math.random();
       if(r<0.34){ a=rnd(3,12); b=rnd(3,12); q=a+" × "+b; ans=a*b; }
-      else if(r<0.67){ b=rnd(2,12); ans=rnd(2,12); a=b*ans; q=a+" ÷ "+b; }
-      else { a=rnd(21,89); b=rnd(11,49); q=a+" + "+b; ans=a+b; }
-    }
-    out.push({t:"math", q:q, a:String(ans)});
+      else if(r<0.67){ b=rnd(2,12); ans=rnd(2,12); q=(b*ans)+" ÷ "+b; }
+      else { a=rnd(21,89); b=rnd(11,49); q=a+" + "+b; ans=a+b; } }
+    o.push({k:"math",q:q,a:String(ans)});
   }
-  return out;
+  return o;
 }
 
 /* ---------- quiz ---------- */
-function startTest(code){
-  var p = code.split("|"), items, subject, test, lang;
+function start(code){
+  var p=code.split("|"), items, subject, test, lang="en-GB";
   if(p[0]==="en"){
-    subject="English"; test="Spelling "+p[1]; lang="en-GB";
-    items = SPELLING[p[1]].items.map(function(x){ return {t:x.t, s:x.s, a:x.a}; });
+    subject="English"; test="Spelling "+p[1];
+    items=TC_SPELL[p[1]][1].map(function(x){ return {k:x[0],s:x[1],a:x[2]}; });
+  } else if(p[0]==="es"){
+    subject="English"; test=p[1];
+    items=SC_SPELL[p[1]][1].map(function(x){ return {k:x[0],s:x[1],a:x[2]}; });
   } else if(p[0]==="zh"){
-    subject="中文"; test="拼音 Lesson 12"; lang="zh-CN";
-    items = PINYIN.slice().sort(function(){ return Math.random()-0.5; }).map(function(x){
-      return {t:"py", h:x[0], a:x[1], tone:x[2], m:x[3], help:x[4]};
-    });
+    subject="华文"; test=p[1]; lang="zh-CN";
+    var bank = who()==="tc" ? TC_PINYIN : SC_TINGXIE;
+    items = bank[p[1]].slice().sort(function(){ return Math.random()-0.5; })
+      .map(function(x){ return {k:"py",h:x[0],word:x[1],a:x[2],tone:x[3],m:x[4]}; });
   } else {
-    subject="Math"; lang="en-GB";
-    test = "Math · " + (p[1]==="easy"?"Warm up":p[1]==="times"?"Times tables":"Challenge");
-    items = mathItems(p[1]);
+    subject="Math"; test="Math · "+(p[1]==="easy"?"Warm up":p[1]==="times"?"Times tables":"Challenge");
+    items=mathItems(p[1]);
   }
-  quiz = {code:code, subject:subject, test:test, lang:lang, items:items,
-          i:0, score:0, done:false, missed:[], graded:false};
-  render(); window.scrollTo(0,0);
+  quiz={code:code,subject:subject,test:test,lang:lang,items:items,i:0,score:0,missed:[],graded:false,done:false};
+  render(); scrollTo(0,0);
 }
+
+function clean(s){ return String(s||"").toLowerCase()
+  .replace(/[.,!?;:'"\u2018\u2019\u201c\u201d]/g,"").replace(/\s+/g," ").trim(); }
+function ltRow(t,g){ var h='<div class="lts">';
+  t.split("").forEach(function(c,k){
+    var ok=g[k]!==undefined&&g[k].toLowerCase()===c.toLowerCase();
+    h+='<span class="lt '+(ok?"h":"s")+'">'+(c===" "?"&nbsp;":c)+'</span>'; });
+  return h+'</div>'; }
 
 function quizHTML(){
-  var q = quiz, it = q.items[q.i];
-  if(q.done) return finishHTML();
+  var q=quiz, it=q.items[q.i];
+  if(q.done) return doneHTML();
+  var s='<div class="panel"><div class="qtop">'+
+    '<button class="btn mini" id="qB">&larr; Back</button>'+
+    '<span class="sc">'+esc(q.test)+' · '+q.score+'/'+q.i+'</span></div>'+
+    '<div class="meter"><i style="width:'+(q.i/q.items.length*100)+'%"></i></div>'+
+    '<div class="kind">'+(it.k==="py"?"听写":it.k==="dict"?"Dictation":it.k==="math"?"Question":"Spelling")+
+      ' '+(q.i+1)+' of '+q.items.length+'</div>';
 
-  var head = '<div class="panel"><div class="qtop">'+
-    '<button class="btn mini" id="qBack">&larr; Back</button>'+
-    '<span class="sc">'+q.test+' · '+q.score+'/'+q.i+'</span></div>'+
-    '<div class="meter"><i style="width:'+(q.i/q.items.length*100)+'%"></i></div>';
-
-  var kind = it.t==="dict" ? "Dictation" : it.t==="py" ? "Character" : it.t==="math" ? "Question" : "Spelling";
-  head += '<div class="kind">'+kind+' '+(q.i+1)+' of '+q.items.length+'</div>';
-
-  if(it.t==="py"){
-    head += '<div class="hanzi">'+it.h+'</div>';
-  } else if(it.t==="math"){
-    head += '<div class="qq">'+it.q+' = ?</div>';
+  if(it.k==="py"){
+    s+='<div class="hz'+(q.graded?"":" q")+'">'+(q.graded?it.h:"?")+'</div>'+
+       '<div class="ctx">'+(q.graded?esc(it.word):"Listen, then write the pinyin")+'</div>'+
+       '<button class="btn play" id="qP">🔊 Hear the word</button>'+
+       '<div class="pair"><span class="f1"><span class="lbl">Pinyin</span>'+
+       '<input type="text" id="qa" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="yong"></span>'+
+       '<span class="f2"><span class="lbl">Tone</span>'+
+       '<input type="text" id="qt" inputmode="numeric" maxlength="1" placeholder="1-4"></span></div>';
+  } else if(it.k==="math"){
+    s+='<div class="qq">'+it.q+' = ?</div>'+
+       '<input type="text" id="qa" inputmode="numeric" autocomplete="off" placeholder="Answer">';
   } else {
-    head += '<div class="qq">'+(it.t==="dict"?"Write the sentence":"Spell the word")+'</div>'+
-            '<div class="tip">Tap play. You will hear the sentence, then the word to spell.</div>';
+    s+='<div class="qq">'+(it.k==="dict"?"Write the sentence":"Spell the word")+'</div>'+
+       '<div class="tip">Tap play. You hear the word, then the sentence, then the word again.</div>'+
+       '<button class="btn play" id="qP">🔊 Play</button>'+
+       (it.k==="dict"
+         ? '<textarea id="qa" spellcheck="false" placeholder="Type the whole sentence" style="margin-top:11px"></textarea>'
+         : '<input type="text" id="qa" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Type here" style="margin-top:11px">');
   }
-
-  if(it.t!=="math"){
-    head += '<button class="btn play" id="qPlay">🔊 '+(it.t==="py"?"Hear it":"Play")+'</button>';
-  }
-
-  if(it.t==="py"){
-    head += '<div class="btnrow" style="align-items:flex-end">'+
-      '<span style="flex:2"><span class="lbl">Pinyin</span>'+
-      '<input type="text" id="qa" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="yong"></span>'+
-      '<span style="flex:1"><span class="lbl">Tone</span>'+
-      '<input type="text" id="qt" inputmode="numeric" maxlength="1" placeholder="1-4"></span></div>';
-  } else if(it.t==="dict"){
-    head += '<textarea id="qa" spellcheck="false" placeholder="Type the whole sentence"></textarea>';
-  } else {
-    head += '<div style="margin-top:11px"><input type="text" id="qa" autocomplete="off" '+
-      'autocapitalize="none" spellcheck="false" '+
-      (it.t==="math"?'inputmode="numeric" ':'')+'placeholder="Type here"></div>';
-  }
-
-  head += '<div class="btnrow"><button class="btn go" id="qGo">Check</button></div>'+
-          '<div id="qfb"></div></div>';
-  return head;
-}
-
-function clean(s){
-  return String(s||"").toLowerCase()
-    .replace(/[.,!?;:'"\u2018\u2019\u201c\u201d]/g,"").replace(/\s+/g," ").trim();
-}
-function letterRow(target, given){
-  var h = '<div class="tiles2">';
-  target.split("").forEach(function(c,k){
-    var ok = given[k]!==undefined && given[k].toLowerCase()===c.toLowerCase();
-    h += '<span class="lt '+(ok?"h":"s")+'">'+(c===" "?"&nbsp;":c)+'</span>';
-  });
-  return h+'</div>';
+  return s+'<div class="btnrow"><button class="btn go" id="qG">Check</button></div><div id="qf"></div></div>';
 }
 
 function wireQuiz(){
-  var q = quiz;
+  var q=quiz;
   if(q.done){
-    document.getElementById("qHome").onclick = function(){ hush(); go(q.subject==="Math"?"math":q.subject==="中文"?"chinese":"english"); };
-    document.getElementById("qAgain").onclick = function(){
-      hush(); startTest(q.code);
-    };
+    document.getElementById("dBack").onclick=function(){ go(q.subject==="Math"?"math":q.subject==="华文"?"chinese":"english"); };
+    document.getElementById("dAgain").onclick=function(){ hush(); start(q.code); };
     return;
   }
-  var it = q.items[q.i];
-  document.getElementById("qBack").onclick = function(){ hush(); go(tab); };
-  var play = document.getElementById("qPlay");
-  if(play) play.onclick = function(){ speakItem(it); };
-
-  var go2 = document.getElementById("qGo");
-  go2.onclick = function(){ q.graded ? next() : grade(); };
-  var a = document.getElementById("qa");
-  a.addEventListener("keydown", function(e){ if(e.key==="Enter" && it.t!=="dict"){ e.preventDefault(); go2.click(); } });
-  var t = document.getElementById("qt");
-  if(t) t.addEventListener("keydown", function(e){ if(e.key==="Enter"){ e.preventDefault(); go2.click(); } });
-  a.focus();
-  if(it.t!=="math" && !q.graded) setTimeout(function(){ speakItem(it); }, 220);
+  var it=q.items[q.i];
+  document.getElementById("qB").onclick=function(){ go(tab); };
+  var p=document.getElementById("qP"); if(p) p.onclick=function(){ speakIt(it); };
+  var g=document.getElementById("qG");
+  g.onclick=function(){ q.graded?next():grade(); };
+  var a=document.getElementById("qa");
+  a.addEventListener("keydown",function(e){ if(e.key==="Enter"&&it.k!=="dict"){ e.preventDefault(); g.click(); } });
+  var t=document.getElementById("qt");
+  if(t) t.addEventListener("keydown",function(e){ if(e.key==="Enter"){ e.preventDefault(); g.click(); } });
+  if(!q.graded){ a.focus(); if(it.k!=="math") setTimeout(function(){ speakIt(it); },250); }
 }
 
-function speakItem(it){
+function speakIt(it){
   hush();
-  if(it.t==="py"){ say(it.h, 0.62, "zh-CN"); setTimeout(function(){ say(it.h,0.55,"zh-CN"); }, 900); }
-  else if(it.t==="dict"){ say("Write this sentence.",0.92); say(it.s,0.8); say("Once more.",0.92); say(it.s,0.72); }
-  else { say("Spell,",0.92); say(it.a+".",0.76); say(it.s,0.86); say(it.a+".",0.7); }
+  if(it.k==="py"){
+    say(it.word,0.62,"zh-CN");
+    setTimeout(function(){ say(it.h,0.55,"zh-CN"); },1100);
+  } else if(it.k==="dict"){
+    say("Write this sentence.",0.92); say(it.s,0.8); say("Once more.",0.92); say(it.s,0.72);
+  } else {
+    say("Spell,",0.92); say(it.a+".",0.76); say(it.s,0.86); say(it.a+".",0.7);
+  }
 }
 
 function grade(){
-  var q = quiz, it = q.items[q.i];
-  var given = document.getElementById("qa").value;
-  var right, detail = "";
-
-  if(it.t==="py"){
-    var tone = (document.getElementById("qt")||{value:""}).value.trim();
-    var pOK = clean(given).replace(/\s/g,"") === it.a;
-    var tOK = tone === it.tone;
-    right = pOK && tOK;
-    detail = (pOK?"Pinyin ✓":"Pinyin ✗ → "+it.a)+" &nbsp;·&nbsp; "+(tOK?"Tone ✓":"Tone ✗ → "+it.tone)+
-             "<br>"+it.h+" — "+it.a+it.tone+" · "+it.m+"<br>"+it.help;
-  } else if(it.t==="math"){
-    right = clean(given) === it.a;
-    if(!right) detail = it.q+" = <b>"+it.a+"</b>";
+  var q=quiz, it=q.items[q.i], given=document.getElementById("qa").value, right, detail="";
+  if(it.k==="py"){
+    var tn=(document.getElementById("qt")||{value:""}).value.trim();
+    var pOK=clean(given).replace(/\s+/g," ")===clean(it.a);
+    var tOK=!it.tone || tn===it.tone;
+    right=pOK&&tOK;
+    detail='<b style="font-size:22px">'+it.h+'</b> &nbsp; '+esc(it.word)+'<br>'+
+      (pOK?"Pinyin ✓":"Pinyin ✗ → <b>"+esc(it.a)+"</b>")+
+      (it.tone?(" &nbsp;·&nbsp; "+(tOK?"Tone ✓":"Tone ✗ → <b>"+it.tone+"</b>")):"")+
+      '<br>'+esc(it.m);
+  } else if(it.k==="math"){
+    right=clean(given)===it.a;
+    if(!right) detail=it.q+' = <b>'+it.a+'</b>';
   } else {
-    right = clean(given) === clean(it.a);
-    detail = letterRow(it.a, given);
+    right=clean(given)===clean(it.a);
+    detail=ltRow(it.a,given);
   }
 
   if(right) q.score++;
-  else q.missed.push(it.t==="py" ? it.h+" ("+it.a+it.tone+")" : it.t==="math" ? it.q : it.a);
+  else q.missed.push(it.k==="py" ? it.h+" ("+it.a+(it.tone||"")+")" : it.k==="math" ? it.q : it.a);
 
-  q.graded = true;
-  document.getElementById("qa").disabled = true;
-  if(document.getElementById("qt")) document.getElementById("qt").disabled = true;
+  q.graded=true;
+  render();
+  document.getElementById("qa").value=given;
+  document.getElementById("qa").disabled=true;
+  if(document.getElementById("qt")) document.getElementById("qt").disabled=true;
+  document.getElementById("qf").innerHTML='<div class="fb '+(right?"ok":"no")+'">'+
+    '<span class="big">'+(right?"Correct":"Not quite")+'</span>'+detail+'</div>';
+  document.getElementById("qG").textContent=(q.i===q.items.length-1)?"See the score":"Next";
 
-  document.getElementById("qfb").innerHTML =
-    '<div class="fb '+(right?"ok":"no")+'">'+
-      '<span class="big">'+(right?"Correct":"Not quite")+'</span>'+detail+'</div>';
-  document.getElementById("qGo").textContent = (q.i===q.items.length-1) ? "See the score" : "Next";
-
+  hush();
   if(right) say("Correct.",0.95);
-  else { hush(); if(it.t==="py") say(it.h,0.55,"zh-CN"); else if(it.t!=="math") say(it.a,0.6); }
+  else if(it.k==="py") say(it.word,0.55,"zh-CN");
+  else if(it.k!=="math") say(it.a,0.6);
 }
 
 function next(){
-  var q = quiz;
-  q.i++; q.graded = false;
-  if(q.i >= q.items.length){
-    q.done = true;
-    addResult({slot:slot(), subject:q.subject, test:q.test,
-               score:q.score, total:q.items.length, missed:q.missed, ts:Date.now()});
+  var q=quiz; q.i++; q.graded=false;
+  if(q.i>=q.items.length){
+    q.done=true;
+    addResult({who:who(),subject:q.subject,test:q.test,score:q.score,
+               total:q.items.length,missed:q.missed,ts:Date.now()});
   }
-  render(); window.scrollTo(0,0);
+  render(); scrollTo(0,0);
 }
 
-function finishHTML(){
-  var q = quiz, pct = q.score/q.items.length;
-  var st = pct===1?"★★★":pct>=.8?"★★☆":pct>=.5?"★☆☆":"☆☆☆";
-  var rk = pct===1?"Full marks":pct>=.8?"Very good":pct>=.5?"Getting there":"Worth another go";
-  if(!q.cheered){ q.cheered = true; say(pct>=0.8 ? "Well done!" : "Good effort. Try again.", 0.95); }
-  return '<div class="panel done"><div class="kind">'+q.test+'</div>'+
-    '<div class="big">'+q.score+' / '+q.items.length+'</div>'+
-    '<div class="st">'+st+'</div><div class="rk">'+rk+'</div>'+
-    (q.missed.length ? '<div class="again">Practise again: <b>'+esc(q.missed.join(", "))+'</b></div>' : '')+
-    '<div class="btnrow"><button class="btn mini" id="qHome" style="flex:1">Back to the list</button>'+
-    '<button class="btn go" id="qAgain" style="flex:1">Try again</button></div></div>';
+function doneHTML(){
+  var q=quiz, p=q.score/q.items.length;
+  var st=p===1?"★★★":p>=.8?"★★☆":p>=.5?"★☆☆":"☆☆☆";
+  var rk=p===1?"Full marks!":p>=.8?"Very good":p>=.5?"Getting there":"Worth another go";
+  if(!q.cheered){ q.cheered=true; say(p>=0.8?"Well done!":"Good effort. Try again.",0.95); }
+  return '<div class="panel done"><div class="kind">'+esc(q.test)+'</div>'+
+    '<div class="big">'+q.score+' / '+q.items.length+'</div><div class="st">'+st+'</div>'+
+    '<div class="rk">'+rk+'</div>'+
+    (q.missed.length?'<div class="again">Practise again: <b>'+esc(q.missed.join(", "))+'</b></div>':'')+
+    '<div class="btnrow"><button class="btn mini" id="dBack">Back to the list</button>'+
+    '<button class="btn go" id="dAgain">Try again</button></div></div>';
 }
 
-/* ---------- results (parent dashboard) ---------- */
-function viewResults(){
-  var html = "";
-  ["p1","p2"].forEach(function(sl){
-    var runs = myRuns(sl);
-    html += '<div class="panel"><h2>'+esc(pname(sl))+'</h2>';
-    if(!runs.length){
-      html += '<p class="empty">No finished tests yet.</p></div>';
-      return;
-    }
-    var xp = runs.reduce(function(t,r){ return t+r.score*10; },0);
-    html += '<p class="lead">'+runs.length+' tests finished · '+xp+' XP · level '+(Math.floor(xp/300)+1)+'</p>';
+/* ---------- results ---------- */
+function vResults(){
+  var s="";
+  KIDS.forEach(function(k){
+    var runs=runsFor(k.id);
+    s+='<div class="panel"><h2>'+esc(pname(k.id))+'</h2>';
+    if(!runs.length){ s+='<p class="empty">No finished tests yet.</p></div>'; return; }
+    var xp=runs.reduce(function(t,r){ return t+r.score*10; },0);
+    s+='<p class="lead">'+runs.length+' tests · '+xp+' XP · level '+(Math.floor(xp/300)+1)+'</p>';
 
-    /* subject bars from the latest attempt of each test */
-    var latest = {}, subj = {};
-    runs.forEach(function(r){ latest[r.test] = r; });
-    Object.keys(latest).forEach(function(t){
-      var r = latest[t];
-      subj[r.subject] = subj[r.subject] || {g:0,m:0};
-      subj[r.subject].g += r.score; subj[r.subject].m += r.total;
-    });
-    html += '<div class="bars">';
-    Object.keys(subj).forEach(function(s){
-      var p = Math.round(subj[s].g/subj[s].m*100);
-      var c = p>=80?"":p>=50?"mid":"low";
-      html += '<div class="brow"><span class="n">'+esc(s)+'</span>'+
-              '<span class="bar"><i class="'+c+'" style="width:'+p+'%"></i></span>'+
-              '<span class="p">'+p+'%</span></div>';
-    });
-    html += '</div>';
+    var latest={},subj={};
+    runs.forEach(function(r){ latest[r.test]=r; });
+    Object.keys(latest).forEach(function(t){ var r=latest[t];
+      subj[r.subject]=subj[r.subject]||{g:0,m:0};
+      subj[r.subject].g+=r.score; subj[r.subject].m+=r.total; });
+    s+='<div class="bars">';
+    Object.keys(subj).forEach(function(x){
+      var p=Math.round(subj[x].g/subj[x].m*100), c=p>=80?"":p>=50?"mid":"low";
+      s+='<div class="brow"><span class="n">'+esc(x)+'</span><span class="bar">'+
+         '<i class="'+c+'" style="width:'+p+'%"></i></span><span class="p">'+p+'%</span></div>'; });
+    s+='</div>';
 
-    /* progression per test */
-    var tests = [];
-    runs.forEach(function(r){ if(tests.indexOf(r.test)<0) tests.push(r.test); });
+    var tests=[]; runs.forEach(function(r){ if(tests.indexOf(r.test)<0) tests.push(r.test); });
     tests.forEach(function(t){
-      var a = runs.filter(function(r){ return r.test===t; });
-      var first=a[0], last=a[a.length-1];
-      var best=a.reduce(function(x,y){ return y.score>x.score?y:x; },a[0]);
-      var mv = last.score-first.score;
-      var tr = a.length<2 ? '<span class="trend fl">First try</span>'
-             : mv>0 ? '<span class="trend up">▲ up '+mv+'</span>'
-             : mv<0 ? '<span class="trend dn">▼ down '+Math.abs(mv)+'</span>'
-             : '<span class="trend fl">no change</span>';
-      var chips = a.map(function(r,n){
-        var p=Math.round(r.score/r.total*100);
-        var c=p>=80?"good":p>=50?"mid":"low";
-        return (n?'<span class="arrow">→</span>':'')+
-          '<span class="run '+c+'"><b>'+r.score+'/'+r.total+'</b><i>'+
-          new Date(r.ts).toLocaleDateString("en-GB",{day:"numeric",month:"short"})+'</i></span>';
+      var a=runs.filter(function(r){ return r.test===t; });
+      var f=a[0], l=a[a.length-1], b=a.reduce(function(x,y){ return y.score>x.score?y:x; },a[0]);
+      var mv=l.score-f.score;
+      var tr=a.length<2?'<span class="tr fl">First try</span>'
+            :mv>0?'<span class="tr up">▲ up '+mv+'</span>'
+            :mv<0?'<span class="tr dn">▼ down '+Math.abs(mv)+'</span>'
+            :'<span class="tr fl">no change</span>';
+      var ch=a.map(function(r,n){
+        var p=Math.round(r.score/r.total*100), c=p>=80?"good":p>=50?"mid":"low";
+        return (n?'<span class="arw">→</span>':'')+'<span class="run '+c+'"><b>'+r.score+'/'+r.total+
+          '</b><i>'+new Date(r.ts).toLocaleDateString("en-GB",{day:"numeric",month:"short"})+'</i></span>';
       }).join("");
-      html += '<div class="runrow"><div class="runhead"><span class="runname">'+esc(t)+'</span>'+tr+
-              '<span class="runbest">Best '+best.score+'/'+best.total+'</span></div>'+
-              '<div class="runline">'+chips+'</div></div>';
+      s+='<div class="rr"><div class="rh"><span class="n">'+esc(t)+'</span>'+tr+
+         '<span class="best">Best '+b.score+'/'+b.total+'</span></div><div class="rl">'+ch+'</div></div>';
     });
-    html += '</div>';
+    s+='</div>';
   });
-
-  return html + '<div class="panel"><h2>Housekeeping</h2>'+
-    '<p class="lead">Scores are stored on this device only</p>'+
+  return s+'<div class="panel"><h2>Housekeeping</h2><p class="lead">Scores live on this device only</p>'+
     '<div class="btnrow"><button class="btn mini" id="wipe">Clear all scores</button></div></div>';
 }
-function wireResults(){
-  document.getElementById("wipe").onclick = function(){
-    if(!confirm("Delete every saved score on this device?")) return;
-    WJ("results", []); render();
-  };
+function wResults(){
+  document.getElementById("wipe").onclick=function(){
+    if(confirm("Delete every saved score on this device?")){ WJ("results",[]); render(); } };
 }
 
-/* ---------- boot ---------- */
 render();
