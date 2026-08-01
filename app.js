@@ -63,7 +63,7 @@ function vHome(){
             (e.time?(st.live?'':' · ')+e.time:'')+'</small>')+
           (e.n?'<span class="nt">'+esc(e.n)+'</span>':'')+
           (e.p?'<button class="prac '+whoCls(e.w)+'" data-go="'+esc(e.p)+'" data-who="'+esc(e.w||"")+'">'+
-               'Practise this \u2192</button>':'')+'</span>'+
+               'Practise '+esc(practiceLabel(e.p))+' \u2192</button>':'')+'</span>'+
         (fromSeed(e.id)?'':'<button class="x" data-del="'+e.id+'" title="Remove">&times;</button>')+
         '</div>';
     });

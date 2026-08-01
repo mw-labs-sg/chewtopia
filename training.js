@@ -117,6 +117,16 @@ function mathItems(kind){
   return o;
 }
 
+/* What a practice code opens, for labelling the button on Upcoming. */
+function practiceLabel(code){
+  var p=String(code).split("|");
+  if(p[0]==="en") return "List "+p[1];
+  if(p[0]==="hz") return "\u6211\u4f1a\u5199 "+p[1];
+  if(p[0]==="rn") return "\u6211\u4f1a\u8ba4 "+p[1];
+  if(p[0]==="ma") return "Maths \u00b7 "+(p[1]==="easy"?"Warm up":p[1]==="times"?"Times tables":"Challenge");
+  return p[1];
+}
+
 function start(code){
   var p=code.split("|"), items, subject, test, lang="en-GB";
   if(p[0]==="en"){ subject="English"; test="Spelling "+p[1];
