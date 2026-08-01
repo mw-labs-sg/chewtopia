@@ -18,13 +18,20 @@ function markGone(id){ var g=seedGone(); if(g.indexOf(id)<0){ g.push(id); WJ("se
 function mergeSeed(key, seed){
   var cur = SJ(key,null);
   if(cur===null){ WJ(key, seed.slice()); return; }
-  var gone = seedGone(), have = {};
-  cur.forEach(function(x){ have[x.id]=1; });
-  var added = false;
-  seed.forEach(function(x){
-    if(!have[x.id] && gone.indexOf(x.id)<0){ cur.push(x); added=true; }
+  var gone = seedGone(), byId = {};
+  seed.forEach(function(x){ byId[x.id]=x; });
+  var out = [], have = {}, changed = false;
+  cur.forEach(function(x){
+    if(byId[x.id]){
+      have[x.id]=1;
+      if(JSON.stringify(x)!==JSON.stringify(byId[x.id])){ changed=true; out.push(byId[x.id]); }
+      else out.push(x);
+    } else out.push(x);
   });
-  if(added) WJ(key, cur);
+  seed.forEach(function(x){
+    if(!have[x.id] && gone.indexOf(x.id)<0){ out.push(x); changed=true; }
+  });
+  if(changed) WJ(key, out);
 }
 function seedOnce(){ mergeSeed("events", SEED_EVENTS); mergeSeed("acts", SEED_ACTS); }
 
@@ -56,6 +63,7 @@ function evState(e){ var a=daysTo(e.d), b=e.d2?daysTo(e.d2):a;
 function evWhen(e){ var s=evState(e);
   if(s.live) return e.d2?"On now":"Today";
   return s.start===1?"Tomorrow":"in "+s.start+" days"; }
+function dday(i){ return new Date(i+"T00:00:00").toLocaleDateString("en-GB",{weekday:"short"}); }
 function dnum(i){ return new Date(i+"T00:00:00").getDate(); }
 function dmon(i){ return new Date(i+"T00:00:00").toLocaleDateString("en-GB",{month:"short"}); }
 var ft={};

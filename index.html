@@ -18,6 +18,7 @@
     --bg:#F2F7FB; --card:#FFF; --ink:#16222E; --soft:#6A7E8F; --line:#E1EAF2;
     --blue:#2F73E8; --lime:#4FB86B; --coral:#FF6F52; --grape:#7C5CE0; --sun:#FFB627;
     --sky:#E8F2FE;
+    --tang:#C25A0C; --peach:#FFE9D2;   /* SC */
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   html{-webkit-text-size-adjust:100%}
@@ -50,7 +51,7 @@
   .pk small{display:block;font-size:11px;font-weight:500;opacity:.8}
   .pk.on{color:#fff;background:var(--ink);border-color:var(--ink);box-shadow:0 3px 0 var(--ink)}
   .pk.k-tc.on{background:var(--blue);border-color:var(--blue);box-shadow:0 3px 0 var(--blue)}
-  .pk.k-sc.on{background:var(--grape);border-color:var(--grape);box-shadow:0 3px 0 var(--grape)}
+  .pk.k-sc.on{background:var(--tang);border-color:var(--tang);box-shadow:0 3px 0 var(--tang)}
 
   .tabs{display:flex;gap:8px;margin-bottom:14px;overflow-x:auto;
     scrollbar-width:none;-webkit-overflow-scrolling:touch;padding-bottom:2px}
@@ -81,6 +82,9 @@
   .ev.soon .cd{background:#FFEDE8} .ev.soon .cd b{color:var(--coral)}
   .ev .tx{flex:1;font-weight:600}
   .ev .tx small{display:block;font-weight:400;color:var(--soft);font-size:13px;margin-top:1px}
+  .ev .nt{display:block;font-weight:400;color:var(--ink);font-size:14px;line-height:1.45;
+    margin-top:7px;padding:9px 11px;background:var(--bg);border-radius:10px}
+  .ev .x{align-self:flex-start}
   .ev .x{background:none;border:none;color:#B9C7D4;font-size:22px;cursor:pointer;
     padding:10px 12px;min-width:44px;min-height:44px}
 
@@ -157,7 +161,7 @@
 
   /* ---- child colours ---- */
   .c-tc{background:var(--sky)!important;color:var(--blue)!important}
-  .c-sc{background:#F0EAFE!important;color:var(--grape)!important}
+  .c-sc{background:var(--peach)!important;color:var(--tang)!important}
   .c-all{background:#DFF3E4!important;color:#2F7A45!important}
   .c-tc b,.c-sc b,.c-all b{color:inherit!important}
   .tag{display:inline-block;font-size:14px;font-weight:800;border-radius:8px;
@@ -191,7 +195,7 @@
   .wkb.hR{width:calc(50% - 1px);justify-self:end}
   /* in both mode, school blocks carry the child's colour on their edge too */
   .wkb.sch.hL{box-shadow:inset 3px 0 0 var(--blue)}
-  .wkb.sch.hR{box-shadow:inset 3px 0 0 var(--grape)}
+  .wkb.sch.hR{box-shadow:inset 3px 0 0 var(--tang)}
   /* school subjects */
   .s-core{background:var(--sky);color:var(--blue)}
   .s-cl{background:#FFE3DC;color:#B03A22}
@@ -314,10 +318,10 @@
   <div class="foot">Saved on this device</div>
 </div>
 <!-- load order matters: data, then core, then screens, app last -->
-<script src="data.js?v=7"></script>
-<script src="core.js?v=4"></script>
+<script src="data.js?v=8"></script>
+<script src="core.js?v=6"></script>
 <script src="timetable.js?v=3"></script>
 <script src="training.js?v=2"></script>
-<script src="app.js?v=27"></script>
+<script src="app.js?v=29"></script>
 </body>
 </html>

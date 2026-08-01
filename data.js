@@ -313,15 +313,24 @@ var SEED_EVENTS = [
   {id:"e5", t:"Birthday party", d:"2026-08-08", w:"sc"},
   {id:"e6", t:"Spelling test",  d:"2026-08-12", w:"sc"},
   {id:"e7", t:"Chiang Mai",     d:"2026-09-04", d2:"2026-09-07"},
-  {id:"e8", t:"HPB form due — health screening", d:"2026-08-11", w:"sc"},
-  {id:"e9", t:"HPB health screening",            d:"2026-08-21", d2:"2026-08-25", w:"sc"},
+  {id:"e8", t:"HPB form due — health screening", d:"2026-08-11", w:"sc",
+   n:"Fill in the online Medical Information and Lifestyle Questionnaire from HPB's letter. It is not a consent form — to opt out, email HPB directly."},
+  {id:"e9", t:"HPB health screening", d:"2026-08-21", d2:"2026-08-25", w:"sc",
+   n:"Annual health screening for K1 and K2, held in school. Nothing to bring."},
+
   /* Nanyang Primary, August info sheet NYPS2026/07/093 */
-  {id:"e10", t:"National Day celebration — red top, 7.30am", d:"2026-08-07", time:"07:30", w:"tc"},
-  {id:"e11", t:"No school — PSLE oral (P1–P5 stay home)", d:"2026-08-12", d2:"2026-08-13", w:"tc"},
-  {id:"e12", t:"Founders' Day — 109th",          d:"2026-08-14", w:"tc"},
+  {id:"e10", t:"National Day celebration", d:"2026-08-07", time:"07:30", w:"tc",
+   n:"Be there by 7.30am at the Basketball and Multi-purpose Courts, King's Road campus. Red top with school shorts. In a small bag: a storybook for silent reading, healthy snacks, a water bottle, a National Day food item that means something about Singapore (his own to eat), and a hand-held flag if he wants one. Out at 10.30am — school bus runs as usual, or drive in between 10.50 and 11.15am."},
+  {id:"e11", t:"No school — PSLE oral", d:"2026-08-12", d2:"2026-08-13", w:"tc",
+   n:"P1 to P5 stay home both days while the P6 oral exams run. Only children booked into Student Care go in."},
+  {id:"e12", t:"Founders' Day — 109th", d:"2026-08-14", w:"tc",
+   n:"The school was founded 15 August 1917. Every child gets a longevity bun with lotus paste, halal option available. Normal school day, nothing to bring."},
+
   /* Nanyang Kindergarten, National Day letter 28 Jul 2026 */
-  {id:"e13", t:"National Day journey — red top, white bottoms", d:"2026-08-07", time:"07:45", w:"sc"},
-  {id:"e14", t:"Public holiday — National Day (in lieu)", d:"2026-08-10"}
+  {id:"e13", t:"National Day learning journey", d:"2026-08-07", time:"07:45", w:"sc",
+   n:"Drop off at the 118 King's Road campus — teachers take them from 7.45am. Journey runs 8.00 to 11.15am, walking to places from Singapore's founding. Red top with white bottoms. Pack in a backpack: a cap, a water bottle, a light raincoat, and shoes he can walk in. Breakfast is given at school. No school bus at all today, so both trips are on us."},
+  {id:"e14", t:"Public holiday — National Day (in lieu)", d:"2026-08-10",
+   n:"9 August falls on a Sunday. Kindergarten reopens Tuesday 11 August."}
 ];
 var SEED_ACTS = [
   /* SC — from the printed weekly schedule */

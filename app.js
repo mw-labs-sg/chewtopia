@@ -55,8 +55,10 @@ function vHome(){
         '<i>'+dmon(e.d)+'</i></span>'+
         '<span class="tx"><span class="tag '+whoCls(e.w)+'">'+
           (e.w?esc(pname(e.w)):"All")+'</span> '+esc(e.t)+
-          '<small>'+evWhen(e)+(e.time?" · "+e.time:"")+'</small></span>'+
-        '<button class="x" data-del="'+e.id+'">&times;</button></div>';
+          '<small>'+dday(e.d)+(e.d2?"–"+dday(e.d2):"")+' · '+
+          evWhen(e)+(e.time?" · "+e.time:"")+'</small>'+
+          (e.n?'<span class="nt">'+esc(e.n)+'</span>':'')+'</span>'+
+        '<button class="x" data-del="'+e.id+'" title="Remove">&times;</button></div>';
     });
   } else s+='<p class="empty">Nothing coming up.</p>';
 
@@ -66,6 +68,7 @@ function vHome(){
     s+='<div class="lbl">What</div><input type="text" id="eT" maxlength="60" placeholder="华文听写 Week 6">'+
        '<div class="lbl">When</div><input type="date" id="eD">'+
        '<div class="lbl">Time (optional)</div><input type="time" id="eTm">'+
+       '<div class="lbl">Details (optional)</div><textarea id="eN" class="cell" style="min-height:64px" placeholder="What to bring, where, what time"></textarea>'+
        '<div class="lbl">Until (trips only)</div><input type="date" id="eD2">'+
        '<div class="lbl">Who</div><select id="eW">'+opts+'</select>'+
        '<div class="btnrow"><button class="btn go" id="eAdd">Add</button>'+
@@ -115,6 +118,7 @@ function wMeals(){
 function wHome(){
   document.querySelectorAll("[data-del]").forEach(function(b){
     b.onclick=function(){
+      if(!confirm("Remove this from Upcoming?")) return;
       markGone(b.dataset.del);
       WJ("events",SJ("events",[]).filter(function(e){return e.id!==b.dataset.del;})); render(); }; });
   var sh=document.getElementById("eShow");
@@ -127,6 +131,7 @@ function wHome(){
     if(!t||!d){ alert("Needs a name and a date."); return; }
     var rec={id:Date.now()+"",t:t.slice(0,60),d:d,w:document.getElementById("eW").value};
     var tm=document.getElementById("eTm").value; if(tm) rec.time=tm;
+    var nn=document.getElementById("eN").value.trim(); if(nn) rec.n=nn.slice(0,600);
     var d2=document.getElementById("eD2").value; if(d2&&d2>=d) rec.d2=d2;
     var a=SJ("events",[]); a.push(rec); WJ("events",a);
     showAdd=false; render();
