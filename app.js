@@ -22,8 +22,8 @@ function render(){
 
   var v=document.getElementById("view");
   if(quiz){ v.innerHTML=quizHTML(); wireQuiz(); return; }
-  var V={home:vHome,schedule:vWeek,meals:vMeals,practice:vTests,results:vResults};
-  var Wr={home:wHome,schedule:wWeek,meals:wMeals,practice:wTests,results:wResults};
+  var V={home:vHome,schedule:vWeek,meals:vMeals,practice:vTests,reading:vRead,results:vResults};
+  var Wr={home:wHome,schedule:wWeek,meals:wMeals,practice:wTests,reading:wRead,results:wResults};
   v.innerHTML=V[tab](); Wr[tab]();
   document.querySelectorAll("textarea.cell").forEach(grow);
 }
@@ -154,6 +154,72 @@ function wHome(){
     var a=SJ("events",[]); a.push(rec); WJ("events",a);
     showAdd=false; render();
   };
+}
+
+/* ==========================================================================
+   READING — books finished, in either language
+   ========================================================================== */
+var showBook=false;
+function vRead(){
+  var s="";
+  KIDS.forEach(function(k){
+    var all=books(k.id), m=booksSince(k.id,30);
+    var en=all.filter(function(b){return b.l==="en";}).length, cn=all.length-en;
+    s+='<div class="panel"><h2>'+esc(pname(k.id))+
+       '<span class="side">'+all.length+(all.length===1?" book":" books")+'</span></h2>'+
+       '<div class="rdsum"><span class="rdc en">'+en+' English</span>'+
+       '<span class="rdc cn">'+cn+' \u534e\u6587</span>'+
+       '<span class="rdc mo">'+m.length+' this month</span></div>';
+    if(!all.length) s+='<p class="empty">Nothing logged yet.</p>';
+    else all.slice(0,12).forEach(function(b){
+      s+='<div class="bk"><span class="bl '+(b.l==="en"?"en":"cn")+'">'+
+         (b.l==="en"?"EN":"\u4e2d")+'</span>'+
+         '<span class="btx">'+esc(b.t)+'<small>'+
+         new Date(b.ts).toLocaleDateString("en-GB",{day:"numeric",month:"short"})+
+         (b.r?' \u00b7 '+"\u2605".repeat(b.r):"")+'</small></span>'+
+         '<button class="x" data-bk="'+k.id+':'+b.id+'" title="Remove">&times;</button></div>';
+    });
+    if(all.length>12) s+='<p class="empty">'+(all.length-12)+' more before these.</p>';
+    s+='</div>';
+  });
+  if(showBook){
+    s+='<div class="panel"><h2>Add a book</h2>'+
+       '<div class="lbl">Title</div><input type="text" id="bT" maxlength="70" placeholder="\u6bdb\u6bdb\u866b\u7684\u978b\u5b50">'+
+       '<div class="lbl">Who read it</div><select id="bW">'+
+       KIDS.map(function(k){ return '<option value="'+k.id+'"'+(k.id===who()?" selected":"")+'>'+esc(pname(k.id))+'</option>'; }).join("")+
+       '</select>'+
+       '<div class="lbl">Language</div><select id="bL">'+
+       '<option value="en">English</option><option value="cn">\u534e\u6587</option></select>'+
+       '<div class="lbl">Did they like it?</div><select id="bR">'+
+       '<option value="">No rating</option><option value="3">\u2605\u2605\u2605 loved it</option>'+
+       '<option value="2">\u2605\u2605 good</option><option value="1">\u2605 ok</option></select>'+
+       '<div class="btnrow"><button class="btn go" id="bAdd">Add</button>'+
+       '<button class="btn soft" id="bCancel">Cancel</button></div></div>';
+  } else {
+    s+='<div class="panel"><button class="addlink" id="bShow">+ Finished a book</button></div>';
+  }
+  return s;
+}
+function wRead(){
+  var sh=document.getElementById("bShow");
+  if(sh) sh.onclick=function(){ showBook=true; render(); };
+  var cx=document.getElementById("bCancel");
+  if(cx) cx.onclick=function(){ showBook=false; render(); };
+  var ad=document.getElementById("bAdd");
+  if(ad) ad.onclick=function(){
+    var t=document.getElementById("bT").value.trim();
+    if(!t){ alert("Needs a title."); return; }
+    var w=document.getElementById("bW").value;
+    addBook(w,{id:Date.now()+"", t:t.slice(0,70), l:document.getElementById("bL").value,
+               r:+document.getElementById("bR").value||0, ts:Date.now()});
+    showBook=false; render();
+  };
+  document.querySelectorAll("[data-bk]").forEach(function(b){
+    b.onclick=function(){
+      if(!confirm("Remove this book?")) return;
+      var p=b.dataset.bk.split(":"); delBook(p[0],p[1]); render();
+    };
+  });
 }
 
 function syncPanel(){

@@ -42,12 +42,12 @@ function mergeSeed(key, seed){
 function seedOnce(){ mergeSeed("events", SEED_EVENTS); mergeSeed("acts", SEED_ACTS); }
 
 var DAYS = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
-var TABS = [["home","Upcoming"],["schedule","Timetable"],["meals","Meals"],["practice","Training"],["results","Progress"]];
+var TABS = [["home","Upcoming"],["schedule","Timetable"],["meals","Meals"],["practice","Training"],["reading","Reading"],["results","Progress"]];
 var tab="home", quiz=null, showAdd=false;
 /* Each tab gets a readable address, e.g. .../chewtopia/#meals, so a link can
    be bookmarked or sent straight to one screen. */
 var SLUGS = {home:"upcoming", schedule:"timetable", meals:"meals",
-             practice:"training", results:"progress"};
+             practice:"training", reading:"reading", results:"progress"};
 function tabFromHash(){
   var h=(location.hash||"").replace(/^#\/?/,"").toLowerCase();
   for(var k in SLUGS){ if(SLUGS[k]===h) return k; }
@@ -254,6 +254,15 @@ function wireFilter(id, save){
   });
 }
 function evFilterBar(){ return filterBar("evFil", evFilter(), "all", "Everyone"); }
+
+/* ---------- reading log ---------- */
+function books(w){ return SJ("books:"+w, []); }
+function addBook(w, rec){ var a=books(w); a.unshift(rec); WJ("books:"+w, a.slice(0,400)); }
+function delBook(w, id){ WJ("books:"+w, books(w).filter(function(b){ return b.id!==id; })); }
+function booksSince(w, days){
+  var cut=Date.now()-days*86400000;
+  return books(w).filter(function(b){ return b.ts>=cut; });
+}
 
 /* ---------- child pickers ---------- */
 /* Training always needs one child. The timetable can also show both. */
