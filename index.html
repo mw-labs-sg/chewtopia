@@ -18,6 +18,7 @@
     --bg:#F2F7FB; --card:#FFF; --ink:#16222E; --soft:#6A7E8F; --line:#E1EAF2;
     --blue:#2F73E8; --lime:#4FB86B; --coral:#FF6F52; --grape:#7C5CE0; --sun:#FFB627;
     --sky:#E8F2FE;
+    --fern:#1E7A5A; --mint:#D8F1E6;   /* TC */
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   html{-webkit-text-size-adjust:100%}
@@ -43,20 +44,14 @@
   .mark span:nth-child(5n+4){color:var(--grape)}
   .mark span:nth-child(5n+5){color:var(--sun)}
 
-  .who{display:flex;gap:9px;margin-bottom:14px}
-  .kid{flex:1;border:2px solid var(--line);background:var(--card);color:var(--soft);
-    border-radius:16px;padding:13px 10px;font-family:inherit;cursor:pointer;
-    display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 2px 0 var(--line)}
-  .kid .av{width:32px;height:32px;border-radius:10px;background:var(--sky);color:var(--blue);
-    font-family:'Baloo 2',cursive;font-weight:800;font-size:15px;
-    display:flex;align-items:center;justify-content:center;flex:0 0 auto}
-  .kid .nm{font-weight:700;font-size:17px;line-height:1.15;text-align:left}
-  .kid .nm small{display:block;font-weight:400;font-size:12px;opacity:.85}
-  .kid.on{border-color:var(--blue);color:var(--ink);box-shadow:0 3px 0 var(--blue)}
-  .kid.on .av{background:var(--blue);color:#fff}
-  .kid.b .av{background:#F0EAFE;color:var(--grape)}
-  .kid.b.on{border-color:var(--grape);box-shadow:0 3px 0 var(--grape)}
-  .kid.b.on .av{background:var(--grape);color:#fff}
+  .pick{display:flex;gap:9px;margin-bottom:14px}
+  .pk{flex:1;border:2px solid var(--line);background:var(--card);color:var(--soft);
+    border-radius:14px;padding:10px 8px;font-family:inherit;font-size:15px;font-weight:700;
+    cursor:pointer;box-shadow:0 2px 0 var(--line);line-height:1.2}
+  .pk small{display:block;font-size:11px;font-weight:500;opacity:.8}
+  .pk.on{color:#fff;background:var(--ink);border-color:var(--ink);box-shadow:0 3px 0 var(--ink)}
+  .pk.k-tc.on{background:var(--fern);border-color:var(--fern);box-shadow:0 3px 0 var(--fern)}
+  .pk.k-sc.on{background:var(--grape);border-color:var(--grape);box-shadow:0 3px 0 var(--grape)}
 
   .tabs{display:flex;gap:8px;margin-bottom:14px;overflow-x:auto;
     scrollbar-width:none;-webkit-overflow-scrolling:touch;padding-bottom:2px}
@@ -66,6 +61,7 @@
     font-weight:700;cursor:pointer;white-space:nowrap;min-height:44px}
   @media(min-width:620px){ .tab{flex:1 1 0;padding:11px 6px} }
   .tab.on{background:var(--ink);border-color:var(--ink);color:#fff}
+  .tabdiv{flex:0 0 auto;width:2px;background:var(--line);border-radius:2px;margin:7px 3px}
 
   .panel{background:var(--card);border:2px solid var(--line);border-radius:18px;
     padding:18px 16px;margin-bottom:14px}
@@ -144,14 +140,21 @@
   .pill.good{background:#DFF3E4;color:#2F7A45}
   .pill.mid{background:#FFF1D6;color:#8A6100}
   .pill.low{background:#FFE3DC;color:#B03A22}
+  .pill.beat{background:var(--sky);color:var(--blue);font-size:12px;padding:5px 9px}
+  .pills{display:flex;gap:5px;align-items:center;flex-shrink:0}
+
+  /* ---- day streak ---- */
+  .strk{display:inline-block;font-size:13px;font-weight:800;border-radius:999px;
+    padding:4px 10px;margin-right:8px;background:#FFEDE8;color:var(--coral)}
+  .strk.cold{background:var(--bg);color:var(--soft)}
   .sub{font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);
     font-weight:700;margin:16px 0 8px}
   .sub:first-of-type{margin-top:0}
 
   /* ---- child colours ---- */
-  .c-tc{background:var(--sky)!important;color:var(--blue)!important}
+  .c-tc{background:var(--mint)!important;color:var(--fern)!important}
   .c-sc{background:#F0EAFE!important;color:var(--grape)!important}
-  .c-all{background:#E4F2DC!important;color:#3D7A45!important}
+  .c-all{background:#FFF1D6!important;color:#8A6100!important}
   .c-tc b,.c-sc b,.c-all b{color:inherit!important}
   .tag{display:inline-block;font-size:12px;font-weight:800;border-radius:7px;
     padding:2px 8px;margin-right:7px;letter-spacing:.03em;vertical-align:1px}
@@ -179,6 +182,9 @@
     font-size:11.5px;font-weight:700;text-align:center;padding:1px 3px;line-height:1.1;
     overflow:hidden;cursor:default;writing-mode:horizontal-tb}
   .wkb.sch{font-size:11px}
+  /* both children on one grid: half a column each */
+  .wkb.hL{width:calc(50% - 1px);justify-self:start}
+  .wkb.hR{width:calc(50% - 1px);justify-self:end}
   /* school subjects */
   .s-core{background:var(--sky);color:var(--blue)}
   .s-cl{background:#FFE3DC;color:#B03A22}
@@ -294,11 +300,15 @@
 <body>
 <div class="shell">
   <button class="mark" id="mark" onclick="go('home')" title="Home"></button>
-  <div class="who" id="who"></div>
   <div class="tabs" id="tabs"></div>
   <div id="view"></div>
   <div class="foot">Saved on this device</div>
 </div>
-<script src="app.js?v=18"></script>
+<!-- load order matters: data, then core, then screens, app last -->
+<script src="data.js?v=3"></script>
+<script src="core.js?v=2"></script>
+<script src="timetable.js?v=2"></script>
+<script src="training.js?v=2"></script>
+<script src="app.js?v=22"></script>
 </body>
 </html>
