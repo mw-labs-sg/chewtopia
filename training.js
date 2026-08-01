@@ -67,17 +67,21 @@ function vTests(){
 
   /* voice settings */
   var sp=parseFloat(S("rate","0.85"));
+  /* No voice picker. The app takes the best installed voice for each language,
+     so nothing has to be chosen on a device someone else set up. */
+  var ve=bestVoice("en-GB"), vc=bestVoice("zh-CN");
   s+='<div class="panel"><h2><span class="em">🔊</span> Voice</h2>'+
-     voiceBox("en-GB")+voiceBox("zh-CN")+
+     '<p class="empty">English: <b>'+esc(ve?ve.name:"none installed")+'</b><br>'+
+     '\u534e\u6587: <b>'+esc(vc?vc.name:"none installed")+'</b></p>'+
      '<div class="lbl">Speaking speed</div>'+
      '<input type="range" id="rate" min="0.5" max="1.1" step="0.05" value="'+sp+'">'+
      '<div class="rateval" id="rateVal">'+(sp<0.7?"Slow":sp<0.95?"Normal":"Quick")+'</div>'+
      '<div class="btnrow"><button class="btn soft" id="vTest">Hear a sample</button></div>'+
-     '<p class="empty" style="margin-top:10px">Voices marked ✨ are the good ones. '+
-     'If the list is short, see the note below.</p>'+
-     '<div class="key">More voices: on Windows open the site in <b>Edge</b> for Sonia and Libby. '+
-     'On iPad go to Settings → Accessibility → Spoken Content → Voices → English and download '+
-     '<b>Serena</b> or <b>Martha</b>.</div></div>';
+     '<div class="key">Chewtopia picks the best voice already on this device. '+
+     'To give it a better one: on <b>iPad</b> go to Settings → Accessibility → Spoken Content → '+
+     'Voices and download the Enhanced or Premium voice for English and for Chinese (Mandarin). '+
+     'On <b>Windows</b> open the site in Edge, and add a Chinese (Simplified, China) voice under '+
+     'Settings → Time &amp; language → Speech.</div></div>';
   return s;
 }
 function wTests(){
@@ -85,7 +89,6 @@ function wTests(){
   document.querySelectorAll("[data-t]").forEach(function(b){ b.onclick=function(){ start(b.dataset.t); }; });
   var f=document.getElementById("pf");
   if(f) f.onchange=function(){ W("pfilter", f.value); render(); };
-  wireVoices();
   var r=document.getElementById("rate");
   if(r){
     r.oninput=function(){

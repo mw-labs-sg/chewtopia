@@ -388,11 +388,16 @@ function voiceScore(v){
   if(CN_OLD.test(n))  x-=50;
   return x;
 }
+var CN_WRONG=/yue|cantonese|hk|hong ?kong|sinji|tw|taiwan|meijia|\u53f0\u7063|\u7cb5/i;
 function langVoices(lang){
   if(!voices.length) loadVoices();
   var base=lang.split("-")[0];
   return voices.filter(function(v){
-    return v.lang && v.lang.replace("_","-").toLowerCase().indexOf(base)===0;
+    var l=(v.lang||"").replace("_","-").toLowerCase();
+    if(l.indexOf(base)!==0) return false;
+    /* Mandarin only. Cantonese and the Taiwan voices read these lists wrong. */
+    if(base==="zh" && (CN_WRONG.test(v.name||"") || CN_WRONG.test(l))) return false;
+    return true;
   }).sort(function(x,y){
     var d=voiceScore(y)-voiceScore(x);
     if(d) return d;
