@@ -91,6 +91,49 @@ var TC_PINYIN = {
     ["张","一张","zhang","1","measure word"],["吹","吹风","chui","1","to blow"],
     ["康","健康","kang","1","well-being"],["健","健康","jian","4","healthy"],
     ["百","一百","bai","3","hundred"],  ["永","永远","yong","3","forever"]
+  ],
+  "第十一课 词表": [
+    ["折","折过","zhe","2","have folded"],
+    ["纸","纸飞机","zhi","3","paper aeroplane"],
+    ["块","魔术方块","kuai","4","Rubik's Cube"],
+    ["跟","跟","gen","1","and"],
+    ["棋","跳棋","qi","2","Chinese checkers"],
+    ["搭","搭","da","1","to build up"],
+    ["积","积木","ji","1","blocks"],
+    ["娃","布娃娃","wa","2","rag doll"],
+    ["器","机器人","qi","4","robot"],
+    ["许","许多","xu","3","many"],
+    ["绳","跳绳","sheng","2","rope skipping"],
+    ["捏","捏","nie","1","to mould"],
+    ["拼","拼","pin","1","to fix together"],
+    ["图","拼图","tu","2","puzzle"],
+    ["船","纸船","chuan","2","paper boat"],
+    ["象","象棋","xiang","4","Chinese chess"],
+    ["石","五石子","shi","2","Five Stones"],
+    ["更","更","geng","4","more"],
+    ["鹰","老鹰","ying","1","eagle"],
+    ["追","追","zhui","1","to chase"]
+  ],
+  "第十二课 词表": [
+    ["远","永远","yuan","3","forever"],
+    ["轻","年轻","qing","1","young"],
+    ["岁","长命百岁","sui","4","longevity and good health"],
+    ["康","健康","kang","1","healthy"],
+    ["幸","幸福","xing","4","happy; blessed"],
+    ["愿","许愿","yuan","4","to make a wish"],
+    ["吹","吹","chui","1","to blow"],
+    ["糕","蛋糕","gao","1","cake"],
+    ["首","首","shou","3","measure word for a song"],
+    ["张","张","zhang","1","measure word for a card"],
+    ["卡","生日卡","ka","3","birthday card"],
+    ["票","电影票","piao","4","movie ticket"],
+    ["礼","礼物","li","3","gift"],
+    ["厅","客厅","ting","1","living room"],
+    ["写","写","xie","3","to write"],
+    ["想","想","xiang","3","to think"],
+    ["怪","奇怪","guai","4","strange"],
+    ["活","活动","huo","2","activity"],
+    ["宝","宝贝","bao","3","darling"]
   ]
 };
 
@@ -98,6 +141,36 @@ var TC_PINYIN = {
 /* 生字表 · 我会写 — Primary 2 textbook, lessons 11–19.
    [character, pinyin, tone, word it appears in, meaning] */
 var HANZI = {
+  "第九课": [
+    ["冷","leng","3","冷天","cold"],
+    ["乌","wu","1","乌云","dark; black"],
+    ["电","dian","4","电闪","electricity"],
+    ["闪","shan","3","闪电","to flash"],
+    ["风","feng","1","刮风","wind"],
+    ["刮","gua","1","刮风","to blow"],
+    ["带","dai","4","带伞","to bring"],
+    ["伞","san","3","雨伞","umbrella"],
+    ["放","fang","4","放学","to let out"],
+    ["急","ji","2","着急","anxious"],
+    ["问","wen","4","问一问","to ask"],
+    ["孩","hai","2","孩子","child"],
+    ["忘","wang","4","忘记","to forget"],
+    ["记","ji","4","记得","to remember"]
+  ],
+  "第十课": [
+    ["爬","pa","2","爬来爬去","to crawl"],
+    ["枝","zhi","1","树枝","branch"],
+    ["跳","tiao","4","跳来跳去","to jump"],
+    ["眼","yan","3","眼睛","eye"],
+    ["睛","jing","1","眼睛","eye"],
+    ["鸟","niao","3","小鸟","bird"],
+    ["叶","ye","4","树叶","leaf"],
+    ["帮","bang","1","帮忙","to help"],
+    ["捉","zhuo","1","捉害虫","to catch"],
+    ["甜","tian","2","甜甜的","sweet"],
+    ["喜","xi","3","喜欢","to like"],
+    ["欢","huan","1","喜欢","to like"]
+  ],
   "第十一课": [
     ["过","guo","4","过来","to cross / pass"], ["娃","wa","2","娃娃","doll"],
     ["更","geng","4","更好","more"],          ["机","ji","1","机器","machine"],
@@ -333,8 +406,8 @@ var SEED_EVENTS = [
    n:"9 August falls on a Sunday. Kindergarten reopens Tuesday 11 August."},
   {id:"e15", t:"Spelling test — List 3.4", d:"2026-08-04", w:"tc", p:"en|3.4",
    n:"Unit 9. Eight words plus two dictation sentences."},
-  {id:"e16", t:"华文 test — 我学会了 第九至十二课", d:"2026-08-06", w:"tc", p:"hz|第十二课",
-   n:"Covers lessons 9 to 12. 第十一课 and 第十二课 生字表 are in Training; lessons 9 and 10 are on paper only."}
+  {id:"e16", t:"华文 test — 我学会了 第九至十二课", d:"2026-08-06", w:"tc", p:"hz|第九课",
+   n:"All four lessons are now in Training. 我会写 生字 for 第九课 (weather), 第十课 (小动物), 第十一课 and 第十二课, plus 词表 word lists for 11 and 12. Work through them in order."}
 ];
 var SEED_ACTS = [
   /* SC — from the printed weekly schedule */
