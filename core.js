@@ -76,7 +76,7 @@ function evState(e){ var a=daysTo(e.d), b=e.d2?daysTo(e.d2):a;
 function evWhen(e){ var s=evState(e);
   if(s.live) return e.d2?"On now":"Today";
   return s.start===1?"Tomorrow":"in "+s.start+" days"; }
-function dday(i){ return new Date(i+"T00:00:00").toLocaleDateString("en-GB",{weekday:"short"}); }
+function dday(i){ return new Date(i+"T00:00:00").toLocaleDateString("en-GB",{weekday:"long"}); }
 function dnum(i){ return new Date(i+"T00:00:00").getDate(); }
 function dmon(i){ return new Date(i+"T00:00:00").toLocaleDateString("en-GB",{month:"short"}); }
 var ft={};
