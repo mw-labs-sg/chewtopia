@@ -269,7 +269,12 @@ function wireQuiz(){
 }
 function speakIt(it){
   hush();
-  if(it.k==="py"){ say(it.word,0.62,"zh-CN"); setTimeout(function(){ say(it.h,0.55,"zh-CN"); },1100); }
+  /* Always read the whole word, never a lone character: 更, 长, 乐, 种 and 教
+     all have two readings and the engine guesses wrong without the context. */
+  if(it.k==="py"||it.k==="hz"||it.k==="rn"){
+    say(it.word,0.9,"zh-CN");
+    setTimeout(function(){ say(it.word,0.8,"zh-CN"); },1300);
+  }
   else if(it.k==="dict"){ say("Write this sentence.",0.92); say(it.s,0.8); say("Once more.",0.92); say(it.s,0.72); }
   else { say("Spell,",0.92); say(it.a+".",0.76); say(it.s,0.86); say(it.a+".",0.7); }
 }
@@ -330,7 +335,7 @@ function grade(){
 
   hush();
   if(right) say(q.streak>=3 ? "Correct! "+q.streak+" in a row." : "Correct.",0.95);
-  else if(it.k==="py"||it.k==="hz"||it.k==="rn") say(it.word,0.55,"zh-CN");
+  else if(it.k==="py"||it.k==="hz"||it.k==="rn") say(it.word,0.85,"zh-CN");
   else if(it.k!=="math") say(it.a,0.6);
 }
 function next(){

@@ -372,14 +372,20 @@ if(window.speechSynthesis){ loadVoices(); speechSynthesis.onvoiceschanged=loadVo
 /* Voice ranking. Modern neural voices first, then known female names.
    Windows' old SAPI voices (Zira, David, Hazel) are pushed to the bottom. */
 var NEURAL=/natural|online|google|siri|premium|enhanced/i;
-var FEM=/samantha|serena|sonia|libby|maisie|aria|jenny|ava|allison|susan|kate|karen|moira|tessa|fiona|martha|female|woman|xiaoxiao|huihui|tingting|meijia|sinji|yaoyao|lili/i;
+var FEM=/samantha|serena|sonia|libby|maisie|aria|jenny|ava|allison|susan|kate|karen|moira|tessa|fiona|martha|female|woman/i;
+/* Mandarin voices worth having, best first. Tingting and Siri are iOS,
+   Xiaoxiao and Yunxi are the Windows neural pair, Huihui is the old SAPI one. */
+var CN_GOOD=/\u666e\u901a\u8bdd|tingting|xiaoxiao|xiaoyi|yunxi|yunyang|meijia|liangliang|kangkang|yaoyao/i;
+var CN_OLD=/huihui/i;
 var OLD=/zira|david|hazel|mark|george|james|ravi|desktop/i;
 
 function voiceScore(v){
   var n=v.name||"", x=0;
-  if(NEURAL.test(n)) x+=100;
-  if(FEM.test(n))    x+=40;
-  if(OLD.test(n))    x-=60;
+  if(NEURAL.test(n))  x+=100;
+  if(CN_GOOD.test(n)) x+=80;
+  if(FEM.test(n))     x+=40;
+  if(OLD.test(n))     x-=60;
+  if(CN_OLD.test(n))  x-=50;
   return x;
 }
 function langVoices(lang){
@@ -401,15 +407,19 @@ function bestVoice(lang){
   if(hit) return hit;
   return langVoices(lang)[0] || null;
 }
+/* Chinese read too slowly turns to mush and loses its tones, so it never
+   drops below this however slow the English is set. */
 function say(t,rate,lang){
   if(!window.speechSynthesis) return;
   lang=lang||"en-GB";
+  var cn = lang.indexOf("zh")===0;
   var u=new SpeechSynthesisUtterance(t), v=bestVoice(lang);
   if(v){ u.voice=v; u.lang=v.lang; } else u.lang=lang;
   var base=parseFloat(S("rate","0.85"));
   if(isNaN(base)) base=0.85;
-  u.rate = rate ? Math.max(0.4, Math.min(1.3, rate * (base/0.85))) : base;
-  u.pitch=1.05; speechSynthesis.speak(u);
+  u.rate = rate ? Math.max(cn?0.75:0.4, Math.min(1.3, rate * (base/0.85))) : base;
+  u.pitch = cn ? 1.0 : 1.05;
+  speechSynthesis.speak(u);
 }
 function hush(){ try{ speechSynthesis.cancel(); }catch(e){} }
 function voiceBox(lang){
