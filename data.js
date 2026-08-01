@@ -309,9 +309,9 @@ var SEED_EVENTS = [
   {id:"e1", t:"Spelling test",  d:"2026-07-28", w:"tc"},
   {id:"e2", t:"华文听写",        d:"2026-07-30", w:"tc"},
   {id:"e3", t:"Hai Di Lao",     d:"2026-08-01", w:"sc"},
-  {id:"e4", t:"华文听写",        d:"2026-08-06", w:"sc"},
+  {id:"e4", t:"华文听写",        d:"2026-08-06", w:"sc", p:"zh|Week 6 · 6 Aug"},
   {id:"e5", t:"Birthday party", d:"2026-08-08", w:"sc"},
-  {id:"e6", t:"Spelling test",  d:"2026-08-12", w:"sc"},
+  {id:"e6", t:"Spelling test",  d:"2026-08-12", w:"sc", p:"es|Week 7 · 12 Aug"},
   {id:"e7", t:"Chiang Mai",     d:"2026-09-04", d2:"2026-09-07"},
   {id:"e8", t:"HPB form due — health screening", d:"2026-08-11", w:"sc",
    n:"Fill in the online Medical Information and Lifestyle Questionnaire from HPB's letter. It is not a consent form — to opt out, email HPB directly."},
@@ -330,7 +330,11 @@ var SEED_EVENTS = [
   {id:"e13", t:"National Day learning journey", d:"2026-08-07", time:"07:45", w:"sc",
    n:"Drop off at the 118 King's Road campus — teachers take them from 7.45am. Journey runs 8.00 to 11.15am, walking to places from Singapore's founding. Red top with white bottoms. Pack in a backpack: a cap, a water bottle, a light raincoat, and shoes he can walk in. Breakfast is given at school. No school bus at all today, so both trips are on us."},
   {id:"e14", t:"Public holiday — National Day (in lieu)", d:"2026-08-10",
-   n:"9 August falls on a Sunday. Kindergarten reopens Tuesday 11 August."}
+   n:"9 August falls on a Sunday. Kindergarten reopens Tuesday 11 August."},
+  {id:"e15", t:"Spelling test — List 3.4", d:"2026-08-04", w:"tc", p:"en|3.4",
+   n:"Unit 9. Eight words plus two dictation sentences."},
+  {id:"e16", t:"华文 test — 我学会了 第九至十二课", d:"2026-08-06", w:"tc", p:"hz|第十二课",
+   n:"Covers lessons 9 to 12. 第十一课 and 第十二课 生字表 are in Training; lessons 9 and 10 are on paper only."}
 ];
 var SEED_ACTS = [
   /* SC — from the printed weekly schedule */

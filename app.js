@@ -59,7 +59,9 @@ function vHome(){
             dday(e.d)+(e.d2?"–"+dday(e.d2):""))+'</span> '+esc(e.t)+
           (st.live&&!e.time?'':'<small>'+(st.live?'':evWhen(e))+
             (e.time?(st.live?'':' · ')+e.time:'')+'</small>')+
-          (e.n?'<span class="nt">'+esc(e.n)+'</span>':'')+'</span>'+
+          (e.n?'<span class="nt">'+esc(e.n)+'</span>':'')+
+          (e.p?'<button class="prac" data-go="'+esc(e.p)+'" data-who="'+esc(e.w||"")+'">'+
+               'Practise this \u2192</button>':'')+'</span>'+
         '<button class="x" data-del="'+e.id+'" title="Remove">&times;</button></div>';
     });
   } else s+='<p class="empty">Nothing coming up.</p>';
@@ -125,6 +127,14 @@ function wHome(){
       if(!confirm("Remove this from Upcoming?")) return;
       markGone(b.dataset.del);
       WJ("events",SJ("events",[]).filter(function(e){return e.id!==b.dataset.del;})); render(); }; });
+  document.querySelectorAll("[data-go]").forEach(function(b){
+    b.onclick=function(){
+      if(b.dataset.who) W("who", b.dataset.who);
+      tab="practice"; showAdd=false;
+      try{ location.hash="#training"; }catch(e){}
+      start(b.dataset.go);
+    };
+  });
   var sh=document.getElementById("eShow");
   if(sh) sh.onclick=function(){ showAdd=true; render(); };
   var cx=document.getElementById("eCancel");
