@@ -314,7 +314,14 @@ var SEED_EVENTS = [
   {id:"e6", t:"Spelling test",  d:"2026-08-12", w:"sc"},
   {id:"e7", t:"Chiang Mai",     d:"2026-09-04", d2:"2026-09-07"},
   {id:"e8", t:"HPB form due — health screening", d:"2026-08-11", w:"sc"},
-  {id:"e9", t:"HPB health screening",            d:"2026-08-21", d2:"2026-08-25", w:"sc"}
+  {id:"e9", t:"HPB health screening",            d:"2026-08-21", d2:"2026-08-25", w:"sc"},
+  /* Nanyang Primary, August info sheet NYPS2026/07/093 */
+  {id:"e10", t:"National Day celebration — red top, 7.30am", d:"2026-08-07", time:"07:30", w:"tc"},
+  {id:"e11", t:"No school — PSLE oral (P1–P5 stay home)", d:"2026-08-12", d2:"2026-08-13", w:"tc"},
+  {id:"e12", t:"Founders' Day — 109th",          d:"2026-08-14", w:"tc"},
+  /* Nanyang Kindergarten, National Day letter 28 Jul 2026 */
+  {id:"e13", t:"National Day journey — red top, white bottoms", d:"2026-08-07", time:"07:45", w:"sc"},
+  {id:"e14", t:"Public holiday — National Day (in lieu)", d:"2026-08-10"}
 ];
 var SEED_ACTS = [
   /* SC — from the printed weekly schedule */

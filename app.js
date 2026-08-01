@@ -28,6 +28,21 @@ function render(){
   document.querySelectorAll("textarea.cell").forEach(grow);
 }
 
+/* Today's food, shown on Upcoming so it is there without switching tabs. */
+function todayFood(){
+  var d=DAYS[todayIdx()];
+  var m=SJ("meals:"+monKey(),null)||mealPlan();
+  var bk=SJ("brek:"+monKey(),null)||BREAKFAST_DEFAULT;
+  var b=bk[d]||"", n=m[d]||"";
+  if(!b && !n) return "";
+  function lines(x){ return esc(x).replace(/\n/g,"<br>"); }
+  return '<div class="panel"><h2><span class="em">\uD83C\uDF5C</span> Eating today'+
+    '<span class="side">'+d+'</span></h2>'+
+    (b?'<div class="ml">Breakfast</div><p class="fd">'+lines(b)+'</p>':'')+
+    (n?'<div class="ml">Dinner</div><p class="fd">'+lines(n)+'</p>':'')+
+    '</div>';
+}
+
 function vHome(){
   var evs=SJ("events",[]).filter(function(e){ return !evState(e).gone; })
     .sort(function(a,b){ return evState(a).start-evState(b).start; });
@@ -57,7 +72,7 @@ function vHome(){
        '<button class="btn soft" id="eCancel">Cancel</button></div>';
   } else s+='<button class="addlink" id="eShow">+ Add something</button>';
 
-  return s+'</div>';
+  return s+'</div>'+todayFood();
 }
 
 function vMeals(){
