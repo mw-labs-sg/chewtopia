@@ -48,7 +48,7 @@ function vHome(){
   var evs=SJ("events",[]).filter(function(e){ return !evState(e).gone; })
     .filter(function(e){ return f==="all" || !e.w || e.w===f; })
     .sort(function(a,b){ return evState(a).start-evState(b).start; });
-  var s='<div class="panel"><h2><span class="em">📅</span> Upcoming</h2>'+kidKey(true);
+  var s='<div class="panel"><h2><span class="em">📅</span> Upcoming</h2>'+evFilterBar();
   if(evs.length){
     evs.forEach(function(e){
       var st=evState(e);
