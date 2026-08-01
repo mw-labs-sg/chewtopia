@@ -91,10 +91,10 @@ function vMeals(){
        '<div class="mh">'+d+' <em>'+dt[i].getDate()+' '+
          dt[i].toLocaleDateString("en-GB",{month:"short"})+'</em></div>'+
        '<div class="mcols">'+
-         '<div class="mcol"><div class="ml">Breakfast</div>'+
+         '<div class="mcol b"><div class="ml">Breakfast</div>'+
          '<textarea class="cell brek" data-brek="'+d+'" placeholder="\u2014">'+esc(bk[d]||"")+'</textarea></div>'+
-         '<div class="mcol"><div class="ml">Dinner</div>'+
-         '<textarea class="cell" data-meal="'+d+'" placeholder="\u2014">'+esc(m[d]||"")+'</textarea></div>'+
+         '<div class="mcol d"><div class="ml">Dinner</div>'+
+         '<textarea class="cell dinr" data-meal="'+d+'" placeholder="\u2014">'+esc(m[d]||"")+'</textarea></div>'+
        '</div></div>';
   });
   return s+'<div class="btnrow"><button class="btn soft" id="mR">Reset to week '+(rotIdx()+1)+'</button></div>'+
@@ -173,4 +173,12 @@ function wResults(){
 }
 
 seedOnce();
+tab = tabFromHash() || tab;
+if(!location.hash){ try{ location.replace("#"+SLUGS[tab]); }catch(e){} }
 render();
+
+/* back and forward buttons, and links pasted straight into the address bar */
+window.addEventListener("hashchange", function(){
+  var t=tabFromHash();
+  if(t && t!==tab) go(t, true);
+});

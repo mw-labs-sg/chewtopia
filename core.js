@@ -38,7 +38,20 @@ function seedOnce(){ mergeSeed("events", SEED_EVENTS); mergeSeed("acts", SEED_AC
 var DAYS = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
 var TABS = [["home","Upcoming"],["schedule","Timetable"],["meals","Meals"],["practice","Training"],["results","Progress"]];
 var tab="home", quiz=null, showAdd=false;
-function go(id){ tab=id; quiz=null; showAdd=false; hush(); render(); scrollTo(0,0); }
+/* Each tab gets a readable address, e.g. .../chewtopia/#meals, so a link can
+   be bookmarked or sent straight to one screen. */
+var SLUGS = {home:"upcoming", schedule:"timetable", meals:"meals",
+             practice:"training", results:"progress"};
+function tabFromHash(){
+  var h=(location.hash||"").replace(/^#\/?/,"").toLowerCase();
+  for(var k in SLUGS){ if(SLUGS[k]===h) return k; }
+  return null;
+}
+function go(id, quiet){
+  tab=id; quiz=null; showAdd=false; hush();
+  if(!quiet){ try{ location.hash="#"+SLUGS[id]; }catch(e){} }
+  render(); scrollTo(0,0);
+}
 
 /* ---------- helpers ---------- */
 /* Subject colours on the school timetable */

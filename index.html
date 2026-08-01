@@ -113,7 +113,10 @@
   @media(min-width:620px){ .mcol .ml{margin-top:2px} }
   .fd{margin:0 0 10px;font-size:15px;line-height:1.5}
   .fd:last-child{margin-bottom:0}
-  .cell.brek{background:var(--sky)}
+  .cell.brek{background:var(--sky);box-shadow:inset 3px 0 0 var(--blue)}
+  .cell.dinr{background:#FFF6E8;box-shadow:inset 3px 0 0 var(--sun)}
+  .mcol.b .ml{color:var(--blue)}
+  .mcol.d .ml{color:#8A6100}
   .mealday:last-of-type{border-bottom:0}
   .mealday .mh{font-family:'Baloo 2',cursive;font-size:18px;margin-bottom:2px}
   .mealday .mh em{font-style:normal;font-size:13px;font-weight:400;
@@ -325,9 +328,9 @@
 </div>
 <!-- load order matters: data, then core, then screens, app last -->
 <script src="data.js?v=8"></script>
-<script src="core.js?v=6"></script>
+<script src="core.js?v=7"></script>
 <script src="timetable.js?v=3"></script>
 <script src="training.js?v=2"></script>
-<script src="app.js?v=31"></script>
+<script src="app.js?v=32"></script>
 </body>
 </html>
