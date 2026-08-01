@@ -31,7 +31,7 @@ function render(){
 function vHome(){
   var evs=SJ("events",[]).filter(function(e){ return !evState(e).gone; })
     .sort(function(a,b){ return evState(a).start-evState(b).start; });
-  var s='<div class="panel"><h2><span class="em">📅</span> Upcoming</h2>';
+  var s='<div class="panel"><h2><span class="em">📅</span> Upcoming</h2>'+kidKey(true);
   if(evs.length){
     evs.forEach(function(e){
       var st=evState(e);
@@ -57,35 +57,42 @@ function vHome(){
        '<button class="btn soft" id="eCancel">Cancel</button></div>';
   } else s+='<button class="addlink" id="eShow">+ Add something</button>';
 
-  return s+'<div class="key" style="margin-top:14px">'+
-    '<span class="dot c-tc"></span> '+esc(pname("tc"))+' &nbsp; '+
-    '<span class="dot c-sc"></span> '+esc(pname("sc"))+' &nbsp; '+
-    '<span class="dot c-all"></span> Everyone</div></div>';
+  return s+'</div>';
 }
 
 function vMeals(){
-  var m=SJ("meals:"+monKey(),null)||MEALS_DEFAULT;
+  var m=SJ("meals:"+monKey(),null)||mealPlan();
+  var bk=SJ("brek:"+monKey(),null)||BREAKFAST_DEFAULT;
   var dt=weekDates();
-  var s='<div class="panel"><h2><span class="em">🍜</span> Dinner this week</h2>';
+  var s='<div class="panel"><h2><span class="em">\uD83C\uDF5C</span> Meals this week'+
+    '<span class="side">Dinner week '+(rotIdx()+1)+' of 4</span></h2>';
   DAYS.forEach(function(d,i){
     s+='<div class="mealday'+(i===todayIdx()?" now":"")+'">'+
        '<div class="mh">'+d+' <em>'+dt[i].getDate()+' '+
          dt[i].toLocaleDateString("en-GB",{month:"short"})+'</em></div>'+
-       '<textarea class="cell" data-meal="'+d+'" placeholder="—">'+esc(m[d]||"")+'</textarea></div>';
+       '<div class="ml">Breakfast</div>'+
+       '<textarea class="cell brek" data-brek="'+d+'" placeholder="\u2014">'+esc(bk[d]||"")+'</textarea>'+
+       '<div class="ml">Dinner</div>'+
+       '<textarea class="cell" data-meal="'+d+'" placeholder="\u2014">'+esc(m[d]||"")+'</textarea></div>';
   });
-  return s+'<div class="btnrow"><button class="btn soft" id="mR">Reset to usual plan</button></div>'+
+  return s+'<div class="btnrow"><button class="btn soft" id="mR">Reset to week '+(rotIdx()+1)+'</button></div>'+
     '<div class="saved" id="mS"></div></div>'+
-    '<div class="panel"><h2><span class="em">🛒</span> Groceries</h2>'+
+    '<div class="panel"><h2><span class="em">\uD83D\uDED2</span> Groceries</h2>'+
     '<textarea class="cell" id="gr" style="min-height:130px" placeholder="What to buy">'+
     esc(S("groc:"+monKey(),""))+'</textarea><div class="saved" id="gS"></div></div>';
 }
 function wMeals(){
   document.querySelectorAll("[data-meal]").forEach(function(t){
     t.oninput=function(){ grow(t);
-      var m=SJ("meals:"+monKey(),null)||JSON.parse(JSON.stringify(MEALS_DEFAULT));
+      var m=SJ("meals:"+monKey(),null)||JSON.parse(JSON.stringify(mealPlan()));
       m[t.dataset.meal]=t.value; WJ("meals:"+monKey(),m); flash("mS"); }; });
+  document.querySelectorAll("[data-brek]").forEach(function(t){
+    t.oninput=function(){ grow(t);
+      var b=SJ("brek:"+monKey(),null)||JSON.parse(JSON.stringify(BREAKFAST_DEFAULT));
+      b[t.dataset.brek]=t.value; WJ("brek:"+monKey(),b); flash("mS"); }; });
   document.getElementById("mR").onclick=function(){
-    if(confirm("Reset this week's dinners?")){ WJ("meals:"+monKey(),MEALS_DEFAULT); render(); } };
+    if(confirm("Reset this week's meals to the printed plan?")){
+      WJ("meals:"+monKey(),mealPlan()); WJ("brek:"+monKey(),BREAKFAST_DEFAULT); render(); } };
   var g=document.getElementById("gr");
   g.oninput=function(){ grow(g); W("groc:"+monKey(),g.value); flash("gS"); };
 }

@@ -6,7 +6,8 @@
      HANZI                  -> 生字表 我会写
      SC_TINGXIE / SC_SPELL  -> Kindergarten tests
      TIMETABLE / SC_SCHOOL  -> school timetables
-     MEALS_DEFAULT          -> the usual dinner plan
+     BREAKFAST_DEFAULT      -> the weekly breakfast plan
+     MEALS_ROTATION         -> the four-week dinner rotation
      SEED_EVENTS            -> term dates, tests, trips
      SEED_ACTS              -> weekly after-school activities
 
@@ -250,14 +251,57 @@ var TT_KEY = "MA maths · CL 华文 · EL English · SS social studies · " +
              "LSP learning support · PAL active learning · " +
              "CCE character &amp; citizenship · FTGP form teacher time";
 
-var MEALS_DEFAULT = {
-  Monday:"Steamed codfish with ginger, spring onion, light soy\nSunny-side eggs for the boys\nStir-fried mixed vegetables\nLong bean + black fungus, minced pork, chilli & peppercorn",
-  Tuesday:"Salmon rice\nChicken fillet salad (adults)\nSoup",
-  Wednesday:"Garlic prawns\nBraised pork belly with carrot, potato & egg\nBlanched vegetables with fried shallots\nSteamed otah",
-  Thursday:"Macaroni soup with minced beef",
-  Friday:"Beef burger, caramelised onion, cheese, fried egg\nBlanched vegetables on the side",
+/* Breakfast is the same every week. */
+var BREAKFAST_DEFAULT = {
+  Monday:"Fried egg sandwich",
+  Tuesday:"Ham sandwich",
+  Wednesday:"Salmon with cream cheese sandwich",
+  Thursday:"Sausage bun",
+  Friday:"Egg with ham sandwich",
   Saturday:"", Sunday:""
 };
+
+/* Four-week dinner rotation, from the printed planner.
+   ROTATION_START is the Monday that counts as Week 1. */
+var ROTATION_START = "2026-08-03";
+var MEALS_ROTATION = [
+{
+  Monday:"Steamed cod fish with ginger & spring onion\nStir fried mixed veg\nSunny egg for the boys\nStir fried bell pepper with chilli and pork belly",
+  Tuesday:"Stir fried garlic prawn\nBraised chicken with carrot, potato & egg\nBlanched veggies with fried garlic/onion",
+  Wednesday:"Salmon rice for the boys\nChicken fillet salad (adults)\nMiso soup with tofu and seaweed",
+  Thursday:"Macaroni soup with minced beef",
+  Friday:"Baked chicken with carrot, onion, zucchini, baby corn\nServe with bread and butter on the side",
+  Saturday:"",
+  Sunday:""
+},
+{
+  Monday:"Steamed cod fish with ginger & spring onion\nStir fried mixed veg\nSunny egg for the boys\nStir fried minced pork with long bean, chilli & peppercorn",
+  Tuesday:"Stir fried garlic prawn\nRoast pork\nBlanched veggies with fried garlic/onion",
+  Wednesday:"Salmon rice for the boys\nChicken fillet salad (adults)\nMiso soup with tofu and seaweed",
+  Thursday:"Pasta bolognese with minced beef",
+  Friday:"Steak with steamed broccoli, corn and carrot\nServe with mushroom and salad",
+  Saturday:"",
+  Sunday:""
+},
+{
+  Monday:"Steamed cod fish with ginger & spring onion\nStir fried mixed veg\nSunny egg for the boys\nClaypot tofu with minced pork and prawn paste",
+  Tuesday:"Stir fried garlic prawn\nBraised pork belly with carrot, potato & egg\nBlanched veggies with fried garlic/onion",
+  Wednesday:"Salmon rice for the boys\nChicken fillet salad (adults)\nMiso soup with tofu and seaweed",
+  Thursday:"Beef burger with minced beef",
+  Friday:"Baked chicken with carrot, onion, zucchini, baby corn\nServe with bread and butter on the side",
+  Saturday:"",
+  Sunday:""
+},
+{
+  Monday:"Steamed cod fish with ginger & spring onion\nStir fried mixed veg\nSunny egg for the boys\nChilli mapo tofu with minced pork or beef",
+  Tuesday:"Stir fried garlic prawn\nCurry chicken\nBlanched veggies with fried garlic/onion\nOmelette with onion",
+  Wednesday:"Salmon rice for the boys\nChicken fillet salad (adults)\nMiso soup with tofu and seaweed",
+  Thursday:"Cream sauce pasta with minced beef",
+  Friday:"Baked chicken with carrot, onion, zucchini, baby corn\nServe with bread and butter on the side",
+  Saturday:"",
+  Sunday:""
+}
+];
 
 /* Test dates and family events, loaded on first open only.
    Delete any of them in the app and they stay deleted. */

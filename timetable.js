@@ -126,7 +126,9 @@ function vWeek(){
 
   var head='<div class="panel"><h2><span class="em">🗓️</span> '+lbl+
     '<span class="side">'+(both?"Both":esc(pname(w)))+'</span></h2>'+
-    kidPicker(w,"ttPick",true)+
+    kidPicker(w,"ttPick",true)+kidKey(true)+
+    (both?'<p class="empty" style="margin:-4px 0 10px">'+esc(pname(KIDS[0].id))+
+      ' on the left of each day, '+esc(pname(KIDS[1].id))+' on the right.</p>':'')+
     '<div class="wknav"><button class="btn soft" id="wkPrev">‹</button>'+
     '<span class="wkrange">'+dates[0].toLocaleDateString("en-GB",{day:"numeric",month:"short"})+
     ' – '+dates[6].toLocaleDateString("en-GB",{day:"numeric",month:"short"})+'</span>'+

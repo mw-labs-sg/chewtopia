@@ -99,6 +99,16 @@ function bumpStreak(){
   WJ(k,s);
   return s;
 }
+/* ---------- meal rotation ---------- */
+/* Which of the four printed weeks this Monday falls on. */
+function rotIdx(off){
+  var d=new Date(); d.setHours(0,0,0,0);
+  d.setDate(d.getDate()-todayIdx()+(off||0)*7);
+  var w=Math.floor((d-new Date(ROTATION_START+"T00:00:00"))/604800000);
+  return ((w%4)+4)%4;
+}
+function mealPlan(off){ return MEALS_ROTATION[rotIdx(off)]; }
+
 /* ---------- child pickers ---------- */
 /* Training always needs one child. The timetable can also show both. */
 function ttWho(){ return S("ttwho","both"); }
@@ -124,6 +134,14 @@ function wirePicker(id, cur, save){
       quiz=null; render();
     };
   });
+}
+
+/* A colour key naming both boys, used wherever their colours appear. */
+function kidKey(withAll){
+  var s='<div class="legend">';
+  KIDS.forEach(function(k){ s+='<span class="lg '+whoCls(k.id)+'">'+esc(pname(k.id))+'</span>'; });
+  if(withAll) s+='<span class="lg c-all">Everyone</span>';
+  return s+'</div>';
 }
 
 function streakChip(id){
