@@ -126,9 +126,7 @@ function vWeek(){
 
   var head='<div class="panel"><h2><span class="em">🗓️</span> '+lbl+
     '<span class="side">'+(both?"Both":esc(pname(w)))+'</span></h2>'+
-    kidPicker(w,"ttPick",true)+kidKey(true)+
-    (both?'<p class="empty" style="margin:-4px 0 10px">'+esc(pname(KIDS[0].id))+
-      ' on the left of each day, '+esc(pname(KIDS[1].id))+' on the right.</p>':'')+
+    filterBar("ttFil", w, "both", "Both")+
     '<div class="wknav"><button class="btn soft" id="wkPrev">‹</button>'+
     '<span class="wkrange">'+dates[0].toLocaleDateString("en-GB",{day:"numeric",month:"short"})+
     ' – '+dates[6].toLocaleDateString("en-GB",{day:"numeric",month:"short"})+'</span>'+
@@ -174,7 +172,7 @@ function wWeek(){
             t:t.slice(0,40)});
     WJ("acts",a); render();
   };
-  wirePicker("ttPick", ttWho(), function(v){ W("ttwho", v); });
+  wireFilter("ttFil", function(v){ W("ttwho", v); });
   document.querySelectorAll("[data-act]").forEach(function(b){
     b.onclick=function(){
       if(!confirm("Remove "+b.textContent+"?")) return;

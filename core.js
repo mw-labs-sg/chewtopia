@@ -138,16 +138,23 @@ function mealPlan(off){ return MEALS_ROTATION[rotIdx(off)]; }
 
 /* Upcoming filter: everyone, or one child plus anything family-wide. */
 function evFilter(){ return S("evfilter","all"); }
-function evFilterBar(){
-  var f=evFilter();
-  var s='<div class="legend" id="evFil">'+
-    '<button class="lg c-all'+(f==="all"?" on":"")+'" data-fil="all">Everyone</button>';
+/* One filter bar shape, used on Upcoming and on the Timetable. */
+function filterBar(id, cur, allValue, allLabel){
+  var s='<div class="legend" id="'+id+'">'+
+    '<button class="lg c-all'+(cur===allValue?" on":"")+'" data-fil="'+allValue+'">'+allLabel+'</button>';
   KIDS.forEach(function(k){
-    s+='<button class="lg '+whoCls(k.id)+(f===k.id?" on":"")+'" data-fil="'+k.id+'">'+
+    s+='<button class="lg '+whoCls(k.id)+(cur===k.id?" on":"")+'" data-fil="'+k.id+'">'+
        esc(pname(k.id))+'</button>';
   });
   return s+'</div>';
 }
+function wireFilter(id, save){
+  var box=document.getElementById(id); if(!box) return;
+  box.querySelectorAll("[data-fil]").forEach(function(b){
+    b.onclick=function(){ save(b.dataset.fil); render(); };
+  });
+}
+function evFilterBar(){ return filterBar("evFil", evFilter(), "all", "Everyone"); }
 
 /* ---------- child pickers ---------- */
 /* Training always needs one child. The timetable can also show both. */

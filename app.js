@@ -130,10 +130,7 @@ function wHome(){
       if(!confirm("Remove this from Upcoming?")) return;
       markGone(b.dataset.del);
       WJ("events",SJ("events",[]).filter(function(e){return e.id!==b.dataset.del;})); render(); }; });
-  var fb=document.getElementById("evFil");
-  if(fb) fb.querySelectorAll("[data-fil]").forEach(function(b){
-    b.onclick=function(){ W("evfilter", b.dataset.fil); render(); };
-  });
+  wireFilter("evFil", function(v){ W("evfilter", v); });
   document.querySelectorAll("[data-go]").forEach(function(b){
     b.onclick=function(){
       if(b.dataset.who) W("who", b.dataset.who);
