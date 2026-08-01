@@ -342,7 +342,69 @@ function burst(n){
 }
 
 /* ---------- mascot ---------- */
+/* ---------- praise, mixed so it never repeats itself ---------- */
+var PRAISE_EN=["Nice one!","Well done!","That's it!","Spot on!","Good work!","Yes!","Lovely.","Got it!"];
+var PRAISE_CN=[["\u5f88\u597d","hen hao"],["\u592a\u68d2\u4e86","tai bang le"],["\u5bf9\u4e86","dui le"],
+               ["\u4e0d\u9519","bu cuo"],["\u771f\u5389\u5bb3","zhen li hai"],["\u597d\u68d2","hao bang"]];
+var OOPS_EN=["Not quite.","Nearly.","Close one.","Have another look."];
+function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+/* Chinese questions get Chinese praise, English gets English. Both mix. */
+function praise(cn, streak){
+  if(streak>=4) return cn ? {t:pick(PRAISE_CN)[0], lang:"zh-CN"} : {t:streak+" in a row!", lang:null};
+  if(cn && Math.random()<0.7){ return {t:pick(PRAISE_CN)[0], lang:"zh-CN"}; }
+  return {t:pick(PRAISE_EN), lang:null};
+}
+
+/* ---------- weak items: everything missed, kept per child ---------- */
+function weakKey(it){ return it.k+"|"+(it.h||it.a||it.q||it.s||""); }
+function weakAll(w){ return SJ("weak:"+(w||who()), []); }
+function weakAdd(it, code){
+  var w=who(), a=weakAll(w), k=weakKey(it), hit=null;
+  a.forEach(function(x){ if(x.k===k) hit=x; });
+  if(hit){ hit.n++; hit.ts=Date.now(); }
+  else a.push({k:k, n:1, ts:Date.now(), it:it, code:code||""});
+  WJ("weak:"+w, a.slice(-120));
+}
+function weakDrop(it){
+  var w=who(), k=weakKey(it), a=weakAll(w), out=[];
+  a.forEach(function(x){
+    if(x.k!==k){ out.push(x); return; }
+    x.n--; if(x.n>0) out.push(x);          /* two clean goes clears it */
+  });
+  WJ("weak:"+w, out);
+}
+function weakTop(w, n){
+  return weakAll(w).slice().sort(function(a,b){
+    return (b.n-a.n) || (b.ts-a.ts);
+  }).slice(0, n||5);
+}
+function weakLabel(x){
+  var it=x.it||{};
+  if(it.k==="hz"||it.k==="rn") return it.h+" \u00b7 "+(it.word||"");
+  if(it.k==="py") return (it.word||it.h||"");
+  if(it.k==="math") return it.q||"";
+  return it.a||it.s||"";
+}
+
+/* A different buddy each session, so it never feels like the same screen.
+   All share the eye and mouth classes, so the cheer and oops animations work. */
+var BUDDIES=["robot","cat","dragon","rocket","owl"];
+function buddy(){
+  var b=S("buddy",""); 
+  if(BUDDIES.indexOf(b)<0){ b=BUDDIES[Math.floor(Math.random()*BUDDIES.length)]; W("buddy",b); }
+  return b;
+}
+function newBuddy(){
+  var cur=buddy(), pick=cur;
+  while(pick===cur) pick=BUDDIES[Math.floor(Math.random()*BUDDIES.length)];
+  W("buddy",pick); return pick;
+}
 function botSVG(){
+  var b=buddy();
+  if(b==="cat")    return catSVG();
+  if(b==="dragon") return dragonSVG();
+  if(b==="rocket") return rocketSVG();
+  if(b==="owl")    return owlSVG();
   return '<svg class="bot" id="bot" viewBox="0 0 150 128" aria-hidden="true">'+
     '<line x1="75" y1="30" x2="75" y2="13" stroke="#B8C9DA" stroke-width="5" stroke-linecap="round"/>'+
     '<circle cx="75" cy="9" r="7" fill="#FFB627"/>'+
@@ -357,6 +419,57 @@ function botSVG(){
     '<rect x="82" y="100" width="16" height="12" rx="5" fill="#B8C9DA"/>'+
   '</svg>';
 }
+function catSVG(){
+  return '<svg class="bot" id="bot" viewBox="0 0 150 128" aria-hidden="true">'+
+    '<path d="M45 44 L40 18 L64 32 Z" fill="#FFB627"/>'+
+    '<path d="M105 44 L110 18 L86 32 Z" fill="#FFB627"/>'+
+    '<circle cx="75" cy="66" r="40" fill="#FFE9D2" stroke="#F0C89A" stroke-width="3"/>'+
+    '<circle class="eye" cx="62" cy="60" r="6" fill="#16222E"/>'+
+    '<circle class="eye" cx="88" cy="60" r="6" fill="#16222E"/>'+
+    '<path d="M70 76 q5 6 10 0" stroke="#C25A0C" stroke-width="3" fill="none" stroke-linecap="round"/>'+
+    '<rect class="mouth" x="66" y="82" width="18" height="4" rx="2" fill="#C25A0C"/>'+
+    '<path d="M30 64 H14 M30 72 H16 M120 64 H136 M120 72 H134" stroke="#F0C89A" stroke-width="3" stroke-linecap="round"/>'+
+  '</svg>';
+}
+function dragonSVG(){
+  return '<svg class="bot" id="bot" viewBox="0 0 150 128" aria-hidden="true">'+
+    '<path d="M52 30 L60 14 L68 30 M82 30 L90 14 L98 30" fill="#2F7A45"/>'+
+    '<ellipse cx="75" cy="68" rx="42" ry="38" fill="#DFF3E4" stroke="#8FCBA3" stroke-width="3"/>'+
+    '<circle class="eye" cx="62" cy="60" r="6" fill="#16222E"/>'+
+    '<circle class="eye" cx="88" cy="60" r="6" fill="#16222E"/>'+
+    '<ellipse cx="68" cy="80" rx="3" ry="4" fill="#2F7A45"/>'+
+    '<ellipse cx="82" cy="80" rx="3" ry="4" fill="#2F7A45"/>'+
+    '<rect class="mouth" x="64" y="88" width="22" height="5" rx="2.5" fill="#2F7A45"/>'+
+    '<path d="M33 70 q-14 -6 -18 6 q12 4 18 -2" fill="#8FCBA3"/>'+
+    '<path d="M117 70 q14 -6 18 6 q-12 4 -18 -2" fill="#8FCBA3"/>'+
+  '</svg>';
+}
+function rocketSVG(){
+  return '<svg class="bot" id="bot" viewBox="0 0 150 128" aria-hidden="true">'+
+    '<path d="M75 12 q26 26 26 58 q0 20 -26 30 q-26 -10 -26 -30 q0 -32 26 -58 Z" fill="#E8F2FE" stroke="#C9DFF8" stroke-width="3"/>'+
+    '<path d="M49 74 L30 96 L49 92 Z" fill="#FF6F52"/>'+
+    '<path d="M101 74 L120 96 L101 92 Z" fill="#FF6F52"/>'+
+    '<circle cx="75" cy="52" r="17" fill="#2F73E8"/>'+
+    '<circle class="eye" cx="69" cy="50" r="5" fill="#fff"/>'+
+    '<circle class="eye" cx="82" cy="50" r="5" fill="#fff"/>'+
+    '<rect class="mouth" x="66" y="66" width="18" height="4" rx="2" fill="#7C5CE0"/>'+
+    '<path d="M66 100 q9 20 18 0 q-9 8 -18 0 Z" fill="#FFB627"/>'+
+  '</svg>';
+}
+function owlSVG(){
+  return '<svg class="bot" id="bot" viewBox="0 0 150 128" aria-hidden="true">'+
+    '<path d="M44 34 L52 16 L64 30 Z" fill="#7C5CE0"/>'+
+    '<path d="M106 34 L98 16 L86 30 Z" fill="#7C5CE0"/>'+
+    '<ellipse cx="75" cy="70" rx="40" ry="40" fill="#F0EAFE" stroke="#CDBDF5" stroke-width="3"/>'+
+    '<circle cx="62" cy="60" r="14" fill="#fff" stroke="#CDBDF5" stroke-width="2"/>'+
+    '<circle cx="88" cy="60" r="14" fill="#fff" stroke="#CDBDF5" stroke-width="2"/>'+
+    '<circle class="eye" cx="62" cy="60" r="6" fill="#16222E"/>'+
+    '<circle class="eye" cx="88" cy="60" r="6" fill="#16222E"/>'+
+    '<path d="M75 72 L69 80 L81 80 Z" fill="#FFB627"/>'+
+    '<rect class="mouth" x="66" y="88" width="18" height="4" rx="2" fill="#7C5CE0"/>'+
+  '</svg>';
+}
+
 function botReact(kind){
   var b=document.getElementById("bot"); if(!b) return;
   b.classList.remove("cheer","oops");

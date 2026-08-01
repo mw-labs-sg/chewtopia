@@ -62,6 +62,15 @@ function vTests(){
         '<span class="mt">Bigger numbers and division</span></span>'+pill(("Math · Challenge"))+'</button>';
   }
 
+  var wk=weakTop(who(), 12);
+  if(wk.length){
+    s='<div class="panel"><h2><span class="em">\uD83C\uDFAF</span> Review'+
+      '<span class="side">'+wk.length+' to fix</span></h2>'+
+      '<button class="test rev" data-t="weak"><span class="tx"><span class="nm">Tricky ones</span>'+
+      '<span class="mt">'+esc(wk.slice(0,4).map(weakLabel).join(", "))+
+      (wk.length>4?", \u2026":"")+'</span></span>'+
+      '<span class="pill beat">Go</span></button></div>'+s;
+  }
   if(!any) s+='<p class="empty">Nothing here yet.</p>';
   s+='</div>';
 
@@ -130,7 +139,24 @@ function practiceLabel(code){
   return p[1];
 }
 
+/* Replay a specific set of items — used straight after a test, and by Review. */
+function startItems(items, test, subject, lang, code){
+  if(!items || !items.length) return;
+  quiz={code:code||"review", subject:subject||"Review", test:test, lang:lang||"en-GB",
+        items:items.slice().sort(function(){ return Math.random()-0.5; }),
+        i:0,score:0,streak:0,best:0,missed:[],wrong:[],graded:false,done:false,review:true};
+  render(); scrollTo(0,0);
+}
+/* Everything this child has got wrong before, hardest first. */
+function startWeak(){
+  var a=weakTop(who(), 12).map(function(x){ return x.it; }).filter(Boolean);
+  if(!a.length) return;
+  var cn=a.every(function(i){ return i.k==="hz"||i.k==="rn"||i.k==="py"; });
+  startItems(a, "Review \u00b7 tricky ones", "Review", cn?"zh-CN":"en-GB", "weak");
+}
+
 function start(code){
+  if(code==="weak") return startWeak();
   var p=code.split("|"), items, subject, test, lang="en-GB";
   if(p[0]==="en"){ subject="English"; test="Spelling "+p[1];
     items=TC_SPELL[p[1]][1].map(function(x){ return {k:x[0],s:x[1],a:x[2]}; }); }
@@ -238,8 +264,13 @@ function quizHTML(){
 function wireQuiz(){
   var q=quiz;
   if(q.done){
-    document.getElementById("dBack").onclick=function(){ go("practice"); };
-    document.getElementById("dAgain").onclick=function(){ hush(); start(q.code); };
+    document.getElementById("dBack").onclick=function(){ newBuddy(); go("practice"); };
+    document.getElementById("dAgain").onclick=function(){ hush(); newBuddy(); start(q.code); };
+    var fx=document.getElementById("dFix");
+    if(fx) fx.onclick=function(){
+      hush();
+      startItems(q.wrong, "Fixing \u00b7 "+q.test, q.subject, q.lang, q.code);
+    };
     return;
   }
   var it=q.items[q.i];
@@ -313,19 +344,26 @@ function grade(){
 
   q.marks = q.marks || [];
   q.marks[q.i] = right;
+  q.wrong = q.wrong || [];
   if(right){
     q.score++; q.streak++; q.best=Math.max(q.best,q.streak);
+    weakDrop(it);
   } else {
     q.streak=0;
     q.missed.push(it.k==="py"?it.h+" ("+it.a+(it.tone||"")+")":it.k==="math"?it.q:it.a);
+    q.wrong.push(it);
+    weakAdd(it, q.code);
   }
   q.graded=true;
   render();
   var a=document.getElementById("qa"); a.value=given; a.disabled=true;
   if(document.getElementById("qt")) document.getElementById("qt").disabled=true;
+  var cnQ = (it.k==="py"||it.k==="hz"||it.k==="rn");
+  var pr = right ? praise(cnQ, q.streak) : {t:pick(OOPS_EN), lang:null};
+  q.say = pr;
   document.getElementById("qf").innerHTML='<div class="fb '+(right?"ok":"no")+'">'+
-    '<span class="big">'+(right ? (q.streak>=3 ? "🔥 "+q.streak+" in a row!" : "Correct!")
-      : "Not quite")+'</span>'+detail+'</div>';
+    '<span class="big">'+(right && q.streak>=3 ? "\uD83D\uDD25 "+q.streak+" \u00b7 "+esc(pr.t)
+      : esc(pr.t))+'</span>'+detail+'</div>';
   document.getElementById("qG").textContent=(q.i===q.items.length-1)?"See the score":"Next";
 
   if(right){
@@ -337,7 +375,7 @@ function grade(){
   }
 
   hush();
-  if(right) say(q.streak>=3 ? "Correct! "+q.streak+" in a row." : "Correct.",0.95);
+  if(right) say(q.say.t, q.say.lang?0.95:0.95, q.say.lang||undefined);
   else if(it.k==="py"||it.k==="hz"||it.k==="rn") say(it.word,0.85,"zh-CN");
   else if(it.k!=="math") say(it.a,0.6);
 }
@@ -366,7 +404,10 @@ function doneHTML(){
     '<div class="rankbadge r'+rank+'">Rank '+rank+'</div>'+
     '<div class="rk">'+rk+'</div>'+
     '<div class="streakline">Longest streak: '+q.best+'</div>'+
-    (q.missed.length?'<div class="again">Practise again: <b>'+esc(q.missed.join(", "))+'</b></div>':'')+
-    '<div class="btnrow"><button class="btn soft" id="dBack">Back to training</button>'+
-    '<button class="btn go" id="dAgain">Try again</button></div></div>';
+    (q.missed.length?'<div class="again">Missed: <b>'+esc(q.missed.join(", "))+'</b></div>':'')+
+    '<div class="btnrow">'+
+    ((q.wrong&&q.wrong.length)
+      ? '<button class="btn go" id="dFix">Fix the '+q.wrong.length+' missed \u2192</button>' : '')+
+    '<button class="btn '+((q.wrong&&q.wrong.length)?"soft":"go")+'" id="dAgain">Try again</button>'+
+    '<button class="btn soft" id="dBack">Back to training</button></div></div>';
 }

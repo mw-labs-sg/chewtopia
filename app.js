@@ -183,7 +183,14 @@ function vResults(){
     var runs=runsFor(k.id);
     s+='<div class="panel"><h2>'+esc(pname(k.id))+
        '<span class="side">'+streakChip(k.id)+runs.length+(runs.length===1?" test":" tests")+'</span></h2>';
-    if(!runs.length){ s+='<p class="empty">Nothing yet.</p></div>'; return; }
+    var wk=weakTop(k.id, 6);
+    if(wk.length){
+      s+='<div class="weak"><div class="wt">Keeps getting these wrong</div>'+
+         wk.map(function(x){
+           return '<span class="wi">'+esc(weakLabel(x))+'<i>'+x.n+'\u00d7</i></span>';
+         }).join("")+'</div>';
+    }
+    if(!runs.length){ s+=(wk.length?'':'<p class="empty">Nothing yet.</p>')+'</div>'; return; }
     var tests=[]; runs.forEach(function(r){ if(tests.indexOf(r.test)<0) tests.push(r.test); });
     tests.forEach(function(t){
       var all=runs.filter(function(r){ return r.test===t; });
