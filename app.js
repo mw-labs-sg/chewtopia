@@ -54,9 +54,11 @@ function vHome(){
         '<span class="cd '+whoCls(e.w)+'"><b>'+dnum(e.d)+(e.d2?"–"+dnum(e.d2):"")+'</b>'+
         '<i>'+dmon(e.d)+'</i></span>'+
         '<span class="tx"><span class="tag '+whoCls(e.w)+'">'+
-          (e.w?esc(pname(e.w)):"All")+'</span> '+esc(e.t)+
-          '<small>'+dday(e.d)+(e.d2?"–"+dday(e.d2):"")+' · '+
-          evWhen(e)+(e.time?" · "+e.time:"")+'</small>'+
+          (e.w?esc(pname(e.w)):"All")+'</span>'+
+          '<span class="wh">'+(st.live?(e.d2?"On now":"Today"):
+            dday(e.d)+(e.d2?"–"+dday(e.d2):""))+'</span> '+esc(e.t)+
+          (st.live&&!e.time?'':'<small>'+(st.live?'':evWhen(e))+
+            (e.time?(st.live?'':' · ')+e.time:'')+'</small>')+
           (e.n?'<span class="nt">'+esc(e.n)+'</span>':'')+'</span>'+
         '<button class="x" data-del="'+e.id+'" title="Remove">&times;</button></div>';
     });
