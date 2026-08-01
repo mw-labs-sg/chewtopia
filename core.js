@@ -13,6 +13,12 @@ function who(){ return S("who","tc"); }
 
 /* Adds anything new from data.js without touching what is already here.
    Deleting a seeded item inside the app records it, so it will not come back. */
+/* Anything that came from data.js is school-set — no delete button for it.
+   Only things added inside the app can be removed. */
+function fromSeed(id){
+  for(var i=0;i<SEED_EVENTS.length;i++){ if(SEED_EVENTS[i].id===id) return true; }
+  return false;
+}
 function seedGone(){ return SJ("seedgone",[]); }
 function markGone(id){ var g=seedGone(); if(g.indexOf(id)<0){ g.push(id); WJ("seedgone",g); } }
 function mergeSeed(key, seed){
