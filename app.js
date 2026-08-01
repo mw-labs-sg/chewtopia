@@ -162,14 +162,14 @@ function syncPanel(){
   s+='</h2>';
   if(cloudUser){
     var p=pending();
-    s+='<p class="empty">Signed in as '+esc(cloudUser.email)+'. '+
+    s+='<p class="empty">Signed in as '+esc(familyName(cloudUser.email))+'. '+
        (p? p+' still to upload.' : 'Everything is saved to the family account.')+'</p>'+
        '<div class="btnrow"><button class="btn soft" id="cSync">Sync now</button>'+
        '<button class="btn soft" id="cOut">Sign out</button></div>';
   } else {
     s+='<p class="empty">Sign in once on this device and scores will appear on every '+
        'other one. Training works without it \u2014 results wait here and upload later.</p>'+
-       '<div class="lbl">Email</div><input type="email" id="cEm" autocomplete="username">'+
+       '<div class="lbl">Family name</div><input type="text" id="cEm" autocomplete="username" placeholder="chewtopia">'+
        '<div class="lbl">Password</div><input type="password" id="cPw" autocomplete="current-password">'+
        '<div class="btnrow"><button class="btn go" id="cIn">Sign in</button></div>';
   }
@@ -206,10 +206,20 @@ function vResults(){
 }
 function wResults(){
   var i=document.getElementById("cIn");
-  if(i) i.onclick=function(){
-    cloudLogin(document.getElementById("cEm").value.trim(),
-               document.getElementById("cPw").value);
-  };
+  if(i){
+    var go=function(){
+      var em=document.getElementById("cEm").value.trim();
+      var pw=document.getElementById("cPw").value;
+      if(!em || !pw){ cloudMsg="Type the family name and password first."; render(); return; }
+      cloudLogin(em, pw);
+    };
+    i.onclick=go;
+    ["cEm","cPw"].forEach(function(id){
+      var f=document.getElementById(id);
+      if(f) f.addEventListener("keydown",function(e){
+        if(e.key==="Enter"){ e.preventDefault(); go(); } });
+    });
+  }
   var o=document.getElementById("cOut"); if(o) o.onclick=cloudLogout;
   var sy=document.getElementById("cSync"); if(sy) sy.onclick=cloudSync;
   document.getElementById("wipe").onclick=function(){

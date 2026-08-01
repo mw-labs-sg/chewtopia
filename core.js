@@ -123,7 +123,15 @@ function cloudInit(){
     if(cloudUser) cloudSync(); else render();
   });
 }
+function asEmail(name){
+  name=String(name).trim().toLowerCase();
+  return name.indexOf("@")>-1 ? name : name+FAMILY_DOMAIN;
+}
+function familyName(email){
+  return String(email||"").replace(FAMILY_DOMAIN,"");
+}
 function cloudLogin(email, pass){
+  email=asEmail(email);
   var c=sbc(); if(!c){ cloudMsg="Cannot reach the server."; render(); return; }
   cloudMsg="Signing in\u2026"; render();
   c.auth.signInWithPassword({email:email, password:pass}).then(function(r){
@@ -138,6 +146,12 @@ function cloudLogout(){
 /* Pull everything down, merge by id, then send up anything the cloud lacks. */
 function cloudSync(){
   var c=sbc(); if(!c||!cloudUser) return;
+  /* Signed in as a different account than last time? Everything local needs
+     re-uploading, since rows belong to whoever created them. */
+  if(S("clouduid","")!==cloudUser.id){
+    var l=results(); l.forEach(function(x){ x.up=0; }); WJ("results",l);
+    W("clouduid", cloudUser.id);
+  }
   cloudMsg="Syncing\u2026"; render();
   c.from("results").select("*").then(function(r){
     if(r.error){ cloudMsg=r.error.message; render(); return; }

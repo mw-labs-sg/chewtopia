@@ -330,6 +330,10 @@ var TT_KEY = "MA maths · CL 华文 · EL English · SS social studies · " +
    requires a signed-in family account. */
 var SUPA_URL = "https://bbaysfiqeppteiqozmwd.supabase.co";
 var SUPA_KEY = "sb_publishable__AP7bKLoEneuD9Vh5SXXYA_oVmZRCkc";
+/* Sign-in takes a plain name. This gets tacked on to make it an email,
+   which is all Supabase needs. Type "chewtopia", it sends
+   "chewtopia@chewtopia.family". A full email typed in still works. */
+var FAMILY_DOMAIN = "@chewtopia.family";
 
 var BREAKFAST_DEFAULT = {
   Monday:"Fried egg sandwich",
