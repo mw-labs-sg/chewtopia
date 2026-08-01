@@ -44,7 +44,9 @@ function todayFood(){
 }
 
 function vHome(){
+  var f=evFilter();
   var evs=SJ("events",[]).filter(function(e){ return !evState(e).gone; })
+    .filter(function(e){ return f==="all" || !e.w || e.w===f; })
     .sort(function(a,b){ return evState(a).start-evState(b).start; });
   var s='<div class="panel"><h2><span class="em">📅</span> Upcoming</h2>'+kidKey(true);
   if(evs.length){
@@ -65,7 +67,7 @@ function vHome(){
         (fromSeed(e.id)?'':'<button class="x" data-del="'+e.id+'" title="Remove">&times;</button>')+
         '</div>';
     });
-  } else s+='<p class="empty">Nothing coming up.</p>';
+  } else s+='<p class="empty">Nothing coming up'+(f==="all"?"":" for "+esc(pname(f)))+'.</p>';
 
   if(showAdd){
     var opts='<option value="">Everyone</option>'+KIDS.map(function(k){
@@ -128,6 +130,10 @@ function wHome(){
       if(!confirm("Remove this from Upcoming?")) return;
       markGone(b.dataset.del);
       WJ("events",SJ("events",[]).filter(function(e){return e.id!==b.dataset.del;})); render(); }; });
+  var fb=document.getElementById("evFil");
+  if(fb) fb.querySelectorAll("[data-fil]").forEach(function(b){
+    b.onclick=function(){ W("evfilter", b.dataset.fil); render(); };
+  });
   document.querySelectorAll("[data-go]").forEach(function(b){
     b.onclick=function(){
       if(b.dataset.who) W("who", b.dataset.who);

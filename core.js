@@ -136,6 +136,19 @@ function rotIdx(off){
 }
 function mealPlan(off){ return MEALS_ROTATION[rotIdx(off)]; }
 
+/* Upcoming filter: everyone, or one child plus anything family-wide. */
+function evFilter(){ return S("evfilter","all"); }
+function evFilterBar(){
+  var f=evFilter();
+  var s='<div class="legend" id="evFil">'+
+    '<button class="lg c-all'+(f==="all"?" on":"")+'" data-fil="all">Everyone</button>';
+  KIDS.forEach(function(k){
+    s+='<button class="lg '+whoCls(k.id)+(f===k.id?" on":"")+'" data-fil="'+k.id+'">'+
+       esc(pname(k.id))+'</button>';
+  });
+  return s+'</div>';
+}
+
 /* ---------- child pickers ---------- */
 /* Training always needs one child. The timetable can also show both. */
 function ttWho(){ return S("ttwho","both"); }

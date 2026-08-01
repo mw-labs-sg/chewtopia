@@ -223,7 +223,9 @@
     width:100%;text-align:center;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
   .key{font-size:13px;color:var(--soft);line-height:1.9;margin-top:14px}
   .legend{display:flex;gap:7px;flex-wrap:wrap;margin:0 0 13px}
-  .lg{font-size:14px;font-weight:800;border-radius:9px;padding:6px 13px}
+  .lg{font-size:14px;font-weight:800;border-radius:9px;padding:6px 13px;
+    border:2px solid transparent;font-family:inherit;cursor:pointer;opacity:.55}
+  .lg.on{opacity:1;border-color:currentColor}
 
   /* ---- quiz ---- */
   .qtop{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:11px}
@@ -331,9 +333,9 @@
 </div>
 <!-- load order matters: data, then core, then screens, app last -->
 <script src="data.js?v=13"></script>
-<script src="core.js?v=9"></script>
+<script src="core.js?v=10"></script>
 <script src="timetable.js?v=3"></script>
 <script src="training.js?v=2"></script>
-<script src="app.js?v=36"></script>
+<script src="app.js?v=37"></script>
 </body>
 </html>
