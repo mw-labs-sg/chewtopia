@@ -107,6 +107,10 @@
   .mealday{padding:12px 0;border-bottom:1px solid var(--line)}
   .ml{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--soft);
     font-weight:700;margin:6px 0 2px}
+  .mcols{display:grid;grid-template-columns:1fr;gap:0}
+  @media(min-width:620px){ .mcols{grid-template-columns:1fr 1.4fr;gap:12px;align-items:start} }
+  .mcol .ml{margin-top:6px}
+  @media(min-width:620px){ .mcol .ml{margin-top:2px} }
   .fd{margin:0 0 10px;font-size:15px;line-height:1.5}
   .fd:last-child{margin-bottom:0}
   .cell.brek{background:var(--sky)}
@@ -324,6 +328,6 @@
 <script src="core.js?v=6"></script>
 <script src="timetable.js?v=3"></script>
 <script src="training.js?v=2"></script>
-<script src="app.js?v=30"></script>
+<script src="app.js?v=31"></script>
 </body>
 </html>

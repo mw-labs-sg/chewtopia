@@ -90,10 +90,12 @@ function vMeals(){
     s+='<div class="mealday'+(i===todayIdx()?" now":"")+'">'+
        '<div class="mh">'+d+' <em>'+dt[i].getDate()+' '+
          dt[i].toLocaleDateString("en-GB",{month:"short"})+'</em></div>'+
-       '<div class="ml">Breakfast</div>'+
-       '<textarea class="cell brek" data-brek="'+d+'" placeholder="\u2014">'+esc(bk[d]||"")+'</textarea>'+
-       '<div class="ml">Dinner</div>'+
-       '<textarea class="cell" data-meal="'+d+'" placeholder="\u2014">'+esc(m[d]||"")+'</textarea></div>';
+       '<div class="mcols">'+
+         '<div class="mcol"><div class="ml">Breakfast</div>'+
+         '<textarea class="cell brek" data-brek="'+d+'" placeholder="\u2014">'+esc(bk[d]||"")+'</textarea></div>'+
+         '<div class="mcol"><div class="ml">Dinner</div>'+
+         '<textarea class="cell" data-meal="'+d+'" placeholder="\u2014">'+esc(m[d]||"")+'</textarea></div>'+
+       '</div></div>';
   });
   return s+'<div class="btnrow"><button class="btn soft" id="mR">Reset to week '+(rotIdx()+1)+'</button></div>'+
     '<div class="saved" id="mS"></div></div>'+
