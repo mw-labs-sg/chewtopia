@@ -336,7 +336,7 @@ function grade(){
 function next(){
   var q=quiz; q.i++; q.graded=false;
   if(q.i>=q.items.length){ q.done=true;
-    addResult({who:who(),subject:q.subject,test:q.test,score:q.score,
+    addResult({who:who(),subject:q.subject,code:q.code,test:q.test,score:q.score,
                total:q.items.length,missed:q.missed,ts:Date.now()});
     bumpStreak(); }
   render(); scrollTo(0,0);

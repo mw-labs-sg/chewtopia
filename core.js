@@ -90,8 +90,93 @@ function flash(id){ var e=document.getElementById(id); if(!e) return;
   e.textContent="Saved"; clearTimeout(ft[id]); ft[id]=setTimeout(function(){e.textContent="";},1100); }
 function grow(t){ t.style.height="auto"; t.style.height=(t.scrollHeight)+"px"; }
 
+function uuid(){
+  if(window.crypto && crypto.randomUUID) return crypto.randomUUID();
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g,function(ch){
+    var r=Math.random()*16|0; return (ch==="x"?r:(r&0x3|0x8)).toString(16); });
+}
+
 function results(){ return SJ("results",[]); }
-function addResult(r){ var a=results(); a.unshift(r); WJ("results",a.slice(0,600)); }
+function addResult(r){
+  if(!r.id) r.id=uuid();
+  r.up=0;                                  /* not yet uploaded */
+  var a=results(); a.unshift(r); WJ("results",a.slice(0,600));
+  cloudPush();
+}
+
+/* ==========================================================================
+   SHARED RESULTS
+   One family account. Scores save on the device first, then upload.
+   Progress reads whatever the cloud has, so any device sees every run.
+   ========================================================================== */
+var SB=null, cloudUser=null, cloudMsg="";
+function sbc(){
+  if(SB) return SB;
+  if(!window.supabase || !SUPA_URL) return null;
+  try{ SB=window.supabase.createClient(SUPA_URL, SUPA_KEY); }catch(e){ return null; }
+  return SB;
+}
+function cloudInit(){
+  var c=sbc(); if(!c) return;
+  c.auth.getSession().then(function(r){
+    cloudUser = (r.data && r.data.session) ? r.data.session.user : null;
+    if(cloudUser) cloudSync(); else render();
+  });
+}
+function cloudLogin(email, pass){
+  var c=sbc(); if(!c){ cloudMsg="Cannot reach the server."; render(); return; }
+  cloudMsg="Signing in\u2026"; render();
+  c.auth.signInWithPassword({email:email, password:pass}).then(function(r){
+    if(r.error){ cloudMsg=r.error.message; cloudUser=null; render(); return; }
+    cloudUser=r.data.user; cloudMsg=""; cloudSync();
+  });
+}
+function cloudLogout(){
+  var c=sbc(); if(!c) return;
+  c.auth.signOut().then(function(){ cloudUser=null; cloudMsg=""; render(); });
+}
+/* Pull everything down, merge by id, then send up anything the cloud lacks. */
+function cloudSync(){
+  var c=sbc(); if(!c||!cloudUser) return;
+  cloudMsg="Syncing\u2026"; render();
+  c.from("results").select("*").then(function(r){
+    if(r.error){ cloudMsg=r.error.message; render(); return; }
+    var local=results(), byId={};
+    local.forEach(function(x){ if(x.id) byId[x.id]=x; });
+    (r.data||[]).forEach(function(row){
+      if(byId[row.id]){ byId[row.id].up=1; return; }
+      local.push({id:row.id, who:row.child_id, code:row.test_code, test:row.test_name,
+                  score:row.score, total:row.total,
+                  ts:new Date(row.completed_at).getTime(), up:1});
+    });
+    local.sort(function(a,b){ return b.ts-a.ts; });
+    WJ("results", local.slice(0,600));
+    cloudMsg=""; cloudPush();
+  });
+}
+function cloudPush(){
+  var c=sbc(); if(!c||!cloudUser) return;
+  var local=results(), todo=[];
+  local.forEach(function(x){
+    if(x.up) return;
+    if(!x.id) x.id=uuid();                 /* older runs saved before sync existed */
+    todo.push(x);
+  });
+  if(!todo.length){ return; }
+  WJ("results", local);
+  var rows=todo.map(function(x){
+    return {id:x.id, user_id:cloudUser.id, child_id:x.who, test_code:x.code||null,
+            test_name:x.test, score:x.score, total:x.total,
+            completed_at:new Date(x.ts).toISOString()};
+  });
+  c.from("results").upsert(rows,{onConflict:"id", ignoreDuplicates:true}).then(function(r){
+    if(r.error){ cloudMsg=r.error.message; render(); return; }
+    var done={}; todo.forEach(function(x){ done[x.id]=1; });
+    var l=results(); l.forEach(function(x){ if(done[x.id]) x.up=1; });
+    WJ("results", l); render();
+  });
+}
+function pending(){ return results().filter(function(x){ return !x.up; }).length; }
 function runsFor(id){ return results().filter(function(r){ return r.who===(id||who()); })
   .slice().sort(function(a,b){ return a.ts-b.ts; }); }
 function lastFor(t){ var a=runsFor().filter(function(r){ return r.test===t; });

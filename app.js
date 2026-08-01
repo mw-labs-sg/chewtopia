@@ -156,6 +156,27 @@ function wHome(){
   };
 }
 
+function syncPanel(){
+  var s='<div class="panel"><h2><span class="em">\u2601\uFE0F</span> Shared scores';
+  if(cloudUser) s+='<span class="side">On</span>';
+  s+='</h2>';
+  if(cloudUser){
+    var p=pending();
+    s+='<p class="empty">Signed in as '+esc(cloudUser.email)+'. '+
+       (p? p+' still to upload.' : 'Everything is saved to the family account.')+'</p>'+
+       '<div class="btnrow"><button class="btn soft" id="cSync">Sync now</button>'+
+       '<button class="btn soft" id="cOut">Sign out</button></div>';
+  } else {
+    s+='<p class="empty">Sign in once on this device and scores will appear on every '+
+       'other one. Training works without it \u2014 results wait here and upload later.</p>'+
+       '<div class="lbl">Email</div><input type="email" id="cEm" autocomplete="username">'+
+       '<div class="lbl">Password</div><input type="password" id="cPw" autocomplete="current-password">'+
+       '<div class="btnrow"><button class="btn go" id="cIn">Sign in</button></div>';
+  }
+  if(cloudMsg) s+='<p class="empty" style="color:var(--coral)">'+esc(cloudMsg)+'</p>';
+  return s+'</div>';
+}
+
 function vResults(){
   var s="";
   KIDS.forEach(function(k){
@@ -165,28 +186,38 @@ function vResults(){
     if(!runs.length){ s+='<p class="empty">Nothing yet.</p></div>'; return; }
     var tests=[]; runs.forEach(function(r){ if(tests.indexOf(r.test)<0) tests.push(r.test); });
     tests.forEach(function(t){
-      var a=runs.filter(function(r){ return r.test===t; });
-      var b=a.reduce(function(x,y){ return y.score>x.score?y:x; },a[0]);
+      var all=runs.filter(function(r){ return r.test===t; });
+      var b=all.reduce(function(x,y){ return y.score>x.score?y:x; },all[0]);
+      var a=all.slice(-5);                       /* last five goes only */
+      var more=all.length-a.length;
       var ch=a.map(function(r,n){
         var p=Math.round(r.score/r.total*100), c=p>=80?"good":p>=50?"mid":"low";
         return (n?'<span class="arw">→</span>':'')+'<span class="run '+c+'"><b>'+r.score+'/'+r.total+
           '</b><i>'+new Date(r.ts).toLocaleDateString("en-GB",{day:"numeric",month:"short"})+'</i></span>';
       }).join("");
       s+='<div class="res"><div class="top"><span class="n">'+esc(t)+'</span>'+
-         '<span class="best">Best '+b.score+'/'+b.total+'</span></div>'+
+         '<span class="best">'+(more?more+" earlier \u00b7 ":"")+'Best '+b.score+'/'+b.total+'</span></div>'+
          '<div class="rl">'+ch+'</div></div>';
     });
     s+='</div>';
   });
-  return s+'<div class="panel"><h2>Housekeeping</h2>'+
+  return s+syncPanel()+'<div class="panel"><h2>Housekeeping</h2>'+
     '<div class="btnrow"><button class="btn soft" id="wipe">Clear all scores</button></div></div>';
 }
 function wResults(){
+  var i=document.getElementById("cIn");
+  if(i) i.onclick=function(){
+    cloudLogin(document.getElementById("cEm").value.trim(),
+               document.getElementById("cPw").value);
+  };
+  var o=document.getElementById("cOut"); if(o) o.onclick=cloudLogout;
+  var sy=document.getElementById("cSync"); if(sy) sy.onclick=cloudSync;
   document.getElementById("wipe").onclick=function(){
     if(confirm("Delete every saved score on this device?")){ WJ("results",[]); render(); } };
 }
 
 seedOnce();
+cloudInit();
 tab = tabFromHash() || tab;
 if(!location.hash){ try{ location.replace("#"+SLUGS[tab]); }catch(e){} }
 render();

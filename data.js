@@ -325,6 +325,12 @@ var TT_KEY = "MA maths · CL 华文 · EL English · SS social studies · " +
              "CCE character &amp; citizenship · FTGP form teacher time";
 
 /* Breakfast is the same every week. */
+/* Shared results database. Both of these are meant to be public — the
+   publishable key opens nothing on its own, because row level security
+   requires a signed-in family account. */
+var SUPA_URL = "https://bbaysfiqeppteiqozmwd.supabase.co";
+var SUPA_KEY = "sb_publishable__AP7bKLoEneuD9Vh5SXXYA_oVmZRCkc";
+
 var BREAKFAST_DEFAULT = {
   Monday:"Fried egg sandwich",
   Tuesday:"Ham sandwich",
