@@ -65,25 +65,36 @@ function tColumn(kid, subj){
   return out || '<div class="mxnone">\u2014</div>';
 }
 
-/* The one button that decides for them. Says what is in the set first. */
+/* The one button that decides for them. It names the test that is closest on
+   the calendar, and says exactly what the ten questions are made of. */
+function dueEvent(kid){
+  var out=null;
+  SJ("events",[]).forEach(function(e){
+    if(!e.p || e.w!==kid || evState(e).gone) return;
+    if(!out || evState(e).start < evState(out).start) out=e;
+  });
+  return out;
+}
 function dailyBtn(kid){
   var p=dailyPlan(kid);
   if(!p.any) return "";
-  var bits=[];
-  if(p.due.length)     bits.push(esc(practiceLabel(p.due[0]))+" coming up");
-  if(p.weak.length)    bits.push(Math.min(4,p.weak.length)+" to fix");
-  if(p.untried.length) bits.push("something new");
-  var done = streak(kid).last===todayISO();
+  var ev=dueEvent(kid);
+  var title = ev ? "Coming up: "+esc(practiceLabel(ev.p)) : "Ten minutes of practice";
+  var when  = ev ? evWhen(ev) : "";
+
+  /* the same shares startDaily uses, so the label never lies */
+  var bits=[], left=10;
+  if(p.due.length){ var n=Math.min(4,left); bits.push(n+" from it"); left-=n; }
+  if(p.weak.length){ var m=Math.min(4,left,p.weak.length); bits.push(m+" he keeps missing"); left-=m; }
+  if(left>0 && p.untried.length) bits.push(left+" not tried yet");
+
   return '<button class="daily k-'+kid+'" data-t="daily" data-kid="'+kid+'">'+
-    '<span class="dl">Today\u2019s ten minutes'+(done?' <i>\u2713 already done</i>':'')+'</span>'+
-    '<span class="dm">'+esc(bits.join(" \u00b7 "))+'</span></button>';
+    '<span class="dl">'+title+(when?' <i>'+esc(when)+'</i>':'')+'</span>'+
+    '<span class="dm">10 questions \u00b7 '+esc(bits.join(", "))+'</span></button>';
 }
 
 function vTests(){
-  var f=pFilter();
-  var opts=[["all","Everything"],["en","English"],["zh","华文"],["ma","Maths"]]
-    .map(function(o){ return '<option value="'+o[0]+'"'+(f===o[0]?" selected":"")+'>'+o[1]+'</option>'; }).join("");
-  var pick=SUBJ_COLS.filter(function(c){ return f==="all" || f===c[0]; });
+  var pick=SUBJ_COLS.slice();     /* everything, always — one screen, no filter */
 
   var s='<div class="panel"><h2><span class="em">📝</span> Training</h2>'+
         '<div class="mxkey"><span><span class="dot" style="background:#C3D2DF"></span> '+
@@ -92,8 +103,7 @@ function vTests(){
           '<span><span class="dot" style="background:#FFB627"></span> <b>70% or better</b></span>'+
           '<span><span class="dot" style="background:#FF6F52"></span> <b>below 70%</b></span>'+
           '<span>last score \u00b7 tap to start</span></div>'+
-        '<div class="lbl">Subject</div><select id="pf">'+opts+'</select>'+
-        '<div style="height:14px"></div><div class="mx6">';
+        '<div style="height:4px"></div><div class="mx6">';
 
   shownKids().forEach(function(k){
     var cols=pick.filter(function(c){ return hasSubj(k.id, c[0]); });
@@ -142,8 +152,6 @@ function wTests(){
       start(b.dataset.t);
     };
   });
-  var f=document.getElementById("pf");
-  if(f) f.onchange=function(){ W("pfilter", f.value); render(); };
   var r=document.getElementById("rate");
   if(r){
     r.oninput=function(){
