@@ -32,8 +32,8 @@ function whoBar(){
 /* ---------- scenes ---------- */
 /* The world behind the cards. Kept per device, since one boy will want lava
    and the other will not. */
-var SCENES=[["galaxy","Galaxy"],["sky","Sky"],["forest","Forest"],
-            ["lava","Lava"],["spirit","Spirit"]];
+var SCENES=[["galaxy","Galaxy"],["aurora","Aurora"],["ocean","Deep sea"],
+            ["forest","Forest"],["volcano","Volcano"]];
 function scene(){
   var s=S("scene","galaxy");
   for(var i=0;i<SCENES.length;i++){ if(SCENES[i][0]===s) return s; }
@@ -84,9 +84,9 @@ function seedOnce(){ mergeSeed("events", SEED_EVENTS); mergeSeed("acts", SEED_AC
 
 var DAYS = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
 /* Each tab keeps its own colour, so the eye learns where things live. */
-var TABS = [["home","Upcoming","t-blue"],["schedule","Timetable","t-grape"],
-            ["meals","Meals","t-coral"],["practice","Training","t-lime"],
-            ["results","Progress","t-sun"],["reading","Reading","t-teal"]];
+var TABS = [["home","Upcoming","t1"],["schedule","Timetable","t2"],
+            ["meals","Meals","t3"],["practice","Training","t4"],
+            ["results","Progress","t5"],["reading","Reading","t6"]];
 var tab="home", quiz=null, showAdd=false;
 /* Each tab gets a readable address, e.g. .../chewtopia/#meals, so a link can
    be bookmarked or sent straight to one screen. */

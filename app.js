@@ -411,10 +411,7 @@ function vResults(){
        }).join("")+'</div></div>';
   }
 
-  return s+'<div class="panel"><h2>Housekeeping</h2>'+
-    '<div class="btnrow"><button class="btn soft" id="wipe">Clear all scores</button>'+
-    (cloudUser?'<button class="btn soft" id="cOut">Sign out</button>':'')+
-    '</div></div>';
+  return s;
 }
 
 /* Sync sits at the top. One family name and password, nothing else to do. */
@@ -453,8 +450,6 @@ function wResults(){
         if(e.key==="Enter"){ e.preventDefault(); goIn(); } });
     });
   }
-  var o=document.getElementById("cOut");
-  if(o) o.onclick=function(){ if(confirm("Sign out of the family account?")) cloudLogout(); };
   var sy=document.getElementById("cSync"); if(sy) sy.onclick=cloudSync;
   document.querySelectorAll("[data-run]").forEach(function(b){
     b.onclick=function(){
@@ -464,8 +459,6 @@ function wResults(){
       start(b.dataset.run);
     };
   });
-  document.getElementById("wipe").onclick=function(){
-    if(confirm("Delete every saved score on this device?")){ WJ("results",[]); render(); } };
 }
 
 seedOnce();
