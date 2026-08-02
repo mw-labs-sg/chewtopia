@@ -703,7 +703,12 @@ function say(t,rate,lang){
   u.pitch = cn ? 1.0 : 1.05;
   speechSynthesis.speak(u);
 }
-function hush(){ try{ speechSynthesis.cancel(); }catch(e){} }
+var sayTimers=[];
+function sayLater(fn, ms){ sayTimers.push(setTimeout(fn, ms)); }
+function hush(){
+  sayTimers.forEach(clearTimeout); sayTimers=[];
+  try{ speechSynthesis.cancel(); }catch(e){}
+}
 function voiceBox(lang){
   var o=langVoices(lang);
   var label = lang==="zh-CN" ? "Chinese voice" : "English voice";

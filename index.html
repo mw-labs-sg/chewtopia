@@ -359,11 +359,17 @@
 
   /* ---- 听写: a square per character, then marked by eye ---- */
   .padrow{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:14px 0 4px}
-  .padcell{width:132px}
+  /* the fewer the characters, the bigger each square gets */
+  .padcell,.markcell{width:132px}
+  .padrow.n1 .padcell,.padrow.n1 .markcell{width:min(230px,64vw)}
+  .padrow.n2 .padcell,.padrow.n2 .markcell{width:min(200px,42vw)}
+  .padrow.n3 .padcell,.padrow.n3 .markcell{width:min(165px,29vw)}
+  .padrow.n4 .padcell,.padrow.n4 .markcell{width:min(140px,22vw)}
+  .padrow.n5 .padcell,.padrow.n5 .markcell{width:min(130px,18vw)}
   .padcell .pad{width:100%;display:block;border-radius:12px;
     box-shadow:inset 0 0 0 2px #CFDCE8}
   .marktip{font-size:14px;font-weight:600;color:var(--soft);text-align:center;margin:12px 0 2px}
-  .markcell{width:132px;cursor:pointer;border-radius:14px;padding:6px;position:relative;
+  .markcell{cursor:pointer;border-radius:14px;padding:6px;position:relative;
     background:var(--bg);text-align:center}
   .markcell img{display:block;width:100%;border-radius:10px;background:#fff}
   .markcell .noimg{display:block;height:96px;line-height:96px;color:#C3D2DF;background:#fff;
@@ -388,7 +394,12 @@
   .mkrun .nm{display:block;font-size:15px;font-weight:800}
   .mkrun .mt{display:block;font-size:12px;font-weight:600;color:var(--soft);margin-top:1px}
   .mkrun:active{transform:translateY(1px)}
-  @media(max-width:460px){ .padcell,.markcell{width:min(104px,29vw)}
+  @media(max-width:460px){
+    .padrow.n1 .padcell,.padrow.n1 .markcell{width:min(230px,70vw)}
+    .padrow.n2 .padcell,.padrow.n2 .markcell{width:min(170px,44vw)}
+    .padrow.n3 .padcell,.padrow.n3 .markcell{width:min(130px,29vw)}
+    .padrow.n4 .padcell,.padrow.n4 .markcell{width:min(110px,22vw)}
+    .padrow.n5 .padcell,.padrow.n5 .markcell{width:min(96px,18vw)}
     .markcell .ansch{font-size:28px} .markcell .noimg{height:76px;line-height:76px} }
 
   /* ---- long answers: one wide pad, marked by eye ---- */
@@ -648,14 +659,14 @@ body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;-
   </div>
   <div class="tabs" id="tabs"></div>
   <div id="view"></div>
-  <div class="foot">Saved on this device · build 74</div>
+  <div class="foot">Saved on this device · build 75</div>
 </div>
 <!-- load order matters: data, then core, then screens, app last -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="data.js?v=16"></script>
-<script src="core.js?v=36"></script>
+<script src="core.js?v=37"></script>
 <script src="timetable.js?v=5"></script>
-<script src="training.js?v=30"></script>
-<script src="app.js?v=66"></script>
+<script src="training.js?v=31"></script>
+<script src="app.js?v=67"></script>
 </body>
 </html>

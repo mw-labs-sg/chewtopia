@@ -513,7 +513,7 @@ function quizHTML(){
        '<div class="ctx wcount">'+esc(ask.count)+'</div>';
     if(!q.show && !q.graded){
       /* he writes, with nothing on screen to copy */
-      s+='<div class="padrow">'+chs.map(function(_,i){
+      s+='<div class="padrow n'+Math.min(5,chs.length)+'">'+chs.map(function(_,i){
            return '<div class="padcell"><canvas class="pad" data-pad="'+i+'"></canvas></div>';
          }).join("")+'</div>'+
          '<div class="trbtns"><button class="trbtn" id="padClr">\u21ba Rub out</button>'+
@@ -523,7 +523,7 @@ function quizHTML(){
          away how close he was. He does not mark it — that is a grown-up job,
          and a child marking his own 听写 is not a score anyone can use. */
       s+='<div class="marktip">Here is how it should look.</div>'+
-         '<div class="padrow">'+chs.map(function(ch,i){
+         '<div class="padrow n'+Math.min(5,chs.length)+'">'+chs.map(function(ch,i){
            return '<div class="markcell show">'+
              (q.img&&q.img[i] ? '<img src="'+q.img[i]+'" alt="">' : '<span class="noimg">\u2014</span>')+
              '<span class="ansch">'+esc(ch)+'</span></div>';
@@ -784,14 +784,15 @@ function speakIt(it){
   /* Always read the whole word, never a lone character: 更, 长, 乐, 种 and 教
      all have two readings and the engine guesses wrong without the context. */
   if(it.k==="tx"){
-    /* The way a teacher dictates: the word in a phrase so the meaning is
-       clear, then 写, then the word itself twice — so he is never in doubt
-       about which part goes on the paper. */
+    /* A teacher dictates like this: the phrase so the meaning is clear, then
+       the word on its own, twice, the second time slowly. The last thing he
+       hears is always the word that goes in the boxes. */
     var ctx=String(it.word||"").replace(/[\u3002\uff01\uff1f]/g,"");
-    if(ctx && ctx!==it.h) say(ctx,0.85,"zh-CN");
-    setTimeout(function(){ say("\u5199",0.8,"zh-CN"); }, ctx&&ctx!==it.h ? 1100 : 0);
-    setTimeout(function(){ say(it.h,0.75,"zh-CN"); }, ctx&&ctx!==it.h ? 1700 : 500);
-    setTimeout(function(){ say(it.h,0.65,"zh-CN"); }, ctx&&ctx!==it.h ? 3000 : 1800);
+    var hasCtx = ctx && ctx!==it.h;
+    if(hasCtx) say(ctx,0.8,"zh-CN");                       /* 过来 */
+    sayLater(function(){ say("\u5199",0.75,"zh-CN"); }, hasCtx?1500:200);   /* 写 */
+    sayLater(function(){ say(it.h,0.7,"zh-CN"); },      hasCtx?2200:800);    /* 来 */
+    sayLater(function(){ say(it.h,0.6,"zh-CN"); },      hasCtx?3600:2200);   /* 来 */
   }
   else if(it.k==="py"||it.k==="hz"||it.k==="rn"){
     /* here the whole word is right: 更, 长, 乐, 种 and 教 all have two
@@ -808,7 +809,7 @@ function speakIt(it){
        thing he hears is always the word he has to write */
     say("Spell",0.92); say(it.a+".",0.72);
     say(it.s,0.86);
-    say("Again."+"",0.92); say(it.a+".",0.66);
+    say("Again.",0.92); say(it.a+".",0.66);
   }
 }
 function grade(forced){
