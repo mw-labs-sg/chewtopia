@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#F4F6FD">
+<meta name="theme-color" content="#0A0F26">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Chewtopia">
 <link rel="apple-touch-icon" href="icon.png">
 <link rel="icon" href="icon.png">
@@ -21,6 +22,12 @@
     --tang:#C25A0C; --peach:#FFE9D2;   /* SC */
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{overscroll-behavior-y:contain}          /* no pull-to-refresh mid-test */
+  button,select,.tab,.wb,.trbtn,.markcell,.mkrun,.runrow,.tbox,.daily,.fixbtn{
+    touch-action:manipulation;                      /* no double-tap zoom */
+    -webkit-user-select:none;user-select:none}
+  canvas,.markcell img,.shimgs img{-webkit-touch-callout:none;-webkit-user-select:none;
+    user-select:none;pointer-events:auto}
   html{-webkit-text-size-adjust:100%}
   html,body{margin:0;padding:0;min-height:100%}
   body{
@@ -348,7 +355,7 @@
     min-height:44px}
   .trbtn:active{transform:translateY(1px)}
   .trbtn.skip{background:#FFF1D6;color:#8A6100}
-  @media(max-width:460px){ .trbox{width:104px;height:104px} }
+  @media(max-width:460px){ .trbox{width:min(104px,29vw);height:min(104px,29vw)} }
 
   /* ---- 听写: a square per character, then marked by eye ---- */
   .padrow{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:14px 0 4px}
@@ -381,7 +388,7 @@
   .mkrun .nm{display:block;font-size:15px;font-weight:800}
   .mkrun .mt{display:block;font-size:12px;font-weight:600;color:var(--soft);margin-top:1px}
   .mkrun:active{transform:translateY(1px)}
-  @media(max-width:460px){ .padcell,.markcell{width:104px}
+  @media(max-width:460px){ .padcell,.markcell{width:min(104px,29vw)}
     .markcell .ansch{font-size:28px} .markcell .noimg{height:76px;line-height:76px} }
 
   /* ---- long answers: one wide pad, marked by eye ---- */
@@ -641,7 +648,7 @@ body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;-
   </div>
   <div class="tabs" id="tabs"></div>
   <div id="view"></div>
-  <div class="foot">Saved on this device · build 73</div>
+  <div class="foot">Saved on this device · build 74</div>
 </div>
 <!-- load order matters: data, then core, then screens, app last -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
