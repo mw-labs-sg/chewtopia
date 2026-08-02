@@ -97,7 +97,7 @@ var DAYS = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunda
 var TABS = [["home","Upcoming","t1"],["schedule","Timetable","t2"],
             ["meals","Meals","t3"],["practice","Training","t4"],
             ["results","Progress","t5"],["reading","Reading","t6"]];
-var tab="home", quiz=null, showAdd=false, openTest=null;
+var tab="home", quiz=null, showAdd=false, openTest=null, openRun=null;
 /* Each tab gets a readable address, e.g. .../chewtopia/#meals, so a link can
    be bookmarked or sent straight to one screen. */
 var SLUGS = {home:"upcoming", schedule:"timetable", meals:"meals",
@@ -108,7 +108,7 @@ function tabFromHash(){
   return null;
 }
 function go(id, quiet){
-  tab=id; quiz=null; showAdd=false; openTest=null; hush();
+  tab=id; quiz=null; showAdd=false; openTest=null; openRun=null; hush();
   if(!quiet){ try{ location.hash="#"+SLUGS[id]; }catch(e){} }
   render(); scrollTo(0,0);
 }
@@ -154,7 +154,12 @@ function results(){ return SJ("results",[]); }
 function addResult(r){
   if(!r.id) r.id=uuid();
   r.up=0;                                  /* not yet uploaded */
-  var a=results(); a.unshift(r); WJ("results",a.slice(0,600));
+  var a=results(); a.unshift(r);
+  /* Handwriting pictures are heavy, so only the last 20 runs keep theirs.
+     Everything older keeps its score, just not the pictures. */
+  var seen=0;
+  a.forEach(function(x){ if(x.ans){ seen++; if(seen>20) delete x.ans; } });
+  WJ("results", a.slice(0,600));
   /* straight up to the cloud, if signed in — the sync button is only ever
      needed for the other direction or after being offline */
   if(typeof cloudPushAll==="function" && cloudUser) cloudPushAll(true);

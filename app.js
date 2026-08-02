@@ -387,6 +387,31 @@ function itemState(it, kid, attempted){
   return attempted ? "good" : "none";
 }
 
+/* What he actually put down, question by question. */
+function answerSheet(r){
+  var s='<div class="sheet">';
+  (r.ans||[]).forEach(function(x){
+    s+='<div class="shrow '+(x.right?"ok":"no")+'">'+
+       '<span class="shask">'+esc(x.ask||"")+'</span>';
+    if(x.img && x.img.length){
+      s+='<span class="shimgs">'+x.img.map(function(src,i){
+           var bad = x.marks && x.marks[i]===false;
+           return '<img class="'+(bad?"no":"ok")+'" src="'+src+'" alt="">';
+         }).join("")+'</span>';
+    } else if(x.marks){
+      /* handwriting from an older run whose pictures have been let go */
+      s+='<span class="shgot">'+x.marks.map(function(ok){
+           return '<b class="'+(ok===false?"no":"ok")+'">'+(ok===false?"\u2715":"\u2713")+'</b>';
+         }).join(" ")+'</span>';
+    } else {
+      s+='<span class="shgot">'+(x.got ? esc(x.got) : '<i>nothing</i>')+'</span>';
+    }
+    s+='<span class="shwant">'+esc(x.want||"")+'</span>'+
+       '<span class="shflag">'+(x.right?"\u2713":"\u2715")+'</span></div>';
+  });
+  return s+'</div>';
+}
+
 function vTestDetail(){
   var kid=openTest.kid, code=openTest.code;
   var q=itemsFor(code, kid);
@@ -414,11 +439,14 @@ function vTestDetail(){
   if(runs.length){
     s+='<div class="mxg">Every go</div><div class="runlist">'+
        runs.slice().reverse().map(function(r){
-         var cls=scoreCls(r.score,r.total);
-         return '<div class="runrow"><span class="rundate">'+dshort(r.ts)+'</span>'+
+         var cls=scoreCls(r.score,r.total), open=(openRun===r.id);
+         var row='<div class="runrow'+(r.ans?" can":"")+'"'+(r.ans?' data-run="'+esc(r.id)+'"':'')+'>'+
+           '<span class="rundate">'+dshort(r.ts)+'</span>'+
            '<span class="runbar"><i class="'+cls+'" style="width:'+
              Math.round(r.score/r.total*100)+'%"></i></span>'+
-           '<span class="runsc '+cls+'">'+r.score+'/'+r.total+'</span></div>';
+           '<span class="runsc '+cls+'">'+r.score+'/'+r.total+'</span>'+
+           (r.ans?'<span class="runarw">'+(open?"\u2303":"\u2304")+'</span>':'')+'</div>';
+         return row + (open ? answerSheet(r) : "");
        }).join("")+'</div>'+
        (best?'<p class="empty">Best so far '+best.score+'/'+best.total+
          ' \u00b7 '+runs.length+(runs.length===1?' go':' goes')+'</p>':'');
@@ -529,8 +557,14 @@ function wResults(){
   if(sy) sy.onclick=function(){ sfxTap(); cloudSync(); };
   document.querySelectorAll("[data-open]").forEach(function(b){
     b.onclick=function(){
-      openTest={kid:b.dataset.kid, code:b.dataset.open};
+      openTest={kid:b.dataset.kid, code:b.dataset.open}; openRun=null;
       sfxTap(); render(); scrollTo(0,0);
+    };
+  });
+  document.querySelectorAll(".runrow[data-run]").forEach(function(row){
+    row.onclick=function(){
+      openRun = (openRun===row.dataset.run) ? null : row.dataset.run;
+      sfxTap(); render();
     };
   });
   var dtb=document.getElementById("dtBack");

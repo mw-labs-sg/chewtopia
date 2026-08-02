@@ -660,7 +660,11 @@ function wireQuiz(){
   if(document.querySelector("[data-mk]")) wireMarks(it);
   if(document.querySelector("[data-tr]")) wireTrace(it);
   var shw=document.getElementById("qShow");
-  if(shw) shw.onclick=function(){ sfxTap(); q.show=true; render(); };
+  if(shw) shw.onclick=function(){
+    var p=document.getElementById("pad");
+    if(p){ try{ q.img=[p.toDataURL("image/png")]; }catch(e){} }
+    sfxTap(); q.show=true; render();
+  };
   var my=document.getElementById("mkY"), mn=document.getElementById("mkN");
   if(my) my.onclick=function(){ grade(true); };
   if(mn) mn.onclick=function(){ grade(false); };
@@ -783,9 +787,14 @@ function speakIt(it){
   /* Always read the whole word, never a lone character: 更, 长, 乐, 种 and 教
      all have two readings and the engine guesses wrong without the context. */
   if(it.k==="tx"){
-    /* the answer itself, twice, exactly as a teacher dictates it */
-    say(it.h,0.85,"zh-CN");
-    setTimeout(function(){ say(it.h,0.7,"zh-CN"); },1400);
+    /* The way a teacher dictates: the word in a phrase so the meaning is
+       clear, then 写, then the word itself twice — so he is never in doubt
+       about which part goes on the paper. */
+    var ctx=String(it.word||"").replace(/[\u3002\uff01\uff1f]/g,"");
+    if(ctx && ctx!==it.h) say(ctx,0.85,"zh-CN");
+    setTimeout(function(){ say("\u5199",0.8,"zh-CN"); }, ctx&&ctx!==it.h ? 1100 : 0);
+    setTimeout(function(){ say(it.h,0.75,"zh-CN"); }, ctx&&ctx!==it.h ? 1700 : 500);
+    setTimeout(function(){ say(it.h,0.65,"zh-CN"); }, ctx&&ctx!==it.h ? 3000 : 1800);
   }
   else if(it.k==="py"||it.k==="hz"||it.k==="rn"){
     /* here the whole word is right: 更, 长, 乐, 种 and 教 all have two
@@ -793,8 +802,17 @@ function speakIt(it){
     say(it.word,0.9,"zh-CN");
     setTimeout(function(){ say(it.word,0.8,"zh-CN"); },1300);
   }
-  else if(it.k==="dict"){ say("Write this sentence.",0.92); say(it.s,0.8); say("Once more.",0.92); say(it.s,0.72); }
-  else { say("Spell,",0.92); say(it.a+".",0.76); say(it.s,0.86); say(it.a+".",0.7); }
+  else if(it.k==="dict"){
+    say("Write the whole sentence.",0.92); say(it.s,0.78);
+    say("Again.",0.92); say(it.s,0.68);
+  }
+  else {
+    /* word, then the sentence it lives in, then the word again — the last
+       thing he hears is always the word he has to write */
+    say("Spell",0.92); say(it.a+".",0.72);
+    say(it.s,0.86);
+    say("Again."+"",0.92); say(it.a+".",0.66);
+  }
 }
 function grade(forced){
   var q=quiz, it=q.items[q.i], right, detail="";
@@ -847,6 +865,21 @@ function grade(forced){
     right=clean(given)===it.a;
     if(!right) detail=it.q+' = <b>'+it.a+'</b>';
   } else { right=clean(given)===clean(it.a); detail=ltRow(it.a,given); }
+
+  /* Keep what he actually put down, so it can be looked at afterwards:
+     the typing as text, the handwriting as small pictures. */
+  q.ans = q.ans || [];
+  q.ans[q.i] = {
+    ask: (it.k==="hz"||it.k==="rn"||it.k==="py"||it.k==="tx") ? (it.word||it.h||"")
+        : (it.k==="math" ? it.q : it.s || ""),
+    want: (it.k==="hz"||it.k==="tx") ? it.h
+        : (it.k==="rn"||it.k==="py") ? (it.a+(it.tone||""))
+        : (it.a||""),
+    got:  (it.k==="tx"||it.k==="hz") ? "" : String(given||""),
+    img:  (it.k==="tx" && q.img && q.img.length) ? q.img.slice() : null,
+    marks:(it.k==="tx" && q.mk) ? q.mk.slice() : null,
+    right: right
+  };
 
   q.marks = q.marks || [];
   q.marks[q.i] = right;
@@ -902,7 +935,8 @@ function next(){
   var q=quiz; q.i++; q.graded=false; q.show=false; q.trMiss=0; q.trDone=0; q.mk=null; q.img=null;
   if(q.i>=q.items.length){ q.done=true;
     addResult({who:who(),subject:q.subject,code:q.code,test:q.test,score:q.score,
-               total:q.total||q.items.length,missed:q.missed,ts:Date.now()});
+               total:q.total||q.items.length,missed:q.missed,ts:Date.now(),
+               ans:(q.ans||[]).filter(Boolean)});
     bumpStreak();
     autoSend(); }                   /* send it up while the tablet is still awake */
   render(); scrollTo(0,0);

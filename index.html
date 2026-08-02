@@ -441,6 +441,29 @@
   .runbar i.good{background:#4FB86B} .runbar i.mid{background:#FFB627}
   .runbar i.low{background:#FF6F52}
   .runsc{font-size:13px;font-weight:800;width:52px;text-align:right}
+  .runrow.can{cursor:pointer;border-radius:10px}
+  .runrow.can:active{background:var(--bg)}
+  .runarw{color:var(--soft);font-size:13px;width:14px;text-align:right}
+  /* what he actually put down */
+  .sheet{background:var(--bg);border-radius:12px;padding:8px 10px;margin:2px 0 10px}
+  .shrow{display:flex;align-items:center;gap:10px;padding:7px 0;
+    border-bottom:1px solid rgba(0,0,0,.05)}
+  .shrow:last-child{border-bottom:0}
+  .shask{flex:1;min-width:0;font-size:13px;color:var(--soft);font-weight:600;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .shgot{font-size:15px;font-weight:700;color:var(--ink);max-width:42%;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .shgot i{color:#C3D2DF;font-style:normal}
+  .shgot b.ok{color:#4FB86B} .shgot b.no{color:#FF6F52}
+  .shimgs{display:flex;gap:4px}
+  .shimgs img{width:46px;height:46px;border-radius:8px;background:#fff;
+    box-shadow:inset 0 0 0 2px #DFE8F0}
+  .shimgs img.no{box-shadow:0 0 0 2px #FF6F52}
+  .shwant{font-size:16px;font-weight:800;color:#2F7A45;
+    font-family:'Noto Sans SC','Lexend',sans-serif}
+  .shrow.no .shwant{color:#B03A22}
+  .shflag{width:18px;text-align:right;font-weight:800}
+  .shrow.ok .shflag{color:#4FB86B} .shrow.no .shflag{color:#FF6F52}
   .runsc.good{color:#2F7A45} .runsc.mid{color:#8A6100} .runsc.low{color:#B03A22}
 
   /* ---- progress matrix: each boy gets three subject columns ---- */
@@ -608,14 +631,14 @@ body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;-
   </div>
   <div class="tabs" id="tabs"></div>
   <div id="view"></div>
-  <div class="foot">Saved on this device · build 71</div>
+  <div class="foot">Saved on this device · build 72</div>
 </div>
 <!-- load order matters: data, then core, then screens, app last -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="data.js?v=16"></script>
-<script src="core.js?v=34"></script>
+<script src="core.js?v=35"></script>
 <script src="timetable.js?v=5"></script>
-<script src="training.js?v=28"></script>
-<script src="app.js?v=64"></script>
+<script src="training.js?v=29"></script>
+<script src="app.js?v=65"></script>
 </body>
 </html>
