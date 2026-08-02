@@ -5,88 +5,92 @@
 
 function pFilter(){ return S("pfilter","all"); }
 
-/* Both boys side by side. Each column is that child's own lists, because
-   they are in different years and never sit the same test. */
-function testsFor(kid, f){
-  var s="", any=false;
+/* Both boys side by side, three subject columns each, laid out exactly like
+   Progress. Grey means never tried; otherwise it is the last score, with the
+   name of the test in black inside the same box. */
+function tCell(kid, code, name, testName, meta){
+  var l = testName ? lastFor(testName, kid) : null;
+  var cls = l ? scoreCls(l.score, l.total) : "none";
+  var val, sub;
+  if(l){
+    var b = bestFor(testName, kid);
+    val = l.score+"/"+l.total;
+    sub = dshort(l.ts) + ((b && b.score>l.score) ? " \u00b7 best "+b.score : "");
+  } else { val = "Not tried"; sub = meta||""; }
+  return '<button class="tbox '+cls+'" data-t="'+esc(code)+'" data-kid="'+kid+'">'+
+    '<span class="tn">'+esc(name)+'</span>'+
+    '<span class="tv'+(l?'':' small')+'">'+val+'</span>'+
+    (sub?'<span class="td">'+esc(sub)+'</span>':'')+'</button>';
+}
 
-  var wk=weakTop(kid, 12);
-  if(wk.length){
-    s+='<button class="test rev" data-t="weak" data-kid="'+kid+'">'+
-       '<span class="tx"><span class="nm">Tricky ones</span>'+
-       '<span class="mt">'+esc(wk.slice(0,3).map(weakLabel).join(", "))+
-       (wk.length>3?", \u2026":"")+'</span></span>'+
-       '<span class="pill beat">Go</span></button>';
-  }
-
-  if(f==="all"||f==="en"){
+function tColumn(kid, subj){
+  var out="";
+  if(subj==="en"){
     var eb = kid==="tc" ? TC_SPELL : SC_SPELL, ec = kid==="tc" ? "en" : "es";
-    if(Object.keys(eb).length){
-      s+='<div class="sub">English spelling</div>'; any=true;
-      Object.keys(eb).forEach(function(k){
-        s+='<button class="test" data-t="'+ec+'|'+k+'" data-kid="'+kid+'">'+
-          '<span><span class="nm">'+(kid==="tc"?"List "+k:esc(k))+'</span>'+
-          '<span class="mt">'+eb[k][1].length+' questions</span></span>'+
-          pill(kid==="tc"?("Spelling "+k):k, kid)+'</button>'; });
-    }
-  }
-
-  if(f==="all"||f==="zh"){
-    var bank = kid==="tc" ? TC_PINYIN : SC_TINGXIE;
-    if(Object.keys(bank).length){
-      s+='<div class="sub">'+(kid==="tc"?"\u534e\u6587 \u00b7 \u6c49\u8bed\u62fc\u97f3":"\u534e\u6587\u542c\u5199")+'</div>'; any=true;
-      Object.keys(bank).forEach(function(k){
-        s+='<button class="test" data-t="zh|'+k+'" data-kid="'+kid+'">'+
-          '<span><span class="nm">'+esc(k)+'</span>'+
-          '<span class="mt">'+bank[k].length+' words</span></span>'+pill(k, kid)+'</button>'; });
-    }
-
-    if(kid==="tc"){
-      s+='<div class="sub">\u751f\u5b57\u8868 \u00b7 \u6211\u4f1a\u8ba4</div>';
-      Object.keys(HANZI).forEach(function(k){
-        s+='<button class="test" data-t="rn|'+k+'" data-kid="'+kid+'">'+
-          '<span><span class="nm">'+esc(k)+'</span>'+
-          '<span class="mt">'+HANZI[k].length+' \u5b57 \u00b7 see the character, write the pinyin</span></span>'+
-          pill("\u6211\u4f1a\u8ba4 "+k, kid)+'</button>'; });
-
-      s+='<div class="sub">\u751f\u5b57\u8868 \u00b7 \u6211\u4f1a\u5199</div>';
-      Object.keys(HANZI).forEach(function(k){
-        s+='<button class="test" data-t="hz|'+k+'" data-kid="'+kid+'">'+
-          '<span><span class="nm">'+esc(k)+'</span>'+
-          '<span class="mt">'+HANZI[k].map(function(x){return x[0];}).join("")+'</span></span>'+
-          pill("\u6211\u4f1a\u5199 "+k, kid)+'</button>'; });
-    }
-  }
-
-  if(f==="all"||f==="ma"){
-    s+='<div class="sub">Maths</div>'; any=true;
-    [["easy","Warm up","Add and take away to 20"],
-     ["times","Times tables","2 to 10"],
-     ["hard","Challenge","Bigger numbers and division"]].forEach(function(m){
-      s+='<button class="test" data-t="ma|'+m[0]+'" data-kid="'+kid+'">'+
-        '<span><span class="nm">'+m[1]+'</span><span class="mt">'+m[2]+'</span></span>'+
-        pill("Math \u00b7 "+m[1], kid)+'</button>';
+    Object.keys(eb).forEach(function(k){
+      out+=tCell(kid, ec+"|"+k, kid==="tc"?("List "+k):k,
+                 kid==="tc"?("Spelling "+k):k, eb[k][1].length+" questions");
     });
   }
-
-  if(!any && !wk.length) s+='<p class="empty">Nothing here yet.</p>';
-  return s;
+  else if(subj==="zh"){
+    var bank = kid==="tc" ? TC_PINYIN : SC_TINGXIE;
+    if(Object.keys(bank).length){
+      out+='<div class="mxtag">'+(kid==="tc"?"\u6c49\u8bed\u62fc\u97f3":"\u542c\u5199")+'</div>';
+      Object.keys(bank).forEach(function(k){
+        out+=tCell(kid, "zh|"+k, k, k, bank[k].length+" words");
+      });
+    }
+    if(kid==="tc"){
+      out+='<div class="mxtag">\u6211\u4f1a\u8ba4</div>';
+      Object.keys(HANZI).forEach(function(k){
+        out+=tCell(kid, "rn|"+k, k, "\u6211\u4f1a\u8ba4 "+k, HANZI[k].length+" \u5b57");
+      });
+      out+='<div class="mxtag">\u6211\u4f1a\u5199</div>';
+      Object.keys(HANZI).forEach(function(k){
+        out+=tCell(kid, "hz|"+k, k, "\u6211\u4f1a\u5199 "+k, HANZI[k].length+" \u5b57");
+      });
+    }
+  }
+  else {
+    [["easy","Warm up","Add and take away to 20"],
+     ["times","Times tables","2 to 10"],
+     ["hard","Challenge","Bigger numbers, division"]].forEach(function(m){
+      out+=tCell(kid, "ma|"+m[0], m[1], "Math \u00b7 "+m[1], m[2]);
+    });
+  }
+  return out || '<div class="mxnone">\u2014</div>';
 }
 
 function vTests(){
   var f=pFilter();
   var opts=[["all","Everything"],["en","English"],["zh","华文"],["ma","Maths"]]
     .map(function(o){ return '<option value="'+o[0]+'"'+(f===o[0]?" selected":"")+'>'+o[1]+'</option>'; }).join("");
+  var cols=SUBJ_COLS.filter(function(c){ return f==="all" || f===c[0]; });
 
   var s='<div class="panel"><h2><span class="em">📝</span> Training</h2>'+
+        '<div class="mxkey"><span><span class="dot" style="background:#C3D2DF"></span> '+
+          '<b>not tried</b></span>'+
+          '<span><span class="dot" style="background:#4FB86B"></span> <b>full marks</b></span>'+
+          '<span><span class="dot" style="background:#FFB627"></span> <b>70% or better</b></span>'+
+          '<span><span class="dot" style="background:#FF6F52"></span> <b>below 70%</b></span>'+
+          '<span>last score \u00b7 tap to start</span></div>'+
         '<div class="lbl">Subject</div><select id="pf">'+opts+'</select>'+
-        '<div style="height:14px"></div><div class="duo">';
+        '<div style="height:14px"></div><div class="mx6">';
 
   KIDS.forEach(function(k){
+    var wk=weakTop(k.id, 12);
     s+='<div class="kidbox"><button class="kidname '+whoCls(k.id)+'" data-rename="'+k.id+'">'+
        esc(pname(k.id))+'<small>'+k.level+
        (streak(k.id).n?' \u00b7 '+streak(k.id).n+"\uD83D\uDD25":"")+'</small></button>'+
-       testsFor(k.id, f)+'</div>';
+       (wk.length?'<button class="test rev" data-t="weak" data-kid="'+k.id+'">'+
+         '<span class="tx"><span class="nm">Tricky ones</span>'+
+         '<span class="mt">'+esc(wk.slice(0,3).map(weakLabel).join(", "))+
+         (wk.length>3?", \u2026":"")+'</span></span>'+
+         '<span class="pill beat">Go</span></button>':'')+
+       '<div class="mxcols'+(cols.length===1?" one":cols.length===2?" two":"")+'">';
+    cols.forEach(function(c){ s+='<div class="mxsub">'+c[1]+'</div>'; });
+    cols.forEach(function(c){ s+='<div class="mxcol">'+tColumn(k.id, c[0])+'</div>'; });
+    s+='</div></div>';
   });
   s+='</div></div>';
 
@@ -131,8 +135,8 @@ function wTests(){
       document.getElementById("rateVal").textContent = v<0.7?"Slow":v<0.95?"Normal":"Quick";
     };
   }
-  var t=document.getElementById("vTest");
-  if(t) t.onclick=function(){ say("Spell, mischievous. John read a book about three mischievous children.",0,"en-GB"); };
+  var vt=document.getElementById("vTest");
+  if(vt) vt.onclick=function(){ say("Spell, mischievous. John read a book about three mischievous children.",0,"en-GB"); };
 }
 
 function rnd(a,b){ return Math.floor(Math.random()*(b-a+1))+a; }
