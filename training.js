@@ -83,7 +83,7 @@ function vTests(){
   var f=pFilter();
   var opts=[["all","Everything"],["en","English"],["zh","华文"],["ma","Maths"]]
     .map(function(o){ return '<option value="'+o[0]+'"'+(f===o[0]?" selected":"")+'>'+o[1]+'</option>'; }).join("");
-  var cols=SUBJ_COLS.filter(function(c){ return f==="all" || f===c[0]; });
+  var pick=SUBJ_COLS.filter(function(c){ return f==="all" || f===c[0]; });
 
   var s='<div class="panel"><h2><span class="em">📝</span> Training</h2>'+
         '<div class="mxkey"><span><span class="dot" style="background:#C3D2DF"></span> '+
@@ -96,6 +96,8 @@ function vTests(){
         '<div style="height:14px"></div><div class="mx6">';
 
   shownKids().forEach(function(k){
+    var cols=pick.filter(function(c){ return hasSubj(k.id, c[0]); });
+    if(!cols.length) return;
     var wk=weakTop(k.id, 12);
     s+='<div class="kidbox"><div class="kidname '+whoCls(k.id)+'">'+
        esc(pname(k.id))+'<small>'+k.level+
@@ -260,10 +262,10 @@ function dueCodes(kid){
 }
 function allCodes(kid){
   var out=[];
-  Object.keys(kid==="tc"?TC_SPELL:SC_SPELL).forEach(function(k){ out.push((kid==="tc"?"en|":"es|")+k); });
+  if(hasSubj(kid,"en")) Object.keys(kid==="tc"?TC_SPELL:SC_SPELL).forEach(function(k){ out.push((kid==="tc"?"en|":"es|")+k); });
   Object.keys(kid==="tc"?TC_PINYIN:SC_TINGXIE).forEach(function(k){ out.push("zh|"+k); });
   if(kid==="tc") Object.keys(HANZI).forEach(function(k){ out.push("rn|"+k); out.push("hz|"+k); });
-  ["easy","times","hard"].forEach(function(k){ out.push("ma|"+k); });
+  if(hasSubj(kid,"ma")) ["easy","times","hard"].forEach(function(k){ out.push("ma|"+k); });
   return out;
 }
 function untriedCodes(kid){

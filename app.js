@@ -375,10 +375,12 @@ function vResults(){
     var full=runs.filter(function(r){ return r.score>=r.total; }).length;
     m+='<div class="kidbox"><div class="kidname '+whoCls(k.id)+'">'+esc(pname(k.id))+
        '<small>'+(streak(k.id).n?streak(k.id).n+"\uD83D\uDD25 \u00b7 ":"")+
-       runs.length+' tests \u00b7 '+full+' full</small></div><div class="mxcols">';
+       runs.length+' tests \u00b7 '+full+' full</small></div>'+
+       '<div class="mxcols'+(kidSubj(k.id).length===2?" two":"")+'">';
     /* three headers first, then the three columns under them */
-    SUBJ_COLS.forEach(function(sub){ m+='<div class="mxsub">'+sub[1]+'</div>'; });
-    SUBJ_COLS.forEach(function(sub){
+    var mine=SUBJ_COLS.filter(function(sub){ return hasSubj(k.id, sub[0]); });
+    mine.forEach(function(sub){ m+='<div class="mxsub">'+sub[1]+'</div>'; });
+    mine.forEach(function(sub){
       var row=g[sub[0]]||{}, out="";
       Object.keys(row).filter(function(t){ return row[t][k.id]; })
         .sort(function(a,b){ return row[b][k.id].last - row[a][k.id].last; })

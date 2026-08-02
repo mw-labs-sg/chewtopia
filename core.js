@@ -16,6 +16,12 @@ function vwho(){
   for(var i=0;i<KIDS.length;i++){ if(KIDS[i].id===v) return v; }
   return "all";
 }
+function kidSubj(id){
+  for(var i=0;i<KIDS.length;i++){ if(KIDS[i].id===id) return KIDS[i].subj||["en","zh","ma"]; }
+  return ["en","zh"];
+}
+function hasSubj(id, s){ return kidSubj(id).indexOf(s)>=0; }
+
 function shownKids(){
   var v=vwho();
   return v==="all" ? KIDS : KIDS.filter(function(k){ return k.id===v; });
