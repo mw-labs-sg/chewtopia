@@ -341,21 +341,29 @@ function handwritten(it){ return it.k==="hz" || it.k==="tx"; }
 function writing(it){ return handwritten(it) && !tracing(it); }
 
 /* What goes on the pad, and what is revealed when it is time to mark. */
+/* Exactly what to write: one character, a word of two, or the whole sentence. */
+function askCount(it){
+  var s=String(traceTarget(it)||it.h||""), n=s.length;
+  if(it.k==="hz") return n===1 ? "Just the one character" : "Both characters";
+  var stop = /[\u3002\uff01\uff1f]/.test(String(it.word||""));
+  if(n===1) return "One character";
+  if(n<=3) return "One word \u00b7 "+n+" characters";
+  return "A whole sentence \u00b7 "+n+" characters"+(stop?" and the full stop":"");
+}
 function writeAsk(it){
   if(it.k==="hz"){
     var wd=String(it.word||it.h), tgt=String(it.h);
     var box='<b class="blank">'+"\u25a2".repeat(tgt.length)+'</b>';
     return {title:"\u5199\u4e00\u5199",
             sub:(wd.indexOf(tgt)>=0 ? esc(wd).replace(esc(tgt),box) : box),
-            count:tgt.length+" character"+(tgt.length===1?"":"s")+" to write"};
+            count:askCount(it)};
   }
   if(it.k==="rn"){
     return {title:"\u5199\u62fc\u97f3", sub:'<b class="blank">'+esc(it.h)+'</b>',
-            count:"pinyin and tone"};
+            count:"The pinyin and the tone"};
   }
   var n=String(it.h||"").length;
-  return {title:"\u542c\u4e00\u542c\uff0c\u5199\u4e00\u5199", sub:"",
-          count:n+" character"+(n===1?"":"s")+" to write"};
+  return {title:"\u542c\u4e00\u542c\uff0c\u5199\u4e00\u5199", sub:"", count:askCount(it)};
 }
 
 /* ==========================================================================
@@ -473,8 +481,8 @@ function quizHTML(){
     s+='<div class="qq">'+tk.title+'</div>'+
        (tk.sub?'<div class="ctx big-word">'+tk.sub+'</div>':'')+
        '<button class="btn play wide" id="qP">\uD83D\uDD0A Hear it</button>'+
-       '<div class="ctx wcount">Write it in the box \u2014 it only inks in when the '+
-         'stroke is right</div>'+
+       '<div class="ctx wcount">'+esc(tk.count)+'</div>'+
+       '<div class="tip">It only inks in when the stroke is right.</div>'+
        '<div class="tracerow">'+tg.split("").map(function(_,i){
           return '<div class="trbox" data-tr="'+i+'"></div>'; }).join("")+'</div>'+
        '<div class="trbtns">'+
@@ -489,7 +497,7 @@ function quizHTML(){
     s+='<div class="qq">'+ask.title+'</div>'+
        (ask.sub?'<div class="ctx big-word">'+ask.sub+'</div>':'')+
        '<button class="btn play wide" id="qP">\uD83D\uDD0A Hear it again</button>'+
-       '<div class="ctx wcount">'+ask.count+'</div>'+
+       '<div class="ctx wcount">'+esc(ask.count)+'</div>'+
        ((q.show||q.graded)
         ? '<div class="hz">'+esc(it.k==="rn"?(it.a+(it.tone||"")):it.h)+'</div>'+
           '<div class="ctx">'+esc(it.word||"")+
@@ -675,7 +683,14 @@ function speakIt(it){
   hush();
   /* Always read the whole word, never a lone character: 更, 长, 乐, 种 and 教
      all have two readings and the engine guesses wrong without the context. */
-  if(it.k==="py"||it.k==="hz"||it.k==="rn"||it.k==="tx"){
+  if(it.k==="tx"){
+    /* the answer itself, twice, exactly as a teacher dictates it */
+    say(it.h,0.85,"zh-CN");
+    setTimeout(function(){ say(it.h,0.7,"zh-CN"); },1400);
+  }
+  else if(it.k==="py"||it.k==="hz"||it.k==="rn"){
+    /* here the whole word is right: 更, 长, 乐, 种 and 教 all have two
+       readings and the engine guesses wrong without the context */
     say(it.word,0.9,"zh-CN");
     setTimeout(function(){ say(it.word,0.8,"zh-CN"); },1300);
   }
