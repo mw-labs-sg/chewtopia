@@ -9,12 +9,14 @@ function render(){
   if(wb){
     wb.innerHTML=whoBar();
     wb.querySelectorAll("[data-vw]").forEach(function(b){
-      b.onclick=function(){ W("vwho", b.dataset.vw); sfxTap(); render(); };
+      b.onclick=function(){ W("vwho", b.dataset.vw); sfxPop(); render(); };
     });
   }
   var sb=document.getElementById("scenes");
   if(sb){
-    sb.innerHTML=sceneBar();
+    sb.innerHTML=sceneBar()+sndToggle();
+    var sn=sb.querySelector("#sndBtn");
+    if(sn) sn.onclick=function(){ W("snd", snd()?"off":"on"); sfxTap(); render(); };
     sb.querySelectorAll("[data-scene]").forEach(function(b){
       b.onclick=function(){ W("scene", b.dataset.scene); sfxTap(); render(); };
     });
@@ -29,9 +31,9 @@ function render(){
       var d=document.createElement("span"); d.className="tabdiv"; tb.appendChild(d);
     }
     var b=document.createElement("button");
-    b.className="tab"+(t[0]===tab?" on":"");
+    b.className="tab "+(t[2]||"t-blue")+(t[0]===tab?" on":"");
     b.textContent=t[1];
-    b.onclick=function(){ go(t[0]); };
+    b.onclick=function(){ sfxSwipe(); go(t[0]); };
     tb.appendChild(b);
   });
 

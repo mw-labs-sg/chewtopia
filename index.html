@@ -56,11 +56,26 @@
   .tabs{display:flex;gap:8px;margin-bottom:14px;overflow-x:auto;
     scrollbar-width:none;-webkit-overflow-scrolling:touch;padding-bottom:2px}
   .tabs::-webkit-scrollbar{display:none}
-  .tab{flex:0 0 auto;background:var(--card);border:2px solid var(--line);color:var(--soft);
-    border-radius:14px;padding:11px 16px;font-family:inherit;font-size:15px;
-    font-weight:700;cursor:pointer;white-space:nowrap;min-height:44px}
+  .tab{flex:0 0 auto;border:none;border-radius:14px;padding:11px 16px;font-family:inherit;
+    font-size:15px;font-weight:800;cursor:pointer;white-space:nowrap;min-height:44px;
+    transition:transform .1s,box-shadow .1s}
   @media(min-width:620px){ .tab{flex:1 1 0;padding:11px 6px} }
-  .tab.on{background:var(--ink);border-color:var(--ink);color:#fff}
+  .tab:active{transform:translateY(2px)}
+  /* resting: a wash of its own colour. chosen: filled, with a white ring. */
+  .tab.on{color:#fff;box-shadow:0 0 0 3px #fff, 0 4px 0 rgba(16,24,40,.22)}
+  .t-blue {background:#E4EEFD;color:#2559B8}
+  .t-blue.on {background:linear-gradient(150deg,#2F73E8,#5A9BF7)}
+  .t-grape{background:#EEE9FD;color:#5B41B8}
+  .t-grape.on{background:linear-gradient(150deg,#7C5CE0,#A38BF0)}
+  .t-coral{background:#FFE7E1;color:#C2472C}
+  .t-coral.on{background:linear-gradient(150deg,#FF6F52,#FF9478)}
+  .t-lime {background:#DFF3E4;color:#2F7A45}
+  .t-lime.on {background:linear-gradient(150deg,#4FB86B,#79D191)}
+  .t-sun  {background:#FFF0D2;color:#8A6100}
+  .t-sun.on  {background:linear-gradient(150deg,#E9A00C,#FFC24D)}
+  .t-teal {background:#DFF1F4;color:#1F6E7C}
+  .t-teal.on {background:linear-gradient(150deg,#1F8FA3,#4FC0D2)}
+  .tabdiv{flex:0 0 auto;width:2px;background:rgba(255,255,255,.5);border-radius:2px;margin:7px 3px}
   .tabdiv{flex:0 0 auto;width:2px;background:var(--line);border-radius:2px;margin:7px 3px}
 
   .panel{background:var(--card);border:2px solid var(--line);border-radius:18px;
@@ -229,8 +244,8 @@
   .wkb.hL{width:calc(50% - 1px);justify-self:start}
   .wkb.hR{width:calc(50% - 1px);justify-self:end}
   /* in both mode, school blocks carry the child's colour on their edge too */
-  .wkb.sch.hL{box-shadow:inset 3px 0 0 var(--blue)}
-  .wkb.sch.hR{box-shadow:inset 3px 0 0 var(--tang)}
+  .wkb.sch.hL{box-shadow:inset 0 -3px 0 rgba(47,115,232,.55)}
+  .wkb.sch.hR{box-shadow:inset 0 -3px 0 rgba(194,90,12,.55)}
   /* school subjects */
   .s-core{background:var(--sky);color:var(--blue)}
   .s-cl{background:#FFE3DC;color:#B03A22}
@@ -238,7 +253,7 @@
   .s-fun{background:#DFF3E4;color:#2F7A45}
   .s-other{background:#F0EAFE;color:var(--grape)}
   /* after-school blocks: child colour plus a solid edge */
-  .wkb.own{cursor:pointer;box-shadow:inset 3px 0 0 currentColor;font-weight:800}
+  .wkb.own{cursor:pointer;box-shadow:inset 0 -3px 0 currentColor;font-weight:800}
   .wkallday-label{grid-column:1;font-size:10px;color:var(--soft);text-align:right;
     padding-right:5px;align-self:center;line-height:1.1}
   .wkallday{display:flex;flex-wrap:wrap;gap:2px;align-content:center;padding:2px 0}
@@ -360,11 +375,11 @@
   .agd.sp{background:transparent}
   .agc{min-height:6px;padding-bottom:6px}
   .agc.both{grid-column:2/-1}
-  .evc{position:relative;background:var(--bg);border-radius:12px;padding:9px 30px 9px 11px;
-    margin-bottom:6px;border-left:4px solid var(--line)}
-  .evc.e-tc{background:#F2F8FF;border-left-color:var(--blue)}
-  .evc.e-sc{background:#FFF6EC;border-left-color:var(--tang)}
-  .evc.e-all{background:#F5F3FE;border-left-color:var(--grape)}
+  .evc{position:relative;background:var(--bg);border-radius:12px;padding:10px 30px 10px 12px;
+    margin-bottom:6px}
+  .evc.e-tc{background:#F2F8FF}
+  .evc.e-sc{background:#FFF6EC}
+  .evc.e-all{background:#F5F3FE}
   .evc.live{box-shadow:0 0 0 2px var(--sun) inset}
   .evt{display:block;font-weight:700;font-size:14.5px;line-height:1.25;color:var(--ink)}
   .evw{display:block;font-size:11.5px;font-weight:700;color:var(--soft);margin-top:2px}
@@ -493,6 +508,10 @@
     cursor:pointer;padding:0;box-shadow:0 2px 7px rgba(16,24,40,.22);transition:transform .12s}
   .sc-pick.on{outline:2.5px solid #fff;outline-offset:2px;transform:scale(1.14)}
   .sc-pick:hover{transform:scale(1.14)}
+  .sndbtn{margin-left:6px;width:30px;height:30px;border-radius:50%;border:none;cursor:pointer;
+    background:rgba(255,255,255,.85);font-size:14px;line-height:1;padding:0;
+    box-shadow:0 2px 7px rgba(16,24,40,.22)}
+  .sndbtn.off{background:rgba(255,255,255,.45);opacity:.7}
 
   /* ---- who the whole app is showing, sitting under the tabs ---- */
   .whobar{display:flex;gap:9px;margin-bottom:14px}
@@ -511,9 +530,10 @@
     box-shadow:inset 0 0 0 1.5px #F5D2AE, 0 3px 0 #F5D2AE}
   /* chosen: filled, with a little lift */
   .wb.on{color:#fff}
-  .wb.all.on{background:linear-gradient(150deg,#4C6FE8,#7C5CE0);box-shadow:0 4px 0 #4433A6}
-  .wb.k-tc.on{background:linear-gradient(150deg,#2F73E8,#4FA0F5);box-shadow:0 4px 0 #2559B8}
-  .wb.k-sc.on{background:linear-gradient(150deg,#E1740F,#FFA23D);box-shadow:0 4px 0 #93430A}
+  .wb.on{box-shadow:0 0 0 3px #fff, 0 4px 0 rgba(16,24,40,.22)}
+  .wb.all.on{background:linear-gradient(150deg,#4C6FE8,#7C5CE0)}
+  .wb.k-tc.on{background:linear-gradient(150deg,#2F73E8,#4FA0F5)}
+  .wb.k-sc.on{background:linear-gradient(150deg,#E1740F,#FFA23D)}
   .wb.on small{opacity:.9}
   .wb:active.on{box-shadow:0 2px 0 rgba(0,0,0,.3)}
   .sc-sky{background:linear-gradient(160deg,#8CC6F5,#E9F4FE)}
@@ -540,9 +560,9 @@
 <!-- load order matters: data, then core, then screens, app last -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="data.js?v=15"></script>
-<script src="core.js?v=22"></script>
+<script src="core.js?v=23"></script>
 <script src="timetable.js?v=5"></script>
 <script src="training.js?v=12"></script>
-<script src="app.js?v=53"></script>
+<script src="app.js?v=54"></script>
 </body>
 </html>

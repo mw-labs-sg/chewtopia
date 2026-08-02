@@ -83,7 +83,10 @@ function mergeSeed(key, seed){
 function seedOnce(){ mergeSeed("events", SEED_EVENTS); mergeSeed("acts", SEED_ACTS); }
 
 var DAYS = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
-var TABS = [["home","Upcoming"],["schedule","Timetable"],["meals","Meals"],["practice","Training"],["results","Progress"],["reading","Reading"]];
+/* Each tab keeps its own colour, so the eye learns where things live. */
+var TABS = [["home","Upcoming","t-blue"],["schedule","Timetable","t-grape"],
+            ["meals","Meals","t-coral"],["practice","Training","t-lime"],
+            ["results","Progress","t-sun"],["reading","Reading","t-teal"]];
 var tab="home", quiz=null, showAdd=false;
 /* Each tab gets a readable address, e.g. .../chewtopia/#meals, so a link can
    be bookmarked or sent straight to one screen. */
@@ -348,9 +351,17 @@ function streakChip(id){
 }
 
 /* ---------- sound effects ---------- */
+/* One switch for every noise the app makes, including the reading voice. */
+function snd(){ return S("snd","on")!=="off"; }
+function sndToggle(){
+  return '<button class="sndbtn'+(snd()?"":" off")+'" id="sndBtn" '+
+    'title="'+(snd()?"Sound on":"Sound off")+'" aria-label="Sound">'+
+    (snd()?"\uD83D\uDD0A":"\uD83D\uDD07")+'</button>';
+}
 var ac=null;
 function actx(){ if(!ac){ var C=window.AudioContext||window.webkitAudioContext; if(C) ac=new C(); } return ac; }
 function blip(f,dur,type,vol){
+  if(!snd()) return;
   dur=dur||0.12; type=type||"square"; vol=vol||0.06;
   try{
     var a=actx(); if(!a) return;
@@ -369,6 +380,8 @@ function sfxStreak(){ blip([659,784,988,1319,1568],0.09); }
 function sfxLose(){ blip([196,155],0.17,"sawtooth",0.05); }
 function sfxTap(){ blip([880],0.045,"triangle",0.035); }
 function sfxDone(){ blip([523,659,784,1047,1319],0.13); }
+function sfxSwipe(){ blip([392,523],0.055,"triangle",0.03); }   /* changing tab */
+function sfxPop(){ blip([659,880],0.05,"sine",0.045); }         /* picking someone */
 
 function burst(n){
   var cols=["#2F73E8","#4FB86B","#FF6F52","#7C5CE0","#FFB627"];
@@ -583,7 +596,7 @@ function bestVoice(lang){
    drops below this however slow the English is set. */
 function hasVoice(lang){ return !!bestVoice(lang); }
 function say(t,rate,lang){
-  if(!window.speechSynthesis) return;
+  if(!window.speechSynthesis || !snd()) return;
   lang=lang||"en-GB";
   var cn = lang.indexOf("zh")===0;
   var u=new SpeechSynthesisUtterance(t), v=bestVoice(lang);
