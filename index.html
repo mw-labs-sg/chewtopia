@@ -380,6 +380,17 @@
     color:var(--soft);margin:8px 0 2px}
   .mxcol > .mxtag:first-child{margin-top:0}
   .mxcols.two{grid-template-columns:repeat(2,1fr)}
+  .mxcols.wide{grid-template-columns:1fr 2.1fr 1fr}
+  .zhwrap{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:6px}
+  .hzgrid{display:grid;grid-template-columns:minmax(52px,auto) 1fr 1fr;gap:6px;
+    align-items:stretch}
+  .hzh{font-size:10px;letter-spacing:.04em;font-weight:800;color:var(--soft);
+    text-align:center;padding-bottom:2px}
+  .hzl{font-size:12.5px;font-weight:700;display:flex;flex-direction:column;
+    justify-content:center;line-height:1.15}
+  .hzl em{font-style:normal;font-size:10px;font-weight:600;color:var(--soft)}
+  .hzgrid .tbox{padding:6px}
+  .hzgrid .tbox .td{font-size:9.5px}
   .mxcols.one{grid-template-columns:1fr}
   .mxcols.one .mxsub{text-align:left}
   .tbox:active{transform:translateY(1px)}
@@ -406,7 +417,7 @@
 <script src="data.js?v=15"></script>
 <script src="core.js?v=19"></script>
 <script src="timetable.js?v=4"></script>
-<script src="training.js?v=9"></script>
+<script src="training.js?v=10"></script>
 <script src="app.js?v=49"></script>
 </body>
 </html>

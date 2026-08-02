@@ -18,7 +18,7 @@ function tCell(kid, code, name, testName, meta){
     sub = dshort(l.ts) + ((b && b.score>l.score) ? " \u00b7 best "+b.score : "");
   } else { val = "Not tried"; sub = meta||""; }
   return '<button class="tbox '+cls+'" data-t="'+esc(code)+'" data-kid="'+kid+'">'+
-    '<span class="tn">'+esc(name)+'</span>'+
+    (name===null ? '' : '<span class="tn">'+esc(name)+'</span>')+
     '<span class="tv'+(l?'':' small')+'">'+val+'</span>'+
     (sub?'<span class="td">'+esc(sub)+'</span>':'')+'</button>';
 }
@@ -35,20 +35,24 @@ function tColumn(kid, subj){
   else if(subj==="zh"){
     var bank = kid==="tc" ? TC_PINYIN : SC_TINGXIE;
     if(Object.keys(bank).length){
-      out+='<div class="mxtag">'+(kid==="tc"?"\u6c49\u8bed\u62fc\u97f3":"\u542c\u5199")+'</div>';
+      out+='<div class="mxtag">'+(kid==="tc"?"\u6c49\u8bed\u62fc\u97f3 \u00b7 \u8bcd\u8868":"\u542c\u5199")+'</div><div class="zhwrap">';
       Object.keys(bank).forEach(function(k){
         out+=tCell(kid, "zh|"+k, k, k, bank[k].length+" words");
       });
+      out+='</div>';
     }
+    /* 我会认 and 我会写 cover the same lessons, so they go side by side:
+       one row per lesson, read it on the left, write it on the right. */
     if(kid==="tc"){
-      out+='<div class="mxtag">\u6211\u4f1a\u8ba4</div>';
+      out+='<div class="mxtag">\u751f\u5b57\u8868</div><div class="hzgrid">'+
+           '<span></span><span class="hzh">\u6211\u4f1a\u8ba4</span>'+
+           '<span class="hzh">\u6211\u4f1a\u5199</span>';
       Object.keys(HANZI).forEach(function(k){
-        out+=tCell(kid, "rn|"+k, k, "\u6211\u4f1a\u8ba4 "+k, HANZI[k].length+" \u5b57");
+        out+='<span class="hzl">'+esc(k)+'<em>'+HANZI[k].length+' \u5b57</em></span>'+
+             tCell(kid, "rn|"+k, null, "\u6211\u4f1a\u8ba4 "+k, "")+
+             tCell(kid, "hz|"+k, null, "\u6211\u4f1a\u5199 "+k, "");
       });
-      out+='<div class="mxtag">\u6211\u4f1a\u5199</div>';
-      Object.keys(HANZI).forEach(function(k){
-        out+=tCell(kid, "hz|"+k, k, "\u6211\u4f1a\u5199 "+k, HANZI[k].length+" \u5b57");
-      });
+      out+='</div>';
     }
   }
   else {
@@ -87,7 +91,8 @@ function vTests(){
          '<span class="mt">'+esc(wk.slice(0,3).map(weakLabel).join(", "))+
          (wk.length>3?", \u2026":"")+'</span></span>'+
          '<span class="pill beat">Go</span></button>':'')+
-       '<div class="mxcols'+(cols.length===1?" one":cols.length===2?" two":"")+'">';
+       '<div class="mxcols'+(cols.length===1?" one":cols.length===2?" two":"")+
+       (k.id==="tc" && cols.length===3 ? " wide":"")+'">';
     cols.forEach(function(c){ s+='<div class="mxsub">'+c[1]+'</div>'; });
     cols.forEach(function(c){ s+='<div class="mxcol">'+tColumn(k.id, c[0])+'</div>'; });
     s+='</div></div>';
