@@ -340,6 +340,32 @@ function hzOpts(it){
   return it.opts;
 }
 
+/* Writing mode. Any Chinese question can be answered on the pad instead of the
+   keyboard, and marked by eye afterwards. SC starts there because he cannot
+   type pinyin at six; TC starts on the keyboard and can switch any time. */
+function cmodeKey(){ return "cmode:"+who(); }
+function cmode(){ return S(cmodeKey(), who()==="sc" ? "write" : "keys"); }
+function isCN(it){ return it.k==="hz"||it.k==="rn"||it.k==="py"||it.k==="tx"; }
+function writing(it){ return isCN(it) && cmode()==="write"; }
+
+/* What goes on the pad, and what is revealed when it is time to mark. */
+function writeAsk(it){
+  if(it.k==="hz"){
+    var wd=String(it.word||it.h), tgt=String(it.h);
+    var box='<b class="blank">'+"\u25a2".repeat(tgt.length)+'</b>';
+    return {title:"\u5199\u4e00\u5199",
+            sub:(wd.indexOf(tgt)>=0 ? esc(wd).replace(esc(tgt),box) : box),
+            count:tgt.length+" character"+(tgt.length===1?"":"s")+" to write"};
+  }
+  if(it.k==="rn"){
+    return {title:"\u5199\u62fc\u97f3", sub:'<b class="blank">'+esc(it.h)+'</b>',
+            count:"pinyin and tone"};
+  }
+  var n=String(it.h||"").length;
+  return {title:"\u542c\u4e00\u542c\uff0c\u5199\u4e00\u5199", sub:"",
+          count:n+" character"+(n===1?"":"s")+" to write"};
+}
+
 function quizHTML(){
   var q=quiz, it=q.items[q.i];
   if(q.done) return doneHTML();
@@ -361,14 +387,31 @@ function quizHTML(){
     '<div class="meter"><i style="width:'+(q.i/q.items.length*100)+'%"></i></div>'+
     '<div class="kind">'+(it.k==="rn"?"我会认":it.k==="hz"?"我会写":it.k==="py"?"听写":it.k==="tx"?"听写":it.k==="dict"?"Dictation":it.k==="math"?"Question":"Spelling")+
       ' '+(q.i+1)+' of '+q.items.length+'</div>';
-  if(it.k==="rn"){
+  if(writing(it)){
+    var ask=writeAsk(it);
+    s+='<div class="qq">'+ask.title+'</div>'+
+       (ask.sub?'<div class="ctx big-word">'+ask.sub+'</div>':'')+
+       '<button class="btn play wide" id="qP">\uD83D\uDD0A Hear it again</button>'+
+       '<div class="ctx wcount">'+ask.count+'</div>'+
+       ((q.show||q.graded)
+        ? '<div class="hz">'+esc(it.k==="rn"?(it.a+(it.tone||"")):it.h)+'</div>'+
+          '<div class="ctx">'+esc(it.word||"")+
+            (it.k==="rn"?"":' \u00b7 '+esc(it.a)+(it.tone||""))+
+            (it.m?' \u00b7 '+esc(it.m):"")+'</div>'
+        : '<div class="padwrap"><canvas id="pad" class="pad"></canvas>'+
+          '<button class="padclr" id="padClr">Rub out</button></div>'+
+          '<div class="switch"><button class="addlink" id="cSwitch">Use the keyboard instead</button></div>')+
+       '<input type="hidden" id="qa" value="">';
+  }
+  else if(it.k==="rn"){
     s+='<div class="hz">'+it.h+'</div>'+
        '<div class="ctx">'+(q.graded?esc(it.word)+' · '+esc(it.m):"Write the pinyin and the tone")+'</div>'+
        '<div class="pair"><span class="f1"><div class="lbl">Pinyin</div>'+
        '<input type="text" id="qa" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="yong"></span>'+
        '<span class="f2"><div class="lbl">Tone</div>'+
        '<input type="text" id="qt" inputmode="numeric" maxlength="1" placeholder="1-4"></span></div>'+
-       '<div class="switch"><button class="addlink" id="qP">🔊 Hear it</button></div>';
+       '<div class="switch"><button class="addlink" id="qP">🔊 Hear it</button>'+
+       '<button class="addlink" id="cSwitch">Write it on the pad</button></div>';
   }
   else if(it.k==="hz"){
     /* Say plainly which character is wanted: the word with one box missing,
@@ -388,27 +431,14 @@ function quizHTML(){
         ? '<div class="opts">'+hzOpts(it).map(function(c){
             return '<button class="opt" data-opt="'+c+'">'+c+'</button>'; }).join("")+
           '<input type="hidden" id="qa" value="">'+
-          '<div class="switch"><button class="addlink" id="hzSwitch">Write it instead</button></div>'
+          '<div class="switch"><button class="addlink" id="hzSwitch">Type it instead</button>'+
+          '<button class="addlink" id="cSwitch">Write on the pad</button></div>'
         : '<input type="text" id="qa" autocomplete="off" spellcheck="false" '+
           'class="hzin" placeholder="'+esc(tgt.length>1?"写这两个字":"写这个字")+'" lang="zh">'+
-          '<div class="switch"><button class="addlink" id="hzSwitch">Tap from four instead</button></div>');
+          '<div class="switch"><button class="addlink" id="hzSwitch">Tap from four instead</button>'+
+          '<button class="addlink" id="cSwitch">Write on the pad</button></div>');
   }
-  else if(it.k==="tx"){
-    /* No answer on screen until it has been attempted — that is the whole test. */
-    var n=String(it.h||"").length;
-    s+='<div class="qq">\u542c\u4e00\u542c\uff0c\u5199\u4e00\u5199</div>'+
-       '<div class="tip">'+(q.graded?"":"Listen, then write it \u2014 on the pad below, or on paper.")+'</div>'+
-       '<button class="btn play wide" id="qP">\uD83D\uDD0A Hear it again</button>'+
-       '<div class="ctx wcount">'+n+' character'+(n===1?"":"s")+' to write</div>'+
-       ((q.show||q.graded)
-        ? '<div class="hz">'+esc(it.h)+'</div>'+
-          '<div class="ctx">'+esc(it.word)+' \u00b7 '+esc(it.a)+(it.tone||"")+
-          (it.m?' \u00b7 '+esc(it.m):"")+'</div>'
-        : '<div class="padwrap"><canvas id="pad" class="pad"></canvas>'+
-          '<button class="padclr" id="padClr">Rub out</button></div>')+
-       '<input type="hidden" id="qa" value="">';
-  }
-  else if(it.k==="py"){
+  else if(it.k==="py"||it.k==="tx"){
     var pn=String(it.h||"").length;
     s+='<div class="hz'+(q.graded?"":" q")+'">'+(q.graded?esc(it.h):"?")+'</div>'+
        '<div class="ctx">'+(q.graded?esc(it.word)
@@ -418,7 +448,8 @@ function quizHTML(){
        '<div class="pair"><span class="f1"><div class="lbl">Pinyin</div>'+
        '<input type="text" id="qa" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="yong"></span>'+
        '<span class="f2"><div class="lbl">Tone</div>'+
-       '<input type="text" id="qt" inputmode="numeric" maxlength="1" placeholder="1-4"></span></div>';
+       '<input type="text" id="qt" inputmode="numeric" maxlength="1" placeholder="1-4"></span></div>'+
+       '<div class="switch"><button class="addlink" id="cSwitch">Write it on the pad</button></div>';
   } else if(it.k==="math"){
     s+='<div class="qq">'+it.q+' = ?</div>'+
        '<input type="text" id="qa" inputmode="numeric" autocomplete="off" placeholder="Answer">';
@@ -430,7 +461,7 @@ function quizHTML(){
         ? '<textarea id="qa" spellcheck="false" placeholder="Type the whole sentence" style="margin-top:12px"></textarea>'
         : '<input type="text" id="qa" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Type here" style="margin-top:12px">');
   }
-  if(it.k==="tx"){
+  if(writing(it)){
     s += q.graded
       ? '<div class="btnrow"><button class="btn go" id="qG">Next</button></div>'
       : (q.show
@@ -467,6 +498,12 @@ function wireQuiz(){
   var my=document.getElementById("mkY"), mn=document.getElementById("mkN");
   if(my) my.onclick=function(){ grade(true); };
   if(mn) mn.onclick=function(){ grade(false); };
+
+  var cs=document.getElementById("cSwitch");
+  if(cs) cs.onclick=function(){
+    W(cmodeKey(), cmode()==="write" ? "keys" : "write");
+    q.show=false; render();
+  };
 
   var sw=document.getElementById("hzSwitch");
   if(sw) sw.onclick=function(){
@@ -552,9 +589,9 @@ function speakIt(it){
 function grade(forced){
   var q=quiz, it=q.items[q.i], right, detail="";
   var ga=document.getElementById("qa"), given = ga ? ga.value : "";
-  if(it.k==="tx"){
+  if(writing(it)){
     right = forced===true;
-    detail='<b style="font-size:34px">'+esc(it.h)+'</b><br>'+esc(it.word)+' \u00b7 '+
+    detail='<b style="font-size:34px">'+esc(it.h)+'</b><br>'+esc(it.word||"")+' \u00b7 '+
            esc(it.a)+(it.tone||"")+(it.m?'<br>'+esc(it.m):"");
   }
   else
@@ -573,22 +610,7 @@ function grade(forced){
     detail='<b style="font-size:34px">'+it.h+'</b><br>'+esc(it.word)+' · '+esc(it.a)+(it.tone||"")+
            '<br>'+esc(it.m)+(right?"":'<br>You put: '+(esc(gv)||"nothing"));
   }
-  else if(it.k==="tx"){
-    /* No answer on screen until it has been attempted — that is the whole test. */
-    var n=String(it.h||"").length;
-    s+='<div class="qq">\u542c\u4e00\u542c\uff0c\u5199\u4e00\u5199</div>'+
-       '<div class="tip">'+(q.graded?"":"Listen, then write it \u2014 on the pad below, or on paper.")+'</div>'+
-       '<button class="btn play wide" id="qP">\uD83D\uDD0A Hear it again</button>'+
-       '<div class="ctx wcount">'+n+' character'+(n===1?"":"s")+' to write</div>'+
-       ((q.show||q.graded)
-        ? '<div class="hz">'+esc(it.h)+'</div>'+
-          '<div class="ctx">'+esc(it.word)+' \u00b7 '+esc(it.a)+(it.tone||"")+
-          (it.m?' \u00b7 '+esc(it.m):"")+'</div>'
-        : '<div class="padwrap"><canvas id="pad" class="pad"></canvas>'+
-          '<button class="padclr" id="padClr">Rub out</button></div>')+
-       '<input type="hidden" id="qa" value="">';
-  }
-  else if(it.k==="py"){
+  else if(it.k==="py"||it.k==="tx"){
     var tn=(document.getElementById("qt")||{value:""}).value.trim();
     var pOK=clean(given)===clean(it.a), tOK=!it.tone||tn===it.tone;
     right=pOK&&tOK;
