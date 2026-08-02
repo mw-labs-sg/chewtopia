@@ -428,6 +428,15 @@ function wireTrace(it){
       }
     });
   });
+  var clr=document.getElementById("trClear");
+  if(clr) clr.onclick=function(){
+    /* wipe the squares and start the character again. Free: a child who has
+       gone wrong should be able to start over without being punished twice. */
+    sfxTap();
+    q.trDone=0;
+    boxes.forEach(function(b){ b.classList.remove("filled"); });
+    wireTrace(it);
+  };
   var hint=document.getElementById("trHint");
   if(hint) hint.onclick=function(){
     q.trMiss+=2;                       /* asking to be shown is not knowing it */
@@ -468,8 +477,11 @@ function quizHTML(){
          'stroke is right</div>'+
        '<div class="tracerow">'+tg.split("").map(function(_,i){
           return '<div class="trbox" data-tr="'+i+'"></div>'; }).join("")+'</div>'+
-       '<div class="switch"><button class="addlink" id="trHint">Show me how</button>'+
-       '<button class="addlink" id="trSkip">I don\u2019t know it</button></div>'+
+       '<div class="trbtns">'+
+         '<button class="trbtn" id="trClear">\u21ba Rub out</button>'+
+         '<button class="trbtn" id="trHint">\uD83D\uDC40 Show me</button>'+
+         '<button class="trbtn skip" id="trSkip">I don\u2019t know it</button>'+
+       '</div>'+
        '<input type="hidden" id="qa" value="">';
   }
   else if(writing(it) || (tracing(it) && q.graded)){
@@ -567,6 +579,8 @@ function wireQuiz(){
   var q=quiz;
   if(q.done){
     document.getElementById("dBack").onclick=function(){ newBuddy(); go("practice"); };
+    var ds=document.getElementById("dScore");
+    if(ds) ds.onclick=function(){ newBuddy(); go("results"); };
     document.getElementById("dAgain").onclick=function(){ hush(); newBuddy(); start(q.code); };
     var fx=document.getElementById("dFix");
     if(fx) fx.onclick=function(){
@@ -729,7 +743,13 @@ function grade(forced){
     '<span class="big">'+(right && q.streak>=3 ? "\uD83D\uDD25 "+q.streak+" \u00b7 "+esc(pr.t)
       : esc(pr.t))+'</span>'+detail+'</div>';
   var gb=document.getElementById("qG");
-  if(gb) gb.textContent=(q.i===q.items.length-1)?"Finished \u2192":"Next";
+  if(gb){
+    gb.textContent=(q.i===q.items.length-1)?"Finished \u2192":"Next";
+    try{ if(document.activeElement && document.activeElement.blur) document.activeElement.blur(); }catch(e){}
+    setTimeout(function(){
+      try{ gb.scrollIntoView({block:"center", behavior:"smooth"}); }catch(e){}
+    }, 60);
+  }
 
   if(right){
     if(q.streak>=3) sfxStreak(); else sfxWin();
@@ -778,6 +798,8 @@ function doneHTML(){
     '<div class="btnrow">'+
     ((q.wrong&&q.wrong.length)
       ? '<button class="btn go" id="dFix">Fix the '+q.wrong.length+' missed \u2192</button>' : '')+
-    '<button class="btn '+((q.wrong&&q.wrong.length)?"soft":"go")+'" id="dAgain">Try again</button>'+
-    '<button class="btn soft" id="dBack">Back to training</button></div></div>';
+    '<button class="btn '+((q.wrong&&q.wrong.length)?"soft":"go")+'" id="dScore">See my progress \u2192</button>'+
+    '</div><div class="btnrow">'+
+    '<button class="btn soft" id="dAgain">Try again</button>'+
+    '<button class="btn soft" id="dBack">More practice</button></div></div>';
 }

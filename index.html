@@ -151,6 +151,9 @@
   .btn:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
   .btnrow{display:flex;gap:9px;margin-top:12px;flex-wrap:wrap;clear:both}
   .quizcard .btnrow .btn{min-height:56px;font-size:18px}
+  .quizcard .btnrow{position:sticky;bottom:6px;z-index:3}
+  .done .btnrow{position:static}
+  .done .btnrow .btn{min-height:52px}
   .btnrow .btn{flex:1;min-width:130px}
   .addlink{background:none;border:none;color:var(--blue);font-family:inherit;
     font-size:15px;font-weight:700;cursor:pointer;padding:14px 0 6px;min-height:44px}
@@ -339,6 +342,12 @@
     background-position:center center, center center;
     background-repeat:no-repeat}
   .trbox.filled{box-shadow:inset 0 0 0 2px #4FB86B}
+  .trbtns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:10px 0 2px}
+  .trbtn{border:none;font-family:inherit;font-size:14px;font-weight:800;cursor:pointer;
+    border-radius:12px;padding:11px 15px;background:var(--bg);color:var(--ink);
+    min-height:44px}
+  .trbtn:active{transform:translateY(1px)}
+  .trbtn.skip{background:#FFF1D6;color:#8A6100}
   @media(max-width:460px){ .trbox{width:104px;height:104px} }
 
   /* ---- 听写 writing pad, marked by eye ---- */
@@ -556,14 +565,14 @@ body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;-
   </div>
   <div class="tabs" id="tabs"></div>
   <div id="view"></div>
-  <div class="foot">Saved on this device · build 65</div>
+  <div class="foot">Saved on this device · build 67</div>
 </div>
 <!-- load order matters: data, then core, then screens, app last -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="data.js?v=16"></script>
 <script src="core.js?v=33"></script>
 <script src="timetable.js?v=5"></script>
-<script src="training.js?v=23"></script>
+<script src="training.js?v=25"></script>
 <script src="app.js?v=63"></script>
 </body>
 </html>
