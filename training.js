@@ -3,7 +3,6 @@
    generator, and the quiz that runs when a test is tapped.
    ========================================================================== */
 
-function pFilter(){ return S("pfilter","all"); }
 
 /* Both boys side by side, three subject columns each, laid out exactly like
    Progress. Grey means never tried; otherwise it is the last score, with the
@@ -338,7 +337,6 @@ function hzOpts(it){
    In the boxes, the strokes are checked where the data allows; where it does
    not — long words — he writes freely and it is marked by eye. Either way he
    does the same thing: hear it, write it in the box. */
-function isCN(it){ return it.k==="hz"||it.k==="rn"||it.k==="py"||it.k==="tx"; }
 function handwritten(it){ return it.k==="hz" || it.k==="tx"; }
 function writing(it){ return handwritten(it) && !tracing(it); }
 

@@ -44,7 +44,6 @@
   .mark span:nth-child(5n+4){color:var(--grape)}
   .mark span:nth-child(5n+5){color:var(--sun)}
 
-  .pick{display:flex;gap:9px;margin-bottom:14px}
   .pk{flex:1;border:2px solid var(--line);background:var(--card);color:var(--soft);
     border-radius:14px;padding:10px 8px;font-family:inherit;font-size:15px;font-weight:700;
     cursor:pointer;box-shadow:0 2px 0 var(--line);line-height:1.2}
@@ -70,9 +69,9 @@
   .tabdiv{flex:0 0 auto;width:2px;background:rgba(255,255,255,.5);border-radius:2px;margin:7px 3px}
   .tabdiv{flex:0 0 auto;width:2px;background:rgba(255,255,255,.45);border-radius:2px;margin:7px 3px}
 
-  .panel{background:var(--card);border:2px solid var(--line);border-radius:18px;
-    padding:18px 16px;margin-bottom:14px}
-  h2{font-family:'Baloo 2',cursive;font-size:23px;margin:0 0 12px;
+  .panel{background:var(--card);border:none;border-radius:20px;
+    padding:20px 18px;margin-bottom:14px}
+  h2{font-family:'Baloo 2',cursive;font-size:22px;margin:0 0 14px;
      display:flex;align-items:center;gap:9px}
   h2 .em{font-size:21px}
   h2 .side{margin-left:auto;font-family:'Lexend',sans-serif;font-size:13px;
@@ -81,25 +80,11 @@
   .hidden{display:none!important}
 
   /* ---- coming up ---- */
-  .ev{display:flex;gap:13px;align-items:center;padding:11px 0;border-bottom:1px solid var(--line)}
-  .ev:last-of-type{border-bottom:0}
-  .ev .cd{background:var(--sky);border-radius:12px;padding:8px 10px;text-align:center;min-width:58px}
-  .ev .cd b{display:block;font-family:'Baloo 2',cursive;font-size:19px;line-height:1.05;color:var(--blue)}
-  .ev .cd i{font-style:normal;font-size:11px;text-transform:uppercase;color:var(--soft);font-weight:700}
-  .ev.soon .cd{background:#FFEDE8} .ev.soon .cd b{color:var(--coral)}
-  .ev .tx{flex:1;font-weight:600}
-  .ev .tx small{display:block;font-weight:400;color:var(--soft);font-size:13px;margin-top:1px}
-  .ev .wh{font-weight:800;color:var(--ink);margin-right:8px}
-  .ev.soon .wh{color:var(--coral)}
-  .ev .nt{display:block;font-weight:400;color:var(--ink);font-size:14px;line-height:1.45;
-    margin-top:7px;padding:9px 11px;background:var(--bg);border-radius:10px}
-  .ev .x{align-self:flex-start}
   .prac{display:inline-block;margin-top:8px;border:none;border-radius:10px;
     padding:8px 14px;font-family:inherit;font-size:14px;font-weight:800;cursor:pointer}
   .prac:active{transform:scale(.97)}
 
   /* ---- review card and weak list ---- */
-  .test.rev{background:linear-gradient(135deg,#FFF4E4,#FFE9D2);border-color:#F3C99B}
   .weak{margin:10px 0 2px;padding:11px 13px;background:#FFF4E4;border-radius:12px}
   .weak .wt{font-size:11px;letter-spacing:.09em;text-transform:uppercase;
     font-weight:700;color:#8A6100;margin-bottom:7px}
@@ -108,7 +93,6 @@
   .wi i{font-style:normal;font-weight:500;color:var(--coral);margin-left:6px;font-size:12px}
 
   /* ---- reading ---- */
-  .rdsum{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px}
   .rdc{font-size:13px;font-weight:800;border-radius:9px;padding:5px 11px}
   .rdc.en{background:var(--sky);color:var(--blue)}
   .rdc.cn{background:#FFE9D2;color:var(--tang)}
@@ -120,8 +104,6 @@
   .bl.cn{background:#FFE9D2;color:var(--tang)}
   .btx{flex:1;font-weight:700;font-size:16px}
   .btx small{display:block;font-weight:400;font-size:13px;color:var(--soft);margin-top:1px}
-  .ev .x{background:none;border:none;color:#B9C7D4;font-size:22px;cursor:pointer;
-    padding:10px 12px;min-width:44px;min-height:44px}
 
   /* ---- day rows ---- */
   .day{display:grid;grid-template-columns:58px 1fr;gap:12px;align-items:center;
@@ -191,7 +173,6 @@
   .pill.good{background:#DFF3E4;color:#2F7A45}
   .pill.mid{background:#FFF1D6;color:#8A6100}
   .pill.low{background:#FFE3DC;color:#B03A22}
-  .pill.beat{background:var(--sky);color:var(--blue);font-size:12px;padding:5px 9px}
   .pills{display:flex;gap:5px;align-items:center;flex-shrink:0}
 
   /* ---- day streak ---- */
@@ -334,12 +315,6 @@
   .streakline{font-size:14px;color:var(--soft);font-weight:600}
 
   /* ---- results ---- */
-  .res{padding:12px 0;border-bottom:1px solid var(--line)}
-  .res:last-of-type{border-bottom:0}
-  .res .top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px}
-  .res .n{font-weight:700;font-size:16px}
-  .res .best{margin-left:auto;font-size:13px;color:var(--soft)}
-  .rl{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
   .run{display:inline-flex;flex-direction:column;align-items:center;border-radius:11px;
     padding:8px 12px;min-width:62px}
   .run b{font-size:17px;font-weight:800;line-height:1.1}
@@ -347,7 +322,6 @@
   .run.good{background:#DFF3E4;color:#2F7A45}
   .run.mid{background:#FFF1D6;color:#8A6100}
   .run.low{background:#FFE3DC;color:#B03A22}
-  .arw{color:#C3D2DF;font-size:15px}
 
   /* ---- sync: two big buttons and a plain sentence ---- */
   .syncrow{display:flex;gap:10px;margin-bottom:10px}
@@ -357,7 +331,7 @@
 
   /* ---- one square per character, checked stroke by stroke ---- */
   .tracerow{display:flex;gap:10px;justify-content:center;margin:14px 0 6px;flex-wrap:wrap}
-  .trbox{width:150px;height:150px;background:#fff;border-radius:14px;touch-action:none;
+  .trbox{width:148px;height:148px;background:#fff;border-radius:14px;touch-action:none;
     box-shadow:inset 0 0 0 2px var(--line);
     background-image:linear-gradient(var(--line),var(--line)),
                      linear-gradient(var(--line),var(--line));
@@ -365,7 +339,7 @@
     background-position:center center, center center;
     background-repeat:no-repeat}
   .trbox.filled{box-shadow:inset 0 0 0 2px #4FB86B}
-  @media(max-width:420px){ .trbox{width:120px;height:120px} }
+  @media(max-width:460px){ .trbox{width:104px;height:104px} }
 
   /* ---- 听写 writing pad, marked by eye ---- */
   .padwrap{position:relative;margin:12px 0 4px}
@@ -418,7 +392,7 @@
   }
 
   /* ---- progress matrix: each boy gets three subject columns ---- */
-  .mxkey{display:flex;gap:14px;flex-wrap:wrap;align-items:center;font-size:12.5px;
+  .mxkey{display:flex;gap:12px;flex-wrap:wrap;align-items:center;font-size:12.5px;
     color:var(--soft);font-weight:600;margin-bottom:12px}
   .mxkey b{font-weight:700;color:var(--ink)}
   .mx6,.duo{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-start}
@@ -552,7 +526,7 @@ body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;-
   .sc-volcano{background:linear-gradient(160deg,#2C1116,#FF8B3D)}
 
   /* ---- who this panel is about ---- */
-  .whobar{display:flex;gap:8px;margin:0 0 16px}
+  .whobar{display:flex;gap:8px;margin:0 0 14px}
   .wb{flex:1;min-width:0;border:none;border-radius:14px;padding:10px 8px;font-family:inherit;
     font-size:15px;font-weight:800;cursor:pointer;line-height:1.15;display:flex;
     flex-direction:column;align-items:center;justify-content:center;
@@ -582,14 +556,14 @@ body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;-
   </div>
   <div class="tabs" id="tabs"></div>
   <div id="view"></div>
-  <div class="foot">Saved on this device · build 64</div>
+  <div class="foot">Saved on this device · build 65</div>
 </div>
 <!-- load order matters: data, then core, then screens, app last -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="data.js?v=16"></script>
-<script src="core.js?v=32"></script>
+<script src="core.js?v=33"></script>
 <script src="timetable.js?v=5"></script>
-<script src="training.js?v=22"></script>
-<script src="app.js?v=62"></script>
+<script src="training.js?v=23"></script>
+<script src="app.js?v=63"></script>
 </body>
 </html>

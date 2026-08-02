@@ -155,7 +155,9 @@ function addResult(r){
   if(!r.id) r.id=uuid();
   r.up=0;                                  /* not yet uploaded */
   var a=results(); a.unshift(r); WJ("results",a.slice(0,600));
-  cloudPush();
+  /* straight up to the cloud, if signed in — the sync button is only ever
+     needed for the other direction or after being offline */
+  if(typeof cloudPushAll==="function" && cloudUser) cloudPushAll(true);
 }
 
 /* ==========================================================================
@@ -399,24 +401,7 @@ function rotIdx(off){
 function mealPlan(off){ return MEALS_ROTATION[rotIdx(off)]; }
 
 /* Upcoming filter: everyone, or one child plus anything family-wide. */
-function evFilter(){ return S("evfilter","all"); }
 /* One filter bar shape, used on Upcoming and on the Timetable. */
-function filterBar(id, cur, allValue, allLabel){
-  var s='<div class="legend" id="'+id+'">'+
-    '<button class="lg c-all'+(cur===allValue?" on":"")+'" data-fil="'+allValue+'">'+allLabel+'</button>';
-  KIDS.forEach(function(k){
-    s+='<button class="lg '+whoCls(k.id)+(cur===k.id?" on":"")+'" data-fil="'+k.id+'">'+
-       esc(pname(k.id))+'</button>';
-  });
-  return s+'</div>';
-}
-function wireFilter(id, save){
-  var box=document.getElementById(id); if(!box) return;
-  box.querySelectorAll("[data-fil]").forEach(function(b){
-    b.onclick=function(){ save(b.dataset.fil); render(); };
-  });
-}
-function evFilterBar(){ return filterBar("evFil", evFilter(), "all", "Everyone"); }
 
 /* ---------- reading log ---------- */
 function books(w){ return SJ("books:"+w, []); }
@@ -429,30 +414,7 @@ function booksSince(w, days){
 
 /* ---------- child pickers ---------- */
 /* Training always needs one child. The timetable can also show both. */
-function ttWho(){ return S("ttwho","both"); }
-function kidPicker(cur, id, withBoth){
-  var s='<div class="pick" id="'+id+'">';
-  if(withBoth) s+='<button class="pk'+(cur==="both"?" on":"")+'" data-pick="both">Both</button>';
-  KIDS.forEach(function(k){
-    s+='<button class="pk k-'+k.id+(cur===k.id?" on":"")+'" data-pick="'+k.id+'">'+
-       esc(pname(k.id))+'<small>'+k.level+'</small></button>';
-  });
-  return s+'</div>';
-}
 /* Tapping the child already showing lets you rename them, as the old header did. */
-function wirePicker(id, cur, save){
-  var box=document.getElementById(id); if(!box) return;
-  box.querySelectorAll("[data-pick]").forEach(function(b){
-    b.onclick=function(){
-      var v=b.dataset.pick;
-      if(v===cur && v!=="both"){
-        var n=prompt("Name (kept on this device only)", pname(v));
-        if(n && n.trim()) W("name:"+v, n.trim().slice(0,16));
-      } else save(v);
-      quiz=null; render();
-    };
-  });
-}
 
 /* A colour key naming both boys, used wherever their colours appear. */
 function kidKey(withAll){
@@ -671,6 +633,7 @@ if(window.speechSynthesis){ loadVoices(); speechSynthesis.onvoiceschanged=loadVo
 /* Voice ranking. Modern neural voices first, then known female names.
    Windows' old SAPI voices (Zira, David, Hazel) are pushed to the bottom. */
 var NEURAL=/natural|online|google|siri|premium|enhanced/i;
+var BEST_EN=/serena|martha|sonia|libby|kate|stephanie|matilda|samantha|ava|jenny|aria/i;
 var FEM=/samantha|serena|sonia|libby|maisie|aria|jenny|ava|allison|susan|kate|karen|moira|tessa|fiona|martha|shelley|nicky|female|woman|tingting|ting-ting|xiaoxiao|xiaoyi|yaoyao|xiaohan|xiaomo|meijia|huihui|\u5a77\u5a77|\u6653\u6653/i;
 /* Mandarin voices worth having, best first. Tingting and Siri are iOS,
    Xiaoxiao and Yunxi are the Windows neural pair, Huihui is the old SAPI one. */
@@ -681,7 +644,10 @@ var OLD=/zira|david|hazel|mark|george|james|ravi|desktop/i;
 var MALE=/\b(male|man|men)\b|daniel|\balex\b|fred|thomas|\bdavid\b|\bmark\b|george|james|oliver|arthur|\bryan\b|aaron|gordon|rishi|nathan|yunxi|yunyang|kangkang|liangliang/i;
 
 function voiceScore(v){
-  var n=v.name||"", x=0;
+  var n=v.name||"", l=(v.lang||"").replace("_","-"), x=0;
+  if(BEST_EN.test(n)) x+=60;           /* the ones that sound like a person */
+  if(/^en-GB/i.test(l)) x+=30;         /* the accent they hear at school */
+  if(/^en-AU|^en-IE/i.test(l)) x+=10;
   if(FEM.test(n))     x+=200;   /* a woman's voice first, always */
   if(NEURAL.test(n))  x+=100;
   if(CN_GOOD.test(n)) x+=80;
@@ -716,7 +682,6 @@ function bestVoice(lang){
 }
 /* Chinese read too slowly turns to mush and loses its tones, so it never
    drops below this however slow the English is set. */
-function hasVoice(lang){ return !!bestVoice(lang); }
 function say(t,rate,lang){
   if(!window.speechSynthesis || !snd()) return;
   lang=lang||"en-GB";

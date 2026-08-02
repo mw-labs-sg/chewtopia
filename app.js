@@ -479,6 +479,10 @@ render();
 
 /* back and forward buttons, and links pasted straight into the address bar */
 window.addEventListener("hashchange", function(){
+  /* Never navigate out of a test in progress. Tapping a score in Progress sets
+     the address bar and then starts the test; the hash change lands a moment
+     later and used to wipe the quiz that had just opened. */
+  if(quiz) return;
   var t=tabFromHash();
   if(t && t!==tab) go(t, true);
 });
