@@ -343,6 +343,30 @@
   .run.mid{background:#FFF1D6;color:#8A6100}
   .run.low{background:#FFE3DC;color:#B03A22}
   .arw{color:#C3D2DF;font-size:15px}
+
+  /* ---- progress matrix: kids across, subjects down ---- */
+  .mx{display:grid;grid-template-columns:minmax(78px,1.25fr) 1fr 1fr;column-gap:6px}
+  .mxh{font-weight:800;font-size:14px;padding:7px 6px;border-radius:11px;text-align:center;
+    position:sticky;top:0;z-index:2}
+  .mxh small{display:block;font-size:10px;font-weight:600;opacity:.85;letter-spacing:0;
+    text-transform:none}
+  .mxh.corner{background:transparent}
+  .mxg{grid-column:1/-1;font-size:11px;letter-spacing:.09em;text-transform:uppercase;
+    font-weight:800;color:var(--soft);margin:14px 0 5px;padding-bottom:4px;
+    border-bottom:1px solid var(--line)}
+  .mxn{font-size:13.5px;font-weight:600;line-height:1.2;display:flex;align-items:center;
+    padding:4px 2px 4px 0;border-bottom:1px solid var(--line)}
+  .mxc{display:flex;align-items:center;justify-content:center;padding:3px 0;
+    border-bottom:1px solid var(--line)}
+  .mxs{display:block;width:100%;text-align:center;border-radius:10px;padding:5px 3px;
+    font-weight:800;font-size:15px;line-height:1.15}
+  .mxs i{display:block;font-style:normal;font-size:10px;font-weight:600;opacity:.72}
+  .mxs.good{background:#DFF3E4;color:#2F7A45}
+  .mxs.mid{background:#FFF1D6;color:#8A6100}
+  .mxs.low{background:#FFE3DC;color:#B03A22}
+  .mxs.none{color:#C3D2DF;font-weight:600}
+  .mxwk{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .mxwk .wt{margin-top:0}
   .foot{text-align:center;margin-top:16px;color:var(--soft);font-size:12px;line-height:1.7}
   @media(min-width:700px){
     .day{grid-template-columns:80px 1fr}
@@ -363,6 +387,6 @@
 <script src="core.js?v=18"></script>
 <script src="timetable.js?v=4"></script>
 <script src="training.js?v=7"></script>
-<script src="app.js?v=45"></script>
+<script src="app.js?v=46"></script>
 </body>
 </html>

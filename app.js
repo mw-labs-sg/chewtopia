@@ -222,78 +222,162 @@ function wRead(){
   });
 }
 
-function syncPanel(){
-  var s='<div class="panel"><h2><span class="em">\u2601\uFE0F</span> Shared scores';
-  if(cloudUser) s+='<span class="side">On</span>';
-  s+='</h2>';
-  if(cloudUser){
-    var p=pending();
-    s+='<p class="empty">Signed in as '+esc(familyName(cloudUser.email))+'. '+
-       (p? p+' still to upload.' : 'Everything is saved to the family account.')+'</p>'+
-       '<div class="btnrow"><button class="btn soft" id="cSync">Sync now</button>'+
-       '<button class="btn soft" id="cOut">Sign out</button></div>';
-  } else {
-    s+='<p class="empty">Sign in once on this device and scores will appear on every '+
-       'other one. Training works without it \u2014 results wait here and upload later.</p>'+
-       '<div class="lbl">Family name</div><input type="text" id="cEm" autocomplete="username" placeholder="chewtopia">'+
-       '<div class="lbl">Password</div><input type="password" id="cPw" autocomplete="current-password">'+
-       '<div class="btnrow"><button class="btn go" id="cIn">Sign in</button></div>';
-  }
-  if(cloudMsg) s+='<p class="empty" style="color:var(--coral)">'+esc(cloudMsg)+'</p>';
-  return s+'</div>';
+/* ==========================================================================
+   PROGRESS — one matrix: the two boys across, the subjects down.
+   Green is full marks, amber is close, red needs work.
+   ========================================================================== */
+
+/* Practice runs made straight after a test, fixing the missed ones, are not
+   a fair score of the whole list, so they never reach this screen. */
+function isFixing(r){ return /^Fixing/.test(String(r.test||"")); }
+
+/* Which subject a run belongs to. The code comes first because runs pulled
+   back down from the cloud do not carry the subject with them. */
+var SUBJ_ROWS=[["en","English"],["zh","\u534e\u6587"],["ma","Maths"],["rv","Review"]];
+function runSubject(r){
+  var c=String(r.code||"").split("|")[0];
+  if(c==="en"||c==="es") return "en";
+  if(c==="zh"||c==="hz"||c==="rn") return "zh";
+  if(c==="ma") return "ma";
+  if(c==="weak"||c==="review") return "rv";
+  if(r.subject==="English") return "en";
+  if(r.subject==="Math") return "ma";
+  if(r.subject==="\u534e\u6587") return "zh";
+  var t=String(r.test||"");
+  if(/^Math/.test(t)) return "ma";
+  if(/^Review/.test(t)) return "rv";
+  if(/[\u4e00-\u9fff]/.test(t)) return "zh";
+  return "en";
+}
+function scoreCls(sc,tot){
+  if(!tot) return "none";
+  return sc>=tot ? "good" : (sc/tot>=0.7 ? "mid" : "low");
+}
+function dshort(ts){
+  return new Date(ts).toLocaleDateString("en-GB",{day:"numeric",month:"short"});
+}
+
+/* subject -> test name -> child -> {best, total, tries, last} */
+function gradeGrid(){
+  var g={};
+  KIDS.forEach(function(k){
+    runsFor(k.id).forEach(function(r){
+      if(isFixing(r)) return;
+      var sj=runSubject(r), t=String(r.test||"?");
+      var row=(g[sj]=g[sj]||{});
+      var cell=(row[t]=row[t]||{});
+      var c=cell[k.id];
+      if(!c) c=cell[k.id]={best:r.score,total:r.total,tries:0,last:r.ts};
+      c.tries++;
+      if(r.score>c.best){ c.best=r.score; c.total=r.total; }
+      if(r.ts>c.last) c.last=r.ts;
+    });
+  });
+  return g;
+}
+
+function kidHead(k){
+  var runs=runsFor(k.id).filter(function(r){ return !isFixing(r); });
+  var full=runs.filter(function(r){ return r.score>=r.total; }).length;
+  return '<div class="mxh '+whoCls(k.id)+'">'+esc(pname(k.id))+
+    '<small>'+(streak(k.id).n?streak(k.id).n+"\uD83D\uDD25 \u00b7 ":"")+
+    runs.length+' tests \u00b7 '+full+' full</small></div>';
 }
 
 function vResults(){
-  var s="";
-  KIDS.forEach(function(k){
-    var runs=runsFor(k.id);
-    s+='<div class="panel"><h2>'+esc(pname(k.id))+
-       '<span class="side">'+streakChip(k.id)+runs.length+(runs.length===1?" test":" tests")+'</span></h2>';
-    var wk=weakTop(k.id, 6);
-    if(wk.length){
-      s+='<div class="weak"><div class="wt">Keeps getting these wrong</div>'+
-         wk.map(function(x){
-           return '<span class="wi">'+esc(weakLabel(x))+'<i>'+x.n+'\u00d7</i></span>';
-         }).join("")+'</div>';
-    }
-    if(!runs.length){ s+=(wk.length?'':'<p class="empty">Nothing yet.</p>')+'</div>'; return; }
-    var tests=[]; runs.forEach(function(r){ if(tests.indexOf(r.test)<0) tests.push(r.test); });
-    tests.forEach(function(t){
-      var all=runs.filter(function(r){ return r.test===t; });
-      var b=all.reduce(function(x,y){ return y.score>x.score?y:x; },all[0]);
-      var a=all.slice(-5);                       /* last five goes only */
-      var more=all.length-a.length;
-      var ch=a.map(function(r,n){
-        var p=Math.round(r.score/r.total*100), c=p>=80?"good":p>=50?"mid":"low";
-        return (n?'<span class="arw">→</span>':'')+'<span class="run '+c+'"><b>'+r.score+'/'+r.total+
-          '</b><i>'+new Date(r.ts).toLocaleDateString("en-GB",{day:"numeric",month:"short"})+'</i></span>';
-      }).join("");
-      s+='<div class="res"><div class="top"><span class="n">'+esc(t)+'</span>'+
-         '<span class="best">'+(more?more+" earlier \u00b7 ":"")+'Best '+b.score+'/'+b.total+'</span></div>'+
-         '<div class="rl">'+ch+'</div></div>';
+  var s=syncPanel();
+
+  var g=gradeGrid(), any=false;
+  var m='<div class="mx"><div class="mxh corner"></div>'+
+        KIDS.map(kidHead).join("");
+
+  SUBJ_ROWS.forEach(function(sub){
+    var row=g[sub[0]]; if(!row) return;
+    var tests=Object.keys(row).sort(function(a,b){
+      var la=Math.max.apply(null,KIDS.map(function(k){ return (row[a][k.id]||{last:0}).last; }));
+      var lb=Math.max.apply(null,KIDS.map(function(k){ return (row[b][k.id]||{last:0}).last; }));
+      return lb-la;
     });
-    s+='</div>';
+    if(!tests.length) return;
+    any=true;
+    m+='<div class="mxg">'+sub[1]+'</div>';
+    tests.forEach(function(t){
+      m+='<div class="mxn">'+esc(t)+'</div>';
+      KIDS.forEach(function(k){
+        var c=row[t][k.id];
+        m+='<div class="mxc">'+(c
+          ? '<span class="mxs '+scoreCls(c.best,c.total)+'">'+c.best+'/'+c.total+
+            '<i>'+(c.tries>1?c.tries+" goes \u00b7 ":"")+dshort(c.last)+'</i></span>'
+          : '<span class="mxs none">\u2014</span>')+'</div>';
+      });
+    });
   });
-  return s+syncPanel()+'<div class="panel"><h2>Housekeeping</h2>'+
-    '<div class="btnrow"><button class="btn soft" id="wipe">Clear all scores</button></div></div>';
+  m+='</div>';
+
+  s+='<div class="panel"><h2><span class="em">\uD83D\uDCCA</span> How they are doing</h2>'+
+     (any ? m+'<div class="key"><span class="dot" style="background:#4FB86B"></span> full marks &nbsp;'+
+       '<span class="dot" style="background:#FFB627"></span> 70% or better &nbsp;'+
+       '<span class="dot" style="background:#FF6F52"></span> below 70%<br>'+
+       'Each box is the best score so far, with how many goes it took.</div>'
+      : '<p class="empty">No tests yet. Anything done in Training turns up here.</p>')+
+     '</div>';
+
+  /* what each of them keeps missing, side by side */
+  var wk=KIDS.map(function(k){ return {k:k, w:weakTop(k.id, 6)}; });
+  if(wk.some(function(x){ return x.w.length; })){
+    s+='<div class="panel"><h2><span class="em">\uD83C\uDFAF</span> Keeps getting these wrong</h2>'+
+       '<div class="mxwk">'+wk.map(function(x){
+         return '<div class="weak"><div class="wt">'+esc(pname(x.k.id))+'</div>'+
+           (x.w.length ? x.w.map(function(y){
+             return '<span class="wi">'+esc(weakLabel(y))+'<i>'+y.n+'\u00d7</i></span>'; }).join("")
+            : '<span class="wi">Nothing stuck</span>')+'</div>';
+       }).join("")+'</div></div>';
+  }
+
+  return s+'<div class="panel"><h2>Housekeeping</h2>'+
+    '<div class="btnrow"><button class="btn soft" id="wipe">Clear all scores</button>'+
+    (cloudUser?'<button class="btn soft" id="cOut">Sign out</button>':'')+
+    '</div></div>';
 }
+
+/* Sync sits at the top. One family name and password, nothing else to do. */
+function syncPanel(){
+  var s='<div class="panel"><h2><span class="em">\u2601\uFE0F</span> Sync';
+  if(cloudUser) s+='<span class="side">'+esc(familyName(cloudUser.email))+'</span>';
+  s+='</h2>';
+  if(cloudUser){
+    var p=pending();
+    s+='<div class="btnrow"><button class="btn go" id="cSync">'+
+       (p? 'Sync now \u00b7 '+p+' waiting' : 'Sync now')+'</button></div>';
+  } else {
+    s+='<div class="pair"><span class="f1"><div class="lbl">Family name</div>'+
+       '<input type="text" id="cEm" autocomplete="username" placeholder="chewtopia"></span>'+
+       '<span class="f1"><div class="lbl">Password</div>'+
+       '<input type="password" id="cPw" autocomplete="current-password"></span></div>'+
+       '<div class="btnrow"><button class="btn go" id="cIn">Sign in</button></div>';
+  }
+  if(cloudMsg) s+='<p class="empty" style="color:var(--coral);margin-bottom:0">'+esc(cloudMsg)+'</p>';
+  return s+'</div>';
+}
+
 function wResults(){
   var i=document.getElementById("cIn");
   if(i){
-    var go=function(){
+    var goIn=function(){
       var em=document.getElementById("cEm").value.trim();
       var pw=document.getElementById("cPw").value;
       if(!em || !pw){ cloudMsg="Type the family name and password first."; render(); return; }
       cloudLogin(em, pw);
     };
-    i.onclick=go;
+    i.onclick=goIn;
     ["cEm","cPw"].forEach(function(id){
       var f=document.getElementById(id);
       if(f) f.addEventListener("keydown",function(e){
-        if(e.key==="Enter"){ e.preventDefault(); go(); } });
+        if(e.key==="Enter"){ e.preventDefault(); goIn(); } });
     });
   }
-  var o=document.getElementById("cOut"); if(o) o.onclick=cloudLogout;
+  var o=document.getElementById("cOut");
+  if(o) o.onclick=function(){ if(confirm("Sign out of the family account?")) cloudLogout(); };
   var sy=document.getElementById("cSync"); if(sy) sy.onclick=cloudSync;
   document.getElementById("wipe").onclick=function(){
     if(confirm("Delete every saved score on this device?")){ WJ("results",[]); render(); } };
