@@ -412,18 +412,20 @@ function quizHTML(){
        '<div class="ctx big-word">'+blanked+'</div>'+
        '<div class="hint2">\u25a2 = <b>'+esc(it.a)+(it.tone||"")+'</b>'+
          (it.m?' \u00b7 '+esc(it.m):"")+'</div>'+
-       '<div class="tip">The whole word is read out. Write only the box.</div>'+
+       '<div class="tip">'+(S("hzmode","tap")==="tap"
+          ? "Listen, then tap the character that belongs in the box."
+          : "Listen, then write the character that belongs in the box.")+'</div>'+
        '<button class="btn play wide" id="qP">\uD83D\uDD0A Hear the word</button>'+
        (S("hzmode","tap")==="tap" && hzOpts(it)
         ? '<div class="opts">'+hzOpts(it).map(function(c){
             return '<button class="opt" data-opt="'+c+'">'+c+'</button>'; }).join("")+
+          '</div>'+
           '<input type="hidden" id="qa" value="">'+
-          '<div class="switch"><button class="addlink" id="hzSwitch">Type it instead</button>'+
-          '<button class="addlink" id="cSwitch">Write on the pad</button></div>'
+          '<div class="switch"><button class="addlink" id="cSwitch">Write it instead</button></div>'
         : '<input type="text" id="qa" autocomplete="off" spellcheck="false" '+
           'class="hzin" placeholder="'+esc(tgt.length>1?"写这两个字":"写这个字")+'" lang="zh">'+
           '<div class="switch"><button class="addlink" id="hzSwitch">Tap from four instead</button>'+
-          '<button class="addlink" id="cSwitch">Write on the pad</button></div>');
+          '<button class="addlink" id="cSwitch">Write it instead</button></div>');
   }
   else if(it.k==="py"||it.k==="tx"){
     var pn=String(it.h||"").length;
@@ -634,7 +636,7 @@ function grade(forced){
     '<span class="big">'+(right && q.streak>=3 ? "\uD83D\uDD25 "+q.streak+" \u00b7 "+esc(pr.t)
       : esc(pr.t))+'</span>'+detail+'</div>';
   var gb=document.getElementById("qG");
-  if(gb) gb.textContent=(q.i===q.items.length-1)?"See the score":"Next";
+  if(gb) gb.textContent=(q.i===q.items.length-1)?"Finished \u2192":"Next";
 
   if(right){
     if(q.streak>=3) sfxStreak(); else sfxWin();
