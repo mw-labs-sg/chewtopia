@@ -5,79 +5,93 @@
 
 function pFilter(){ return S("pfilter","all"); }
 
+/* Both boys side by side. Each column is that child's own lists, because
+   they are in different years and never sit the same test. */
+function testsFor(kid, f){
+  var s="", any=false;
+
+  var wk=weakTop(kid, 12);
+  if(wk.length){
+    s+='<button class="test rev" data-t="weak" data-kid="'+kid+'">'+
+       '<span class="tx"><span class="nm">Tricky ones</span>'+
+       '<span class="mt">'+esc(wk.slice(0,3).map(weakLabel).join(", "))+
+       (wk.length>3?", \u2026":"")+'</span></span>'+
+       '<span class="pill beat">Go</span></button>';
+  }
+
+  if(f==="all"||f==="en"){
+    var eb = kid==="tc" ? TC_SPELL : SC_SPELL, ec = kid==="tc" ? "en" : "es";
+    if(Object.keys(eb).length){
+      s+='<div class="sub">English spelling</div>'; any=true;
+      Object.keys(eb).forEach(function(k){
+        s+='<button class="test" data-t="'+ec+'|'+k+'" data-kid="'+kid+'">'+
+          '<span><span class="nm">'+(kid==="tc"?"List "+k:esc(k))+'</span>'+
+          '<span class="mt">'+eb[k][1].length+' questions</span></span>'+
+          pill(kid==="tc"?("Spelling "+k):k, kid)+'</button>'; });
+    }
+  }
+
+  if(f==="all"||f==="zh"){
+    var bank = kid==="tc" ? TC_PINYIN : SC_TINGXIE;
+    if(Object.keys(bank).length){
+      s+='<div class="sub">'+(kid==="tc"?"\u534e\u6587 \u00b7 \u6c49\u8bed\u62fc\u97f3":"\u534e\u6587\u542c\u5199")+'</div>'; any=true;
+      Object.keys(bank).forEach(function(k){
+        s+='<button class="test" data-t="zh|'+k+'" data-kid="'+kid+'">'+
+          '<span><span class="nm">'+esc(k)+'</span>'+
+          '<span class="mt">'+bank[k].length+' words</span></span>'+pill(k, kid)+'</button>'; });
+    }
+
+    if(kid==="tc"){
+      s+='<div class="sub">\u751f\u5b57\u8868 \u00b7 \u6211\u4f1a\u8ba4</div>';
+      Object.keys(HANZI).forEach(function(k){
+        s+='<button class="test" data-t="rn|'+k+'" data-kid="'+kid+'">'+
+          '<span><span class="nm">'+esc(k)+'</span>'+
+          '<span class="mt">'+HANZI[k].length+' \u5b57 \u00b7 see the character, write the pinyin</span></span>'+
+          pill("\u6211\u4f1a\u8ba4 "+k, kid)+'</button>'; });
+
+      s+='<div class="sub">\u751f\u5b57\u8868 \u00b7 \u6211\u4f1a\u5199</div>';
+      Object.keys(HANZI).forEach(function(k){
+        s+='<button class="test" data-t="hz|'+k+'" data-kid="'+kid+'">'+
+          '<span><span class="nm">'+esc(k)+'</span>'+
+          '<span class="mt">'+HANZI[k].map(function(x){return x[0];}).join("")+'</span></span>'+
+          pill("\u6211\u4f1a\u5199 "+k, kid)+'</button>'; });
+    }
+  }
+
+  if(f==="all"||f==="ma"){
+    s+='<div class="sub">Maths</div>'; any=true;
+    [["easy","Warm up","Add and take away to 20"],
+     ["times","Times tables","2 to 10"],
+     ["hard","Challenge","Bigger numbers and division"]].forEach(function(m){
+      s+='<button class="test" data-t="ma|'+m[0]+'" data-kid="'+kid+'">'+
+        '<span><span class="nm">'+m[1]+'</span><span class="mt">'+m[2]+'</span></span>'+
+        pill("Math \u00b7 "+m[1], kid)+'</button>';
+    });
+  }
+
+  if(!any && !wk.length) s+='<p class="empty">Nothing here yet.</p>';
+  return s;
+}
+
 function vTests(){
   var f=pFilter();
   var opts=[["all","Everything"],["en","English"],["zh","华文"],["ma","Maths"]]
     .map(function(o){ return '<option value="'+o[0]+'"'+(f===o[0]?" selected":"")+'>'+o[1]+'</option>'; }).join("");
 
-  var s='<div class="panel"><h2><span class="em">📝</span> Training'+
-        '<span class="side">'+streakChip()+'</span></h2>'+
-        kidPicker(who(),"trPick",false)+
-        '<div class="lbl">Subject</div><select id="pf">'+opts+'</select><div style="height:14px"></div>';
+  var s='<div class="panel"><h2><span class="em">📝</span> Training</h2>'+
+        '<div class="lbl">Subject</div><select id="pf">'+opts+'</select>'+
+        '<div style="height:14px"></div><div class="duo">';
 
-  var any=false;
-
-  if(f==="all"||f==="en"){
-    s+='<div class="sub">English spelling</div>'; any=true;
-    if(who()==="tc"){
-      Object.keys(TC_SPELL).forEach(function(k){
-        s+='<button class="test" data-t="en|'+k+'"><span><span class="nm">List '+k+'</span>'+
-          '<span class="mt">'+TC_SPELL[k][0]+' · '+TC_SPELL[k][1].length+' questions</span></span>'+
-          pill(("Spelling "+k))+'</button>'; });
-    } else {
-      Object.keys(SC_SPELL).forEach(function(k){
-        s+='<button class="test" data-t="es|'+k+'"><span><span class="nm">'+k+'</span>'+
-          '<span class="mt">'+SC_SPELL[k][1].length+' questions</span></span>'+pill((k))+'</button>'; });
-    }
-  }
-
-  if(f==="all"||f==="zh"){
-    var bank = who()==="tc" ? TC_PINYIN : SC_TINGXIE;
-    s+='<div class="sub">'+(who()==="tc"?"华文 · 汉语拼音":"华文听写")+'</div>'; any=true;
-    Object.keys(bank).forEach(function(k){
-      s+='<button class="test" data-t="zh|'+k+'"><span><span class="nm">'+k+'</span>'+
-        '<span class="mt">'+bank[k].length+' words</span></span>'+pill((k))+'</button>'; });
-  }
-
-  if((f==="all"||f==="zh") && who()==="tc"){
-    s+='<div class="sub">生字表 · 我会认 &nbsp;<em style="font-weight:400;text-transform:none">see the character, write the pinyin</em></div>';
-    Object.keys(HANZI).forEach(function(k){
-      s+='<button class="test" data-t="rn|'+k+'"><span><span class="nm">'+k+'</span>'+
-        '<span class="mt">'+HANZI[k].length+' 字</span></span>'+pill(("我会认 "+k))+'</button>'; });
-
-    s+='<div class="sub">生字表 · 我会写 &nbsp;<em style="font-weight:400;text-transform:none">hear the word, produce the character</em></div>';
-    Object.keys(HANZI).forEach(function(k){
-      s+='<button class="test" data-t="hz|'+k+'"><span><span class="nm">'+k+'</span>'+
-        '<span class="mt">'+HANZI[k].length+' 字 · '+HANZI[k].map(function(x){return x[0];}).join("")+'</span></span>'+
-        pill(("我会写 "+k))+'</button>'; });
-  }
-
-  if(f==="all"||f==="ma"){
-    s+='<div class="sub">Maths</div>'; any=true;
-    s+='<button class="test" data-t="ma|easy"><span><span class="nm">Warm up</span>'+
-        '<span class="mt">Add and take away to 20</span></span>'+pill(("Math · Warm up"))+'</button>'+
-       '<button class="test" data-t="ma|times"><span><span class="nm">Times tables</span>'+
-        '<span class="mt">2 to 10</span></span>'+pill(("Math · Times tables"))+'</button>'+
-       '<button class="test" data-t="ma|hard"><span><span class="nm">Challenge</span>'+
-        '<span class="mt">Bigger numbers and division</span></span>'+pill(("Math · Challenge"))+'</button>';
-  }
-
-  var wk=weakTop(who(), 12);
-  if(wk.length){
-    s='<div class="panel"><h2><span class="em">\uD83C\uDFAF</span> Review'+
-      '<span class="side">'+wk.length+' to fix</span></h2>'+
-      '<button class="test rev" data-t="weak"><span class="tx"><span class="nm">Tricky ones</span>'+
-      '<span class="mt">'+esc(wk.slice(0,4).map(weakLabel).join(", "))+
-      (wk.length>4?", \u2026":"")+'</span></span>'+
-      '<span class="pill beat">Go</span></button></div>'+s;
-  }
-  if(!any) s+='<p class="empty">Nothing here yet.</p>';
-  s+='</div>';
+  KIDS.forEach(function(k){
+    s+='<div class="kidbox"><button class="kidname '+whoCls(k.id)+'" data-rename="'+k.id+'">'+
+       esc(pname(k.id))+'<small>'+k.level+
+       (streak(k.id).n?' \u00b7 '+streak(k.id).n+"\uD83D\uDD25":"")+'</small></button>'+
+       testsFor(k.id, f)+'</div>';
+  });
+  s+='</div></div>';
 
   /* voice settings */
   var sp=parseFloat(S("rate","0.85"));
-  /* No voice picker. The app takes the best installed voice for each language,
-     so nothing has to be chosen on a device someone else set up. */
   var ve=bestVoice("en-GB"), vc=bestVoice("zh-CN");
   s+='<div class="panel"><h2><span class="em">🔊</span> Voice</h2>'+
      '<p class="empty">English: <b>'+esc(ve?ve.name:"none installed")+'</b><br>'+
@@ -94,8 +108,19 @@ function vTests(){
   return s;
 }
 function wTests(){
-  wirePicker("trPick", who(), function(v){ W("who", v); });
-  document.querySelectorAll("[data-t]").forEach(function(b){ b.onclick=function(){ start(b.dataset.t); }; });
+  document.querySelectorAll("[data-rename]").forEach(function(b){
+    b.onclick=function(){
+      var id=b.dataset.rename;
+      var n=prompt("Name (kept on this device only)", pname(id));
+      if(n && n.trim()){ W("name:"+id, n.trim().slice(0,16)); render(); }
+    };
+  });
+  document.querySelectorAll("[data-t]").forEach(function(b){
+    b.onclick=function(){
+      if(b.dataset.kid) W("who", b.dataset.kid);
+      start(b.dataset.t);
+    };
+  });
   var f=document.getElementById("pf");
   if(f) f.onchange=function(){ W("pfilter", f.value); render(); };
   var r=document.getElementById("rate");

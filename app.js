@@ -161,12 +161,12 @@ function wHome(){
    ========================================================================== */
 var showBook=false;
 function vRead(){
-  var s="";
+  var s='<div class="panel"><h2><span class="em">\uD83D\uDCDA</span> Reading</h2><div class="duo">';
   KIDS.forEach(function(k){
     var all=books(k.id), m=booksSince(k.id,30);
     var en=all.filter(function(b){return b.l==="en";}).length, cn=all.length-en;
-    s+='<div class="panel"><h2>'+esc(pname(k.id))+
-       '<span class="side">'+all.length+(all.length===1?" book":" books")+'</span></h2>'+
+    s+='<div class="kidbox"><div class="kidname '+whoCls(k.id)+'">'+esc(pname(k.id))+
+       '<small>'+all.length+(all.length===1?" book":" books")+'</small></div>'+
        '<div class="rdsum"><span class="rdc en">'+en+' English</span>'+
        '<span class="rdc cn">'+cn+' \u534e\u6587</span>'+
        '<span class="rdc mo">'+m.length+' this month</span></div>';
@@ -182,6 +182,8 @@ function vRead(){
     if(all.length>12) s+='<p class="empty">'+(all.length-12)+' more before these.</p>';
     s+='</div>';
   });
+  s+='</div></div>';
+
   if(showBook){
     s+='<div class="panel"><h2>Add a book</h2>'+
        '<div class="lbl">Title</div><input type="text" id="bT" maxlength="70" placeholder="\u6bdb\u6bdb\u866b\u7684\u978b\u5b50">'+

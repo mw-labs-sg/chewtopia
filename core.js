@@ -42,7 +42,7 @@ function mergeSeed(key, seed){
 function seedOnce(){ mergeSeed("events", SEED_EVENTS); mergeSeed("acts", SEED_ACTS); }
 
 var DAYS = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
-var TABS = [["home","Upcoming"],["schedule","Timetable"],["meals","Meals"],["practice","Training"],["reading","Reading"],["results","Progress"]];
+var TABS = [["home","Upcoming"],["schedule","Timetable"],["meals","Meals"],["practice","Training"],["results","Progress"],["reading","Reading"]];
 var tab="home", quiz=null, showAdd=false;
 /* Each tab gets a readable address, e.g. .../chewtopia/#meals, so a link can
    be bookmarked or sent straight to one screen. */
@@ -193,18 +193,18 @@ function cloudPush(){
 function pending(){ return results().filter(function(x){ return !x.up; }).length; }
 function runsFor(id){ return results().filter(function(r){ return r.who===(id||who()); })
   .slice().sort(function(a,b){ return a.ts-b.ts; }); }
-function lastFor(t){ var a=runsFor().filter(function(r){ return r.test===t; });
+function lastFor(t,kid){ var a=runsFor(kid).filter(function(r){ return r.test===t; });
   return a.length?a[a.length-1]:null; }
-function bestFor(t){ var a=runsFor().filter(function(r){ return r.test===t; });
+function bestFor(t,kid){ var a=runsFor(kid).filter(function(r){ return r.test===t; });
   return a.length ? a.reduce(function(x,y){ return y.score>x.score?y:x; },a[0]) : null; }
 
 /* Last score, plus the score to beat when there is a better one on record. */
-function pill(t){
-  var l=lastFor(t);
+function pill(t,kid){
+  var l=lastFor(t,kid);
   if(!l) return '<span class="pills"><span class="pill">Not tried</span></span>';
   var p=Math.round(l.score/l.total*100), c=p>=80?"good":p>=50?"mid":"low";
   var s='<span class="pills"><span class="pill '+c+'">'+l.score+'/'+l.total+'</span>';
-  var b=bestFor(t);
+  var b=bestFor(t,kid);
   if(b && b.score>l.score) s+='<span class="pill beat">Beat '+b.score+'</span>';
   else if(l.score===l.total) s+='<span class="pill beat">\u2605</span>';
   return s+'</span>';
