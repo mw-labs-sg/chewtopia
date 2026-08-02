@@ -241,7 +241,7 @@ function runSubject(r){
   if(c==="en"||c==="es") return "en";
   if(c==="zh"||c==="hz"||c==="rn") return "zh";
   if(c==="ma") return "ma";
-  if(c==="weak"||c==="review") return "rv";
+  if(c==="weak"||c==="review"||c==="daily") return "rv";
   if(r.subject==="English") return "en";
   if(r.subject==="Math") return "ma";
   if(r.subject==="\u534e\u6587") return "zh";

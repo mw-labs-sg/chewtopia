@@ -65,6 +65,20 @@ function tColumn(kid, subj){
   return out || '<div class="mxnone">\u2014</div>';
 }
 
+/* The one button that decides for them. Says what is in the set first. */
+function dailyBtn(kid){
+  var p=dailyPlan(kid);
+  if(!p.any) return "";
+  var bits=[];
+  if(p.due.length)     bits.push(esc(practiceLabel(p.due[0]))+" coming up");
+  if(p.weak.length)    bits.push(Math.min(4,p.weak.length)+" to fix");
+  if(p.untried.length) bits.push("something new");
+  var done = streak(kid).last===todayISO();
+  return '<button class="daily'+(done?" done":"")+'" data-t="daily" data-kid="'+kid+'">'+
+    '<span class="dl">'+(done?"\u2713 Done today \u00b7 go again":"Today\u2019s ten minutes")+'</span>'+
+    '<span class="dm">'+esc(bits.join(" \u00b7 "))+'</span></button>';
+}
+
 function vTests(){
   var f=pFilter();
   var opts=[["all","Everything"],["en","English"],["zh","华文"],["ma","Maths"]]
@@ -86,6 +100,7 @@ function vTests(){
     s+='<div class="kidbox"><button class="kidname '+whoCls(k.id)+'" data-rename="'+k.id+'">'+
        esc(pname(k.id))+'<small>'+k.level+
        (streak(k.id).n?' \u00b7 '+streak(k.id).n+"\uD83D\uDD25":"")+'</small></button>'+
+       dailyBtn(k.id)+
        (wk.length?'<button class="test rev" data-t="weak" data-kid="'+k.id+'">'+
          '<span class="tx"><span class="nm">Tricky ones</span>'+
          '<span class="mt">'+esc(wk.slice(0,3).map(weakLabel).join(", "))+
@@ -103,6 +118,9 @@ function vTests(){
   var sp=parseFloat(S("rate","0.85"));
   var ve=bestVoice("en-GB"), vc=bestVoice("zh-CN");
   s+='<div class="panel"><h2><span class="em">🔊</span> Voice</h2>'+
+     (vc?'':'<p class="warn">No Mandarin voice on this device, so the Chinese tests '+
+       'stay silent rather than being read out in an English accent. '+
+       'The instructions below add one.</p>')+
      '<p class="empty">English: <b>'+esc(ve?ve.name:"none installed")+'</b><br>'+
      '\u534e\u6587: <b>'+esc(vc?vc.name:"none installed")+'</b></p>'+
      '<div class="lbl">Speaking speed</div>'+
@@ -189,39 +207,119 @@ function startWeak(){
   startItems(a, "Review \u00b7 tricky ones", "Review", cn?"zh-CN":"en-GB", "weak");
 }
 
+/* Everything a code opens: the questions, what to call it, which voice.
+   Kept apart from start() so the daily set can borrow from several at once. */
+function itemsFor(code, kid){
+  kid = kid || who();
+  var p=String(code).split("|"), k=p[1], items, subject, test, lang="en-GB";
+  try{
+    if(p[0]==="en"){ subject="English"; test="Spelling "+k;
+      items=TC_SPELL[k][1].map(function(x){ return {k:x[0],s:x[1],a:x[2]}; }); }
+    else if(p[0]==="es"){ subject="English"; test=k;
+      items=SC_SPELL[k][1].map(function(x){ return {k:x[0],s:x[1],a:x[2]}; }); }
+    else if(p[0]==="hz"){
+      subject="\u534e\u6587"; test="\u6211\u4f1a\u5199 "+k; lang="zh-CN";
+      var set=HANZI[k];
+      items=set.slice().sort(function(){ return Math.random()-0.5; }).map(function(x){
+        var pool=set.filter(function(y){ return y[0]!==x[0]; }).sort(function(){ return Math.random()-0.5; });
+        var opts=[x[0], pool[0][0], pool[1][0], pool[2][0]].sort(function(){ return Math.random()-0.5; });
+        return {k:"hz", h:x[0], a:x[1], tone:x[2], word:x[3], m:x[4], opts:opts};
+      });
+    }
+    else if(p[0]==="rn"){
+      subject="\u534e\u6587"; test="\u6211\u4f1a\u8ba4 "+k; lang="zh-CN";
+      items=HANZI[k].slice().sort(function(){ return Math.random()-0.5; }).map(function(x){
+        return {k:"rn", h:x[0], a:x[1], tone:x[2], word:x[3], m:x[4]};
+      });
+    }
+    else if(p[0]==="zh"){ subject="\u534e\u6587"; test=k; lang="zh-CN";
+      var bank = kid==="tc" ? TC_PINYIN : SC_TINGXIE;
+      items=bank[k].slice().sort(function(){ return Math.random()-0.5; })
+        .map(function(x){ return {k:"py",h:x[0],word:x[1],a:x[2],tone:x[3],m:x[4]}; }); }
+    else if(p[0]==="ma"){ subject="Math";
+      test="Math \u00b7 "+(k==="easy"?"Warm up":k==="times"?"Times tables":"Challenge");
+      items=mathItems(k); }
+  }catch(e){ return null; }
+  if(!items || !items.length) return null;
+  return {items:items, subject:subject, test:test, lang:lang};
+}
+
 function start(code){
-  if(code==="weak") return startWeak();
-  var p=code.split("|"), items, subject, test, lang="en-GB";
-  if(p[0]==="en"){ subject="English"; test="Spelling "+p[1];
-    items=TC_SPELL[p[1]][1].map(function(x){ return {k:x[0],s:x[1],a:x[2]}; }); }
-  else if(p[0]==="es"){ subject="English"; test=p[1];
-    items=SC_SPELL[p[1]][1].map(function(x){ return {k:x[0],s:x[1],a:x[2]}; }); }
-  else if(p[0]==="hz"){
-    subject="华文"; test="我会写 "+p[1]; lang="zh-CN";
-    var set=HANZI[p[1]];
-    items=set.slice().sort(function(){ return Math.random()-0.5; }).map(function(x){
-      var pool=set.filter(function(y){ return y[0]!==x[0]; }).sort(function(){ return Math.random()-0.5; });
-      var opts=[x[0], pool[0][0], pool[1][0], pool[2][0]].sort(function(){ return Math.random()-0.5; });
-      return {k:"hz", h:x[0], a:x[1], tone:x[2], word:x[3], m:x[4], opts:opts};
-    });
-  }
-  else if(p[0]==="rn"){
-    subject="华文"; test="我会认 "+p[1]; lang="zh-CN";
-    items=HANZI[p[1]].slice().sort(function(){ return Math.random()-0.5; }).map(function(x){
-      return {k:"rn", h:x[0], a:x[1], tone:x[2], word:x[3], m:x[4]};
-    });
-  }
-  else if(p[0]==="zh"){ subject="华文"; test=p[1]; lang="zh-CN";
-    var bank=who()==="tc"?TC_PINYIN:SC_TINGXIE;
-    items=bank[p[1]].slice().sort(function(){ return Math.random()-0.5; })
-      .map(function(x){ return {k:"py",h:x[0],word:x[1],a:x[2],tone:x[3],m:x[4]}; }); }
-  else { subject="Math";
-    test="Math · "+(p[1]==="easy"?"Warm up":p[1]==="times"?"Times tables":"Challenge");
-    items=mathItems(p[1]); }
-  quiz={code:code,subject:subject,test:test,lang:lang,items:items,
+  if(code==="weak")  return startWeak();
+  if(code==="daily") return startDaily(who());
+  var q=itemsFor(code);
+  if(!q){ alert("That list is not in the app any more."); return; }
+  quiz={code:code,subject:q.subject,test:q.test,lang:q.lang,items:q.items,
         i:0,score:0,streak:0,best:0,missed:[],graded:false,done:false};
   render(); scrollTo(0,0);
 }
+
+/* ==========================================================================
+   TODAY'S TEN MINUTES
+   A mixed set built without anyone having to choose: what a test is coming up
+   for, what keeps going wrong, and one list never tried. Ten questions.
+   ========================================================================== */
+function dueCodes(kid){
+  return SJ("events",[]).filter(function(e){
+      return e.p && e.w===kid && !evState(e).gone;
+    }).sort(function(a,b){ return evState(a).start-evState(b).start; })
+    .map(function(e){ return e.p; });
+}
+function allCodes(kid){
+  var out=[];
+  Object.keys(kid==="tc"?TC_SPELL:SC_SPELL).forEach(function(k){ out.push((kid==="tc"?"en|":"es|")+k); });
+  Object.keys(kid==="tc"?TC_PINYIN:SC_TINGXIE).forEach(function(k){ out.push("zh|"+k); });
+  if(kid==="tc") Object.keys(HANZI).forEach(function(k){ out.push("rn|"+k); out.push("hz|"+k); });
+  ["easy","times","hard"].forEach(function(k){ out.push("ma|"+k); });
+  return out;
+}
+function untriedCodes(kid){
+  return allCodes(kid).filter(function(c){
+    var q=itemsFor(c, kid);
+    return q && !lastFor(q.test, kid);
+  });
+}
+function some(items, n){
+  return (items||[]).slice().sort(function(){ return Math.random()-0.5; }).slice(0,n);
+}
+/* What the button says before it is pressed, so it is never a mystery box. */
+function dailyPlan(kid){
+  var due=dueCodes(kid), weak=weakTop(kid,8), untried=untriedCodes(kid);
+  return {due:due, weak:weak, untried:untried,
+          any: !!(due.length || weak.length || untried.length)};
+}
+function startDaily(kid){
+  kid=kid||who();
+  W("who", kid);
+  var plan=dailyPlan(kid), items=[], seen={};
+  function push(list){
+    (list||[]).forEach(function(it){
+      if(!it || items.length>=10) return;
+      var k=weakKey(it); if(seen[k]) return;
+      seen[k]=1; items.push(it);
+    });
+  }
+  /* four from whatever is being tested soonest */
+  plan.due.slice(0,2).forEach(function(c){
+    var q=itemsFor(c, kid); if(q) push(some(q.items, 4));
+  });
+  /* four they keep getting wrong */
+  push(some(plan.weak.map(function(x){ return x.it; }).filter(Boolean), 4));
+  /* two from something never tried */
+  if(items.length<10 && plan.untried.length){
+    var q2=itemsFor(some(plan.untried,1)[0], kid);
+    if(q2) push(some(q2.items, 10-items.length));
+  }
+  /* still short? top it up from anything at all */
+  if(items.length<6){
+    var q3=itemsFor(some(allCodes(kid),1)[0], kid);
+    if(q3) push(some(q3.items, 10-items.length));
+  }
+  if(!items.length){ alert("Nothing to practise yet."); return; }
+  var cn=items.every(function(i){ return i.k==="hz"||i.k==="rn"||i.k==="py"; });
+  startItems(items, "Today \u00b7 ten minutes", "Review", cn?"zh-CN":"en-GB", "daily");
+}
+
 function clean(s){ return String(s||"").toLowerCase()
   .replace(/[.,!?;:'"\u2018\u2019\u201c\u201d]/g,"").replace(/\s+/g," ").trim(); }
 function ltRow(t,g){ var h='<div class="lts">';
@@ -229,6 +327,21 @@ function ltRow(t,g){ var h='<div class="lts">';
     var ok=g[k]!==undefined&&g[k].toLowerCase()===c.toLowerCase();
     h+='<span class="lt '+(ok?"h":"s")+'">'+(c===" "?"&nbsp;":c)+'</span>'; });
   return h+'</div>'; }
+
+/* Weak items are stored bare, without the four choices they were first shown
+   with, so anything replaying them has to build a fresh set. */
+function hzOpts(it){
+  if(it.opts && it.opts.length>=2) return it.opts;
+  var pool=[];
+  Object.keys(HANZI).forEach(function(k){
+    HANZI[k].forEach(function(x){ if(x[0]!==it.h) pool.push(x[0]); });
+  });
+  pool=pool.sort(function(){ return Math.random()-0.5; }).slice(0,3);
+  if(pool.length<3) return null;                 /* not enough to choose from */
+  /* kept on the item, so the four do not jump about between redraws */
+  it.opts=[it.h].concat(pool).sort(function(){ return Math.random()-0.5; });
+  return it.opts;
+}
 
 function quizHTML(){
   var q=quiz, it=q.items[q.i];
@@ -265,8 +378,8 @@ function quizHTML(){
        '<div class="qq">'+esc(it.a)+(it.tone||"")+'</div>'+
        '<div class="tip">'+esc(it.m)+'</div>'+
        '<button class="btn play wide" id="qP">🔊 Hear the word</button>'+
-       (S("hzmode","tap")==="tap"
-        ? '<div class="opts">'+it.opts.map(function(c){
+       (S("hzmode","tap")==="tap" && hzOpts(it)
+        ? '<div class="opts">'+hzOpts(it).map(function(c){
             return '<button class="opt" data-opt="'+c+'">'+c+'</button>'; }).join("")+
           '<input type="hidden" id="qa" value="">'+
           '<div class="switch"><button class="addlink" id="hzSwitch">Write it instead</button></div>'
@@ -393,7 +506,7 @@ function grade(){
   var a=document.getElementById("qa"); a.value=given; a.disabled=true;
   if(document.getElementById("qt")) document.getElementById("qt").disabled=true;
   var cnQ = (it.k==="py"||it.k==="hz"||it.k==="rn");
-  var pr = right ? praise(cnQ, q.streak) : {t:pick(OOPS_EN), lang:null};
+  var pr = right ? praise(cnQ, q.streak) : oops(cnQ);
   q.say = pr;
   document.getElementById("qf").innerHTML='<div class="fb '+(right?"ok":"no")+'">'+
     '<span class="big">'+(right && q.streak>=3 ? "\uD83D\uDD25 "+q.streak+" \u00b7 "+esc(pr.t)
@@ -423,13 +536,17 @@ function next(){
 }
 function doneHTML(){
   var q=quiz, p=q.score/q.items.length;
+  var cn = String(q.lang||"").indexOf("zh")===0;
   var st=p===1?"★★★":p>=.8?"★★☆":p>=.5?"★☆☆":"☆☆☆";
   var rank=p===1?"S":p>=.9?"A":p>=.8?"B":p>=.6?"C":"D";
-  var rk=p===1?"Full marks!":p>=.8?"Very good":p>=.5?"Getting there":"Worth another go";
+  var rk = cn
+    ? (p===1?"\u6ee1\u5206\uff01":p>=.8?"\u5f88\u597d":p>=.5?"\u6709\u8fdb\u6b65":"\u518d\u8bd5\u4e00\u6b21")
+    : (p===1?"Full marks!":p>=.8?"Very good":p>=.5?"Getting there":"Worth another go");
   if(!q.cheered){
     q.cheered=true;
     sfxDone(); burst(p>=0.8?40:16);
-    say(p>=0.8?"Well done!":"Good effort. Try again.",0.95);
+    if(cn) say(p>=0.8?"\u592a\u68d2\u4e86\uff01":"\u518d\u8bd5\u4e00\u6b21\u3002",0.95,"zh-CN");
+    else   say(p>=0.8?"Well done!":"Good effort. Try again.",0.95);
   }
   return '<div class="panel done">'+botSVG()+
     '<div class="kind">'+esc(q.test)+'</div>'+

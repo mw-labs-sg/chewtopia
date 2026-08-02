@@ -356,13 +356,17 @@ var PRAISE_EN=["Nice one!","Well done!","That's it!","Spot on!","Good work!","Ye
 var PRAISE_CN=[["\u5f88\u597d","hen hao"],["\u592a\u68d2\u4e86","tai bang le"],["\u5bf9\u4e86","dui le"],
                ["\u4e0d\u9519","bu cuo"],["\u771f\u5389\u5bb3","zhen li hai"],["\u597d\u68d2","hao bang"]];
 var OOPS_EN=["Not quite.","Nearly.","Close one.","Have another look."];
+var OOPS_CN=["\u518d\u60f3\u60f3","\u5dee\u4e00\u70b9","\u4e0d\u5bf9\u54e6","\u518d\u770b\u4e00\u904d"];
 function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
-/* Chinese questions get Chinese praise, English gets English. Both mix. */
+/* A Chinese question is answered entirely in Chinese — praise, the miss, and
+   the streak line. Mixing English in halfway through breaks the spell and
+   teaches nothing. */
 function praise(cn, streak){
-  if(streak>=4) return cn ? {t:pick(PRAISE_CN)[0], lang:"zh-CN"} : {t:streak+" in a row!", lang:null};
-  if(cn && Math.random()<0.7){ return {t:pick(PRAISE_CN)[0], lang:"zh-CN"}; }
+  if(cn) return {t: streak>=4 ? "\u8fde\u5bf9"+streak+"\u4e2a\uff01" : pick(PRAISE_CN)[0], lang:"zh-CN"};
+  if(streak>=4) return {t:streak+" in a row!", lang:null};
   return {t:pick(PRAISE_EN), lang:null};
 }
+function oops(cn){ return cn ? {t:pick(OOPS_CN), lang:"zh-CN"} : {t:pick(OOPS_EN), lang:null}; }
 
 /* ---------- weak items: everything missed, kept per child ---------- */
 function weakKey(it){ return it.k+"|"+(it.h||it.a||it.q||it.s||""); }
@@ -536,11 +540,15 @@ function bestVoice(lang){
 }
 /* Chinese read too slowly turns to mush and loses its tones, so it never
    drops below this however slow the English is set. */
+function hasVoice(lang){ return !!bestVoice(lang); }
 function say(t,rate,lang){
   if(!window.speechSynthesis) return;
   lang=lang||"en-GB";
   var cn = lang.indexOf("zh")===0;
   var u=new SpeechSynthesisUtterance(t), v=bestVoice(lang);
+  /* An English voice reading Chinese is worse than silence: it teaches the
+     wrong sounds. Say nothing and let the screen carry it. */
+  if(cn && !v) return;
   if(v){ u.voice=v; u.lang=v.lang; } else u.lang=lang;
   var base=parseFloat(S("rate","0.85"));
   if(isNaN(base)) base=0.85;
