@@ -371,6 +371,16 @@
   .markcell.no .mkflag{background:#FF6F52}
   .markcell.no .ansch{color:#B03A22}
   .markscore{text-align:center;font-size:18px;font-weight:800;margin:12px 0 2px}
+  .markcell.show{cursor:default;box-shadow:inset 0 0 0 2px #DFE8F0}
+  .mkitem{padding:10px 0;border-bottom:1px solid var(--line)}
+  .mkitem:last-of-type{border-bottom:0}
+  .mkask{font-size:14px;font-weight:700;color:var(--soft);text-align:center}
+  .mkrun{display:block;width:100%;border:none;font-family:inherit;text-align:left;
+    cursor:pointer;border-radius:12px;padding:12px 14px;margin-bottom:8px;
+    background:var(--bg);color:var(--ink)}
+  .mkrun .nm{display:block;font-size:15px;font-weight:800}
+  .mkrun .mt{display:block;font-size:12px;font-weight:600;color:var(--soft);margin-top:1px}
+  .mkrun:active{transform:translateY(1px)}
   @media(max-width:460px){ .padcell,.markcell{width:104px}
     .markcell .ansch{font-size:28px} .markcell .noimg{height:76px;line-height:76px} }
 
@@ -631,14 +641,14 @@ body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;-
   </div>
   <div class="tabs" id="tabs"></div>
   <div id="view"></div>
-  <div class="foot">Saved on this device · build 72</div>
+  <div class="foot">Saved on this device · build 73</div>
 </div>
 <!-- load order matters: data, then core, then screens, app last -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="data.js?v=16"></script>
-<script src="core.js?v=35"></script>
+<script src="core.js?v=36"></script>
 <script src="timetable.js?v=5"></script>
-<script src="training.js?v=29"></script>
-<script src="app.js?v=65"></script>
+<script src="training.js?v=30"></script>
+<script src="app.js?v=66"></script>
 </body>
 </html>

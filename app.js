@@ -320,8 +320,9 @@ function gradeGrid(){
       var row=(g[sj]=g[sj]||{});
       var cell=(row[t]=row[t]||{});
       var c=cell[k.id];
-      if(!c) c=cell[k.id]={best:r.score,total:r.total,tries:0,last:r.ts,code:r.code||""};
+      if(!c) c=cell[k.id]={best:r.score,total:r.total,tries:0,last:r.ts,code:r.code||"",pend:0};
       if(r.code) c.code=r.code;
+      if(r.pend) c.pend=1;
       c.tries++;
       if(r.score>c.best){ c.best=r.score; c.total=r.total; }
       if(r.ts>c.last) c.last=r.ts;
@@ -359,9 +360,104 @@ function testBox(kid, test, c){
   return '<button class="tbox '+cls+'"'+
     (live ? ' data-open="'+esc(c.code)+'" data-kid="'+kid+'"' : ' disabled')+'>'+
     '<span class="tn">'+esc(test)+'</span>'+
-    '<span class="tv">'+c.best+'/'+c.total+'</span>'+
+    (c.pend && !c.tries2 ? '<span class="tv small">To mark</span>'
+                          : '<span class="tv">'+c.best+'/'+c.total+'</span>')+
     '<span class="td">'+dshort(c.last)+(c.tries>1?" \u00b7 "+c.tries+" goes":"")+'</span>'+
     '</button>';
+}
+
+/* ==========================================================================
+   MARKING — 听写 is written by the child and marked by a grown-up.
+   Behind a PIN, so the marking is not done by the boy who wrote it.
+   ========================================================================== */
+var unlocked=false, pinTry="";        /* both reset when the app is reopened */
+
+function PIN(){ return S("pin","1234"); }
+function pendingRuns(){
+  return results().filter(function(r){ return r.pend && r.ans && r.ans.length; })
+    .sort(function(x,y){ return y.ts-x.ts; });
+}
+function markPanel(){
+  var p=pendingRuns();
+  if(!p.length) return "";
+  if(!unlocked){
+    return '<div class="panel"><h2><span class="em">\u270D\uFE0F</span> Waiting to be marked'+
+      '<span class="side">'+p.length+'</span></h2>'+
+      '<p class="empty">'+p.map(function(r){
+        return esc(pname(r.who))+" \u00b7 "+esc(r.test); }).slice(0,3).join("<br>")+
+        (p.length>3?"<br>and "+(p.length-3)+" more":"")+'</p>'+
+      '<div class="lbl">Grown-up code</div>'+
+      '<input type="password" id="pinIn" inputmode="numeric" maxlength="8" '+
+        'autocomplete="off" placeholder="\u2022\u2022\u2022\u2022">'+
+      (pinTry==="bad"?'<p class="empty" style="color:var(--coral)">Not that one.</p>':'')+
+      '<div class="btnrow"><button class="btn go" id="pinGo">Unlock marking</button></div></div>';
+  }
+  var s='<div class="panel"><h2><span class="em">\u270D\uFE0F</span> To mark'+
+        '<span class="side">'+p.length+'</span></h2>';
+  p.forEach(function(r){
+    s+='<button class="mkrun" data-mark="'+esc(r.id)+'">'+
+       '<span class="nm">'+esc(r.test)+'</span>'+
+       '<span class="mt">'+esc(pname(r.who))+' \u00b7 '+dshort(r.ts)+' \u00b7 '+
+         r.ans.length+' words</span></button>';
+  });
+  return s+'</div>';
+}
+
+/* The marking sheet itself: his writing, the answer, tap what is wrong. */
+function vMarkRun(){
+  var r=results().filter(function(x){ return x.id===markRun; })[0];
+  if(!r) { markRun=null; return vResults(); }
+  markState = markState || r.ans.map(function(x){
+    return (x.want||"").split("").map(function(){ return true; });
+  });
+
+  var s='<div class="panel"><h2><span class="em">\u270D\uFE0F</span> '+esc(r.test)+
+        '<span class="side '+whoCls(r.who)+'">'+esc(pname(r.who))+'</span></h2>'+
+        '<div class="marktip">Tap any character he got wrong.</div>';
+
+  r.ans.forEach(function(x, qi){
+    var chs=String(x.want||"").split("");
+    s+='<div class="mkitem"><div class="mkask">'+esc(x.ask||"")+'</div><div class="padrow">'+
+      chs.map(function(ch,i){
+        var ok=markState[qi][i]!==false;
+        return '<div class="markcell '+(ok?"ok":"no")+'" data-q="'+qi+'" data-c="'+i+'">'+
+          (x.img&&x.img[i] ? '<img src="'+x.img[i]+'" alt="">' : '<span class="noimg">\u2014</span>')+
+          '<span class="ansch">'+esc(ch)+'</span>'+
+          '<span class="mkflag">'+(ok?"\u2713":"\u2715")+'</span></div>';
+      }).join("")+'</div></div>';
+  });
+
+  var got=0, all=0;
+  markState.forEach(function(row){ row.forEach(function(ok){ all++; if(ok!==false) got++; }); });
+  return s+'<div class="markscore">'+got+' of '+all+' characters correct</div>'+
+    '<div class="btnrow"><button class="btn go" id="mkSave">Save the marks</button>'+
+    '<button class="btn soft" id="mkCancel">Later</button></div></div>';
+}
+
+/* Write the marks back: the score, and the characters that need more work. */
+function saveMarks(){
+  var all=results(), r=null;
+  all.forEach(function(x){ if(x.id===markRun) r=x; });
+  if(!r){ markRun=null; markState=null; render(); return; }
+  var score=0, total=0, missed=[];
+  r.ans.forEach(function(x, qi){
+    var chs=String(x.want||"").split("");
+    chs.forEach(function(ch,i){
+      total++;
+      if(markState[qi][i]!==false) score++;
+      else {
+        missed.push(ch);
+        weakAddFor(r.who, {k:"tx",h:ch,word:x.ask,a:"",tone:"",m:""}, r.code);
+      }
+    });
+    x.marks=markState[qi].slice();
+    x.right=markState[qi].every(function(ok){ return ok!==false; });
+  });
+  r.score=score; r.total=total; r.missed=missed; r.pend=0; r.up=0;   /* re-upload */
+  WJ("results", all);
+  markRun=null; markState=null;
+  if(typeof cloudPushAll==="function" && cloudUser) cloudPushAll(true);
+  render(); scrollTo(0,0);
 }
 
 /* ==========================================================================
@@ -458,8 +554,9 @@ function vTestDetail(){
 }
 
 function vResults(){
+  if(markRun) return vMarkRun();
   if(openTest) return vTestDetail();
-  var s=syncPanel();
+  var s=syncPanel()+markPanel();
   var g=gradeGrid(), any=false;
 
   var m='<div class="mx6">';
@@ -567,6 +664,28 @@ function wResults(){
       sfxTap(); render();
     };
   });
+  var pg=document.getElementById("pinGo"), pi=document.getElementById("pinIn");
+  if(pg) pg.onclick=function(){
+    if((pi.value||"").trim()===PIN()){ unlocked=true; pinTry=""; sfxWin(); }
+    else { pinTry="bad"; sfxLose(); }
+    render();
+  };
+  if(pi) pi.addEventListener("keydown",function(e){ if(e.key==="Enter"){ e.preventDefault(); pg.click(); } });
+  document.querySelectorAll("[data-mark]").forEach(function(b){
+    b.onclick=function(){ markRun=b.dataset.mark; markState=null; sfxTap(); render(); scrollTo(0,0); };
+  });
+  document.querySelectorAll("[data-q]").forEach(function(cell){
+    cell.onclick=function(){
+      var qi=+cell.dataset.q, ci=+cell.dataset.c;
+      markState[qi][ci] = markState[qi][ci]===false;
+      sfxTap(); render();
+    };
+  });
+  var ms=document.getElementById("mkSave");
+  if(ms) ms.onclick=function(){ saveMarks(); };
+  var mc=document.getElementById("mkCancel");
+  if(mc) mc.onclick=function(){ markRun=null; markState=null; render(); };
+
   var dtb=document.getElementById("dtBack");
   if(dtb) dtb.onclick=function(){ openTest=null; render(); scrollTo(0,0); };
   var dtg=document.getElementById("dtGo");

@@ -519,20 +519,18 @@ function quizHTML(){
          '<div class="trbtns"><button class="trbtn" id="padClr">\u21ba Rub out</button>'+
          '<button class="trbtn skip" id="qShow">I have finished \u2192</button></div>';
     } else {
-      /* his writing, the answer under it, and a tap to mark each character */
-      q.mk = q.mk || chs.map(function(){ return true; });
-      s+='<div class="marktip">Compare each box with the answer. '+
-         'Tap any character he got wrong.</div>'+
+      /* His writing with the right answer beside it, so he can see straight
+         away how close he was. He does not mark it — that is a grown-up job,
+         and a child marking his own 听写 is not a score anyone can use. */
+      s+='<div class="marktip">Here is how it should look.</div>'+
          '<div class="padrow">'+chs.map(function(ch,i){
-           var ok=q.mk[i]!==false;
-           return '<div class="markcell '+(ok?"ok":"no")+'" data-mk="'+i+'">'+
+           return '<div class="markcell show">'+
              (q.img&&q.img[i] ? '<img src="'+q.img[i]+'" alt="">' : '<span class="noimg">\u2014</span>')+
-             '<span class="ansch">'+esc(ch)+'</span>'+
-             '<span class="mkflag">'+(ok?"\u2713":"\u2715")+'</span></div>';
+             '<span class="ansch">'+esc(ch)+'</span></div>';
          }).join("")+'</div>'+
-         '<div class="markscore" id="mkScore"></div>'+
          '<div class="ctx">'+esc(it.word||"")+' \u00b7 '+esc(it.a||"")+(it.tone||"")+
-           (it.m?' \u00b7 '+esc(it.m):"")+'</div>';
+           (it.m?' \u00b7 '+esc(it.m):"")+'</div>'+
+         '<p class="empty" style="text-align:center">Dad will mark this one.</p>';
     }
     s+='<input type="hidden" id="qa" value="">';
   }
@@ -611,7 +609,7 @@ function quizHTML(){
   if(it.k==="tx"){
     if(!q.show && !q.graded) return s+'<div id="qf"></div></div>';
     return s+'<div class="btnrow"><button class="btn go" id="qG">'+
-      (q.i===q.items.length-1?"Finished \u2192":"Next question")+'</button></div>'+
+      (q.i===q.items.length-1?"Finished \u2192":"Next word")+'</button></div>'+
       '<div id="qf"></div></div>';
   }
   if(tracing(it) && !q.graded){
@@ -657,7 +655,6 @@ function wireQuiz(){
   var pad=document.getElementById("pad");
   if(pad) wirePad(pad);
   if(document.querySelector("[data-pad]")) wirePadRow(it);
-  if(document.querySelector("[data-mk]")) wireMarks(it);
   if(document.querySelector("[data-tr]")) wireTrace(it);
   var shw=document.getElementById("qShow");
   if(shw) shw.onclick=function(){
@@ -819,18 +816,10 @@ function grade(forced){
   var ga=document.getElementById("qa"), given = ga ? ga.value : "";
   var gained=null;
   if(it.k==="tx"){
-    /* one mark per character, so a single slip is not a nought */
-    var chs=String(it.h||"").split("");
-    q.mk = q.mk || chs.map(function(){ return true; });
-    gained=0; q.mk.forEach(function(x){ if(x!==false) gained++; });
-    right = gained===chs.length;
-    detail='<b style="font-size:30px">'+esc(it.h)+'</b> &nbsp; '+gained+' of '+chs.length+
-           ' characters<br>'+esc(it.word||"")+' \u00b7 '+esc(it.a||"")+(it.tone||"")+
-           (it.m?'<br>'+esc(it.m):"");
-    /* only the characters he actually missed come back later */
-    chs.forEach(function(ch,i){
-      if(q.mk[i]===false) weakAdd({k:"tx",h:ch,word:it.word,a:it.a,tone:it.tone,m:it.m}, q.code);
-    });
+    /* Written, not yet marked. The score waits for a grown-up. */
+    q.pend=true;
+    right=null;
+    detail="";
   }
   else if(writing(it) || tracing(it)){
     right = forced===true;
@@ -884,10 +873,8 @@ function grade(forced){
   q.marks = q.marks || [];
   q.marks[q.i] = right;
   q.wrong = q.wrong || [];
-  if(gained!==null){
-    q.score += gained;                       /* part marks for part right */
-    if(right){ q.streak++; q.best=Math.max(q.best,q.streak); weakDrop(it); }
-    else { q.streak=0; q.missed.push(it.h); q.wrong.push(it); }
+  if(right===null){
+    q.marks[q.i]="pend";                     /* neither right nor wrong yet */
   }
   else if(right){
     q.score++; q.streak++; q.best=Math.max(q.best,q.streak);
@@ -899,6 +886,7 @@ function grade(forced){
     if(it.k!=="tx") weakAdd(it, q.code);
   }
   q.graded=true;
+  if(right===null){ next(); return; }        /* nothing to celebrate yet */
   render();
   var a=document.getElementById("qa");
   if(a){ a.value=given; a.disabled=true; }
@@ -936,13 +924,25 @@ function next(){
   if(q.i>=q.items.length){ q.done=true;
     addResult({who:who(),subject:q.subject,code:q.code,test:q.test,score:q.score,
                total:q.total||q.items.length,missed:q.missed,ts:Date.now(),
-               ans:(q.ans||[]).filter(Boolean)});
+               pend:q.pend?1:0, ans:(q.ans||[]).filter(Boolean)});
     bumpStreak();
     autoSend(); }                   /* send it up while the tablet is still awake */
   render(); scrollTo(0,0);
 }
 function doneHTML(){
-  var q=quiz, p=q.score/(q.total||q.items.length);
+  var q=quiz;
+  if(q.pend){
+    if(!q.cheered){ q.cheered=true; sfxDone(); burst(24); }
+    return '<div class="panel done">'+botSVG()+
+      '<div class="kind">'+esc(q.test)+'</div>'+
+      '<div class="big">\u2713</div>'+
+      '<div class="rk">All written</div>'+
+      '<div class="streakline">'+q.items.length+' words written \u00b7 waiting to be marked</div>'+
+      '<p class="empty" style="text-align:center">Ask Dad to mark it in Progress.</p>'+
+      '<div class="btnrow"><button class="btn go" id="dScore">Show Dad \u2192</button>'+
+      '<button class="btn soft" id="dBack">More practice</button></div></div>';
+  }
+  var p=q.score/(q.total||q.items.length);
   var cn = String(q.lang||"").indexOf("zh")===0;
   var st=p===1?"★★★":p>=.8?"★★☆":p>=.5?"★☆☆":"☆☆☆";
   var rank=p===1?"S":p>=.9?"A":p>=.8?"B":p>=.6?"C":"D";

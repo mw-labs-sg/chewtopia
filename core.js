@@ -97,7 +97,7 @@ var DAYS = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunda
 var TABS = [["home","Upcoming","t1"],["schedule","Timetable","t2"],
             ["meals","Meals","t3"],["practice","Training","t4"],
             ["results","Progress","t5"],["reading","Reading","t6"]];
-var tab="home", quiz=null, showAdd=false, openTest=null, openRun=null;
+var tab="home", quiz=null, showAdd=false, openTest=null, openRun=null, markRun=null, markState=null;
 /* Each tab gets a readable address, e.g. .../chewtopia/#meals, so a link can
    be bookmarked or sent straight to one screen. */
 var SLUGS = {home:"upcoming", schedule:"timetable", meals:"meals",
@@ -108,7 +108,7 @@ function tabFromHash(){
   return null;
 }
 function go(id, quiet){
-  tab=id; quiz=null; showAdd=false; openTest=null; openRun=null; hush();
+  tab=id; quiz=null; showAdd=false; openTest=null; openRun=null; markRun=null; markState=null; hush();
   if(!quiet){ try{ location.hash="#"+SLUGS[id]; }catch(e){} }
   render(); scrollTo(0,0);
 }
@@ -511,8 +511,9 @@ function oops(cn){ return cn ? {t:pick(OOPS_CN), lang:"zh-CN"} : {t:pick(OOPS_EN
 /* ---------- weak items: everything missed, kept per child ---------- */
 function weakKey(it){ return it.k+"|"+(it.h||it.a||it.q||it.s||""); }
 function weakAll(w){ return SJ("weak:"+(w||who()), []); }
-function weakAdd(it, code){
-  var w=who(), a=weakAll(w), k=weakKey(it), hit=null;
+function weakAdd(it, code){ return weakAddFor(who(), it, code); }
+function weakAddFor(w, it, code){
+  var a=weakAll(w), k=weakKey(it), hit=null;
   a.forEach(function(x){ if(x.k===k) hit=x; });
   if(hit){ hit.n++; hit.ts=Date.now(); }
   else a.push({k:k, n:1, ts:Date.now(), it:it, code:code||""});
