@@ -22,10 +22,11 @@ function kidSubj(id){
 }
 function hasSubj(id, s){ return kidSubj(id).indexOf(s)>=0; }
 
-function shownKids(){
-  var v=vwho();
-  return v==="all" ? KIDS : KIDS.filter(function(k){ return k.id===v; });
-}
+/* Training, Progress and Reading always show both boys side by side — the
+   whole point of those screens is comparing them, and a filter there only
+   ever hid half the picture. The child switch is on Upcoming and Timetable,
+   where a single day belongs to one of them. */
+function shownKids(){ return KIDS; }
 /* Sits inside the panel, right under its heading, so there is never any doubt
    about whose screen you are looking at. */
 function whoBar(){
@@ -173,7 +174,7 @@ function cloudInit(){
   var c=sbc(); if(!c) return;
   c.auth.getSession().then(function(r){
     cloudUser = (r.data && r.data.session) ? r.data.session.user : null;
-    if(cloudUser) cloudSync(); else render();
+    if(cloudUser) cloudPull(true); else render();
   });
 }
 function asEmail(name){
@@ -189,74 +190,94 @@ function cloudLogin(email, pass){
   cloudMsg="Signing in\u2026"; render();
   c.auth.signInWithPassword({email:email, password:pass}).then(function(r){
     if(r.error){ cloudMsg=r.error.message; cloudUser=null; render(); return; }
-    cloudUser=r.data.user; cloudMsg=""; cloudSync();
+    cloudUser=r.data.user; cloudMsg=""; cloudPull();
   });
 }
 function cloudLogout(){
   var c=sbc(); if(!c) return;
   c.auth.signOut().then(function(){ cloudUser=null; cloudMsg=""; render(); });
 }
-/* Pull everything down, merge by id, then send up anything the cloud lacks. */
-function cloudSync(){
-  var c=sbc(); if(!c||!cloudUser) return;
-  /* Signed in as a different account than last time? Everything local needs
-     re-uploading, since rows belong to whoever created them. */
-  if(S("clouduid","")!==cloudUser.id){
-    var l=results(); l.forEach(function(x){ x.up=0; }); WJ("results",l);
-    W("clouduid", cloudUser.id);
-  }
-  cloudMsg="Syncing\u2026"; render();
+/* ==========================================================================
+   SYNC — two buttons, and it says what happened.
+   Get = bring down whatever the other device sent up.
+   Send = put this device's work up.
+   Both are safe to press at any time and in any order: nothing is ever
+   overwritten, only merged.
+   ========================================================================== */
+var syncBusy=false;
+function syncNote(){ return S("syncnote",""); }
+function setNote(t){ W("syncnote", t); render(); }
+function stamp(){
+  var d=new Date();
+  return String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0");
+}
+function pending(){ return results().filter(function(x){ return !x.up; }).length; }
+
+/* ---------- GET ---------- */
+function cloudPull(quiet){
+  var c=sbc();
+  if(!c||!cloudUser){ if(!quiet) setNote("Not signed in."); return; }
+  if(syncBusy) return;
+  syncBusy=true; if(!quiet) setNote("Getting\u2026");
   c.from("results").select("*").then(function(r){
-    if(r.error){ cloudMsg=r.error.message; render(); return; }
-    var local=results(), byId={};
+    if(r.error){ syncBusy=false; setNote("Could not get: "+r.error.message); return; }
+    var local=results(), byId={}, added=0;
     local.forEach(function(x){ if(x.id) byId[x.id]=x; });
     (r.data||[]).forEach(function(row){
       if(byId[row.id]){ byId[row.id].up=1; return; }
+      added++;
       local.push({id:row.id, who:row.child_id, code:row.test_code, test:row.test_name,
                   score:row.score, total:row.total,
                   ts:new Date(row.completed_at).getTime(), up:1});
     });
     local.sort(function(a,b){ return b.ts-a.ts; });
     WJ("results", local.slice(0,600));
-    cloudMsg=""; syncLast=Date.now(); cloudPush(); cloudState();
+    pullState(function(stMsg){
+      syncBusy=false;
+      setNote("Got "+added+(added===1?" new score":" new scores")+stMsg+" \u00b7 "+stamp());
+    });
   });
 }
-function cloudPush(){
-  var c=sbc(); if(!c||!cloudUser) return;
+
+/* ---------- SEND ---------- */
+function cloudPushAll(quiet){
+  var c=sbc();
+  if(!c||!cloudUser){ if(!quiet) setNote("Not signed in."); return; }
+  if(syncBusy) return;
+  /* a different account than last time means everything local is unsent */
+  if(S("clouduid","")!==cloudUser.id){
+    var l0=results(); l0.forEach(function(x){ x.up=0; }); WJ("results",l0);
+    W("clouduid", cloudUser.id);
+  }
+  syncBusy=true; if(!quiet) setNote("Sending\u2026");
   var local=results(), todo=[];
-  local.forEach(function(x){
-    if(x.up) return;
-    if(!x.id) x.id=uuid();                 /* older runs saved before sync existed */
-    todo.push(x);
-  });
-  if(!todo.length){ return; }
+  local.forEach(function(x){ if(x.up) return; if(!x.id) x.id=uuid(); todo.push(x); });
   WJ("results", local);
+
+  function afterResults(){
+    pushState(function(stMsg){
+      syncBusy=false;
+      setNote("Sent "+todo.length+(todo.length===1?" score":" scores")+stMsg+" \u00b7 "+stamp());
+    });
+  }
+  if(!todo.length){ afterResults(); return; }
   var rows=todo.map(function(x){
     return {id:x.id, user_id:cloudUser.id, child_id:x.who, test_code:x.code||null,
             test_name:x.test, score:x.score, total:x.total,
             completed_at:new Date(x.ts).toISOString()};
   });
   c.from("results").upsert(rows,{onConflict:"id", ignoreDuplicates:true}).then(function(r){
-    if(r.error){ cloudMsg=r.error.message; render(); return; }
+    if(r.error){ syncBusy=false; setNote("Could not send: "+r.error.message); return; }
     var done={}; todo.forEach(function(x){ done[x.id]=1; });
     var l=results(); l.forEach(function(x){ if(done[x.id]) x.up=1; });
-    WJ("results", l); syncLast=Date.now(); render();
+    WJ("results", l);
+    afterResults();
   });
 }
-function pending(){ return results().filter(function(x){ return !x.up; }).length; }
 
-/* ==========================================================================
-   THE REST OF IT — weak items, books, events and after-school activities.
-   Scores were the only thing that travelled, which is why one device could
-   show a test as done and the other as never tried.
-   Needs a small `state` table; if it is not there yet, this fails quietly and
-   scores keep syncing as before.
-   ========================================================================== */
+/* ---------- the rest: mistakes, books, events, activities ---------- */
 var STATE_KEYS=["weak:tc","weak:sc","books:tc","books:sc","events","acts","gone"];
-function stateIdent(k){
-  return k.indexOf("weak:")===0 ? "k" : "id";   /* what makes a row unique */
-}
-/* Merge two lists rather than letting one device overwrite the other. */
+function stateIdent(k){ return k.indexOf("weak:")===0 ? "k" : "id"; }
 function mergeList(a, b, key){
   var out=[], seen={};
   (a||[]).concat(b||[]).forEach(function(x){
@@ -264,7 +285,6 @@ function mergeList(a, b, key){
     var id=x[key]; if(id===undefined){ out.push(x); return; }
     var hit=seen[id];
     if(!hit){ seen[id]=x; out.push(x); return; }
-    /* same row on both sides: keep the fuller one */
     if((x.n||0) > (hit.n||0)) hit.n=x.n;
     if((x.ts||0) > (hit.ts||0)){
       Object.keys(x).forEach(function(f){ if(f!=="n") hit[f]=x[f]; });
@@ -272,57 +292,46 @@ function mergeList(a, b, key){
   });
   return out;
 }
-function cloudState(){
-  var c=sbc(); if(!c||!cloudUser) return;
-  c.from("state").select("*").then(function(r){
-    if(r.error) return;                    /* table not there: nothing lost */
-    var remote={};
-    (r.data||[]).forEach(function(row){ remote[row.k]=row.v; });
-    var push=[];
-    STATE_KEYS.forEach(function(k){
-      var mine=SJ(k,[]), theirs=remote[k];
-      var merged = theirs ? mergeList(mine, theirs, stateIdent(k)) : mine;
-      if(k==="gone") merged = uniq((mine||[]).concat(theirs||[]));
-      WJ(k, merged);
-      if(JSON.stringify(merged)!==JSON.stringify(theirs))
-        push.push({user_id:cloudUser.id, k:k, v:merged, updated_at:new Date().toISOString()});
-    });
-    if(push.length) c.from("state").upsert(push,{onConflict:"user_id,k"}).then(function(){ render(); });
-    else render();
-  });
-}
 function uniq(a){
   var seen={}, out=[];
   (a||[]).forEach(function(x){ if(!seen[x]){ seen[x]=1; out.push(x); } });
   return out;
 }
-
-/* ---------- keeping the two devices honest ---------- */
-/* A sync only ever happened when somebody pressed the button. Now it runs when
-   the app opens, when it comes back to the front, after every finished test,
-   and quietly every couple of minutes. */
-var syncBusy=false, syncLast=0;
-function autoSync(force){
-  if(!cloudUser) return;
-  var now=Date.now();
-  if(!force && (syncBusy || now-syncLast < 20000)) return;
-  syncBusy=true; syncLast=now;
-  cloudSync();
-  setTimeout(function(){ syncBusy=false; }, 4000);
-}
-function syncWatch(){
-  document.addEventListener("visibilitychange", function(){
-    if(!document.hidden) autoSync();
+function pullState(done){
+  var c=sbc();
+  if(!c||!cloudUser) return done("");
+  c.from("state").select("*").then(function(r){
+    if(r.error) return done(", the rest needs the state table");
+    var remote={};
+    (r.data||[]).forEach(function(row){ remote[row.k]=row.v; });
+    var touched=0;
+    STATE_KEYS.forEach(function(k){
+      if(remote[k]===undefined) return;
+      var mine=SJ(k,[]);
+      var merged = k==="gone" ? uniq(mine.concat(remote[k]||[]))
+                              : mergeList(mine, remote[k], stateIdent(k));
+      if(JSON.stringify(merged)!==JSON.stringify(mine)) touched++;
+      WJ(k, merged);
+    });
+    done(touched?", plus the rest":"");
   });
-  window.addEventListener("focus", function(){ autoSync(); });
-  window.addEventListener("online", function(){ autoSync(true); });
-  setInterval(function(){ if(!document.hidden) autoSync(); }, 120000);
 }
-function syncedAgo(){
-  if(!syncLast) return "";
-  var m=Math.round((Date.now()-syncLast)/60000);
-  return m<1 ? "just now" : m===1 ? "1 min ago" : m+" min ago";
+function pushState(done){
+  var c=sbc();
+  if(!c||!cloudUser) return done("");
+  var rows=STATE_KEYS.map(function(k){
+    return {user_id:cloudUser.id, k:k, v:SJ(k,[]), updated_at:new Date().toISOString()};
+  });
+  c.from("state").upsert(rows,{onConflict:"user_id,k"}).then(function(r){
+    done(r.error ? ", the rest needs the state table" : ", plus the rest");
+  });
 }
+
+/* Sending happens on its own the moment a test finishes, so a tablet left on
+   the sofa still gets its work up. Getting stays a button, because pulling
+   halfway through a test would be rude. */
+function autoSend(){ if(cloudUser) cloudPushAll(true); }
+
 function runsFor(id){ return results().filter(function(r){ return r.who===(id||who()); })
   .slice().sort(function(a,b){ return a.ts-b.ts; }); }
 function lastFor(t,kid){ var a=runsFor(kid).filter(function(r){ return r.test===t; });

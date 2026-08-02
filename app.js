@@ -36,7 +36,7 @@ function render(){
   var Wr={home:wHome,schedule:wWeek,meals:wMeals,practice:wTests,reading:wRead,results:wResults};
   /* the child switch belongs inside the first panel, under its heading */
   var html=V[tab]();
-  html=html.replace("</h2>", "</h2>"+whoBar());
+  if(tab==="home"||tab==="schedule") html=html.replace("</h2>", "</h2>"+whoBar());
   v.innerHTML=html; Wr[tab]();
   document.querySelectorAll("[data-vw]").forEach(function(b){
     b.onclick=function(){ W("vwho", b.dataset.vw); sfxPop(); render(); };
@@ -415,19 +415,26 @@ function vResults(){
   return s;
 }
 
-/* Sync sits at the top. One family name and password, nothing else to do. */
+/* Sync sits at the top: two buttons, and a line saying what happened last.
+   Nothing clever, nothing in the background you cannot see. */
 function syncPanel(){
   var s='<div class="panel"><h2><span class="em">\u2601\uFE0F</span> Sync';
   if(cloudUser) s+='<span class="side">'+esc(familyName(cloudUser.email))+'</span>';
   s+='</h2>';
   if(cloudUser){
     var p=pending();
-    s+='<div class="btnrow"><button class="btn go" id="cSync">'+
-       (p? 'Sync now \u00b7 '+p+' waiting' : 'Sync now')+'</button></div>'+
-       '<p class="empty" style="margin-bottom:0">'+
-         (p? p+' waiting to go up. ' : 'Everything is up to date. ')+
-         (syncedAgo()? 'Last sync '+syncedAgo()+'. ' : '')+
-         'Syncs on its own when the app opens and after every test.</p>';
+    s+='<div class="syncrow">'+
+       '<button class="btn go" id="cGet">\u2193 Get</button>'+
+       '<button class="btn go" id="cPut">\u2191 Send'+(p?' \u00b7 '+p:'')+'</button>'+
+       '</div>'+
+       '<p class="synced">'+(syncNote()
+          ? esc(syncNote())
+          : (p ? p+(p===1?" score":" scores")+" on this device not sent yet."
+               : "Nothing waiting to send."))+'</p>'+
+       '<div class="key"><b>Get</b> brings down what the other device sent. '+
+       '<b>Send</b> puts this device\u2019s work up. Neither one overwrites anything \u2014 '+
+       'they merge \u2014 so press them as often as you like. '+
+       'A finished test sends itself.</div>';
   } else {
     s+='<div class="pair"><span class="f1"><div class="lbl">Family name</div>'+
        '<input type="text" id="cEm" autocomplete="username" placeholder="chewtopia"></span>'+
@@ -455,7 +462,10 @@ function wResults(){
         if(e.key==="Enter"){ e.preventDefault(); goIn(); } });
     });
   }
-  var sy=document.getElementById("cSync"); if(sy) sy.onclick=cloudSync;
+  var gt=document.getElementById("cGet");
+  if(gt) gt.onclick=function(){ sfxTap(); cloudPull(); };
+  var pt=document.getElementById("cPut");
+  if(pt) pt.onclick=function(){ sfxTap(); cloudPushAll(); };
   document.querySelectorAll("[data-run]").forEach(function(b){
     b.onclick=function(){
       W("who", b.dataset.kid);
@@ -468,7 +478,6 @@ function wResults(){
 
 seedOnce();
 cloudInit();
-syncWatch();
 tab = tabFromHash() || tab;
 if(!location.hash){ try{ location.replace("#"+SLUGS[tab]); }catch(e){} }
 render();

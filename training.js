@@ -675,7 +675,7 @@ function next(){
     addResult({who:who(),subject:q.subject,code:q.code,test:q.test,score:q.score,
                total:q.items.length,missed:q.missed,ts:Date.now()});
     bumpStreak();
-    autoSync(true); }               /* send it up while the tablet is still awake */
+    autoSend(); }                   /* send it up while the tablet is still awake */
   render(); scrollTo(0,0);
 }
 function doneHTML(){

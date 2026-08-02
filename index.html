@@ -348,6 +348,12 @@
   .run.low{background:#FFE3DC;color:#B03A22}
   .arw{color:#C3D2DF;font-size:15px}
 
+  /* ---- sync: two big buttons and a plain sentence ---- */
+  .syncrow{display:flex;gap:10px;margin-bottom:10px}
+  .syncrow .btn{flex:1;font-size:17px;padding:15px 10px}
+  .synced{font-size:14px;font-weight:700;color:var(--ink);background:var(--bg);
+    border-radius:11px;padding:10px 12px;margin:0 0 10px}
+
   /* ---- 听写 writing pad, marked by eye ---- */
   .padwrap{position:relative;margin:12px 0 4px}
   .pad{display:block;width:100%;background:#fff;border-radius:14px;
@@ -563,14 +569,14 @@ body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;-
   </div>
   <div class="tabs" id="tabs"></div>
   <div id="view"></div>
-  <div class="foot">Saved on this device</div>
+  <div class="foot">Saved on this device · build 60</div>
 </div>
 <!-- load order matters: data, then core, then screens, app last -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="data.js?v=16"></script>
-<script src="core.js?v=27"></script>
+<script src="core.js?v=29"></script>
 <script src="timetable.js?v=5"></script>
-<script src="training.js?v=17"></script>
-<script src="app.js?v=58"></script>
+<script src="training.js?v=18"></script>
+<script src="app.js?v=60"></script>
 </body>
 </html>
