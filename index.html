@@ -350,7 +350,30 @@
   .trbtn.skip{background:#FFF1D6;color:#8A6100}
   @media(max-width:460px){ .trbox{width:104px;height:104px} }
 
-  /* ---- 听写 writing pad, marked by eye ---- */
+  /* ---- 听写: a square per character, then marked by eye ---- */
+  .padrow{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:14px 0 4px}
+  .padcell{width:132px}
+  .padcell .pad{width:100%;display:block}
+  .marktip{font-size:14px;font-weight:600;color:var(--soft);text-align:center;margin:12px 0 2px}
+  .markcell{width:132px;cursor:pointer;border-radius:14px;padding:6px;position:relative;
+    background:var(--bg);text-align:center}
+  .markcell img{display:block;width:100%;border-radius:10px;background:#fff}
+  .markcell .noimg{display:block;height:96px;line-height:96px;color:#C3D2DF;background:#fff;
+    border-radius:10px}
+  .markcell .ansch{display:block;font-size:34px;font-weight:800;line-height:1.25;
+    margin-top:4px;font-family:'Noto Sans SC',sans-serif}
+  .markcell .mkflag{position:absolute;top:10px;right:10px;width:28px;height:28px;
+    border-radius:50%;font-size:15px;font-weight:800;line-height:28px;color:#fff}
+  .markcell.ok{box-shadow:inset 0 0 0 2.5px #4FB86B}
+  .markcell.ok .mkflag{background:#4FB86B}
+  .markcell.no{box-shadow:inset 0 0 0 2.5px #FF6F52}
+  .markcell.no .mkflag{background:#FF6F52}
+  .markcell.no .ansch{color:#B03A22}
+  .markscore{text-align:center;font-size:18px;font-weight:800;margin:12px 0 2px}
+  @media(max-width:460px){ .padcell,.markcell{width:104px}
+    .markcell .ansch{font-size:28px} .markcell .noimg{height:76px;line-height:76px} }
+
+  /* ---- long answers: one wide pad, marked by eye ---- */
   .padwrap{position:relative;margin:12px 0 4px}
   .pad{display:block;width:100%;background:#fff;border-radius:14px;
     box-shadow:inset 0 0 0 2px var(--line);touch-action:none;cursor:crosshair}
@@ -399,6 +422,25 @@
     .evt{font-size:13px}
     .evc{padding:8px 24px 8px 9px}
   }
+
+  /* ---- one test in full ---- */
+  .wchips{display:flex;flex-wrap:wrap;gap:7px;margin:4px 0 6px}
+  .wchip{font-size:15.5px;font-weight:700;border-radius:10px;padding:7px 11px;
+    max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+    font-family:'Noto Sans SC','Lexend',sans-serif}
+  .wchip.good{background:#DFF3E4;color:#2F7A45}
+  .wchip.mid{background:#FFF1D6;color:#8A6100}
+  .wchip.low{background:#FFE3DC;color:#B03A22}
+  .wchip.none{background:var(--bg);color:var(--soft)}
+  .runlist{margin-bottom:8px}
+  .runrow{display:flex;align-items:center;gap:10px;padding:5px 0}
+  .rundate{font-size:12px;font-weight:700;color:var(--soft);width:52px;flex:0 0 52px}
+  .runbar{flex:1;height:10px;border-radius:6px;background:var(--bg);overflow:hidden}
+  .runbar i{display:block;height:100%;border-radius:6px}
+  .runbar i.good{background:#4FB86B} .runbar i.mid{background:#FFB627}
+  .runbar i.low{background:#FF6F52}
+  .runsc{font-size:13px;font-weight:800;width:52px;text-align:right}
+  .runsc.good{color:#2F7A45} .runsc.mid{color:#8A6100} .runsc.low{color:#B03A22}
 
   /* ---- progress matrix: each boy gets three subject columns ---- */
   .mxkey{display:flex;gap:12px;flex-wrap:wrap;align-items:center;font-size:12.5px;
@@ -565,14 +607,14 @@ body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;-
   </div>
   <div class="tabs" id="tabs"></div>
   <div id="view"></div>
-  <div class="foot">Saved on this device · build 68</div>
+  <div class="foot">Saved on this device · build 70</div>
 </div>
 <!-- load order matters: data, then core, then screens, app last -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="data.js?v=16"></script>
-<script src="core.js?v=33"></script>
+<script src="core.js?v=34"></script>
 <script src="timetable.js?v=5"></script>
-<script src="training.js?v=26"></script>
-<script src="app.js?v=63"></script>
+<script src="training.js?v=27"></script>
+<script src="app.js?v=64"></script>
 </body>
 </html>

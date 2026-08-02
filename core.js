@@ -97,7 +97,7 @@ var DAYS = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunda
 var TABS = [["home","Upcoming","t1"],["schedule","Timetable","t2"],
             ["meals","Meals","t3"],["practice","Training","t4"],
             ["results","Progress","t5"],["reading","Reading","t6"]];
-var tab="home", quiz=null, showAdd=false;
+var tab="home", quiz=null, showAdd=false, openTest=null;
 /* Each tab gets a readable address, e.g. .../chewtopia/#meals, so a link can
    be bookmarked or sent straight to one screen. */
 var SLUGS = {home:"upcoming", schedule:"timetable", meals:"meals",
@@ -108,7 +108,7 @@ function tabFromHash(){
   return null;
 }
 function go(id, quiet){
-  tab=id; quiz=null; showAdd=false; hush();
+  tab=id; quiz=null; showAdd=false; openTest=null; hush();
   if(!quiet){ try{ location.hash="#"+SLUGS[id]; }catch(e){} }
   render(); scrollTo(0,0);
 }

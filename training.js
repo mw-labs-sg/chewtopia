@@ -173,11 +173,21 @@ function practiceLabel(code){
 }
 
 /* Replay a specific set of items — used straight after a test, and by Review. */
+/* One mark per character the answer needs. A four-character phrase with one
+   slip should not score the same as a blank. */
+function itemMarks(it){
+  return it.k==="tx" ? Math.max(1, String(it.h||"").length) : 1;
+}
+function totalMarks(items){
+  var n=0; (items||[]).forEach(function(it){ n+=itemMarks(it); }); return n;
+}
+
 function startItems(items, test, subject, lang, code){
   if(!items || !items.length) return;
   quiz={code:code||"review", subject:subject||"Review", test:test, lang:lang||"en-GB",
         items:items.slice().sort(function(){ return Math.random()-0.5; }),
         i:0,score:0,streak:0,best:0,missed:[],wrong:[],graded:false,done:false,review:true};
+  quiz.total=totalMarks(quiz.items);
   render(); scrollTo(0,0);
 }
 /* Everything this child has got wrong before, hardest first. */
@@ -236,6 +246,7 @@ function start(code){
   if(!q){ alert("That list is not in the app any more."); return; }
   quiz={code:code,subject:q.subject,test:q.test,lang:q.lang,items:q.items,
         i:0,score:0,streak:0,best:0,missed:[],graded:false,done:false};
+  quiz.total=totalMarks(quiz.items);
   render(); scrollTo(0,0);
 }
 
@@ -338,6 +349,9 @@ function hzOpts(it){
    not — long words — he writes freely and it is marked by eye. Either way he
    does the same thing: hear it, write it in the box. */
 function handwritten(it){ return it.k==="hz" || it.k==="tx"; }
+/* Stroke checking is for TC's single 我会写 characters only. A six-year-old
+   writing a whole word gets his work marked by a person: recognition that
+   refuses a perfectly readable character is worse than no recognition. */
 function writing(it){ return handwritten(it) && !tracing(it); }
 
 /* What goes on the pad, and what is revealed when it is time to mark. */
@@ -400,9 +414,9 @@ function loadStrokes(then){
 /* What he has to write for this question, as characters. */
 function traceTarget(it){ return handwritten(it) ? String(it.h||"") : ""; }
 function tracing(it){
-  if(!handwritten(it)) return false;
+  if(it.k!=="hz") return false;
   var s=traceTarget(it);
-  return s.length>0 && s.length<=3 && haveStrokes(s);
+  return s.length===1 && haveStrokes(s);
 }
 /* Build one writing square per character and mark the question when they are
    all done. Misses are counted: two or more and it goes down as not known. */
@@ -492,6 +506,36 @@ function quizHTML(){
        '</div>'+
        '<input type="hidden" id="qa" value="">';
   }
+  else if(it.k==="tx"){
+    var chs=String(it.h||"").split(""), ask=writeAsk(it);
+    s+='<div class="qq">'+ask.title+'</div>'+
+       '<button class="btn play wide" id="qP">\uD83D\uDD0A Hear it again</button>'+
+       '<div class="ctx wcount">'+esc(ask.count)+'</div>';
+    if(!q.show && !q.graded){
+      /* he writes, with nothing on screen to copy */
+      s+='<div class="padrow">'+chs.map(function(_,i){
+           return '<div class="padcell"><canvas class="pad" data-pad="'+i+'"></canvas></div>';
+         }).join("")+'</div>'+
+         '<div class="trbtns"><button class="trbtn" id="padClr">\u21ba Rub out</button>'+
+         '<button class="trbtn skip" id="qShow">I have finished \u2192</button></div>';
+    } else {
+      /* his writing, the answer under it, and a tap to mark each character */
+      q.mk = q.mk || chs.map(function(){ return true; });
+      s+='<div class="marktip">Compare each box with the answer. '+
+         'Tap any character he got wrong.</div>'+
+         '<div class="padrow">'+chs.map(function(ch,i){
+           var ok=q.mk[i]!==false;
+           return '<div class="markcell '+(ok?"ok":"no")+'" data-mk="'+i+'">'+
+             (q.img&&q.img[i] ? '<img src="'+q.img[i]+'" alt="">' : '<span class="noimg">\u2014</span>')+
+             '<span class="ansch">'+esc(ch)+'</span>'+
+             '<span class="mkflag">'+(ok?"\u2713":"\u2715")+'</span></div>';
+         }).join("")+'</div>'+
+         '<div class="markscore" id="mkScore"></div>'+
+         '<div class="ctx">'+esc(it.word||"")+' \u00b7 '+esc(it.a||"")+(it.tone||"")+
+           (it.m?' \u00b7 '+esc(it.m):"")+'</div>';
+    }
+    s+='<input type="hidden" id="qa" value="">';
+  }
   else if(writing(it) || (tracing(it) && q.graded)){
     var ask=writeAsk(it);
     s+='<div class="qq">'+ask.title+'</div>'+
@@ -564,6 +608,12 @@ function quizHTML(){
         ? '<textarea id="qa" spellcheck="false" placeholder="Type the whole sentence" style="margin-top:12px"></textarea>'
         : '<input type="text" id="qa" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Type here" style="margin-top:12px">');
   }
+  if(it.k==="tx"){
+    if(!q.show && !q.graded) return s+'<div id="qf"></div></div>';
+    return s+'<div class="btnrow"><button class="btn go" id="qG">'+
+      (q.i===q.items.length-1?"Finished \u2192":"Next question")+'</button></div>'+
+      '<div id="qf"></div></div>';
+  }
   if(tracing(it) && !q.graded){
     return s+'<div id="qf"></div></div>';
   }
@@ -606,6 +656,8 @@ function wireQuiz(){
   /* the writing pad: finger or Apple Pencil, and a rub-out */
   var pad=document.getElementById("pad");
   if(pad) wirePad(pad);
+  if(document.querySelector("[data-pad]")) wirePadRow(it);
+  if(document.querySelector("[data-mk]")) wireMarks(it);
   if(document.querySelector("[data-tr]")) wireTrace(it);
   var shw=document.getElementById("qShow");
   if(shw) shw.onclick=function(){ sfxTap(); q.show=true; render(); };
@@ -631,10 +683,56 @@ function wireQuiz(){
     if(it.k!=="math" && it.k!=="rn") setTimeout(function(){ speakIt(it); },250);
   }
 }
+/* One square per character. Whatever he draws is kept as a picture so it can
+   sit next to the answer while you mark it. */
+function wirePadRow(it){
+  var q=quiz, pads=document.querySelectorAll("[data-pad]");
+  if(!pads.length) return;
+  q.img = q.img || [];
+  pads.forEach(function(cv){ wirePad(cv, true); });
+  var clr=document.getElementById("padClr");
+  if(clr) clr.onclick=function(){
+    sfxTap();
+    pads.forEach(function(cv){ if(cv.rubOut) cv.rubOut(); });
+  };
+  var shw=document.getElementById("qShow");
+  if(shw) shw.onclick=function(){
+    /* photograph each square before the screen changes */
+    q.img=[];
+    pads.forEach(function(cv){
+      try{ q.img.push(cv.toDataURL("image/png")); }catch(e){ q.img.push(""); }
+    });
+    q.mk=null; q.show=true; sfxTap(); render();
+  };
+}
+/* Tapping a character flips it between right and wrong. */
+function wireMarks(it){
+  var q=quiz, chs=String(it.h||"").split("");
+  function tally(){
+    var n=0; q.mk.forEach(function(x){ if(x!==false) n++; });
+    var el=document.getElementById("mkScore");
+    if(el) el.textContent=n+" of "+chs.length+" correct";
+    return n;
+  }
+  q.mk = q.mk || chs.map(function(){ return true; });
+  document.querySelectorAll("[data-mk]").forEach(function(cell){
+    cell.onclick=function(){
+      var i=+cell.dataset.mk;
+      q.mk[i] = q.mk[i]===false;
+      cell.classList.toggle("ok", q.mk[i]!==false);
+      cell.classList.toggle("no", q.mk[i]===false);
+      cell.querySelector(".mkflag").textContent = q.mk[i]===false ? "\u2715" : "\u2713";
+      sfxTap(); tally();
+    };
+  });
+  tally();
+}
+
 /* A plain writing pad. Nothing is recognised — a six-year-old writing 快乐 with
    a finger cannot be graded by software honestly, so it is marked by eye. */
-function wirePad(cv){
-  var box=cv.parentNode, w=box.clientWidth-2, h=Math.round(Math.min(300, w*0.42));
+function wirePad(cv, square){
+  var box=cv.parentNode, w=box.clientWidth-2;
+  var h=square ? w : Math.round(Math.min(300, w*0.42));
   var dpr=window.devicePixelRatio||1;
   cv.style.width=w+"px"; cv.style.height=h+"px";
   cv.width=w*dpr; cv.height=h*dpr;
@@ -675,8 +773,9 @@ function wirePad(cv){
   cv.addEventListener("touchmove",move,{passive:false});
   cv.addEventListener("touchend",end);
 
+  cv.rubOut=function(){ x.clearRect(0,0,w,h); grid(); };
   var clr=document.getElementById("padClr");
-  if(clr) clr.onclick=function(){ x.clearRect(0,0,w,h); grid(); sfxTap(); };
+  if(clr && !square) clr.onclick=function(){ cv.rubOut(); sfxTap(); };
 }
 
 function speakIt(it){
@@ -700,7 +799,22 @@ function speakIt(it){
 function grade(forced){
   var q=quiz, it=q.items[q.i], right, detail="";
   var ga=document.getElementById("qa"), given = ga ? ga.value : "";
-  if(writing(it) || tracing(it)){
+  var gained=null;
+  if(it.k==="tx"){
+    /* one mark per character, so a single slip is not a nought */
+    var chs=String(it.h||"").split("");
+    q.mk = q.mk || chs.map(function(){ return true; });
+    gained=0; q.mk.forEach(function(x){ if(x!==false) gained++; });
+    right = gained===chs.length;
+    detail='<b style="font-size:30px">'+esc(it.h)+'</b> &nbsp; '+gained+' of '+chs.length+
+           ' characters<br>'+esc(it.word||"")+' \u00b7 '+esc(it.a||"")+(it.tone||"")+
+           (it.m?'<br>'+esc(it.m):"");
+    /* only the characters he actually missed come back later */
+    chs.forEach(function(ch,i){
+      if(q.mk[i]===false) weakAdd({k:"tx",h:ch,word:it.word,a:it.a,tone:it.tone,m:it.m}, q.code);
+    });
+  }
+  else if(writing(it) || tracing(it)){
     right = forced===true;
     detail='<b style="font-size:34px">'+esc(it.h)+'</b><br>'+esc(it.word||"")+' \u00b7 '+
            esc(it.a)+(it.tone||"")+(it.m?'<br>'+esc(it.m):"");
@@ -737,14 +851,19 @@ function grade(forced){
   q.marks = q.marks || [];
   q.marks[q.i] = right;
   q.wrong = q.wrong || [];
-  if(right){
+  if(gained!==null){
+    q.score += gained;                       /* part marks for part right */
+    if(right){ q.streak++; q.best=Math.max(q.best,q.streak); weakDrop(it); }
+    else { q.streak=0; q.missed.push(it.h); q.wrong.push(it); }
+  }
+  else if(right){
     q.score++; q.streak++; q.best=Math.max(q.best,q.streak);
     weakDrop(it);
   } else {
     q.streak=0;
     q.missed.push((it.k==="py"||it.k==="tx")?it.h+" ("+it.a+(it.tone||"")+")":it.k==="math"?it.q:it.a);
     q.wrong.push(it);
-    weakAdd(it, q.code);
+    if(it.k!=="tx") weakAdd(it, q.code);
   }
   q.graded=true;
   render();
@@ -780,16 +899,16 @@ function grade(forced){
   else if(it.k!=="math") say(it.a,0.6);
 }
 function next(){
-  var q=quiz; q.i++; q.graded=false; q.show=false; q.trMiss=0; q.trDone=0;
+  var q=quiz; q.i++; q.graded=false; q.show=false; q.trMiss=0; q.trDone=0; q.mk=null; q.img=null;
   if(q.i>=q.items.length){ q.done=true;
     addResult({who:who(),subject:q.subject,code:q.code,test:q.test,score:q.score,
-               total:q.items.length,missed:q.missed,ts:Date.now()});
+               total:q.total||q.items.length,missed:q.missed,ts:Date.now()});
     bumpStreak();
     autoSend(); }                   /* send it up while the tablet is still awake */
   render(); scrollTo(0,0);
 }
 function doneHTML(){
-  var q=quiz, p=q.score/q.items.length;
+  var q=quiz, p=q.score/(q.total||q.items.length);
   var cn = String(q.lang||"").indexOf("zh")===0;
   var st=p===1?"★★★":p>=.8?"★★☆":p>=.5?"★☆☆":"☆☆☆";
   var rank=p===1?"S":p>=.9?"A":p>=.8?"B":p>=.6?"C":"D";
@@ -804,7 +923,7 @@ function doneHTML(){
   }
   return '<div class="panel done">'+botSVG()+
     '<div class="kind">'+esc(q.test)+'</div>'+
-    '<div class="big">'+q.score+' / '+q.items.length+'</div>'+
+    '<div class="big">'+q.score+' / '+(q.total||q.items.length)+'</div>'+
     '<div class="st">'+st+'</div>'+
     '<div class="rankbadge r'+rank+'">Rank '+rank+'</div>'+
     '<div class="rk">'+rk+'</div>'+

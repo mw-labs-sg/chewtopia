@@ -357,14 +357,80 @@ function codeLive(code, kid){
 function testBox(kid, test, c){
   var cls=scoreCls(c.best,c.total), live=codeLive(c.code, kid);
   return '<button class="tbox '+cls+'"'+
-    (live ? ' data-run="'+esc(c.code)+'" data-kid="'+kid+'"' : ' disabled')+'>'+
+    (live ? ' data-open="'+esc(c.code)+'" data-kid="'+kid+'"' : ' disabled')+'>'+
     '<span class="tn">'+esc(test)+'</span>'+
     '<span class="tv">'+c.best+'/'+c.total+'</span>'+
     '<span class="td">'+dshort(c.last)+(c.tries>1?" \u00b7 "+c.tries+" goes":"")+'</span>'+
     '</button>';
 }
 
+/* ==========================================================================
+   ONE TEST, IN FULL — every word in the list, how it went, and every attempt.
+   Training is where a test is started; this is where it is looked at.
+   ========================================================================== */
+
+function itemLabel(it){
+  if(it.k==="hz"||it.k==="rn"||it.k==="py"||it.k==="tx") return it.h;
+  if(it.k==="math") return it.q;
+  if(it.k==="dict"){                       /* a whole sentence needs shortening */
+    var w=String(it.a||it.s||"").split(/\s+/);
+    return w.slice(0,4).join(" ")+(w.length>4?" \u2026":"");
+  }
+  return it.a || it.s || "";
+}
+/* Green means he has it. Amber means he slipped once. Red means it keeps
+   going wrong. Grey means he has not met it yet. */
+function itemState(it, kid, attempted){
+  var k=weakKey(it), hit=null;
+  weakAll(kid).forEach(function(x){ if(x.k===k) hit=x; });
+  if(hit) return hit.n>=2 ? "low" : "mid";
+  return attempted ? "good" : "none";
+}
+
+function vTestDetail(){
+  var kid=openTest.kid, code=openTest.code;
+  var q=itemsFor(code, kid);
+  if(!q) return '<div class="panel"><p class="empty">That list is not in the app any more.</p>'+
+                '<div class="btnrow"><button class="btn go" id="dtBack">Back</button></div></div>';
+
+  var runs=runsFor(kid).filter(function(r){ return r.test===q.test && !isFixing(r); });
+  var attempted=runs.length>0;
+  var best=runs.reduce(function(x,y){ return (!x||y.score/y.total>x.score/x.total)?y:x; }, null);
+
+  /* the words themselves, one chip each */
+  var chips=q.items.map(function(it){
+    var st=itemState(it, kid, attempted);
+    return '<span class="wchip '+st+'">'+esc(itemLabel(it))+'</span>';
+  }).join("");
+
+  var s='<div class="panel"><h2><span class="em">\uD83D\uDD0E</span> '+esc(q.test)+
+        '<span class="side '+whoCls(kid)+'">'+esc(pname(kid))+'</span></h2>'+
+        '<div class="mxkey"><span><span class="dot" style="background:#4FB86B"></span> <b>knows it</b></span>'+
+          '<span><span class="dot" style="background:#FFB627"></span> <b>slipped once</b></span>'+
+          '<span><span class="dot" style="background:#FF6F52"></span> <b>keeps missing</b></span>'+
+          '<span><span class="dot" style="background:#C3D2DF"></span> <b>not met yet</b></span></div>'+
+        '<div class="wchips">'+chips+'</div>';
+
+  if(runs.length){
+    s+='<div class="mxg">Every go</div><div class="runlist">'+
+       runs.slice().reverse().map(function(r){
+         var cls=scoreCls(r.score,r.total);
+         return '<div class="runrow"><span class="rundate">'+dshort(r.ts)+'</span>'+
+           '<span class="runbar"><i class="'+cls+'" style="width:'+
+             Math.round(r.score/r.total*100)+'%"></i></span>'+
+           '<span class="runsc '+cls+'">'+r.score+'/'+r.total+'</span></div>';
+       }).join("")+'</div>'+
+       (best?'<p class="empty">Best so far '+best.score+'/'+best.total+
+         ' \u00b7 '+runs.length+(runs.length===1?' go':' goes')+'</p>':'');
+  } else s+='<p class="empty">Not tried yet.</p>';
+
+  return s+'<div class="btnrow">'+
+    '<button class="btn go" id="dtGo">\u25b6 Practise this now</button>'+
+    '<button class="btn soft" id="dtBack">Back</button></div></div>';
+}
+
 function vResults(){
+  if(openTest) return vTestDetail();
   var s=syncPanel();
   var g=gradeGrid(), any=false;
 
@@ -461,14 +527,19 @@ function wResults(){
   }
   var sy=document.getElementById("cSync");
   if(sy) sy.onclick=function(){ sfxTap(); cloudSync(); };
-  document.querySelectorAll("[data-run]").forEach(function(b){
+  document.querySelectorAll("[data-open]").forEach(function(b){
     b.onclick=function(){
-      W("who", b.dataset.kid);
-      tab="practice"; showAdd=false;
-      try{ location.hash="#training"; }catch(e){}
-      start(b.dataset.run);
+      openTest={kid:b.dataset.kid, code:b.dataset.open};
+      sfxTap(); render(); scrollTo(0,0);
     };
   });
+  var dtb=document.getElementById("dtBack");
+  if(dtb) dtb.onclick=function(){ openTest=null; render(); scrollTo(0,0); };
+  var dtg=document.getElementById("dtGo");
+  if(dtg) dtg.onclick=function(){
+    var o=openTest; openTest=null;
+    W("who", o.kid); tab="practice"; start(o.code);
+  };
 }
 
 seedOnce();
