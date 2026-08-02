@@ -457,7 +457,7 @@ function weakTop(w, n){
 function weakLabel(x){
   var it=x.it||{};
   if(it.k==="hz"||it.k==="rn") return it.h+" \u00b7 "+(it.word||"");
-  if(it.k==="py") return (it.word||it.h||"");
+  if(it.k==="py"||it.k==="tx") return (it.word||it.h||"");
   if(it.k==="math") return it.q||"";
   return it.a||it.s||"";
 }

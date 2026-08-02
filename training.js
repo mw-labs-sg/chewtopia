@@ -228,9 +228,11 @@ function itemsFor(code, kid){
       });
     }
     else if(p[0]==="zh"){ subject="\u534e\u6587"; test=k; lang="zh-CN";
-      var bank = kid==="tc" ? TC_PINYIN : SC_TINGXIE;
+      /* TC types the pinyin. SC's 听写 is a handwriting test: he hears it and
+         writes the characters, then it is marked by eye. */
+      var bank = kid==="tc" ? TC_PINYIN : SC_TINGXIE, kind = kid==="tc" ? "py" : "tx";
       items=bank[k].slice().sort(function(){ return Math.random()-0.5; })
-        .map(function(x){ return {k:"py",h:x[0],word:x[1],a:x[2],tone:x[3],m:x[4]}; }); }
+        .map(function(x){ return {k:kind,h:x[0],word:x[1],a:x[2],tone:x[3],m:x[4]}; }); }
     else if(p[0]==="ma"){ subject="Math";
       test="Math \u00b7 "+(k==="easy"?"Warm up":k==="times"?"Times tables":"Challenge");
       items=mathItems(k); }
@@ -357,7 +359,7 @@ function quizHTML(){
     botSVG()+
     '<div class="track">'+dots+'</div>'+
     '<div class="meter"><i style="width:'+(q.i/q.items.length*100)+'%"></i></div>'+
-    '<div class="kind">'+(it.k==="rn"?"我会认":it.k==="hz"?"我会写":it.k==="py"?"听写":it.k==="dict"?"Dictation":it.k==="math"?"Question":"Spelling")+
+    '<div class="kind">'+(it.k==="rn"?"我会认":it.k==="hz"?"我会写":it.k==="py"?"听写":it.k==="tx"?"听写":it.k==="dict"?"Dictation":it.k==="math"?"Question":"Spelling")+
       ' '+(q.i+1)+' of '+q.items.length+'</div>';
   if(it.k==="rn"){
     s+='<div class="hz">'+it.h+'</div>'+
@@ -369,22 +371,49 @@ function quizHTML(){
        '<div class="switch"><button class="addlink" id="qP">🔊 Hear it</button></div>';
   }
   else if(it.k==="hz"){
-    s+='<div class="ctx big-word">'+esc(it.word.replace(it.h,"_"))+'</div>'+
-       '<div class="qq">'+esc(it.a)+(it.tone||"")+'</div>'+
-       '<div class="tip">'+esc(it.m)+'</div>'+
-       '<button class="btn play wide" id="qP">🔊 Hear the word</button>'+
+    /* Say plainly which character is wanted: the word with one box missing,
+       the pinyin of that character only, and how many to write. */
+    var wd=String(it.word||it.h), tgt=String(it.h);
+    var blanked = wd.indexOf(tgt)>=0
+      ? esc(wd).replace(esc(tgt), '<b class="blank">'+"\u25a2".repeat(tgt.length)+'</b>')
+      : '<b class="blank">'+"\u25a2".repeat(tgt.length)+'</b>';
+    s+='<div class="qq">Write the '+(tgt.length>1?tgt.length+' characters':'character')+
+         ' that goes in the box</div>'+
+       '<div class="ctx big-word">'+blanked+'</div>'+
+       '<div class="hint2">\u25a2 = <b>'+esc(it.a)+(it.tone||"")+'</b>'+
+         (it.m?' \u00b7 '+esc(it.m):"")+'</div>'+
+       '<div class="tip">The whole word is read out. Write only the box.</div>'+
+       '<button class="btn play wide" id="qP">\uD83D\uDD0A Hear the word</button>'+
        (S("hzmode","tap")==="tap" && hzOpts(it)
         ? '<div class="opts">'+hzOpts(it).map(function(c){
             return '<button class="opt" data-opt="'+c+'">'+c+'</button>'; }).join("")+
           '<input type="hidden" id="qa" value="">'+
           '<div class="switch"><button class="addlink" id="hzSwitch">Write it instead</button></div>'
         : '<input type="text" id="qa" autocomplete="off" spellcheck="false" '+
-          'class="hzin" placeholder="写这个字" lang="zh">'+
+          'class="hzin" placeholder="'+esc(tgt.length>1?"写这两个字":"写这个字")+'" lang="zh">'+
           '<div class="switch"><button class="addlink" id="hzSwitch">Tap from four instead</button></div>');
   }
+  else if(it.k==="tx"){
+    /* No answer on screen until it has been attempted — that is the whole test. */
+    var n=String(it.h||"").length;
+    s+='<div class="qq">\u542c\u4e00\u542c\uff0c\u5199\u4e00\u5199</div>'+
+       '<div class="tip">'+(q.graded?"":"Listen, then write it \u2014 on the pad below, or on paper.")+'</div>'+
+       '<button class="btn play wide" id="qP">\uD83D\uDD0A Hear it again</button>'+
+       '<div class="ctx wcount">'+n+' character'+(n===1?"":"s")+' to write</div>'+
+       ((q.show||q.graded)
+        ? '<div class="hz">'+esc(it.h)+'</div>'+
+          '<div class="ctx">'+esc(it.word)+' \u00b7 '+esc(it.a)+(it.tone||"")+
+          (it.m?' \u00b7 '+esc(it.m):"")+'</div>'
+        : '<div class="padwrap"><canvas id="pad" class="pad"></canvas>'+
+          '<button class="padclr" id="padClr">Rub out</button></div>')+
+       '<input type="hidden" id="qa" value="">';
+  }
   else if(it.k==="py"){
-    s+='<div class="hz'+(q.graded?"":" q")+'">'+(q.graded?it.h:"?")+'</div>'+
-       '<div class="ctx">'+(q.graded?esc(it.word):"Listen, then write the pinyin")+'</div>'+
+    var pn=String(it.h||"").length;
+    s+='<div class="hz'+(q.graded?"":" q")+'">'+(q.graded?esc(it.h):"?")+'</div>'+
+       '<div class="ctx">'+(q.graded?esc(it.word)
+         :"Listen, then type the pinyin for "+(pn>1?"all "+pn+" characters":"the word")+
+          " \u2014 no spaces")+'</div>'+
        '<button class="btn play wide" id="qP">🔊 Hear the word</button>'+
        '<div class="pair"><span class="f1"><div class="lbl">Pinyin</div>'+
        '<input type="text" id="qa" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="yong"></span>'+
@@ -400,6 +429,15 @@ function quizHTML(){
        (it.k==="dict"
         ? '<textarea id="qa" spellcheck="false" placeholder="Type the whole sentence" style="margin-top:12px"></textarea>'
         : '<input type="text" id="qa" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Type here" style="margin-top:12px">');
+  }
+  if(it.k==="tx"){
+    s += q.graded
+      ? '<div class="btnrow"><button class="btn go" id="qG">Next</button></div>'
+      : (q.show
+         ? '<div class="btnrow"><button class="btn go" id="mkY">\u2713 He got it</button>'+
+           '<button class="btn soft" id="mkN">\u2717 Not yet</button></div>'
+         : '<div class="btnrow"><button class="btn go" id="qShow">Show the answer</button></div>');
+    return s+'<div id="qf"></div></div>';
   }
   return s+'<div class="btnrow"><button class="btn go" id="qG">Check</button></div><div id="qf"></div></div>';
 }
@@ -419,7 +457,16 @@ function wireQuiz(){
   document.getElementById("qB").onclick=function(){ go("practice"); };
   var p=document.getElementById("qP"); if(p) p.onclick=function(){ sfxTap(); speakIt(it); };
   var g=document.getElementById("qG");
-  g.onclick=function(){ q.graded?next():grade(); };
+  if(g) g.onclick=function(){ q.graded?next():grade(); };
+
+  /* the writing pad: finger or Apple Pencil, and a rub-out */
+  var pad=document.getElementById("pad");
+  if(pad) wirePad(pad);
+  var shw=document.getElementById("qShow");
+  if(shw) shw.onclick=function(){ sfxTap(); q.show=true; render(); };
+  var my=document.getElementById("mkY"), mn=document.getElementById("mkN");
+  if(my) my.onclick=function(){ grade(true); };
+  if(mn) mn.onclick=function(){ grade(false); };
 
   var sw=document.getElementById("hzSwitch");
   if(sw) sw.onclick=function(){
@@ -435,27 +482,82 @@ function wireQuiz(){
     };
   });
   var a=document.getElementById("qa");
-  a.addEventListener("keydown",function(e){ if(e.key==="Enter"&&it.k!=="dict"){ e.preventDefault(); g.click(); } });
+  if(a) a.addEventListener("keydown",function(e){ if(e.key==="Enter"&&it.k!=="dict"){ e.preventDefault(); g.click(); } });
   var t=document.getElementById("qt");
-  if(t) t.addEventListener("keydown",function(e){ if(e.key==="Enter"){ e.preventDefault(); g.click(); } });
-  if(!q.graded){
+  if(t) t.addEventListener("keydown",function(e){ if(e.key==="Enter"&&g){ e.preventDefault(); g.click(); } });
+  if(!q.graded && !q.show){
     if(a && a.type!=="hidden") a.focus();
     if(it.k!=="math" && it.k!=="rn") setTimeout(function(){ speakIt(it); },250);
   }
 }
+/* A plain writing pad. Nothing is recognised — a six-year-old writing 快乐 with
+   a finger cannot be graded by software honestly, so it is marked by eye. */
+function wirePad(cv){
+  var box=cv.parentNode, w=box.clientWidth-2, h=Math.round(Math.min(300, w*0.42));
+  var dpr=window.devicePixelRatio||1;
+  cv.style.width=w+"px"; cv.style.height=h+"px";
+  cv.width=w*dpr; cv.height=h*dpr;
+  var x=cv.getContext && cv.getContext("2d");
+  if(!x) return;                      /* no canvas: paper still works fine */
+  x.scale(dpr,dpr);
+  x.lineWidth=7; x.lineCap="round"; x.lineJoin="round"; x.strokeStyle="#16202B";
+
+  function grid(){
+    x.save();
+    x.strokeStyle="#D9E4EF"; x.lineWidth=1; x.setLineDash([6,6]);
+    x.beginPath(); x.moveTo(0,h/2); x.lineTo(w,h/2);
+    x.moveTo(w/2,0); x.lineTo(w/2,h);
+    /* 田字格 style boxes across, so characters get a place to sit */
+    var n=Math.max(2,Math.round(w/h)), s=w/n;
+    for(var i=1;i<n;i++){ x.moveTo(i*s,0); x.lineTo(i*s,h); }
+    x.stroke(); x.restore();
+  }
+  grid();
+
+  var down=false, px=0, py=0;
+  function pos(e){
+    var r=cv.getBoundingClientRect();
+    var t=e.touches?e.touches[0]:e;
+    return [t.clientX-r.left, t.clientY-r.top];
+  }
+  function begin(e){ e.preventDefault(); down=true; var p=pos(e); px=p[0]; py=p[1]; }
+  function move(e){
+    if(!down) return; e.preventDefault();
+    var p=pos(e);
+    x.beginPath(); x.moveTo(px,py); x.lineTo(p[0],p[1]); x.stroke();
+    px=p[0]; py=p[1];
+  }
+  function end(){ down=false; }
+  cv.addEventListener("pointerdown",begin); cv.addEventListener("pointermove",move);
+  cv.addEventListener("pointerup",end);     cv.addEventListener("pointerleave",end);
+  cv.addEventListener("touchstart",begin,{passive:false});
+  cv.addEventListener("touchmove",move,{passive:false});
+  cv.addEventListener("touchend",end);
+
+  var clr=document.getElementById("padClr");
+  if(clr) clr.onclick=function(){ x.clearRect(0,0,w,h); grid(); sfxTap(); };
+}
+
 function speakIt(it){
   hush();
   /* Always read the whole word, never a lone character: 更, 长, 乐, 种 and 教
      all have two readings and the engine guesses wrong without the context. */
-  if(it.k==="py"||it.k==="hz"||it.k==="rn"){
+  if(it.k==="py"||it.k==="hz"||it.k==="rn"||it.k==="tx"){
     say(it.word,0.9,"zh-CN");
     setTimeout(function(){ say(it.word,0.8,"zh-CN"); },1300);
   }
   else if(it.k==="dict"){ say("Write this sentence.",0.92); say(it.s,0.8); say("Once more.",0.92); say(it.s,0.72); }
   else { say("Spell,",0.92); say(it.a+".",0.76); say(it.s,0.86); say(it.a+".",0.7); }
 }
-function grade(){
-  var q=quiz, it=q.items[q.i], given=document.getElementById("qa").value, right, detail="";
+function grade(forced){
+  var q=quiz, it=q.items[q.i], right, detail="";
+  var ga=document.getElementById("qa"), given = ga ? ga.value : "";
+  if(it.k==="tx"){
+    right = forced===true;
+    detail='<b style="font-size:34px">'+esc(it.h)+'</b><br>'+esc(it.word)+' \u00b7 '+
+           esc(it.a)+(it.tone||"")+(it.m?'<br>'+esc(it.m):"");
+  }
+  else
   if(it.k==="rn"){
     var tn2=(document.getElementById("qt")||{value:""}).value.trim();
     var pOK2=clean(given)===clean(it.a), tOK2=!it.tone||tn2===it.tone;
@@ -470,6 +572,21 @@ function grade(){
     right = gv===it.h;
     detail='<b style="font-size:34px">'+it.h+'</b><br>'+esc(it.word)+' · '+esc(it.a)+(it.tone||"")+
            '<br>'+esc(it.m)+(right?"":'<br>You put: '+(esc(gv)||"nothing"));
+  }
+  else if(it.k==="tx"){
+    /* No answer on screen until it has been attempted — that is the whole test. */
+    var n=String(it.h||"").length;
+    s+='<div class="qq">\u542c\u4e00\u542c\uff0c\u5199\u4e00\u5199</div>'+
+       '<div class="tip">'+(q.graded?"":"Listen, then write it \u2014 on the pad below, or on paper.")+'</div>'+
+       '<button class="btn play wide" id="qP">\uD83D\uDD0A Hear it again</button>'+
+       '<div class="ctx wcount">'+n+' character'+(n===1?"":"s")+' to write</div>'+
+       ((q.show||q.graded)
+        ? '<div class="hz">'+esc(it.h)+'</div>'+
+          '<div class="ctx">'+esc(it.word)+' \u00b7 '+esc(it.a)+(it.tone||"")+
+          (it.m?' \u00b7 '+esc(it.m):"")+'</div>'
+        : '<div class="padwrap"><canvas id="pad" class="pad"></canvas>'+
+          '<button class="padclr" id="padClr">Rub out</button></div>')+
+       '<input type="hidden" id="qa" value="">';
   }
   else if(it.k==="py"){
     var tn=(document.getElementById("qt")||{value:""}).value.trim();
@@ -492,21 +609,23 @@ function grade(){
     weakDrop(it);
   } else {
     q.streak=0;
-    q.missed.push(it.k==="py"?it.h+" ("+it.a+(it.tone||"")+")":it.k==="math"?it.q:it.a);
+    q.missed.push((it.k==="py"||it.k==="tx")?it.h+" ("+it.a+(it.tone||"")+")":it.k==="math"?it.q:it.a);
     q.wrong.push(it);
     weakAdd(it, q.code);
   }
   q.graded=true;
   render();
-  var a=document.getElementById("qa"); a.value=given; a.disabled=true;
+  var a=document.getElementById("qa");
+  if(a){ a.value=given; a.disabled=true; }
   if(document.getElementById("qt")) document.getElementById("qt").disabled=true;
-  var cnQ = (it.k==="py"||it.k==="hz"||it.k==="rn");
+  var cnQ = (it.k==="py"||it.k==="hz"||it.k==="rn"||it.k==="tx");
   var pr = right ? praise(cnQ, q.streak) : oops(cnQ);
   q.say = pr;
   document.getElementById("qf").innerHTML='<div class="fb '+(right?"ok":"no")+'">'+
     '<span class="big">'+(right && q.streak>=3 ? "\uD83D\uDD25 "+q.streak+" \u00b7 "+esc(pr.t)
       : esc(pr.t))+'</span>'+detail+'</div>';
-  document.getElementById("qG").textContent=(q.i===q.items.length-1)?"See the score":"Next";
+  var gb=document.getElementById("qG");
+  if(gb) gb.textContent=(q.i===q.items.length-1)?"See the score":"Next";
 
   if(right){
     if(q.streak>=3) sfxStreak(); else sfxWin();
@@ -518,11 +637,11 @@ function grade(){
 
   hush();
   if(right) say(q.say.t, q.say.lang?0.95:0.95, q.say.lang||undefined);
-  else if(it.k==="py"||it.k==="hz"||it.k==="rn") say(it.word,0.85,"zh-CN");
+  else if(it.k==="py"||it.k==="hz"||it.k==="rn"||it.k==="tx") say(it.word,0.85,"zh-CN");
   else if(it.k!=="math") say(it.a,0.6);
 }
 function next(){
-  var q=quiz; q.i++; q.graded=false;
+  var q=quiz; q.i++; q.graded=false; q.show=false;
   if(q.i>=q.items.length){ q.done=true;
     addResult({who:who(),subject:q.subject,code:q.code,test:q.test,score:q.score,
                total:q.items.length,missed:q.missed,ts:Date.now()});
