@@ -741,14 +741,14 @@ function wirePad(cv, square){
   x.scale(dpr,dpr);
   x.lineWidth=7; x.lineCap="round"; x.lineJoin="round"; x.strokeStyle="#16202B";
 
+  /* A 田字格 square: a solid edge, and one faint cross to aim at. Nothing else
+     — more lines than that and the child cannot see his own writing. */
   function grid(){
     x.save();
-    x.strokeStyle="#D9E4EF"; x.lineWidth=1; x.setLineDash([6,6]);
-    x.beginPath(); x.moveTo(0,h/2); x.lineTo(w,h/2);
-    x.moveTo(w/2,0); x.lineTo(w/2,h);
-    /* 田字格 style boxes across, so characters get a place to sit */
-    var n=Math.max(2,Math.round(w/h)), s=w/n;
-    for(var i=1;i<n;i++){ x.moveTo(i*s,0); x.lineTo(i*s,h); }
+    x.strokeStyle="#E6EDF5"; x.lineWidth=1; x.setLineDash([5,7]);
+    x.beginPath();
+    x.moveTo(8,h/2); x.lineTo(w-8,h/2);
+    x.moveTo(w/2,8); x.lineTo(w/2,h-8);
     x.stroke(); x.restore();
   }
   grid();
