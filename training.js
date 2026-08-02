@@ -332,10 +332,15 @@ function hzOpts(it){
 /* Writing mode. Any Chinese question can be answered on the pad instead of the
    keyboard, and marked by eye afterwards. SC starts there because he cannot
    type pinyin at six; TC starts on the keyboard and can switch any time. */
-function cmodeKey(){ return "cmode:"+who(); }
-function cmode(){ return S(cmodeKey(), "trace"); }   /* stroke-checked by default */
+/* One rule, and nothing to set. A test that asks him to WRITE A CHARACTER
+   gets boxes to write in: 我会写 for TC, 听写 for SC. A test that asks for
+   PINYIN keeps the keyboard, because pinyin is letters.
+   In the boxes, the strokes are checked where the data allows; where it does
+   not — long words — he writes freely and it is marked by eye. Either way he
+   does the same thing: hear it, write it in the box. */
 function isCN(it){ return it.k==="hz"||it.k==="rn"||it.k==="py"||it.k==="tx"; }
-function writing(it){ return isCN(it) && cmode()==="write"; }
+function handwritten(it){ return it.k==="hz" || it.k==="tx"; }
+function writing(it){ return handwritten(it) && !tracing(it); }
 
 /* What goes on the pad, and what is revealed when it is time to mark. */
 function writeAsk(it){
@@ -387,13 +392,9 @@ function loadStrokes(then){
   one("strokes.js?v=1");
 }
 /* What he has to write for this question, as characters. */
-function traceTarget(it){
-  if(it.k==="hz") return String(it.h||"");
-  if(it.k==="tx"||it.k==="py") return String(it.h||"");
-  return "";
-}
+function traceTarget(it){ return handwritten(it) ? String(it.h||"") : ""; }
 function tracing(it){
-  if(cmode()!=="trace") return false;
+  if(!handwritten(it)) return false;
   var s=traceTarget(it);
   return s.length>0 && s.length<=3 && haveStrokes(s);
 }
@@ -470,8 +471,7 @@ function quizHTML(){
        '<div class="tracerow">'+tg.split("").map(function(_,i){
           return '<div class="trbox" data-tr="'+i+'"></div>'; }).join("")+'</div>'+
        '<div class="switch"><button class="addlink" id="trHint">Show me how</button>'+
-       '<button class="addlink" id="trSkip">I don\u2019t know it</button>'+
-       '<button class="addlink" id="cSwitch">Plain pad instead</button></div>'+
+       '<button class="addlink" id="trSkip">I don\u2019t know it</button></div>'+
        '<input type="hidden" id="qa" value="">';
   }
   else if(writing(it) || (tracing(it) && q.graded)){
@@ -487,7 +487,7 @@ function quizHTML(){
             (it.m?' \u00b7 '+esc(it.m):"")+'</div>'
         : '<div class="padwrap"><canvas id="pad" class="pad"></canvas>'+
           '<button class="padclr" id="padClr">Rub out</button></div>'+
-          '<div class="switch"><button class="addlink" id="cSwitch">Use the keyboard instead</button></div>')+
+          '')+
        '<input type="hidden" id="qa" value="">';
   }
   else if(it.k==="rn"){
@@ -497,8 +497,7 @@ function quizHTML(){
        '<input type="text" id="qa" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="yong"></span>'+
        '<span class="f2"><div class="lbl">Tone</div>'+
        '<input type="text" id="qt" inputmode="numeric" maxlength="1" placeholder="1-4"></span></div>'+
-       '<div class="switch"><button class="addlink" id="qP">🔊 Hear it</button>'+
-       '<button class="addlink" id="cSwitch">Write it on the pad</button></div>';
+       '<div class="switch"><button class="addlink" id="qP">🔊 Hear it</button></div>';
   }
   else if(it.k==="hz"){
     /* Say plainly which character is wanted: the word with one box missing,
@@ -512,20 +511,17 @@ function quizHTML(){
        '<div class="ctx big-word">'+blanked+'</div>'+
        '<div class="hint2">\u25a2 = <b>'+esc(it.a)+(it.tone||"")+'</b>'+
          (it.m?' \u00b7 '+esc(it.m):"")+'</div>'+
-       '<div class="tip">'+(S("hzmode","tap")==="tap"
-          ? "Listen, then tap the character that belongs in the box."
-          : "Listen, then write the character that belongs in the box.")+'</div>'+
+       '<div class="tip">Listen, then tap the character that belongs in the box.</div>'+
        '<button class="btn play wide" id="qP">\uD83D\uDD0A Hear the word</button>'+
-       (S("hzmode","tap")==="tap" && hzOpts(it)
+       (hzOpts(it)
         ? '<div class="opts">'+hzOpts(it).map(function(c){
             return '<button class="opt" data-opt="'+c+'">'+c+'</button>'; }).join("")+
           '</div>'+
           '<input type="hidden" id="qa" value="">'+
-          '<div class="switch"><button class="addlink" id="cSwitch">Write it instead</button></div>'
+          ''
         : '<input type="text" id="qa" autocomplete="off" spellcheck="false" '+
           'class="hzin" placeholder="'+esc(tgt.length>1?"写这两个字":"写这个字")+'" lang="zh">'+
-          '<div class="switch"><button class="addlink" id="hzSwitch">Tap from four instead</button>'+
-          '<button class="addlink" id="cSwitch">Write it instead</button></div>');
+          '');
   }
   else if(it.k==="py"||it.k==="tx"){
     var pn=String(it.h||"").length;
@@ -538,7 +534,7 @@ function quizHTML(){
        '<input type="text" id="qa" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="yong"></span>'+
        '<span class="f2"><div class="lbl">Tone</div>'+
        '<input type="text" id="qt" inputmode="numeric" maxlength="1" placeholder="1-4"></span></div>'+
-       '<div class="switch"><button class="addlink" id="cSwitch">Write it on the pad</button></div>';
+       '';
   } else if(it.k==="math"){
     s+='<div class="qq">'+it.q+' = ?</div>'+
        '<input type="text" id="qa" inputmode="numeric" autocomplete="off" placeholder="Answer">';
@@ -596,16 +592,6 @@ function wireQuiz(){
   var my=document.getElementById("mkY"), mn=document.getElementById("mkN");
   if(my) my.onclick=function(){ grade(true); };
   if(mn) mn.onclick=function(){ grade(false); };
-
-  var cs=document.getElementById("cSwitch");
-  if(cs) cs.onclick=function(){
-    W(cmodeKey(), cmode()==="trace" ? "write" : cmode()==="write" ? "keys" : "trace");
-    q.show=false; q.trMiss=0; render();
-  };
-
-  var sw=document.getElementById("hzSwitch");
-  if(sw) sw.onclick=function(){
-    W("hzmode", S("hzmode","tap")==="tap" ? "type" : "tap"); render(); };
 
   document.querySelectorAll("[data-opt]").forEach(function(b){
     b.onclick=function(){
