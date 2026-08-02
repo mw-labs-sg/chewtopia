@@ -423,7 +423,11 @@ function syncPanel(){
   if(cloudUser){
     var p=pending();
     s+='<div class="btnrow"><button class="btn go" id="cSync">'+
-       (p? 'Sync now \u00b7 '+p+' waiting' : 'Sync now')+'</button></div>';
+       (p? 'Sync now \u00b7 '+p+' waiting' : 'Sync now')+'</button></div>'+
+       '<p class="empty" style="margin-bottom:0">'+
+         (p? p+' waiting to go up. ' : 'Everything is up to date. ')+
+         (syncedAgo()? 'Last sync '+syncedAgo()+'. ' : '')+
+         'Syncs on its own when the app opens and after every test.</p>';
   } else {
     s+='<div class="pair"><span class="f1"><div class="lbl">Family name</div>'+
        '<input type="text" id="cEm" autocomplete="username" placeholder="chewtopia"></span>'+
@@ -464,6 +468,7 @@ function wResults(){
 
 seedOnce();
 cloudInit();
+syncWatch();
 tab = tabFromHash() || tab;
 if(!location.hash){ try{ location.replace("#"+SLUGS[tab]); }catch(e){} }
 render();

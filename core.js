@@ -218,7 +218,7 @@ function cloudSync(){
     });
     local.sort(function(a,b){ return b.ts-a.ts; });
     WJ("results", local.slice(0,600));
-    cloudMsg=""; cloudPush();
+    cloudMsg=""; syncLast=Date.now(); cloudPush(); cloudState();
   });
 }
 function cloudPush(){
@@ -240,10 +240,89 @@ function cloudPush(){
     if(r.error){ cloudMsg=r.error.message; render(); return; }
     var done={}; todo.forEach(function(x){ done[x.id]=1; });
     var l=results(); l.forEach(function(x){ if(done[x.id]) x.up=1; });
-    WJ("results", l); render();
+    WJ("results", l); syncLast=Date.now(); render();
   });
 }
 function pending(){ return results().filter(function(x){ return !x.up; }).length; }
+
+/* ==========================================================================
+   THE REST OF IT — weak items, books, events and after-school activities.
+   Scores were the only thing that travelled, which is why one device could
+   show a test as done and the other as never tried.
+   Needs a small `state` table; if it is not there yet, this fails quietly and
+   scores keep syncing as before.
+   ========================================================================== */
+var STATE_KEYS=["weak:tc","weak:sc","books:tc","books:sc","events","acts","gone"];
+function stateIdent(k){
+  return k.indexOf("weak:")===0 ? "k" : "id";   /* what makes a row unique */
+}
+/* Merge two lists rather than letting one device overwrite the other. */
+function mergeList(a, b, key){
+  var out=[], seen={};
+  (a||[]).concat(b||[]).forEach(function(x){
+    if(!x) return;
+    var id=x[key]; if(id===undefined){ out.push(x); return; }
+    var hit=seen[id];
+    if(!hit){ seen[id]=x; out.push(x); return; }
+    /* same row on both sides: keep the fuller one */
+    if((x.n||0) > (hit.n||0)) hit.n=x.n;
+    if((x.ts||0) > (hit.ts||0)){
+      Object.keys(x).forEach(function(f){ if(f!=="n") hit[f]=x[f]; });
+    }
+  });
+  return out;
+}
+function cloudState(){
+  var c=sbc(); if(!c||!cloudUser) return;
+  c.from("state").select("*").then(function(r){
+    if(r.error) return;                    /* table not there: nothing lost */
+    var remote={};
+    (r.data||[]).forEach(function(row){ remote[row.k]=row.v; });
+    var push=[];
+    STATE_KEYS.forEach(function(k){
+      var mine=SJ(k,[]), theirs=remote[k];
+      var merged = theirs ? mergeList(mine, theirs, stateIdent(k)) : mine;
+      if(k==="gone") merged = uniq((mine||[]).concat(theirs||[]));
+      WJ(k, merged);
+      if(JSON.stringify(merged)!==JSON.stringify(theirs))
+        push.push({user_id:cloudUser.id, k:k, v:merged, updated_at:new Date().toISOString()});
+    });
+    if(push.length) c.from("state").upsert(push,{onConflict:"user_id,k"}).then(function(){ render(); });
+    else render();
+  });
+}
+function uniq(a){
+  var seen={}, out=[];
+  (a||[]).forEach(function(x){ if(!seen[x]){ seen[x]=1; out.push(x); } });
+  return out;
+}
+
+/* ---------- keeping the two devices honest ---------- */
+/* A sync only ever happened when somebody pressed the button. Now it runs when
+   the app opens, when it comes back to the front, after every finished test,
+   and quietly every couple of minutes. */
+var syncBusy=false, syncLast=0;
+function autoSync(force){
+  if(!cloudUser) return;
+  var now=Date.now();
+  if(!force && (syncBusy || now-syncLast < 20000)) return;
+  syncBusy=true; syncLast=now;
+  cloudSync();
+  setTimeout(function(){ syncBusy=false; }, 4000);
+}
+function syncWatch(){
+  document.addEventListener("visibilitychange", function(){
+    if(!document.hidden) autoSync();
+  });
+  window.addEventListener("focus", function(){ autoSync(); });
+  window.addEventListener("online", function(){ autoSync(true); });
+  setInterval(function(){ if(!document.hidden) autoSync(); }, 120000);
+}
+function syncedAgo(){
+  if(!syncLast) return "";
+  var m=Math.round((Date.now()-syncLast)/60000);
+  return m<1 ? "just now" : m===1 ? "1 min ago" : m+" min ago";
+}
 function runsFor(id){ return results().filter(function(r){ return r.who===(id||who()); })
   .slice().sort(function(a,b){ return a.ts-b.ts; }); }
 function lastFor(t,kid){ var a=runsFor(kid).filter(function(r){ return r.test===t; });

@@ -74,8 +74,8 @@ function dailyBtn(kid){
   if(p.weak.length)    bits.push(Math.min(4,p.weak.length)+" to fix");
   if(p.untried.length) bits.push("something new");
   var done = streak(kid).last===todayISO();
-  return '<button class="daily'+(done?" done":"")+'" data-t="daily" data-kid="'+kid+'">'+
-    '<span class="dl">'+(done?"\u2713 Done today \u00b7 go again":"Today\u2019s ten minutes")+'</span>'+
+  return '<button class="daily k-'+kid+'" data-t="daily" data-kid="'+kid+'">'+
+    '<span class="dl">Today\u2019s ten minutes'+(done?' <i>\u2713 already done</i>':'')+'</span>'+
     '<span class="dm">'+esc(bits.join(" \u00b7 "))+'</span></button>';
 }
 
@@ -103,11 +103,10 @@ function vTests(){
        esc(pname(k.id))+'<small>'+k.level+
        (streak(k.id).n?' \u00b7 '+streak(k.id).n+"\uD83D\uDD25":"")+'</small></div>'+
        dailyBtn(k.id)+
-       (wk.length?'<button class="test rev" data-t="weak" data-kid="'+k.id+'">'+
-         '<span class="tx"><span class="nm">Tricky ones</span>'+
-         '<span class="mt">'+esc(wk.slice(0,3).map(weakLabel).join(", "))+
-         (wk.length>3?", \u2026":"")+'</span></span>'+
-         '<span class="pill beat">Go</span></button>':'')+
+       (wk.length?'<button class="fixbtn" data-t="weak" data-kid="'+k.id+'">'+
+         '<span class="nm">Practise the '+wk.length+' he keeps missing</span>'+
+         '<span class="mt">'+esc(wk.slice(0,4).map(weakLabel).join(", "))+
+         (wk.length>4?", \u2026":"")+'</span></button>':'')+
        '<div class="mxcols'+(cols.length===1?" one":cols.length===2?" two":"")+
        (k.id==="tc" && cols.length===3 ? " wide":"")+'">';
     cols.forEach(function(c){ s+='<div class="mxsub">'+c[1]+'</div>'; });
@@ -667,7 +666,8 @@ function next(){
   if(q.i>=q.items.length){ q.done=true;
     addResult({who:who(),subject:q.subject,code:q.code,test:q.test,score:q.score,
                total:q.items.length,missed:q.missed,ts:Date.now()});
-    bumpStreak(); }
+    bumpStreak();
+    autoSync(true); }               /* send it up while the tablet is still awake */
   render(); scrollTo(0,0);
 }
 function doneHTML(){
