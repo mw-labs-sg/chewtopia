@@ -26,31 +26,10 @@
   body{
     font-family:'Lexend',system-ui,-apple-system,sans-serif;
     font-size:17px;line-height:1.5;color:var(--ink);background:var(--bg);
-    background-image:
-      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='420' height='420' viewBox='0 0 420 420'><g fill='none' stroke-linecap='round' stroke-linejoin='round'><path d='M60 70 q6 -22 12 0 q22 6 0 12 q-6 22 -12 0 q-22 -6 0 -12z' fill='%237C5CE0' opacity='.20'/><path d='M300 40 q5 -18 10 0 q18 5 0 10 q-5 18 -10 0 q-18 -5 0 -10z' fill='%232F73E8' opacity='.18'/><path d='M180 250 q7 -26 14 0 q26 7 0 14 q-7 26 -14 0 q-26 -7 0 -14z' fill='%23FF6F52' opacity='.14'/><path d='M370 300 q5 -18 10 0 q18 5 0 10 q-5 18 -10 0 q-18 -5 0 -10z' fill='%23FFB627' opacity='.20'/><path d='M90 370 q5 -18 10 0 q18 5 0 10 q-5 18 -10 0 q-18 -5 0 -10z' fill='%234FB86B' opacity='.16'/><ellipse cx='250' cy='150' rx='58' ry='22' stroke='%237C5CE0' stroke-width='2' opacity='.16' transform='rotate(-20 250 150)'/><ellipse cx='90' cy='210' rx='40' ry='15' stroke='%232F73E8' stroke-width='2' opacity='.14' transform='rotate(24 90 210)'/><circle cx='250' cy='150' r='9' fill='%237C5CE0' opacity='.18' stroke='none'/><circle cx='90' cy='210' r='6' fill='%232F73E8' opacity='.16' stroke='none'/><path d='M340 210 a22 22 0 1 0 16 26 a17 17 0 1 1 -16 -26z' fill='%23FFB627' opacity='.16' stroke='none'/><g fill='%232F73E8' stroke='none'><circle cx='30' cy='140' r='2.6' opacity='.30'/><circle cx='150' cy='60' r='2' opacity='.26'/><circle cx='215' cy='330' r='2.4' opacity='.24'/><circle cx='395' cy='120' r='2' opacity='.26'/><circle cx='120' cy='300' r='1.8' opacity='.22'/><circle cx='285' cy='395' r='2.2' opacity='.22'/><circle cx='45' cy='265' r='1.8' opacity='.24'/><circle cx='330' cy='95' r='1.6' opacity='.24'/></g><path d='M150 60 L215 105 L285 85 L330 95' stroke='%237C5CE0' stroke-width='1.4' opacity='.18'/><path d='M30 140 L45 265 L120 300' stroke='%232F73E8' stroke-width='1.4' opacity='.14'/></g></svg>"),
-      radial-gradient(720px 520px at 12% -6%, rgba(124,92,224,.16), transparent 62%),
-      radial-gradient(680px 480px at 92% 4%, rgba(47,115,232,.15), transparent 60%),
-      radial-gradient(760px 560px at 78% 96%, rgba(255,111,82,.11), transparent 62%),
-      radial-gradient(640px 520px at 4% 88%, rgba(79,184,107,.10), transparent 60%),
-      linear-gradient(170deg,#F3F6FE 0%,#F6F3FC 46%,#FBF4F6 100%);
-    background-size:420px 420px, cover, cover, cover, cover, cover;
-    background-attachment:scroll, fixed, fixed, fixed, fixed, fixed;
     display:flex;justify-content:center;
     padding:16px calc(13px + env(safe-area-inset-right)) calc(34px + env(safe-area-inset-bottom))
             calc(13px + env(safe-area-inset-left));
   }
-  /* a slow drift of light over the top, so the sky is not quite still */
-  body::before{content:"";position:fixed;inset:-40% -40%;pointer-events:none;z-index:0;
-    background:
-      radial-gradient(2px 2px at 20% 30%, rgba(124,92,224,.5), transparent 60%),
-      radial-gradient(2px 2px at 70% 20%, rgba(47,115,232,.45), transparent 60%),
-      radial-gradient(1.6px 1.6px at 40% 70%, rgba(255,182,39,.5), transparent 60%),
-      radial-gradient(2px 2px at 85% 65%, rgba(255,111,82,.4), transparent 60%),
-      radial-gradient(1.6px 1.6px at 12% 82%, rgba(79,184,107,.45), transparent 60%),
-      radial-gradient(1.6px 1.6px at 58% 46%, rgba(124,92,224,.4), transparent 60%);
-    animation:drift 46s ease-in-out infinite alternate;opacity:.85}
-  @keyframes drift{from{transform:translate3d(0,0,0) scale(1)}
-    to{transform:translate3d(2.5%,-2%,0) scale(1.04)}}
   .shell{width:100%;max-width:760px;position:relative;z-index:1}
   .warn{background:#FFF4E4;color:#8A6100;border-radius:12px;padding:11px 13px;
     font-size:14px;font-weight:600;margin:0 0 12px}
@@ -427,6 +406,57 @@
   @media(min-width:700px){
     .day{grid-template-columns:80px 1fr}
   }
+
+  /* ==========================================================================
+     SCENES — one full-bleed backdrop, picked at the bottom of the screen.
+     The cards stay as they are; only the world behind them changes.
+     ========================================================================== */
+  body{background-attachment:fixed;background-repeat:no-repeat;background-size:cover}
+
+  body[data-scene="sky"]{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 900' preserveAspectRatio='xMidYMax slice'><circle cx='1180' cy='170' r='90' fill='%23FFF3CE' opacity='.85'/><circle cx='1180' cy='170' r='150' fill='%23FFE9A8' opacity='.35'/><g fill='%23FFFFFF' opacity='.85'><path d='M120 300 q22 -46 66 -34 q16 -40 62 -30 q40 -30 74 12 q46 -6 46 34 q0 22 -30 22 H150 q-32 0 -30 -4z'/><path d='M880 200 q18 -38 54 -28 q14 -32 52 -24 q32 -24 60 10 q38 -4 38 28 q0 18 -24 18 H904 q-26 0 -24 -4z' opacity='.75'/><path d='M520 470 q26 -54 78 -40 q18 -46 72 -34 q48 -36 88 14 q54 -8 54 40 q0 26 -36 26 H556 q-38 0 -36 -6z' opacity='.6'/></g><path d='M0 720 q180 -70 360 -20 q190 54 360 6 q190 -54 360 -6 q180 48 360 -14 V900 H0z' fill='%23BFE0FF' opacity='.55'/><path d='M0 800 q200 -50 400 -8 q200 42 420 0 q200 -38 620 6 V900 H0z' fill='%239EC9F5' opacity='.5'/></svg>"),
+    linear-gradient(180deg,#8CC6F5 0%,#BEE0FA 42%,#E9F4FE 100%)}
+  body[data-scene="forest"]{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 900' preserveAspectRatio='xMidYMax slice'><g opacity='.30' fill='%23BFE6CE'><path d='M60 900 L60 560 L20 560 L110 400 L60 400 L150 250 L240 400 L190 400 L280 560 L240 560 L240 900z'/><path d='M400 900 L400 600 L370 600 L450 470 L410 470 L490 350 L570 470 L530 470 L610 600 L580 600 L580 900z'/><path d='M900 900 L900 580 L865 580 L950 430 L910 430 L995 290 L1080 430 L1040 430 L1125 580 L1090 580 L1090 900z'/><path d='M1290 900 L1290 620 L1260 620 L1340 500 L1300 500 L1380 380 L1440 500 V900z'/></g><g opacity='.55' fill='%233F7A55'><path d='M180 900 L180 620 L140 620 L235 450 L185 450 L285 290 L385 450 L335 450 L430 620 L390 620 L390 900z'/><path d='M640 900 L640 650 L605 650 L695 500 L650 500 L740 360 L830 500 L785 500 L875 650 L840 650 L840 900z'/><path d='M1080 900 L1080 640 L1045 640 L1130 490 L1090 490 L1175 350 L1260 490 L1220 490 L1305 640 L1270 640 L1270 900z'/><path d='M0 900 L0 700 L60 700 L0 560z'/></g><g fill='%23FFE9A8'><circle cx='330' cy='330' r='5' opacity='.9'/><circle cx='700' cy='250' r='4' opacity='.75'/><circle cx='1010' cy='380' r='5' opacity='.8'/><circle cx='520' cy='430' r='3.5' opacity='.7'/><circle cx='1230' cy='260' r='4' opacity='.7'/><circle cx='150' cy='420' r='3.5' opacity='.65'/></g></svg>"),
+    radial-gradient(900px 500px at 70% 8%,rgba(255,233,168,.20),transparent 60%),
+    linear-gradient(180deg,#0D2B23 0%,#16412F 46%,#22593B 100%)}
+  body[data-scene="galaxy"]{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 900' preserveAspectRatio='xMidYMax slice'><g fill='%23FFFFFF'><circle cx='120' cy='120' r='2.2' opacity='.9'/><circle cx='300' cy='60' r='1.6' opacity='.7'/><circle cx='520' cy='170' r='2' opacity='.8'/><circle cx='760' cy='90' r='1.5' opacity='.6'/><circle cx='980' cy='210' r='2.4' opacity='.85'/><circle cx='1240' cy='120' r='1.8' opacity='.7'/><circle cx='200' cy='330' r='1.6' opacity='.6'/><circle cx='640' cy='400' r='2' opacity='.7'/><circle cx='1100' cy='430' r='1.6' opacity='.6'/><circle cx='420' cy='520' r='2.2' opacity='.7'/><circle cx='880' cy='600' r='1.6' opacity='.55'/><circle cx='1340' cy='330' r='2' opacity='.65'/><circle cx='60' cy='620' r='1.8' opacity='.6'/><circle cx='1000' cy='760' r='1.6' opacity='.5'/></g><path d='M180 250 l4 -14 l4 14 l14 4 l-14 4 l-4 14 l-4 -14 l-14 -4z' fill='%23FFFFFF' opacity='.8'/><path d='M1150 620 l5 -16 l5 16 l16 5 l-16 5 l-5 16 l-5 -16 l-16 -5z' fill='%23FFE9A8' opacity='.7'/><g transform='translate(1180 740)'><circle r='96' fill='%237C5CE0' opacity='.55'/><circle r='96' fill='none' stroke='%23BFA8FF' stroke-width='2' opacity='.5'/><ellipse rx='168' ry='34' fill='none' stroke='%23FFD98A' stroke-width='7' opacity='.55' transform='rotate(-18)'/><circle cx='-34' cy='-30' r='20' fill='%235B3FB0' opacity='.5'/><circle cx='30' cy='26' r='13' fill='%235B3FB0' opacity='.45'/></g><circle cx='230' cy='800' r='44' fill='%232F73E8' opacity='.35'/></svg>"),
+    radial-gradient(760px 520px at 18% 12%,rgba(124,92,224,.55),transparent 62%),
+    radial-gradient(700px 480px at 84% 26%,rgba(47,115,232,.42),transparent 60%),
+    radial-gradient(680px 520px at 60% 88%,rgba(255,111,82,.20),transparent 62%),
+    linear-gradient(170deg,#080B26 0%,#141543 48%,#251A4A 100%)}
+  body[data-scene="lava"]{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 900' preserveAspectRatio='xMidYMax slice'><g fill='%23FFB86B' opacity='.75'><circle cx='240' cy='430' r='3'/><circle cx='420' cy='300' r='2.2'/><circle cx='700' cy='380' r='2.6'/><circle cx='980' cy='260' r='2'/><circle cx='1180' cy='420' r='3'/><circle cx='560' cy='180' r='2'/><circle cx='1320' cy='200' r='2.4'/><circle cx='120' cy='260' r='2.2'/><circle cx='860' cy='520' r='2.6'/></g><path d='M0 900 L0 690 L180 560 L300 660 L470 470 L640 640 L820 500 L1010 650 L1180 540 L1320 640 L1440 570 V900z' fill='%23200C0C' opacity='.9'/><path d='M470 470 q-26 60 -40 120 q40 -30 82 -6 q-16 -66 -42 -114z' fill='%23FF6F52' opacity='.75'/><path d='M0 780 q120 -40 240 -6 q140 40 280 -10 q150 -52 300 6 q150 54 320 -14 q160 -64 300 8 V900 H0z' fill='%23C7371B' opacity='.55'/><path d='M0 840 q160 -34 320 0 q170 36 340 -6 q180 -44 360 8 q160 46 420 -8 V900 H0z' fill='%23FF8B3D' opacity='.5'/></svg>"),
+    radial-gradient(900px 520px at 50% 104%,rgba(255,140,60,.55),transparent 62%),
+    radial-gradient(620px 420px at 18% 22%,rgba(255,111,82,.22),transparent 60%),
+    linear-gradient(180deg,#150A10 0%,#2C1116 52%,#5A1A12 100%)}
+  body[data-scene="spirit"]{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 900' preserveAspectRatio='xMidYMax slice'><g opacity='.5'><path d='M0 620 q220 -40 440 -4 q220 36 440 -8 q200 -40 560 4' stroke='%23D9C7FF' stroke-width='16' fill='none' opacity='.35'/><path d='M0 720 q260 -34 520 2 q260 36 520 -10 q200 -34 400 8' stroke='%23D9C7FF' stroke-width='22' fill='none' opacity='.28'/></g><g><circle cx='250' cy='300' r='26' fill='%23FFD98A' opacity='.55'/><circle cx='250' cy='300' r='58' fill='%23FFD98A' opacity='.18'/><circle cx='620' cy='210' r='18' fill='%23FFC9E4' opacity='.55'/><circle cx='620' cy='210' r='44' fill='%23FFC9E4' opacity='.16'/><circle cx='1010' cy='330' r='30' fill='%23A8E6FF' opacity='.5'/><circle cx='1010' cy='330' r='66' fill='%23A8E6FF' opacity='.15'/><circle cx='1300' cy='170' r='16' fill='%23FFD98A' opacity='.5'/><circle cx='1300' cy='170' r='40' fill='%23FFD98A' opacity='.14'/><circle cx='430' cy='470' r='14' fill='%23D9C7FF' opacity='.55'/><circle cx='430' cy='470' r='36' fill='%23D9C7FF' opacity='.16'/><circle cx='860' cy='520' r='20' fill='%23FFC9E4' opacity='.45'/><circle cx='860' cy='520' r='48' fill='%23FFC9E4' opacity='.14'/></g><g fill='none' stroke='%23FFFFFF' stroke-width='2' opacity='.3'><circle cx='250' cy='300' r='90'/><circle cx='1010' cy='330' r='104'/></g><path d='M0 900 q240 -120 480 -60 q240 60 480 -20 q240 -80 480 20 V900z' fill='%233B2569' opacity='.5'/></svg>"),
+    radial-gradient(760px 520px at 24% 16%,rgba(255,201,228,.30),transparent 62%),
+    radial-gradient(700px 480px at 82% 34%,rgba(168,230,255,.26),transparent 60%),
+    linear-gradient(172deg,#2B1B4B 0%,#452C6E 50%,#6B4A94 100%)}
+
+  /* dark worlds: lift the small print off the sky */
+  body[data-scene="galaxy"] .foot,
+  body[data-scene="lava"] .foot,
+  body[data-scene="spirit"] .foot,
+  body[data-scene="forest"] .foot{color:rgba(255,255,255,.78)}
+  body[data-scene="galaxy"] .mark span,
+  body[data-scene="lava"] .mark span,
+  body[data-scene="spirit"] .mark span,
+  body[data-scene="forest"] .mark span{text-shadow:0 2px 14px rgba(0,0,0,.35)}
+  body[data-scene="galaxy"] .panel,
+  body[data-scene="lava"] .panel,
+  body[data-scene="spirit"] .panel,
+  body[data-scene="forest"] .panel{box-shadow:0 10px 34px rgba(0,0,0,.28)}
+
+  /* the picker itself */
+  .scenes{display:flex;gap:9px;justify-content:center;margin-bottom:9px;flex-wrap:wrap}
+  .sc-pick{width:30px;height:30px;border-radius:50%;border:2px solid rgba(255,255,255,.7);
+    cursor:pointer;padding:0;box-shadow:0 2px 7px rgba(16,24,40,.22)}
+  .sc-pick.on{outline:2.5px solid #fff;outline-offset:2px;transform:scale(1.1)}
+  .sc-sky{background:linear-gradient(160deg,#8CC6F5,#E9F4FE)}
+  .sc-forest{background:linear-gradient(160deg,#0D2B23,#2A5A3C)}
+  .sc-galaxy{background:linear-gradient(160deg,#141543,#7C5CE0)}
+  .sc-lava{background:linear-gradient(160deg,#2C1116,#FF8B3D)}
+  .sc-spirit{background:linear-gradient(160deg,#452C6E,#FFC9E4)}
+
   @media(prefers-reduced-motion:reduce){*{transition:none!important}
     body::before{animation:none}}
 </style>
@@ -436,14 +466,14 @@
   <button class="mark" id="mark" onclick="go('home')" title="Home"></button>
   <div class="tabs" id="tabs"></div>
   <div id="view"></div>
-  <div class="foot">Saved on this device</div>
+  <div class="foot"><div class="scenes" id="scenes"></div>Saved on this device</div>
 </div>
 <!-- load order matters: data, then core, then screens, app last -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="data.js?v=15"></script>
-<script src="core.js?v=20"></script>
+<script src="core.js?v=21"></script>
 <script src="timetable.js?v=4"></script>
 <script src="training.js?v=11"></script>
-<script src="app.js?v=50"></script>
+<script src="app.js?v=51"></script>
 </body>
 </html>

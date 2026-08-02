@@ -8,6 +8,26 @@ function W(k,v){ try{ localStorage.setItem("chew:"+k,v); }catch(e){} }
 function SJ(k,d){ try{ var v=JSON.parse(localStorage.getItem("chew:"+k)); return (v===null||v===undefined)?d:v; }catch(e){ return d; } }
 function WJ(k,v){ W(k, JSON.stringify(v)); }
 
+/* ---------- scenes ---------- */
+/* The world behind the cards. Kept per device, since one boy will want lava
+   and the other will not. */
+var SCENES=[["galaxy","Galaxy"],["sky","Sky"],["forest","Forest"],
+            ["lava","Lava"],["spirit","Spirit"]];
+function scene(){
+  var s=S("scene","galaxy");
+  for(var i=0;i<SCENES.length;i++){ if(SCENES[i][0]===s) return s; }
+  return "galaxy";
+}
+function applyScene(){
+  try{ document.body.setAttribute("data-scene", scene()); }catch(e){}
+}
+function sceneBar(){
+  return SCENES.map(function(s){
+    return '<button class="sc-pick sc-'+s[0]+(scene()===s[0]?" on":"")+'" '+
+           'data-scene="'+s[0]+'" title="'+s[1]+'" aria-label="'+s[1]+'"></button>';
+  }).join("");
+}
+
 function pname(id){ var k=KIDS.filter(function(x){return x.id===id;})[0]; return S("name:"+id,k.init); }
 function who(){ return S("who","tc"); }
 

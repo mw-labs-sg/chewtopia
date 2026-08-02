@@ -4,6 +4,14 @@
    ========================================================================== */
 
 function render(){
+  applyScene();
+  var sb=document.getElementById("scenes");
+  if(sb){
+    sb.innerHTML=sceneBar();
+    sb.querySelectorAll("[data-scene]").forEach(function(b){
+      b.onclick=function(){ W("scene", b.dataset.scene); sfxTap(); render(); };
+    });
+  }
   document.getElementById("mark").innerHTML =
     "CHEWTOPIA".split("").map(function(c){return "<span>"+c+"</span>";}).join("");
 
