@@ -47,7 +47,8 @@ function tColumn(kid, subj){
            '<span></span><span class="hzh">\u6211\u4f1a\u8ba4</span>'+
            '<span class="hzh">\u6211\u4f1a\u5199</span>';
       Object.keys(HANZI).forEach(function(k){
-        out+='<span class="hzl">'+esc(k)+'<em>'+HANZI[k].length+' \u5b57</em></span>'+
+        var rnN=((typeof RECOG!=="undefined" && RECOG[k]) ? RECOG[k] : HANZI[k]).length;
+        out+='<span class="hzl">'+esc(k)+'<em>'+HANZI[k].length+'\u5199 \u00b7 '+rnN+'\u8ba4</em></span>'+
              tCell(kid, "rn|"+k, null, "\u6211\u4f1a\u8ba4 "+k, "")+
              tCell(kid, "hz|"+k, null, "\u6211\u4f1a\u5199 "+k, "");
       });
@@ -219,7 +220,8 @@ function itemsFor(code, kid){
     }
     else if(p[0]==="rn"){
       subject="\u534e\u6587"; test="\u6211\u4f1a\u8ba4 "+k; lang="zh-CN";
-      items=HANZI[k].slice().sort(function(){ return Math.random()-0.5; }).map(function(x){
+      var rb=(typeof RECOG!=="undefined" && RECOG[k]) ? RECOG[k] : HANZI[k];
+      items=rb.slice().sort(function(){ return Math.random()-0.5; }).map(function(x){
         return {k:"rn", h:x[0], a:x[1], tone:x[2], word:x[3], m:x[4]};
       });
     }

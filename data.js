@@ -73,6 +73,40 @@ var TC_SPELL = {
 
 /* 拼音 — hear the word, write the pinyin and the tone number.
    [character, word it is used in, pinyin, tone, meaning] */
+
+/* ==========================================================================
+   我会认 — straight off the 生字表 page (p.116). These are recognition only:
+   longer than the 我会写 lists, and not the same characters.
+   [character, pinyin, tone, the word it appears in, meaning]
+   ========================================================================== */
+var RECOG = {
+  "\u7b2c\u5341\u4e00\u8bfe": [
+    ["\u7eb8","zhi","3","\u7eb8\u98de\u673a","paper"],      ["\u673a","ji","1","\u673a\u5668\u4eba","machine"],
+    ["\u5757","kuai","4","\u9b54\u672f\u65b9\u5757","block"],  ["\u8ddf","gen","1","\u8ddf\u7740","to follow"],
+    ["\u68cb","qi","2","\u8df3\u68cb","chess"],        ["\u642d","da","1","\u642d\u79ef\u6728","to build up"],
+    ["\u79ef","ji","1","\u79ef\u6728","to pile up"],     ["\u5e03","bu","4","\u5e03\u5a03\u5a03","cloth"],
+    ["\u5a03","wa","2","\u5e03\u5a03\u5a03","doll"],      ["\u5427","ba","","\u597d\u5427","(particle)"],
+    ["\u5668","qi","4","\u673a\u5668\u4eba","device"],     ["\u8bb8","xu","3","\u8bb8\u591a","many"],
+    ["\u7ef3","sheng","2","\u8df3\u7ef3","rope"],       ["\u634f","nie","1","\u634f","to mould"],
+    ["\u62fc","pin","1","\u62fc\u56fe","to piece together"], ["\u8239","chuan","2","\u7eb8\u8239","boat"],
+    ["\u66f4","geng","4","\u66f4\u597d","more"],        ["\u9e70","ying","1","\u8001\u9e70","eagle"],
+    ["\u8ffd","zhui","1","\u8ffd","to chase"]
+  ],
+  "\u7b2c\u5341\u4e8c\u8bfe": [
+    ["\u6c38","yong","3","\u6c38\u8fdc","forever"],      ["\u8f7b","qing","1","\u5e74\u8f7b","young"],
+    ["\u547d","ming","4","\u957f\u547d\u767e\u5c81","life"],   ["\u767e","bai","3","\u4e00\u767e","hundred"],
+    ["\u5065","jian","4","\u5065\u5eb7","healthy"],      ["\u5eb7","kang","1","\u5065\u5eb7","well-being"],
+    ["\u5e78","xing","4","\u5e78\u798f","blessed"],      ["\u613f","yuan","4","\u8bb8\u613f","to wish"],
+    ["\u5439","chui","1","\u5439\u98ce","to blow"],      ["\u5947","qi","2","\u5947\u602a","strange"],
+    ["\u7cd5","gao","1","\u86cb\u7cd5","cake"],         ["\u9996","shou","3","\u4e00\u9996\u6b4c","(songs)"],
+    ["\u5f20","zhang","1","\u4e00\u5f20\u5361","(flat things)"], ["\u5361","ka","3","\u751f\u65e5\u5361","card"],
+    ["\u5f71","ying","3","\u7535\u5f71\u7968","film"],     ["\u7968","piao","4","\u7535\u5f71\u7968","ticket"],
+    ["\u793c","li","3","\u793c\u7269","gift"],         ["\u5385","ting","1","\u5ba2\u5385","hall"],
+    ["\u602a","guai","4","\u5947\u602a","strange"],      ["\u6d3b","huo","2","\u6d3b\u52a8","活 alive"],
+    ["\u5b9d","bao","3","\u5b9d\u8d1d","treasure"]
+  ]
+};
+
 var TC_PINYIN = {
   "Lesson 12": [
     ["永","永远","yong","3","forever"], ["轻","轻轻","qing","1","light / gently"],
