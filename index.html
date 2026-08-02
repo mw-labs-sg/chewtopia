@@ -344,27 +344,31 @@
   .run.low{background:#FFE3DC;color:#B03A22}
   .arw{color:#C3D2DF;font-size:15px}
 
-  /* ---- progress matrix: kids across, subjects down ---- */
-  .mx{display:grid;grid-template-columns:minmax(78px,1.25fr) 1fr 1fr;column-gap:6px}
-  .mxh{font-weight:800;font-size:14px;padding:7px 6px;border-radius:11px;text-align:center;
-    position:sticky;top:0;z-index:2}
-  .mxh small{display:block;font-size:10px;font-weight:600;opacity:.85;letter-spacing:0;
-    text-transform:none}
-  .mxh.corner{background:transparent}
-  .mxg{grid-column:1/-1;font-size:11px;letter-spacing:.09em;text-transform:uppercase;
-    font-weight:800;color:var(--soft);margin:14px 0 5px;padding-bottom:4px;
-    border-bottom:1px solid var(--line)}
-  .mxn{font-size:13.5px;font-weight:600;line-height:1.2;display:flex;align-items:center;
-    padding:4px 2px 4px 0;border-bottom:1px solid var(--line)}
-  .mxc{display:flex;align-items:center;justify-content:center;padding:3px 0;
-    border-bottom:1px solid var(--line)}
-  .mxs{display:block;width:100%;text-align:center;border-radius:10px;padding:5px 3px;
-    font-weight:800;font-size:15px;line-height:1.15}
-  .mxs i{display:block;font-style:normal;font-size:10px;font-weight:600;opacity:.72}
-  .mxs.good{background:#DFF3E4;color:#2F7A45}
-  .mxs.mid{background:#FFF1D6;color:#8A6100}
-  .mxs.low{background:#FFE3DC;color:#B03A22}
-  .mxs.none{color:#C3D2DF;font-weight:600}
+  /* ---- progress matrix: each boy gets three subject columns ---- */
+  .mxkey{display:flex;gap:14px;flex-wrap:wrap;align-items:center;font-size:12.5px;
+    color:var(--soft);font-weight:600;margin-bottom:12px}
+  .mxkey b{font-weight:700;color:var(--ink)}
+  .mx6{display:flex;gap:14px;flex-wrap:wrap}
+  .kidbox{flex:1 1 300px;min-width:0}
+  .kidname{font-weight:800;font-size:15px;padding:7px 6px;border-radius:11px;
+    text-align:center;margin-bottom:8px}
+  .kidname small{display:block;font-size:10.5px;font-weight:600;opacity:.85}
+  .mxcols{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+  .mxsub{font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;font-weight:800;
+    color:var(--soft);text-align:center;padding-bottom:5px;border-bottom:1px solid var(--line)}
+  .mxcol{display:flex;flex-direction:column;gap:6px;padding-top:6px;min-width:0}
+  .tbox{border:none;font-family:inherit;text-align:left;width:100%;cursor:pointer;
+    border-radius:12px;padding:8px 8px 7px;line-height:1.2;display:block}
+  .tbox .tn{display:block;font-size:11.5px;font-weight:700;opacity:.85;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .tbox .tv{display:block;font-size:19px;font-weight:800;margin-top:2px}
+  .tbox .td{display:block;font-size:10px;font-weight:600;opacity:.7}
+  .tbox.good{background:#DFF3E4;color:#2F7A45}
+  .tbox.mid{background:#FFF1D6;color:#8A6100}
+  .tbox.low{background:#FFE3DC;color:#B03A22}
+  .tbox:active{transform:translateY(1px)}
+  .tbox[disabled]{cursor:default}
+  .mxnone{color:#C3D2DF;font-size:12px;text-align:center;padding:8px 0;font-weight:600}
   .mxwk{display:grid;grid-template-columns:1fr 1fr;gap:10px}
   .mxwk .wt{margin-top:0}
   .foot{text-align:center;margin-top:16px;color:var(--soft);font-size:12px;line-height:1.7}
@@ -387,6 +391,6 @@
 <script src="core.js?v=18"></script>
 <script src="timetable.js?v=4"></script>
 <script src="training.js?v=7"></script>
-<script src="app.js?v=46"></script>
+<script src="app.js?v=47"></script>
 </body>
 </html>

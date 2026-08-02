@@ -233,7 +233,7 @@ function isFixing(r){ return /^Fixing/.test(String(r.test||"")); }
 
 /* Which subject a run belongs to. The code comes first because runs pulled
    back down from the cloud do not carry the subject with them. */
-var SUBJ_ROWS=[["en","English"],["zh","\u534e\u6587"],["ma","Maths"],["rv","Review"]];
+var SUBJ_COLS=[["en","English"],["zh","\u534e\u6587"],["ma","Maths"]];
 function runSubject(r){
   var c=String(r.code||"").split("|")[0];
   if(c==="en"||c==="es") return "en";
@@ -263,11 +263,13 @@ function gradeGrid(){
   KIDS.forEach(function(k){
     runsFor(k.id).forEach(function(r){
       if(isFixing(r)) return;
+      if(runSubject(r)==="rv") return;   /* mixed-subject review goes */
       var sj=runSubject(r), t=String(r.test||"?");
       var row=(g[sj]=g[sj]||{});
       var cell=(row[t]=row[t]||{});
       var c=cell[k.id];
-      if(!c) c=cell[k.id]={best:r.score,total:r.total,tries:0,last:r.ts};
+      if(!c) c=cell[k.id]={best:r.score,total:r.total,tries:0,last:r.ts,code:r.code||""};
+      if(r.code) c.code=r.code;
       c.tries++;
       if(r.score>c.best){ c.best=r.score; c.total=r.total; }
       if(r.ts>c.last) c.last=r.ts;
@@ -284,42 +286,64 @@ function kidHead(k){
     runs.length+' tests \u00b7 '+full+' full</small></div>';
 }
 
+/* Is this test still in the books? Old scores can name a list that has since
+   been replaced, and tapping one of those should not open an empty quiz. */
+function codeLive(code, kid){
+  var p=String(code||"").split("|"), k=p[1];
+  if(p[0]==="en") return !!(typeof TC_SPELL!=="undefined" && TC_SPELL[k]);
+  if(p[0]==="es") return !!(typeof SC_SPELL!=="undefined" && SC_SPELL[k]);
+  if(p[0]==="hz"||p[0]==="rn") return !!(typeof HANZI!=="undefined" && HANZI[k]);
+  if(p[0]==="zh"){
+    var bank = kid==="tc" ? TC_PINYIN : SC_TINGXIE;
+    return !!(bank && bank[k]);
+  }
+  if(p[0]==="ma") return k==="easy"||k==="times"||k==="hard";
+  return false;
+}
+
+/* One box per test: what it was, the best score, when. Tap to sit it again. */
+function testBox(kid, test, c){
+  var cls=scoreCls(c.best,c.total), live=codeLive(c.code, kid);
+  return '<button class="tbox '+cls+'"'+
+    (live ? ' data-run="'+esc(c.code)+'" data-kid="'+kid+'"' : ' disabled')+'>'+
+    '<span class="tn">'+esc(test)+'</span>'+
+    '<span class="tv">'+c.best+'/'+c.total+'</span>'+
+    '<span class="td">'+dshort(c.last)+(c.tries>1?" \u00b7 "+c.tries+" goes":"")+'</span>'+
+    '</button>';
+}
+
 function vResults(){
   var s=syncPanel();
-
   var g=gradeGrid(), any=false;
-  var m='<div class="mx"><div class="mxh corner"></div>'+
-        KIDS.map(kidHead).join("");
 
-  SUBJ_ROWS.forEach(function(sub){
-    var row=g[sub[0]]; if(!row) return;
-    var tests=Object.keys(row).sort(function(a,b){
-      var la=Math.max.apply(null,KIDS.map(function(k){ return (row[a][k.id]||{last:0}).last; }));
-      var lb=Math.max.apply(null,KIDS.map(function(k){ return (row[b][k.id]||{last:0}).last; }));
-      return lb-la;
+  var m='<div class="mx6">';
+  KIDS.forEach(function(k){
+    var runs=runsFor(k.id).filter(function(r){
+      return !isFixing(r) && runSubject(r)!=="rv"; });
+    var full=runs.filter(function(r){ return r.score>=r.total; }).length;
+    m+='<div class="kidbox"><div class="kidname '+whoCls(k.id)+'">'+esc(pname(k.id))+
+       '<small>'+(streak(k.id).n?streak(k.id).n+"\uD83D\uDD25 \u00b7 ":"")+
+       runs.length+' tests \u00b7 '+full+' full</small></div><div class="mxcols">';
+    /* three headers first, then the three columns under them */
+    SUBJ_COLS.forEach(function(sub){ m+='<div class="mxsub">'+sub[1]+'</div>'; });
+    SUBJ_COLS.forEach(function(sub){
+      var row=g[sub[0]]||{}, out="";
+      Object.keys(row).filter(function(t){ return row[t][k.id]; })
+        .sort(function(a,b){ return row[b][k.id].last - row[a][k.id].last; })
+        .forEach(function(t){ any=true; out+=testBox(k.id, t, row[t][k.id]); });
+      m+='<div class="mxcol">'+(out||'<div class="mxnone">\u2014</div>')+'</div>';
     });
-    if(!tests.length) return;
-    any=true;
-    m+='<div class="mxg">'+sub[1]+'</div>';
-    tests.forEach(function(t){
-      m+='<div class="mxn">'+esc(t)+'</div>';
-      KIDS.forEach(function(k){
-        var c=row[t][k.id];
-        m+='<div class="mxc">'+(c
-          ? '<span class="mxs '+scoreCls(c.best,c.total)+'">'+c.best+'/'+c.total+
-            '<i>'+(c.tries>1?c.tries+" goes \u00b7 ":"")+dshort(c.last)+'</i></span>'
-          : '<span class="mxs none">\u2014</span>')+'</div>';
-      });
-    });
+    m+='</div></div>';
   });
   m+='</div>';
 
   s+='<div class="panel"><h2><span class="em">\uD83D\uDCCA</span> How they are doing</h2>'+
-     (any ? m+'<div class="key"><span class="dot" style="background:#4FB86B"></span> full marks &nbsp;'+
-       '<span class="dot" style="background:#FFB627"></span> 70% or better &nbsp;'+
-       '<span class="dot" style="background:#FF6F52"></span> below 70%<br>'+
-       'Each box is the best score so far, with how many goes it took.</div>'
-      : '<p class="empty">No tests yet. Anything done in Training turns up here.</p>')+
+     '<div class="mxkey"><span><span class="dot" style="background:#4FB86B"></span> '+
+       '<b>full marks</b></span>'+
+       '<span><span class="dot" style="background:#FFB627"></span> <b>70% or better</b></span>'+
+       '<span><span class="dot" style="background:#FF6F52"></span> <b>below 70%</b></span>'+
+       '<span>best score \u00b7 tap to sit it again</span></div>'+
+     (any ? m : '<p class="empty">No tests yet. Anything done in Training turns up here.</p>')+
      '</div>';
 
   /* what each of them keeps missing, side by side */
@@ -379,6 +403,14 @@ function wResults(){
   var o=document.getElementById("cOut");
   if(o) o.onclick=function(){ if(confirm("Sign out of the family account?")) cloudLogout(); };
   var sy=document.getElementById("cSync"); if(sy) sy.onclick=cloudSync;
+  document.querySelectorAll("[data-run]").forEach(function(b){
+    b.onclick=function(){
+      W("who", b.dataset.kid);
+      tab="practice"; showAdd=false;
+      try{ location.hash="#training"; }catch(e){}
+      start(b.dataset.run);
+    };
+  });
   document.getElementById("wipe").onclick=function(){
     if(confirm("Delete every saved score on this device?")){ WJ("results",[]); render(); } };
 }
