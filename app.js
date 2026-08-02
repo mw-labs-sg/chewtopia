@@ -58,30 +58,65 @@ function todayFood(){
     '</div>';
 }
 
+/* ==========================================================================
+   UPCOMING — a rolling agenda. Date down the left, then a column per boy, so
+   the eye lands on "when" first and "who" second. Empty days are skipped.
+   ========================================================================== */
+function evCard(e){
+  var st=evState(e);
+  return '<div class="evc e-'+(e.w||"all")+(st.live?" live":"")+'">'+
+    '<span class="evt">'+esc(e.t)+'</span>'+
+    '<span class="evw">'+(st.live?(e.d2?"On now":"Today"):evWhen(e))+
+      (e.time?' \u00b7 '+e.time:'')+
+      (e.d2?' \u00b7 to '+dnum(e.d2)+' '+dmon(e.d2):'')+'</span>'+
+    (e.n?'<span class="nt">'+esc(e.n)+'</span>':'')+
+    (e.p?'<button class="prac '+whoCls(e.w)+'" data-go="'+esc(e.p)+'" data-who="'+esc(e.w||"")+'">'+
+         '\u25b6 '+esc(practiceLabel(e.p))+'</button>':'')+
+    (fromSeed(e.id)?'':'<button class="x" data-del="'+e.id+'" title="Remove">&times;</button>')+
+    '</div>';
+}
+
 function vHome(){
-  var f=vwho();
+  var f=vwho(), kids=shownKids();
   var evs=SJ("events",[]).filter(function(e){ return !evState(e).gone; })
     .filter(function(e){ return f==="all" || !e.w || e.w===f; })
     .sort(function(a,b){ return evState(a).start-evState(b).start; });
-  var s='<div class="panel"><h2><span class="em">📅</span> Upcoming</h2>';
+
+  var s='<div class="panel"><h2><span class="em">📅</span> What is coming</h2>';
+
   if(evs.length){
+    /* one block per date, in order, so nothing empty takes up room */
+    var days=[], byDay={};
     evs.forEach(function(e){
-      var st=evState(e);
-      s+='<div class="ev'+((st.live||st.start<=2)?" soon":"")+'">'+
-        '<span class="cd '+whoCls(e.w)+'"><b>'+dnum(e.d)+(e.d2?"–"+dnum(e.d2):"")+'</b>'+
-        '<i>'+dmon(e.d)+'</i></span>'+
-        '<span class="tx"><span class="tag '+whoCls(e.w)+'">'+
-          (e.w?esc(pname(e.w)):"All")+'</span>'+
-          '<span class="wh">'+(st.live?(e.d2?"On now":"Today"):
-            dday(e.d)+(e.d2?"–"+dday(e.d2):""))+'</span> '+esc(e.t)+
-          (st.live&&!e.time?'':'<small>'+(st.live?'':evWhen(e))+
-            (e.time?(st.live?'':' · ')+e.time:'')+'</small>')+
-          (e.n?'<span class="nt">'+esc(e.n)+'</span>':'')+
-          (e.p?'<button class="prac '+whoCls(e.w)+'" data-go="'+esc(e.p)+'" data-who="'+esc(e.w||"")+'">'+
-               'Practise '+esc(practiceLabel(e.p))+' \u2192</button>':'')+'</span>'+
-        (fromSeed(e.id)?'':'<button class="x" data-del="'+e.id+'" title="Remove">&times;</button>')+
-        '</div>';
+      if(!byDay[e.d]){ byDay[e.d]=[]; days.push(e.d); }
+      byDay[e.d].push(e);
     });
+
+    s+='<div class="agenda'+(kids.length===1?" solo":"")+'">'+
+       '<span class="agh"></span>'+
+       kids.map(function(k){ return '<span class="agh '+whoCls(k.id)+'">'+esc(pname(k.id))+'</span>'; }).join("");
+
+    var lastMonth="";
+    days.forEach(function(d){
+      var mon=dmon(d);
+      if(mon!==lastMonth){
+        lastMonth=mon;
+        s+='<span class="agmon">'+mon+'</span>';
+      }
+      var list=byDay[d], st=evState(list[0]);
+      s+='<span class="agd'+(st.live?" now":"")+'"><b>'+dnum(d)+'</b><i>'+
+         dday(d).slice(0,3)+'</i></span>';
+      kids.forEach(function(k){
+        var mine=list.filter(function(e){ return e.w===k.id; });
+        s+='<span class="agc">'+(mine.length?mine.map(evCard).join(""):'')+'</span>';
+      });
+      var all=list.filter(function(e){ return !e.w; });
+      if(all.length){
+        s+='<span class="agd sp"></span><span class="agc both">'+
+           all.map(evCard).join("")+'</span>';
+      }
+    });
+    s+='</div>';
   } else s+='<p class="empty">Nothing coming up'+(f==="all"?"":" for "+esc(pname(f)))+'.</p>';
 
   if(showAdd){
