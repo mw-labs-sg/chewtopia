@@ -20,13 +20,16 @@ function shownKids(){
   var v=vwho();
   return v==="all" ? KIDS : KIDS.filter(function(k){ return k.id===v; });
 }
+/* Sits inside the panel, right under its heading, so there is never any doubt
+   about whose screen you are looking at. */
 function whoBar(){
   var v=vwho();
-  return '<button class="wb all'+(v==="all"?" on":"")+'" data-vw="all">Everyone</button>'+
+  return '<div class="whobar"><button class="wb w-all'+(v==="all"?" on":"")+'" data-vw="all">'+
+    'Everyone<small>both boys</small></button>'+
     KIDS.map(function(k){
-      return '<button class="wb k-'+k.id+(v===k.id?" on":"")+'" data-vw="'+k.id+'">'+
+      return '<button class="wb w-'+k.id+(v===k.id?" on":"")+'" data-vw="'+k.id+'">'+
              esc(pname(k.id))+'<small>'+k.level+'</small></button>';
-    }).join("");
+    }).join("")+'</div>';
 }
 
 /* ---------- scenes ---------- */

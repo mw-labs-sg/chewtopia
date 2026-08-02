@@ -416,6 +416,10 @@ var SEED_EVENTS = [
    n:"9 August falls on a Sunday. Kindergarten reopens Tuesday 11 August."},
   {id:"e15", t:"Spelling test — List 3.4", d:"2026-08-04", w:"tc", p:"en|3.4",
    n:"Unit 9. Eight words plus two dictation sentences."},
+  {id:"e17", t:"华文听写", d:"2026-08-20", w:"sc", p:"zh|Week 8 · 20 Aug",
+   n:"第八周 · 八月二十日 (星期四). 狼, 蛇, 鸭子, 乌龟, 小花猫."},
+  {id:"e18", t:"Spelling test", d:"2026-08-26", w:"sc", p:"es|Week 9 · 26 Aug",
+   n:"Week 9, Wednesday. cookies, bake, juice, tray, flour, and the sentence."},
   {id:"e16", t:"华文 test — 我学会了 第九至十二课", d:"2026-08-06", w:"tc", p:"hz|第九课",
    n:"All four lessons are now in Training. 我会写 生字 for 第九课 (weather), 第十课 (小动物), 第十一课 and 第十二课, plus 词表 word lists for 11 and 12. Work through them in order."}
 ];

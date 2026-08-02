@@ -5,13 +5,6 @@
 
 function render(){
   applyScene();
-  var wb=document.getElementById("whobar");
-  if(wb){
-    wb.innerHTML=whoBar();
-    wb.querySelectorAll("[data-vw]").forEach(function(b){
-      b.onclick=function(){ W("vwho", b.dataset.vw); sfxPop(); render(); };
-    });
-  }
   var sb=document.getElementById("scenes");
   if(sb){
     sb.innerHTML=sceneBar()+sndToggle();
@@ -41,7 +34,13 @@ function render(){
   if(quiz){ v.innerHTML=quizHTML(); wireQuiz(); return; }
   var V={home:vHome,schedule:vWeek,meals:vMeals,practice:vTests,reading:vRead,results:vResults};
   var Wr={home:wHome,schedule:wWeek,meals:wMeals,practice:wTests,reading:wRead,results:wResults};
-  v.innerHTML=V[tab](); Wr[tab]();
+  /* the child switch belongs inside the first panel, under its heading */
+  var html=V[tab]();
+  html=html.replace("</h2>", "</h2>"+whoBar());
+  v.innerHTML=html; Wr[tab]();
+  document.querySelectorAll("[data-vw]").forEach(function(b){
+    b.onclick=function(){ W("vwho", b.dataset.vw); sfxPop(); render(); };
+  });
   document.querySelectorAll("textarea.cell").forEach(grow);
 }
 
