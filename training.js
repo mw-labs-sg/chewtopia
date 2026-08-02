@@ -488,7 +488,10 @@ function quizHTML(){
     botSVG()+
     '<div class="track">'+dots+'</div>'+
     '<div class="meter"><i style="width:'+(q.i/q.items.length*100)+'%"></i></div>'+
-    '<div class="kind">'+(it.k==="rn"?"我会认":it.k==="hz"?"我会写":it.k==="py"?"听写":it.k==="tx"?"听写":it.k==="dict"?"Dictation":it.k==="math"?"Question":"Spelling")+
+    '<div class="kind">'+(it.k==="rn"?"我会认":it.k==="hz"?"我会写":
+      it.k==="py"?"\u6c49\u8bed\u62fc\u97f3":              /* TC writes pinyin, not 听写 */
+      it.k==="tx"?"\u542c\u5199":
+      it.k==="dict"?"Dictation":it.k==="math"?"Question":"Spelling")+
       ' '+(q.i+1)+' of '+q.items.length+'</div>';
   if(tracing(it) && !q.graded){
     var tg=traceTarget(it), tk=writeAsk(it);
