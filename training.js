@@ -95,11 +95,11 @@ function vTests(){
         '<div class="lbl">Subject</div><select id="pf">'+opts+'</select>'+
         '<div style="height:14px"></div><div class="mx6">';
 
-  KIDS.forEach(function(k){
+  shownKids().forEach(function(k){
     var wk=weakTop(k.id, 12);
-    s+='<div class="kidbox"><button class="kidname '+whoCls(k.id)+'" data-rename="'+k.id+'">'+
+    s+='<div class="kidbox"><div class="kidname '+whoCls(k.id)+'">'+
        esc(pname(k.id))+'<small>'+k.level+
-       (streak(k.id).n?' \u00b7 '+streak(k.id).n+"\uD83D\uDD25":"")+'</small></button>'+
+       (streak(k.id).n?' \u00b7 '+streak(k.id).n+"\uD83D\uDD25":"")+'</small></div>'+
        dailyBtn(k.id)+
        (wk.length?'<button class="test rev" data-t="weak" data-kid="'+k.id+'">'+
          '<span class="tx"><span class="nm">Tricky ones</span>'+
@@ -135,13 +135,6 @@ function vTests(){
   return s;
 }
 function wTests(){
-  document.querySelectorAll("[data-rename]").forEach(function(b){
-    b.onclick=function(){
-      var id=b.dataset.rename;
-      var n=prompt("Name (kept on this device only)", pname(id));
-      if(n && n.trim()){ W("name:"+id, n.trim().slice(0,16)); render(); }
-    };
-  });
   document.querySelectorAll("[data-t]").forEach(function(b){
     b.onclick=function(){
       if(b.dataset.kid) W("who", b.dataset.kid);

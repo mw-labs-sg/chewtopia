@@ -447,10 +447,26 @@
   body[data-scene="forest"] .panel{box-shadow:0 10px 34px rgba(0,0,0,.28)}
 
   /* the picker itself */
-  .scenes{display:flex;gap:9px;justify-content:center;margin-bottom:9px;flex-wrap:wrap}
-  .sc-pick{width:30px;height:30px;border-radius:50%;border:2px solid rgba(255,255,255,.7);
-    cursor:pointer;padding:0;box-shadow:0 2px 7px rgba(16,24,40,.22)}
-  .sc-pick.on{outline:2.5px solid #fff;outline-offset:2px;transform:scale(1.1)}
+  .head{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+  .head .mark{margin-bottom:0;flex:1}
+  .scenes{display:flex;gap:7px;flex-wrap:nowrap;flex-shrink:0}
+  .sc-pick{width:22px;height:22px;border-radius:50%;border:2px solid rgba(255,255,255,.75);
+    cursor:pointer;padding:0;box-shadow:0 2px 7px rgba(16,24,40,.22);transition:transform .12s}
+  .sc-pick.on{outline:2.5px solid #fff;outline-offset:2px;transform:scale(1.14)}
+  .sc-pick:hover{transform:scale(1.14)}
+
+  /* ---- who the whole app is showing, sitting under the tabs ---- */
+  .whobar{display:flex;gap:9px;margin-bottom:14px}
+  .wb{flex:1;min-width:0;border:2px solid var(--line);background:var(--card);color:var(--soft);
+    border-radius:16px;padding:11px 10px;font-family:inherit;font-size:15px;font-weight:800;
+    cursor:pointer;box-shadow:0 3px 0 var(--line);line-height:1.15;transition:transform .1s}
+  .wb small{display:block;font-size:11px;font-weight:600;opacity:.85;margin-top:1px}
+  .wb:active{transform:translateY(2px);box-shadow:0 1px 0 var(--line)}
+  .wb.on{color:#fff}
+  .wb.all.on{background:var(--ink);border-color:var(--ink);box-shadow:0 3px 0 #0B141C}
+  .wb.k-tc.on{background:var(--blue);border-color:var(--blue);box-shadow:0 3px 0 #2559B8}
+  .wb.k-sc.on{background:var(--tang);border-color:var(--tang);box-shadow:0 3px 0 #93430A}
+  .wb.all{padding-top:16px;padding-bottom:16px}
   .sc-sky{background:linear-gradient(160deg,#8CC6F5,#E9F4FE)}
   .sc-forest{background:linear-gradient(160deg,#0D2B23,#2A5A3C)}
   .sc-galaxy{background:linear-gradient(160deg,#141543,#7C5CE0)}
@@ -463,17 +479,21 @@
 </head>
 <body>
 <div class="shell">
-  <button class="mark" id="mark" onclick="go('home')" title="Home"></button>
+  <div class="head">
+    <button class="mark" id="mark" onclick="go('home')" title="Home"></button>
+    <div class="scenes" id="scenes"></div>
+  </div>
   <div class="tabs" id="tabs"></div>
+  <div class="whobar" id="whobar"></div>
   <div id="view"></div>
-  <div class="foot"><div class="scenes" id="scenes"></div>Saved on this device</div>
+  <div class="foot">Saved on this device</div>
 </div>
 <!-- load order matters: data, then core, then screens, app last -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="data.js?v=15"></script>
-<script src="core.js?v=21"></script>
-<script src="timetable.js?v=4"></script>
-<script src="training.js?v=11"></script>
-<script src="app.js?v=51"></script>
+<script src="core.js?v=22"></script>
+<script src="timetable.js?v=5"></script>
+<script src="training.js?v=12"></script>
+<script src="app.js?v=52"></script>
 </body>
 </html>

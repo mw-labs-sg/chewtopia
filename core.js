@@ -8,6 +8,27 @@ function W(k,v){ try{ localStorage.setItem("chew:"+k,v); }catch(e){} }
 function SJ(k,d){ try{ var v=JSON.parse(localStorage.getItem("chew:"+k)); return (v===null||v===undefined)?d:v; }catch(e){ return d; } }
 function WJ(k,v){ W(k, JSON.stringify(v)); }
 
+/* ---------- who the whole app is showing ---------- */
+/* One choice at the top, used by every screen, instead of a filter per tab. */
+function vwho(){
+  var v=S("vwho","all");
+  if(v==="all") return v;
+  for(var i=0;i<KIDS.length;i++){ if(KIDS[i].id===v) return v; }
+  return "all";
+}
+function shownKids(){
+  var v=vwho();
+  return v==="all" ? KIDS : KIDS.filter(function(k){ return k.id===v; });
+}
+function whoBar(){
+  var v=vwho();
+  return '<button class="wb all'+(v==="all"?" on":"")+'" data-vw="all">Everyone</button>'+
+    KIDS.map(function(k){
+      return '<button class="wb k-'+k.id+(v===k.id?" on":"")+'" data-vw="'+k.id+'">'+
+             esc(pname(k.id))+'<small>'+k.level+'</small></button>';
+    }).join("");
+}
+
 /* ---------- scenes ---------- */
 /* The world behind the cards. Kept per device, since one boy will want lava
    and the other will not. */

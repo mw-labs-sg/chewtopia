@@ -5,6 +5,13 @@
 
 function render(){
   applyScene();
+  var wb=document.getElementById("whobar");
+  if(wb){
+    wb.innerHTML=whoBar();
+    wb.querySelectorAll("[data-vw]").forEach(function(b){
+      b.onclick=function(){ W("vwho", b.dataset.vw); sfxTap(); render(); };
+    });
+  }
   var sb=document.getElementById("scenes");
   if(sb){
     sb.innerHTML=sceneBar();
@@ -52,11 +59,11 @@ function todayFood(){
 }
 
 function vHome(){
-  var f=evFilter();
+  var f=vwho();
   var evs=SJ("events",[]).filter(function(e){ return !evState(e).gone; })
     .filter(function(e){ return f==="all" || !e.w || e.w===f; })
     .sort(function(a,b){ return evState(a).start-evState(b).start; });
-  var s='<div class="panel"><h2><span class="em">📅</span> Upcoming</h2>'+evFilterBar();
+  var s='<div class="panel"><h2><span class="em">📅</span> Upcoming</h2>';
   if(evs.length){
     evs.forEach(function(e){
       var st=evState(e);
@@ -138,7 +145,6 @@ function wHome(){
       if(!confirm("Remove this from Upcoming?")) return;
       markGone(b.dataset.del);
       WJ("events",SJ("events",[]).filter(function(e){return e.id!==b.dataset.del;})); render(); }; });
-  wireFilter("evFil", function(v){ W("evfilter", v); });
   document.querySelectorAll("[data-go]").forEach(function(b){
     b.onclick=function(){
       if(b.dataset.who) W("who", b.dataset.who);
@@ -170,7 +176,7 @@ function wHome(){
 var showBook=false;
 function vRead(){
   var s='<div class="panel"><h2><span class="em">\uD83D\uDCDA</span> Reading</h2><div class="duo">';
-  KIDS.forEach(function(k){
+  shownKids().forEach(function(k){
     var all=books(k.id), m=booksSince(k.id,30);
     var en=all.filter(function(b){return b.l==="en";}).length, cn=all.length-en;
     s+='<div class="kidbox"><div class="kidname '+whoCls(k.id)+'">'+esc(pname(k.id))+
@@ -327,7 +333,7 @@ function vResults(){
   var g=gradeGrid(), any=false;
 
   var m='<div class="mx6">';
-  KIDS.forEach(function(k){
+  shownKids().forEach(function(k){
     var runs=runsFor(k.id).filter(function(r){
       return !isFixing(r) && runSubject(r)!=="rv"; });
     var full=runs.filter(function(r){ return r.score>=r.total; }).length;
@@ -357,7 +363,7 @@ function vResults(){
      '</div>';
 
   /* what each of them keeps missing, side by side */
-  var wk=KIDS.map(function(k){ return {k:k, w:weakTop(k.id, 6)}; });
+  var wk=shownKids().map(function(k){ return {k:k, w:weakTop(k.id, 6)}; });
   if(wk.some(function(x){ return x.w.length; })){
     s+='<div class="panel"><h2><span class="em">\uD83C\uDFAF</span> Keeps getting these wrong</h2>'+
        '<div class="mxwk">'+wk.map(function(x){

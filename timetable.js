@@ -85,7 +85,7 @@ function vWeek(){
   }
 
   /* Both mode puts each child down half the column so they sit side by side. */
-  var w = ttWho(), both = (w==="both");
+  var w = vwho()==="all" ? "both" : vwho(), both = (w==="both");
   function side(id){ return both ? (id===KIDS[0].id ? " hL" : " hR") : ""; }
 
   /* school */
@@ -126,7 +126,6 @@ function vWeek(){
 
   var head='<div class="panel"><h2><span class="em">🗓️</span> '+lbl+
     '<span class="side">'+(both?"Both":esc(pname(w)))+'</span></h2>'+
-    filterBar("ttFil", w, "both", "Both")+
     '<div class="wknav"><button class="btn soft" id="wkPrev">‹</button>'+
     '<span class="wkrange">'+dates[0].toLocaleDateString("en-GB",{day:"numeric",month:"short"})+
     ' – '+dates[6].toLocaleDateString("en-GB",{day:"numeric",month:"short"})+'</span>'+
@@ -172,7 +171,6 @@ function wWeek(){
             t:t.slice(0,40)});
     WJ("acts",a); render();
   };
-  wireFilter("ttFil", function(v){ W("ttwho", v); });
   document.querySelectorAll("[data-act]").forEach(function(b){
     b.onclick=function(){
       if(!confirm("Remove "+b.textContent+"?")) return;
