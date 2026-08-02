@@ -423,18 +423,15 @@ function syncPanel(){
   s+='</h2>';
   if(cloudUser){
     var p=pending();
-    s+='<div class="syncrow">'+
-       '<button class="btn go" id="cGet">\u2193 Get</button>'+
-       '<button class="btn go" id="cPut">\u2191 Send'+(p?' \u00b7 '+p:'')+'</button>'+
-       '</div>'+
+    s+='<div class="syncrow"><button class="btn go" id="cSync">\u21bb Sync'+
+       (p?' \u00b7 '+p+' waiting':'')+'</button></div>'+
        '<p class="synced">'+(syncNote()
           ? esc(syncNote())
-          : (p ? p+(p===1?" score":" scores")+" on this device not sent yet."
-               : "Nothing waiting to send."))+'</p>'+
-       '<div class="key"><b>Get</b> brings down what the other device sent. '+
-       '<b>Send</b> puts this device\u2019s work up. Neither one overwrites anything \u2014 '+
-       'they merge \u2014 so press them as often as you like. '+
-       'A finished test sends itself.</div>';
+          : (p ? p+(p===1?" score":" scores")+" on this device not sent up yet."
+               : "Nothing waiting."))+'</p>'+
+       '<div class="key">One press does both ways: it brings down anything from the other '+
+       'device and sends up anything from this one. Nothing is ever overwritten, so press it '+
+       'as often as you like. A finished test syncs itself.</div>';
   } else {
     s+='<div class="pair"><span class="f1"><div class="lbl">Family name</div>'+
        '<input type="text" id="cEm" autocomplete="username" placeholder="chewtopia"></span>'+
@@ -462,10 +459,8 @@ function wResults(){
         if(e.key==="Enter"){ e.preventDefault(); goIn(); } });
     });
   }
-  var gt=document.getElementById("cGet");
-  if(gt) gt.onclick=function(){ sfxTap(); cloudPull(); };
-  var pt=document.getElementById("cPut");
-  if(pt) pt.onclick=function(){ sfxTap(); cloudPushAll(); };
+  var sy=document.getElementById("cSync");
+  if(sy) sy.onclick=function(){ sfxTap(); cloudSync(); };
   document.querySelectorAll("[data-run]").forEach(function(b){
     b.onclick=function(){
       W("who", b.dataset.kid);

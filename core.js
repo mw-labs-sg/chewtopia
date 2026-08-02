@@ -174,7 +174,7 @@ function cloudInit(){
   var c=sbc(); if(!c) return;
   c.auth.getSession().then(function(r){
     cloudUser = (r.data && r.data.session) ? r.data.session.user : null;
-    if(cloudUser) cloudPull(true); else render();
+    if(cloudUser) cloudSync(); else render();
   });
 }
 function asEmail(name){
@@ -190,7 +190,7 @@ function cloudLogin(email, pass){
   cloudMsg="Signing in\u2026"; render();
   c.auth.signInWithPassword({email:email, password:pass}).then(function(r){
     if(r.error){ cloudMsg=r.error.message; cloudUser=null; render(); return; }
-    cloudUser=r.data.user; cloudMsg=""; cloudPull();
+    cloudUser=r.data.user; cloudMsg=""; cloudSync();
   });
 }
 function cloudLogout(){
@@ -214,13 +214,14 @@ function stamp(){
 function pending(){ return results().filter(function(x){ return !x.up; }).length; }
 
 /* ---------- GET ---------- */
-function cloudPull(quiet){
+function cloudPull(quiet, done){
+  done = done || function(){};
   var c=sbc();
-  if(!c||!cloudUser){ if(!quiet) setNote("Not signed in."); return; }
-  if(syncBusy) return;
+  if(!c||!cloudUser){ if(!quiet) setNote("Not signed in."); return done(0); }
+  if(syncBusy) return done(0);
   syncBusy=true; if(!quiet) setNote("Getting\u2026");
   c.from("results").select("*").then(function(r){
-    if(r.error){ syncBusy=false; setNote("Could not get: "+r.error.message); return; }
+    if(r.error){ syncBusy=false; setNote("Could not sync: "+r.error.message); return done(0); }
     var local=results(), byId={}, added=0;
     local.forEach(function(x){ if(x.id) byId[x.id]=x; });
     (r.data||[]).forEach(function(row){
@@ -234,16 +235,18 @@ function cloudPull(quiet){
     WJ("results", local.slice(0,600));
     pullState(function(stMsg){
       syncBusy=false;
-      setNote("Got "+added+(added===1?" new score":" new scores")+stMsg+" \u00b7 "+stamp());
+      if(!quiet) setNote("Got "+added+(added===1?" new score":" new scores")+stMsg+" \u00b7 "+stamp());
+      done(added);
     });
   });
 }
 
 /* ---------- SEND ---------- */
-function cloudPushAll(quiet){
+function cloudPushAll(quiet, done){
+  done = done || function(){};
   var c=sbc();
-  if(!c||!cloudUser){ if(!quiet) setNote("Not signed in."); return; }
-  if(syncBusy) return;
+  if(!c||!cloudUser){ if(!quiet) setNote("Not signed in."); return done(0); }
+  if(syncBusy) return done(0);
   /* a different account than last time means everything local is unsent */
   if(S("clouduid","")!==cloudUser.id){
     var l0=results(); l0.forEach(function(x){ x.up=0; }); WJ("results",l0);
@@ -257,7 +260,8 @@ function cloudPushAll(quiet){
   function afterResults(){
     pushState(function(stMsg){
       syncBusy=false;
-      setNote("Sent "+todo.length+(todo.length===1?" score":" scores")+stMsg+" \u00b7 "+stamp());
+      if(!quiet) setNote("Sent "+todo.length+(todo.length===1?" score":" scores")+stMsg+" \u00b7 "+stamp());
+      done(todo.length);
     });
   }
   if(!todo.length){ afterResults(); return; }
@@ -267,7 +271,7 @@ function cloudPushAll(quiet){
             completed_at:new Date(x.ts).toISOString()};
   });
   c.from("results").upsert(rows,{onConflict:"id", ignoreDuplicates:true}).then(function(r){
-    if(r.error){ syncBusy=false; setNote("Could not send: "+r.error.message); return; }
+    if(r.error){ syncBusy=false; setNote("Could not sync: "+r.error.message); return done(0); }
     var done={}; todo.forEach(function(x){ done[x.id]=1; });
     var l=results(); l.forEach(function(x){ if(done[x.id]) x.up=1; });
     WJ("results", l);
@@ -327,10 +331,28 @@ function pushState(done){
   });
 }
 
-/* Sending happens on its own the moment a test finishes, so a tablet left on
-   the sofa still gets its work up. Getting stays a button, because pulling
-   halfway through a test would be rude. */
-function autoSend(){ if(cloudUser) cloudPushAll(true); }
+/* ==========================================================================
+   ONE BUTTON. It gets whatever the other device sent, then sends whatever this
+   one has. Two directions in one press, so there is nothing to get wrong and
+   no order to remember.
+   ========================================================================== */
+function cloudSync(){
+  var c=sbc();
+  if(!c||!cloudUser){ setNote("Not signed in."); return; }
+  if(syncBusy) return;
+  setNote("Syncing\u2026");
+  cloudPull(true, function(got){
+    cloudPushAll(true, function(sent){
+      var bits=[];
+      if(got)  bits.push("brought "+got+" down");
+      if(sent) bits.push("sent "+sent+" up");
+      setNote((bits.length ? "Synced \u00b7 "+bits.join(", ") : "Synced \u00b7 nothing new")+
+              " \u00b7 "+stamp());
+    });
+  });
+}
+/* A finished test syncs itself, so a tablet left on the sofa keeps up. */
+function autoSend(){ if(cloudUser) cloudSync(); }
 
 function runsFor(id){ return results().filter(function(r){ return r.who===(id||who()); })
   .slice().sort(function(a,b){ return a.ts-b.ts; }); }
@@ -649,18 +671,21 @@ if(window.speechSynthesis){ loadVoices(); speechSynthesis.onvoiceschanged=loadVo
 /* Voice ranking. Modern neural voices first, then known female names.
    Windows' old SAPI voices (Zira, David, Hazel) are pushed to the bottom. */
 var NEURAL=/natural|online|google|siri|premium|enhanced/i;
-var FEM=/samantha|serena|sonia|libby|maisie|aria|jenny|ava|allison|susan|kate|karen|moira|tessa|fiona|martha|female|woman/i;
+var FEM=/samantha|serena|sonia|libby|maisie|aria|jenny|ava|allison|susan|kate|karen|moira|tessa|fiona|martha|shelley|nicky|female|woman|tingting|ting-ting|xiaoxiao|xiaoyi|yaoyao|xiaohan|xiaomo|meijia|huihui|\u5a77\u5a77|\u6653\u6653/i;
 /* Mandarin voices worth having, best first. Tingting and Siri are iOS,
    Xiaoxiao and Yunxi are the Windows neural pair, Huihui is the old SAPI one. */
 var CN_GOOD=/\u666e\u901a\u8bdd|tingting|xiaoxiao|xiaoyi|yunxi|yunyang|meijia|liangliang|kangkang|yaoyao/i;
 var CN_OLD=/huihui/i;
 var OLD=/zira|david|hazel|mark|george|james|ravi|desktop/i;
+/* Anything obviously a man, so it is never picked while a woman is available */
+var MALE=/\b(male|man|men)\b|daniel|\balex\b|fred|thomas|\bdavid\b|\bmark\b|george|james|oliver|arthur|\bryan\b|aaron|gordon|rishi|nathan|yunxi|yunyang|kangkang|liangliang/i;
 
 function voiceScore(v){
   var n=v.name||"", x=0;
+  if(FEM.test(n))     x+=200;   /* a woman's voice first, always */
   if(NEURAL.test(n))  x+=100;
   if(CN_GOOD.test(n)) x+=80;
-  if(FEM.test(n))     x+=40;
+  if(MALE.test(n))    x-=200;
   if(OLD.test(n))     x-=60;
   if(CN_OLD.test(n))  x-=50;
   return x;
@@ -701,7 +726,7 @@ function say(t,rate,lang){
      wrong sounds. Say nothing and let the screen carry it. */
   if(cn && !v) return;
   if(v){ u.voice=v; u.lang=v.lang; } else u.lang=lang;
-  var base=parseFloat(S("rate","0.85"));
+  var base=0.85;   /* the one speed that suits both boys */
   if(isNaN(base)) base=0.85;
   u.rate = rate ? Math.max(cn?0.75:0.4, Math.min(1.3, rate * (base/0.85))) : base;
   u.pitch = cn ? 1.0 : 1.05;

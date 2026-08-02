@@ -125,26 +125,16 @@ function vTests(){
   });
   s+='</div></div>';
 
-  /* voice settings */
-  var sp=parseFloat(S("rate","0.85"));
-  var ve=bestVoice("en-GB"), vc=bestVoice("zh-CN");
-  s+='<div class="panel"><h2><span class="em">🔊</span> Voice</h2>'+
-     (vc?'':'<p class="warn">No Mandarin voice on this device, so the Chinese tests '+
-       'stay silent rather than being read out in an English accent. '+
-       'The instructions below add one.</p>')+
-     '<p class="empty">English: <b>'+esc(ve?ve.name:"none installed")+'</b><br>'+
-     '\u534e\u6587: <b>'+esc(vc?vc.name:"none installed")+'</b></p>'+
-     '<div class="lbl">Speaking speed</div>'+
-     '<input type="range" id="rate" min="0.5" max="1.1" step="0.05" value="'+sp+'">'+
-     '<div class="rateval" id="rateVal">'+(sp<0.7?"Slow":sp<0.95?"Normal":"Quick")+'</div>'+
-     '<div class="btnrow"><button class="btn soft" id="vTest">Hear a sample</button></div>'+
-     '<div class="key">Chewtopia picks the best voice already on this device. '+
-     'To give it a better one: on <b>iPad</b> go to Settings → Accessibility → Spoken Content → '+
-     'Voices and download the Enhanced or Premium voice for English and for Chinese (Mandarin). '+
-     'On <b>Windows</b> open the site in Edge, and add a Chinese (Simplified, China) voice under '+
-     'Settings → Time &amp; language → Speech.</div></div>';
+  /* A word if the tablet has no Mandarin voice — otherwise nothing to set. */
+  if(!bestVoice("zh-CN")){
+    s+='<div class="panel"><p class="warn" style="margin:0">'+
+       'This device has no Mandarin voice, so the Chinese tests stay silent rather than '+
+       'being read out in an English accent. On an iPad: Settings \u2192 Accessibility \u2192 '+
+       'Spoken Content \u2192 Voices \u2192 Chinese (Mandarin).</p></div>';
+  }
   return s;
 }
+
 function wTests(){
   document.querySelectorAll("[data-t]").forEach(function(b){
     b.onclick=function(){
@@ -152,16 +142,6 @@ function wTests(){
       start(b.dataset.t);
     };
   });
-  var r=document.getElementById("rate");
-  if(r){
-    r.oninput=function(){
-      W("rate", r.value);
-      var v=parseFloat(r.value);
-      document.getElementById("rateVal").textContent = v<0.7?"Slow":v<0.95?"Normal":"Quick";
-    };
-  }
-  var vt=document.getElementById("vTest");
-  if(vt) vt.onclick=function(){ say("Spell, mischievous. John read a book about three mischievous children.",0,"en-GB"); };
 }
 
 function rnd(a,b){ return Math.floor(Math.random()*(b-a+1))+a; }
