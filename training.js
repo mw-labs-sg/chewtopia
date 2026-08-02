@@ -229,6 +229,8 @@ function itemsFor(code, kid){
 }
 
 function start(code){
+  /* Chinese tests want the stroke data; it loads once and is then cached. */
+  if(/^(hz|rn|zh)/.test(String(code)) && !strokesReady) loadStrokes(function(){ render(); });
   if(code==="weak")  return startWeak();
   if(code==="daily") return startDaily(who());
   var q=itemsFor(code);
@@ -331,7 +333,7 @@ function hzOpts(it){
    keyboard, and marked by eye afterwards. SC starts there because he cannot
    type pinyin at six; TC starts on the keyboard and can switch any time. */
 function cmodeKey(){ return "cmode:"+who(); }
-function cmode(){ return S(cmodeKey(), who()==="sc" ? "write" : "keys"); }
+function cmode(){ return S(cmodeKey(), "trace"); }   /* stroke-checked by default */
 function isCN(it){ return it.k==="hz"||it.k==="rn"||it.k==="py"||it.k==="tx"; }
 function writing(it){ return isCN(it) && cmode()==="write"; }
 
@@ -351,6 +353,90 @@ function writeAsk(it){
   var n=String(it.h||"").length;
   return {title:"\u542c\u4e00\u542c\uff0c\u5199\u4e00\u5199", sub:"",
           count:n+" character"+(n===1?"":"s")+" to write"};
+}
+
+/* ==========================================================================
+   TRACING — the character is checked as he writes it.
+   Not handwriting recognition: it compares each stroke against the real stroke
+   data for that character, so a right answer is never marked wrong. He has to
+   know the shape and the stroke order; nothing appears until he gets a stroke
+   right. The library and the stroke data load only when a writing test opens.
+   ========================================================================== */
+var strokesReady=false, strokesLoading=false;
+function haveStrokes(s){
+  if(!strokesReady) return false;
+  /* both halves have to be on board, or fall back to the plain pad */
+  if(typeof HanziWriter==="undefined" || typeof STROKES==="undefined") return false;
+  var ok=true;
+  String(s||"").split("").forEach(function(ch){ if(!STROKES[ch]) ok=false; });
+  return ok && String(s||"").length>0;
+}
+function loadStrokes(then){
+  if(strokesReady) return then(true);
+  if(strokesLoading) return;
+  strokesLoading=true;
+  var left=2, bad=false;
+  function one(src){
+    var el=document.createElement("script");
+    el.src=src;
+    el.onload=function(){ if(!--left){ strokesLoading=false; strokesReady=!bad; then(!bad); } };
+    el.onerror=function(){ bad=true; if(!--left){ strokesLoading=false; then(false); } };
+    document.head.appendChild(el);
+  }
+  one("vendor/hanzi-writer.min.js");
+  one("strokes.js?v=1");
+}
+/* What he has to write for this question, as characters. */
+function traceTarget(it){
+  if(it.k==="hz") return String(it.h||"");
+  if(it.k==="tx"||it.k==="py") return String(it.h||"");
+  return "";
+}
+function tracing(it){
+  if(cmode()!=="trace") return false;
+  var s=traceTarget(it);
+  return s.length>0 && s.length<=3 && haveStrokes(s);
+}
+/* Build one writing square per character and mark the question when they are
+   all done. Misses are counted: two or more and it goes down as not known. */
+function wireTrace(it){
+  var q=quiz, s=traceTarget(it), boxes=document.querySelectorAll("[data-tr]");
+  if(!boxes.length) return;
+  if(typeof HanziWriter==="undefined"){ strokesReady=false; render(); return; }
+  q.trMiss = q.trMiss || 0;
+  q.trDone = 0;
+  boxes.forEach(function(box, idx){
+    box.innerHTML="";
+    var size=box.clientWidth||150;
+    var wr=HanziWriter.create(box, s.charAt(idx), {
+      width:size, height:size, padding:6,
+      showCharacter:false, showOutline:false, showHintAfterMisses:3,
+      strokeColor:"#16202B", drawingColor:"#2F73E8", drawingWidth:26,
+      highlightColor:"#4FB86B", leniency:1.4,
+      charDataLoader:function(ch, done){ done(STROKES[ch]); }
+    });
+    box.hzWriter=wr;
+    wr.quiz({
+      onMistake:function(){ q.trMiss++; sfxLose(); },
+      onCorrectStroke:function(){ sfxTap(); },
+      onComplete:function(){
+        box.classList.add("filled");
+        if(++q.trDone>=s.length){
+          /* he wrote every character: two or more wrong strokes and it counts
+             as not known yet, which is what brings it back in the mistakes set */
+          setTimeout(function(){ grade(q.trMiss<2); }, 350);
+        }
+      }
+    });
+  });
+  var hint=document.getElementById("trHint");
+  if(hint) hint.onclick=function(){
+    q.trMiss+=2;                       /* asking to be shown is not knowing it */
+    boxes.forEach(function(b,i){ if(b.hzWriter && !b.classList.contains("filled")){
+      b.hzWriter.animateCharacter(); } });
+  };
+  var skip=document.getElementById("trSkip");
+  if(skip) skip.onclick=function(){ grade(false); };
 }
 
 function quizHTML(){
@@ -374,7 +460,21 @@ function quizHTML(){
     '<div class="meter"><i style="width:'+(q.i/q.items.length*100)+'%"></i></div>'+
     '<div class="kind">'+(it.k==="rn"?"我会认":it.k==="hz"?"我会写":it.k==="py"?"听写":it.k==="tx"?"听写":it.k==="dict"?"Dictation":it.k==="math"?"Question":"Spelling")+
       ' '+(q.i+1)+' of '+q.items.length+'</div>';
-  if(writing(it)){
+  if(tracing(it) && !q.graded){
+    var tg=traceTarget(it), tk=writeAsk(it);
+    s+='<div class="qq">'+tk.title+'</div>'+
+       (tk.sub?'<div class="ctx big-word">'+tk.sub+'</div>':'')+
+       '<button class="btn play wide" id="qP">\uD83D\uDD0A Hear it</button>'+
+       '<div class="ctx wcount">Write it in the box \u2014 it only inks in when the '+
+         'stroke is right</div>'+
+       '<div class="tracerow">'+tg.split("").map(function(_,i){
+          return '<div class="trbox" data-tr="'+i+'"></div>'; }).join("")+'</div>'+
+       '<div class="switch"><button class="addlink" id="trHint">Show me how</button>'+
+       '<button class="addlink" id="trSkip">I don\u2019t know it</button>'+
+       '<button class="addlink" id="cSwitch">Plain pad instead</button></div>'+
+       '<input type="hidden" id="qa" value="">';
+  }
+  else if(writing(it) || (tracing(it) && q.graded)){
     var ask=writeAsk(it);
     s+='<div class="qq">'+ask.title+'</div>'+
        (ask.sub?'<div class="ctx big-word">'+ask.sub+'</div>':'')+
@@ -450,6 +550,14 @@ function quizHTML(){
         ? '<textarea id="qa" spellcheck="false" placeholder="Type the whole sentence" style="margin-top:12px"></textarea>'
         : '<input type="text" id="qa" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Type here" style="margin-top:12px">');
   }
+  if(tracing(it) && !q.graded){
+    return s+'<div id="qf"></div></div>';
+  }
+  if(tracing(it) && q.graded){
+    return s+'<div class="btnrow"><button class="btn go" id="qG">'+
+      (q.i===q.items.length-1?"Finished \u2192":"Next")+'</button></div>'+
+      '<div id="qf"></div></div>';
+  }
   if(writing(it)){
     s += q.graded
       ? '<div class="btnrow"><button class="btn go" id="qG">Next</button></div>'
@@ -482,6 +590,7 @@ function wireQuiz(){
   /* the writing pad: finger or Apple Pencil, and a rub-out */
   var pad=document.getElementById("pad");
   if(pad) wirePad(pad);
+  if(document.querySelector("[data-tr]")) wireTrace(it);
   var shw=document.getElementById("qShow");
   if(shw) shw.onclick=function(){ sfxTap(); q.show=true; render(); };
   var my=document.getElementById("mkY"), mn=document.getElementById("mkN");
@@ -490,8 +599,8 @@ function wireQuiz(){
 
   var cs=document.getElementById("cSwitch");
   if(cs) cs.onclick=function(){
-    W(cmodeKey(), cmode()==="write" ? "keys" : "write");
-    q.show=false; render();
+    W(cmodeKey(), cmode()==="trace" ? "write" : cmode()==="write" ? "keys" : "trace");
+    q.show=false; q.trMiss=0; render();
   };
 
   var sw=document.getElementById("hzSwitch");
@@ -578,7 +687,7 @@ function speakIt(it){
 function grade(forced){
   var q=quiz, it=q.items[q.i], right, detail="";
   var ga=document.getElementById("qa"), given = ga ? ga.value : "";
-  if(writing(it)){
+  if(writing(it) || tracing(it)){
     right = forced===true;
     detail='<b style="font-size:34px">'+esc(it.h)+'</b><br>'+esc(it.word||"")+' \u00b7 '+
            esc(it.a)+(it.tone||"")+(it.m?'<br>'+esc(it.m):"");
@@ -652,7 +761,7 @@ function grade(forced){
   else if(it.k!=="math") say(it.a,0.6);
 }
 function next(){
-  var q=quiz; q.i++; q.graded=false; q.show=false;
+  var q=quiz; q.i++; q.graded=false; q.show=false; q.trMiss=0; q.trDone=0;
   if(q.i>=q.items.length){ q.done=true;
     addResult({who:who(),subject:q.subject,code:q.code,test:q.test,score:q.score,
                total:q.items.length,missed:q.missed,ts:Date.now()});
