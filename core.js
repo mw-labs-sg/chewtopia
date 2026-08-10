@@ -94,17 +94,21 @@ function seedOnce(){ mergeSeed("events", SEED_EVENTS); mergeSeed("acts", SEED_AC
 
 var DAYS = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
 /* Each tab keeps its own colour, so the eye learns where things live. */
+/* Progress was removed: Training already shows every score in the same boxes,
+   and Sync now sits at the foot of Training. Old #progress links land on
+   Training rather than nowhere. */
 var TABS = [["home","Upcoming","t1"],["schedule","Timetable","t2"],
             ["meals","Meals","t3"],["practice","Training","t4"],
-            ["results","Progress","t5"],["reading","Reading","t6"]];
+            ["reading","Reading","t6"]];
 var tab="home", quiz=null, showAdd=false, openTest=null, openRun=null, markRun=null, markState=null;
 /* Each tab gets a readable address, e.g. .../chewtopia/#meals, so a link can
    be bookmarked or sent straight to one screen. */
 var SLUGS = {home:"upcoming", schedule:"timetable", meals:"meals",
-             practice:"training", reading:"reading", results:"progress"};
+             practice:"training", reading:"reading"};
 function tabFromHash(){
   var h=(location.hash||"").replace(/^#\/?/,"").toLowerCase();
   for(var k in SLUGS){ if(SLUGS[k]===h) return k; }
+  if(h==="progress") return "practice";      /* old bookmarks still work */
   return null;
 }
 function go(id, quiet){

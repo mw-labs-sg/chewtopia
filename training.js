@@ -126,6 +126,10 @@ function dailyBtn(kid){
 }
 
 function vTests(){
+  /* The marking sheet used to open from Progress; with that tab gone it opens
+     over Training instead. Only reachable if old handwriting runs are pending. */
+  if(markRun) return vMarkRun();
+
   var pick=SUBJ_COLS.slice();     /* everything, always — one screen, no filter */
 
   var s='<div class="panel"><h2><span class="em">📝</span> Training</h2>'+
@@ -158,6 +162,11 @@ function vTests(){
   });
   s+='</div></div>';
 
+  /* Sync used to live on Progress. That tab is gone, so it sits here, at the
+     foot of the screen the grown-ups already open. markPanel() renders nothing
+     unless old handwriting runs are still waiting to be marked. */
+  s+=markPanel()+syncPanel();
+
   /* A word if the tablet has no Mandarin voice — otherwise nothing to set. */
   if(!bestVoice("zh-CN")){
     s+='<div class="panel"><p class="warn" style="margin:0">'+
@@ -178,6 +187,7 @@ function wKidBar(){
 
 function wTests(){
   wKidBar();
+  wResults();          /* the sync and marking buttons now live on this screen */
   document.querySelectorAll("[data-t]").forEach(function(b){
     b.onclick=function(){
       if(b.dataset.kid) W("who", b.dataset.kid);
@@ -235,7 +245,10 @@ function startItems(items, test, subject, lang, code){
 }
 /* Everything this child has got wrong before, hardest first. */
 function startWeak(){
-  var a=weakTop(who(), 12).map(function(x){ return x.it; }).filter(Boolean);
+  var a=weakTop(who(), 12).map(function(x){ return x.it; }).filter(Boolean)
+    /* Old handwriting entries have no pinyin banked, so they cannot be asked
+       as a typed question. Drop them rather than show an unanswerable one. */
+    .filter(function(i){ return i.k!=="tx"; });
   if(!a.length) return;
   var cn=a.every(function(i){ return i.k==="hz"||i.k==="rn"||i.k==="py"; });
   startItems(a, "Review \u00b7 tricky ones", "Review", cn?"zh-CN":"en-GB", "weak");
@@ -268,11 +281,12 @@ function itemsFor(code, kid){
       });
     }
     else if(p[0]==="zh"){ subject="\u534e\u6587"; test=k; lang="zh-CN";
-      /* TC types the pinyin. SC's 听写 is a handwriting test: he hears it and
-         writes the characters, then it is marked by eye. */
-      var bank = kid==="tc" ? TC_PINYIN : SC_TINGXIE, kind = kid==="tc" ? "py" : "tx";
+      /* Both boys type the pinyin, same format, tones included. SC used to
+         write the characters on the pad, but that needed marking by hand and
+         was easy to get backwards. */
+      var bank = kid==="tc" ? TC_PINYIN : SC_TINGXIE;
       items=bank[k].slice().sort(function(){ return Math.random()-0.5; })
-        .map(function(x){ return {k:kind,h:x[0],word:x[1],a:x[2],tone:x[3],m:x[4]}; }); }
+        .map(function(x){ return {k:"py",h:x[0],word:x[1],a:x[2],tone:x[3],m:x[4]}; }); }
     else if(p[0]==="ma"){ subject="Math";
       test="Math \u00b7 "+(k==="easy"?"Warm up":k==="times"?"Times tables":"Challenge");
       items=mathItems(k); }
@@ -599,11 +613,10 @@ function quizHTML(){
   }
   else if(it.k==="rn"){
     s+='<div class="hz">'+it.h+'</div>'+
-       '<div class="ctx">'+(q.graded?esc(it.word)+' · '+esc(it.m):"Write the pinyin and the tone")+'</div>'+
-       '<div class="pair"><span class="f1"><div class="lbl">Pinyin</div>'+
-       '<input type="text" id="qa" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="yong"></span>'+
-       '<span class="f2"><div class="lbl">Tone</div>'+
-       '<input type="text" id="qt" inputmode="numeric" maxlength="1" placeholder="1-4"></span></div>'+
+       '<div class="ctx">'+(q.graded?esc(it.word)+' · '+esc(it.m):"Write the pinyin with its tone number")+'</div>'+
+       '<div class="lbl">Pinyin with tones</div>'+
+       '<input type="text" id="qa" class="pyin" autocomplete="off" autocapitalize="none" '+
+       'spellcheck="false" placeholder="yong3">'+
        '<div class="switch"><button class="addlink" id="qP">🔊 Hear it</button></div>';
   }
   else if(it.k==="hz"){
@@ -634,13 +647,11 @@ function quizHTML(){
     var pn=String(it.h||"").length;
     s+='<div class="hz'+(q.graded?"":" q")+'">'+(q.graded?esc(it.h):"?")+'</div>'+
        '<div class="ctx">'+(q.graded?esc(it.word)
-         :"Listen, then type the pinyin for "+(pn>1?"all "+pn+" characters":"the word")+
-          " \u2014 no spaces")+'</div>'+
+         :"Listen, then type the pinyin with tones"+(pn>1?" for all "+pn+" characters":""))+'</div>'+
        '<button class="btn play wide" id="qP">🔊 Hear the word</button>'+
-       '<div class="pair"><span class="f1"><div class="lbl">Pinyin</div>'+
-       '<input type="text" id="qa" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="yong"></span>'+
-       '<span class="f2"><div class="lbl">Tone</div>'+
-       '<input type="text" id="qt" inputmode="numeric" maxlength="1" placeholder="1-4"></span></div>'+
+       '<div class="lbl">Pinyin with tones</div>'+
+       '<input type="text" id="qa" class="pyin" autocomplete="off" autocapitalize="none" '+
+       'spellcheck="false" placeholder="'+(pn>1?"da4 ma3":"ma3")+'">'+
        '';
   } else if(it.k==="math"){
     s+='<div class="qq">'+it.q+' = ?</div>'+
@@ -859,6 +870,18 @@ function speakIt(it){
     say("Again.",0.92); say(it.a+".",0.66);
   }
 }
+/* Pinyin is typed the way the school writes it: the tone number after each
+   syllable, e.g. da4 ma3. One box, so there is nothing to tab between.
+   Where the bank has no tone stored (SC's two- and three-character words),
+   the tone numbers are optional rather than wrong. */
+function pyWant(it){ return String(it.a||"")+String(it.tone||""); }
+function pyOK(given, it){
+  var norm=function(v){ return clean(v).replace(/\s+/g,""); };
+  var w=norm(pyWant(it)), g=norm(given);
+  if(/\d/.test(w)) return g===w;
+  return g===w || g.replace(/\d/g,"")===w;
+}
+
 function grade(forced){
   var q=quiz, it=q.items[q.i], right, detail="";
   var ga=document.getElementById("qa"), given = ga ? ga.value : "";
@@ -876,12 +899,9 @@ function grade(forced){
   }
   else
   if(it.k==="rn"){
-    var tn2=(document.getElementById("qt")||{value:""}).value.trim();
-    var pOK2=clean(given)===clean(it.a), tOK2=!it.tone||tn2===it.tone;
-    right=pOK2&&tOK2;
+    right=pyOK(given, it);
     detail='<b style="font-size:30px">'+it.h+'</b> &nbsp; '+esc(it.word)+'<br>'+
-      (pOK2?"Pinyin ✓":"Pinyin ✗ → <b>"+esc(it.a)+"</b>")+
-      (it.tone?(" &nbsp;·&nbsp; "+(tOK2?"Tone ✓":"Tone ✗ → <b>"+it.tone+"</b>")):" &nbsp;·&nbsp; neutral tone")+
+      (right?"\u2713 "+esc(pyWant(it)):"\u2717 \u2192 <b>"+esc(pyWant(it))+"</b>")+
       '<br>'+esc(it.m);
   }
   else if(it.k==="hz"){
@@ -891,12 +911,9 @@ function grade(forced){
            '<br>'+esc(it.m)+(right?"":'<br>You put: '+(esc(gv)||"nothing"));
   }
   else if(it.k==="py"||it.k==="tx"){
-    var tn=(document.getElementById("qt")||{value:""}).value.trim();
-    var pOK=clean(given)===clean(it.a), tOK=!it.tone||tn===it.tone;
-    right=pOK&&tOK;
+    right=pyOK(given, it);
     detail='<b style="font-size:23px">'+it.h+'</b> &nbsp; '+esc(it.word)+'<br>'+
-      (pOK?"Pinyin ✓":"Pinyin ✗ → <b>"+esc(it.a)+"</b>")+
-      (it.tone?(" &nbsp;·&nbsp; "+(tOK?"Tone ✓":"Tone ✗ → <b>"+it.tone+"</b>")):"")+
+      (right?"\u2713 "+esc(pyWant(it)):"\u2717 \u2192 <b>"+esc(pyWant(it))+"</b>")+
       '<br>'+esc(it.m);
   } else if(it.k==="math"){
     right=clean(given)===it.a;

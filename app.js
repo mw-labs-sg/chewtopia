@@ -32,8 +32,8 @@ function render(){
 
   var v=document.getElementById("view");
   if(quiz){ v.innerHTML=quizHTML(); wireQuiz(); return; }
-  var V={home:vHome,schedule:vWeek,meals:vMeals,practice:vTests,reading:vRead,results:vResults};
-  var Wr={home:wHome,schedule:wWeek,meals:wMeals,practice:wTests,reading:wRead,results:wResults};
+  var V={home:vHome,schedule:vWeek,meals:vMeals,practice:vTests,reading:vRead};
+  var Wr={home:wHome,schedule:wWeek,meals:wMeals,practice:wTests,reading:wRead};
   /* the child switch belongs inside the first panel, under its heading */
   var html=V[tab]();
   if(tab==="home"||tab==="schedule") html=html.replace("</h2>", "</h2>"+whoBar());
@@ -406,7 +406,7 @@ function markPanel(){
 /* The marking sheet itself: his writing, the answer, tap what is wrong. */
 function vMarkRun(){
   var r=results().filter(function(x){ return x.id===markRun; })[0];
-  if(!r) { markRun=null; return vResults(); }
+  if(!r) { markRun=null; return vTests(); }
   markState = markState || r.ans.map(function(x){
     return (x.want||"").split("").map(function(){ return true; });
   });
