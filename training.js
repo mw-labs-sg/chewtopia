@@ -254,7 +254,7 @@ function startWeak(){
        as a typed question. Drop them rather than show an unanswerable one. */
     .filter(function(i){ return i.k!=="tx"; });
   if(!a.length) return;
-  var cn=a.every(function(i){ return i.k==="hz"||i.k==="rn"||i.k==="py"; });
+  var cn=a.every(function(i){ return i.k==="hz"||i.k==="rn"||i.k==="py"||(i.k==="bd"&&i.lesson); });
   startItems(a, "Review \u00b7 tricky ones", "Review", cn?"zh-CN":"en-GB", "weak");
 }
 
@@ -341,7 +341,10 @@ function allCodes(kid){
   var out=[];
   if(hasSubj(kid,"en")) Object.keys(kid==="tc"?TC_SPELL:SC_SPELL).forEach(function(k){ out.push((kid==="tc"?"en|":"es|")+k); });
   Object.keys(kid==="tc"?TC_PINYIN:SC_TINGXIE).forEach(function(k){ out.push("zh|"+k); });
-  if(kid==="tc") Object.keys(HANZI).forEach(function(k){ out.push("rn|"+k); out.push("hz|"+k); });
+  if(kid==="tc") Object.keys(HANZI).forEach(function(k){
+    out.push("rn|"+k); out.push("hz|"+k);
+    if(typeof TC_TINGXIE!=="undefined" && TC_TINGXIE[k]) out.push("tx|"+k);
+  });
   if(hasSubj(kid,"ma")) ["easy","times","hard"].forEach(function(k){ out.push("ma|"+k); });
   return out;
 }
@@ -388,7 +391,7 @@ function startDaily(kid){
     if(q3) push(some(q3.items, 10-items.length));
   }
   if(!items.length){ alert("Nothing to practise yet."); return; }
-  var cn=items.every(function(i){ return i.k==="hz"||i.k==="rn"||i.k==="py"; });
+  var cn=items.every(function(i){ return i.k==="hz"||i.k==="rn"||i.k==="py"||(i.k==="bd"&&i.lesson); });
   startItems(items, "Today \u00b7 ten minutes", "Review", cn?"zh-CN":"en-GB", "daily");
 }
 
@@ -1025,11 +1028,20 @@ function speakIt(it){
     sayLater(function(){ say(it.h,0.7,"zh-CN"); },      hasCtx?2200:800);    /* 来 */
     sayLater(function(){ say(it.h,0.6,"zh-CN"); },      hasCtx?3600:2200);   /* 来 */
   }
+  else if(it.k==="bd" && it.s){
+    /* A 听写 sentence, read the way the teacher reads it: the whole thing
+       through, a gap long enough to write in, then again more slowly. The gap
+       has to grow with the sentence, or the second reading lands on top of
+       the first. */
+    var gap = Math.max(2600, 420*String(it.word||"").length);
+    say(it.word,0.9,"zh-CN");
+    sayLater(function(){ say(it.word,0.75,"zh-CN"); }, gap);
+  }
   else if(it.k==="py"||it.k==="hz"||it.k==="rn"||it.k==="bd"){
     /* here the whole word is right: 更, 长, 乐, 种 and 教 all have two
        readings and the engine guesses wrong without the context */
     say(it.word,0.9,"zh-CN");
-    setTimeout(function(){ say(it.word,0.8,"zh-CN"); },1300);
+    sayLater(function(){ say(it.word,0.8,"zh-CN"); },1300);
   }
   else if(it.k==="dict"){
     say("Write the whole sentence.",0.92); say(it.s,0.78);
