@@ -7,17 +7,47 @@
 /* Both boys side by side, three subject columns each, laid out exactly like
    Progress. Grey means never tried; otherwise it is the last score, with the
    name of the test in black inside the same box. */
+/* Which boy the Training screen is showing. Progress and Reading still put
+   them side by side; Training has too many boxes to read that way. */
+function tKid(){
+  var v=S("tkid", KIDS[0].id);
+  for(var i=0;i<KIDS.length;i++){ if(KIDS[i].id===v) return v; }
+  return KIDS[0].id;
+}
+function tKidBar(){
+  var v=tKid();
+  return '<div class="whobar tkbar">'+KIDS.map(function(k){
+    return '<button class="wb w-'+k.id+(v===k.id?" on":"")+'" data-tk="'+k.id+'">'+
+      esc(pname(k.id))+'<small>'+k.level+'</small></button>';
+  }).join("")+'</div>';
+}
+
+/* The calendar entry a test belongs to, so a box can say when it is sat.
+   Seeded tests carry p:"zh|Week 8 · 20 Aug" and friends. */
+function testEvent(code, kid){
+  var out=null;
+  SJ("events",[]).forEach(function(e){
+    if(e.p!==code || e.w!==kid || evState(e).gone) return;
+    if(!out || evState(e).start < evState(out).start) out=e;
+  });
+  return out;
+}
+function dueId(kid){ var e=dueEvent(kid); return e?e.id:""; }
+
 function tCell(kid, code, name, testName, meta){
   var l = testName ? lastFor(testName, kid) : null;
   var cls = l ? scoreCls(l.score, l.total) : "none";
+  var ev = testEvent(code, kid), nx = !!(ev && ev.id===dueId(kid));
   var val, sub;
   if(l){
     var b = bestFor(testName, kid);
     val = l.score+"/"+l.total;
     sub = dshort(l.ts) + ((b && b.score>l.score) ? " \u00b7 best "+b.score : "");
   } else { val = "Not tried"; sub = meta||""; }
-  return '<button class="tbox '+cls+'" data-t="'+esc(code)+'" data-kid="'+kid+'">'+
+  return '<button class="tbox '+cls+(nx?" next":"")+'" data-t="'+esc(code)+'" data-kid="'+kid+'">'+
     (name===null ? '' : '<span class="tn">'+esc(name)+'</span>')+
+    (ev ? '<span class="tdt">'+esc(dday(ev.d).slice(0,3)+" "+dnum(ev.d)+" "+dmon(ev.d))+
+          (nx?' \u00b7 next up':'')+'</span>' : '')+
     '<span class="tv'+(l?'':' small')+'">'+val+'</span>'+
     (sub?'<span class="td">'+esc(sub)+'</span>':'')+'</button>';
 }
@@ -34,11 +64,13 @@ function tColumn(kid, subj){
   else if(subj==="zh"){
     var bank = kid==="tc" ? TC_PINYIN : SC_TINGXIE;
     if(Object.keys(bank).length){
-      out+='<div class="mxtag">'+(kid==="tc"?"\u6c49\u8bed\u62fc\u97f3 \u00b7 \u8bcd\u8868":"\u542c\u5199")+'</div><div class="zhwrap">';
+      /* TC has two Chinese sections and needs them labelled. SC has only 听写,
+         so the tag said nothing and pushed his column out of line with English. */
+      if(kid==="tc") out+='<div class="mxtag">\u6c49\u8bed\u62fc\u97f3 \u00b7 \u8bcd\u8868</div><div class="zhwrap">';
       Object.keys(bank).forEach(function(k){
         out+=tCell(kid, "zh|"+k, k, k, bank[k].length+" words");
       });
-      out+='</div>';
+      if(kid==="tc") out+='</div>';
     }
     /* 我会认 and 我会写 cover the same lessons, so they go side by side:
        one row per lesson, read it on the left, write it on the right. */
@@ -103,9 +135,10 @@ function vTests(){
           '<span><span class="dot" style="background:#FFB627"></span> <b>70% or better</b></span>'+
           '<span><span class="dot" style="background:#FF6F52"></span> <b>below 70%</b></span>'+
           '<span>last score \u00b7 tap to start</span></div>'+
-        '<div style="height:4px"></div><div class="mx6">';
+        tKidBar()+
+        '<div class="mx6">';
 
-  shownKids().forEach(function(k){
+  shownKids().filter(function(k){ return k.id===tKid(); }).forEach(function(k){
     var cols=pick.filter(function(c){ return hasSubj(k.id, c[0]); });
     if(!cols.length) return;
     var wk=weakTop(k.id, 12);
@@ -136,6 +169,9 @@ function vTests(){
 }
 
 function wTests(){
+  document.querySelectorAll("[data-tk]").forEach(function(b){
+    b.onclick=function(){ W("tkid", b.dataset.tk); render(); };
+  });
   document.querySelectorAll("[data-t]").forEach(function(b){
     b.onclick=function(){
       if(b.dataset.kid) W("who", b.dataset.kid);

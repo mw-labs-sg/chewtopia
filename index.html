@@ -526,6 +526,15 @@
   .tbox.low{background:#FFE3DC;color:#B03A22}
   .tbox.none{background:var(--bg);color:var(--soft);border:1.5px solid var(--line)}
   .tbox .tv.small{font-size:13px;font-weight:700}
+  /* every box in a subject column is the same height, whatever it holds */
+  .mxcol > .tbox, .zhwrap .tbox{min-height:80px;display:flex;flex-direction:column;
+    justify-content:center}
+  .tbox .tdt{display:block;font-size:10px;font-weight:700;opacity:.75;margin-top:1px}
+  /* the one he sits next, called out without changing its score colour */
+  .tbox.next{box-shadow:0 0 0 2.5px currentColor}
+  .tbox.next .tn{font-weight:800}
+  .tbox.next .tdt{opacity:1;font-weight:800}
+  .tkbar{margin-bottom:12px}
   .mxtag{font-size:10px;letter-spacing:.05em;text-transform:uppercase;font-weight:800;
     color:var(--soft);margin:8px 0 2px}
   .mxcol > .mxtag:first-child{margin-top:0}
