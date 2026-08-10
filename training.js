@@ -77,15 +77,21 @@ function tColumn(kid, subj){
     /* 我会认 and 我会写 cover the same lessons, so they go side by side:
        one row per lesson, read it on the left, write it on the right. */
     if(kid==="tc"){
-      /* The lesson name sits inside each box, like every other test on the
-         screen, rather than in a label column down the side. */
+      /* One row per lesson, three ways the school tests it: read it, write it,
+         then the 听写 sheet where the characters sit inside a sentence.
+         A lesson with no 听写 sheet gets a quiet placeholder, not a dead box. */
       out+='<div class="mxtag">\u751f\u5b57\u8868</div><div class="hzgrid">'+
            '<span class="hzh">\u6211\u4f1a\u8ba4</span>'+
-           '<span class="hzh">\u6211\u4f1a\u5199</span>';
+           '<span class="hzh">\u6211\u4f1a\u5199</span>'+
+           '<span class="hzh">\u542c\u5199</span>';
       Object.keys(HANZI).forEach(function(k){
-        var rnN=((typeof RECOG!=="undefined" && RECOG[k]) ? RECOG[k] : HANZI[k]).length;
-        out+=tCell(kid, "rn|"+k, k, "\u6211\u4f1a\u8ba4 "+k, rnN+"\u8ba4")+
-             tCell(kid, "hz|"+k, k, "\u6211\u4f1a\u5199 "+k, HANZI[k].length+"\u5199");
+        var rb=(typeof RECOG!=="undefined" && RECOG[k]) ? RECOG[k] : null;
+        var tx=(typeof TC_TINGXIE!=="undefined" && TC_TINGXIE[k]) ? TC_TINGXIE[k] : null;
+        out+=tCell(kid, "rn|"+k, k, "\u6211\u4f1a\u8ba4 "+k,
+                   (rb?rb.length+"\u8ba4":HANZI[k].length+"\u5199 \u00b7 no \u8ba4 list yet"))+
+             tCell(kid, "hz|"+k, k, "\u6211\u4f1a\u5199 "+k, HANZI[k].length+"\u5199")+
+             (tx ? tCell(kid, "tx|"+k, k, "\u542c\u5199 "+k, tx.length+" sentences")
+                 : '<span class="hzgap">\u2014</span>');
       });
       out+='</div>';
     }
@@ -218,6 +224,7 @@ function practiceLabel(code){
   if(p[0]==="en") return "List "+p[1];
   if(p[0]==="hz") return "\u6211\u4f1a\u5199 "+p[1];
   if(p[0]==="rn") return "\u6211\u4f1a\u8ba4 "+p[1];
+  if(p[0]==="tx") return "\u542c\u5199 "+p[1];
   if(p[0]==="ma") return "Maths \u00b7 "+(p[1]==="easy"?"Warm up":p[1]==="times"?"Times tables":"Challenge");
   return p[1];
 }
@@ -277,26 +284,28 @@ function itemsFor(code, kid){
         return {k:"rn", h:x[0], a:x[1], tone:x[2], word:x[3], m:x[4], lesson:k};
       });
     }
+    else if(p[0]==="tx"){
+      /* The school sheet: a whole sentence with the tested characters knocked
+         out. He has to work out which word belongs in the gap, not just how to
+         write a character he has already been handed. */
+      subject="\u534e\u6587"; test="\u542c\u5199 "+k; lang="zh-CN";
+      items=TC_TINGXIE[k].slice().sort(function(){ return Math.random()-0.5; })
+        .map(function(x){
+          var full="", j=0;
+          for(var i=0;i<x[0].length;i++){
+            full += x[0].charAt(i)==="\u25a1" ? x[1].charAt(j++) : x[0].charAt(i);
+          }
+          return {k:"bd", s:x[0], h:x[1], word:full, a:"", tone:"", m:"", lesson:k};
+        });
+    }
     else if(p[0]==="zh"){ subject="\u534e\u6587"; test=k; lang="zh-CN";
       /* Both boys type the pinyin, same format, tones included. SC used to
          write the characters on the pad, but that needed marking by hand and
          was easy to get backwards. */
-      if(kid==="tc" && typeof TC_TINGXIE!=="undefined" && TC_TINGXIE[k]){
-        /* the school sheet: whole sentences with the characters knocked out */
-        items=TC_TINGXIE[k].slice().sort(function(){ return Math.random()-0.5; })
-          .map(function(x){
-            var said=x[0].split("").map(function(c,i){ return c; }).join("");
-            var full=""; var j=0;
-            for(var i=0;i<x[0].length;i++){
-              full += x[0].charAt(i)==="\u25a1" ? x[1].charAt(j++) : x[0].charAt(i);
-            }
-            return {k:"bd", s:x[0], h:x[1], word:full, a:"", tone:"", m:"", lesson:k};
-          });
-      } else {
-        var bank = kid==="tc" ? TC_PINYIN : SC_TINGXIE;
-        items=bank[k].slice().sort(function(){ return Math.random()-0.5; })
-          .map(function(x){ return {k:"bd",h:x[0],word:x[1],a:x[2],tone:x[3],m:x[4],lesson:k}; });
-      } }
+      var bank = kid==="tc" ? TC_PINYIN : SC_TINGXIE;
+      items=bank[k].slice().sort(function(){ return Math.random()-0.5; })
+        .map(function(x){ return {k:"bd",h:x[0],word:x[1],a:x[2],tone:x[3],m:x[4],lesson:k}; });
+    }
     else if(p[0]==="ma"){ subject="Math";
       test="Math \u00b7 "+(k==="easy"?"Warm up":k==="times"?"Times tables":"Challenge");
       items=mathItems(k); }
