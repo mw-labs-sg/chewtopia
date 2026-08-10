@@ -77,14 +77,15 @@ function tColumn(kid, subj){
     /* 我会认 and 我会写 cover the same lessons, so they go side by side:
        one row per lesson, read it on the left, write it on the right. */
     if(kid==="tc"){
+      /* The lesson name sits inside each box, like every other test on the
+         screen, rather than in a label column down the side. */
       out+='<div class="mxtag">\u751f\u5b57\u8868</div><div class="hzgrid">'+
-           '<span></span><span class="hzh">\u6211\u4f1a\u8ba4</span>'+
+           '<span class="hzh">\u6211\u4f1a\u8ba4</span>'+
            '<span class="hzh">\u6211\u4f1a\u5199</span>';
       Object.keys(HANZI).forEach(function(k){
         var rnN=((typeof RECOG!=="undefined" && RECOG[k]) ? RECOG[k] : HANZI[k]).length;
-        out+='<span class="hzl">'+esc(k)+'<em>'+HANZI[k].length+'\u5199 \u00b7 '+rnN+'\u8ba4</em></span>'+
-             tCell(kid, "rn|"+k, null, "\u6211\u4f1a\u8ba4 "+k, "")+
-             tCell(kid, "hz|"+k, null, "\u6211\u4f1a\u5199 "+k, "");
+        out+=tCell(kid, "rn|"+k, k, "\u6211\u4f1a\u8ba4 "+k, rnN+"\u8ba4")+
+             tCell(kid, "hz|"+k, k, "\u6211\u4f1a\u5199 "+k, HANZI[k].length+"\u5199");
       });
       out+='</div>';
     }
