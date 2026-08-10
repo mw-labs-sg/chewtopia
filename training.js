@@ -277,7 +277,7 @@ function itemsFor(code, kid){
       subject="\u534e\u6587"; test="\u6211\u4f1a\u8ba4 "+k; lang="zh-CN";
       var rb=(typeof RECOG!=="undefined" && RECOG[k]) ? RECOG[k] : HANZI[k];
       items=rb.slice().sort(function(){ return Math.random()-0.5; }).map(function(x){
-        return {k:"rn", h:x[0], a:x[1], tone:x[2], word:x[3], m:x[4]};
+        return {k:"rn", h:x[0], a:x[1], tone:x[2], word:x[3], m:x[4], lesson:k};
       });
     }
     else if(p[0]==="zh"){ subject="\u534e\u6587"; test=k; lang="zh-CN";
@@ -384,6 +384,35 @@ function ltRow(t,g){ var h='<div class="lts">';
 
 /* Weak items are stored bare, without the four choices they were first shown
    with, so anything replaying them has to build a fresh set. */
+/* 我会认 is recognition, not production: he sees the character and picks its
+   pinyin from four. Distractors come from the same lesson where possible, so
+   they are a real choice rather than a giveaway.
+   RECOG and HANZI both store [char, pinyin, tone, word, meaning]. */
+function pyOpts(it){
+  if(it.opts && it.opts.length>=2) return it.opts;
+  var want=pyWant(it), seen={}, near=[], far=[];
+  seen[want]=1;
+  function add(rows, into){
+    (rows||[]).forEach(function(x){
+      if(!x || x[0]===it.h) return;
+      var p=String(x[1]||"")+String(x[2]||"");
+      if(!p || seen[p]) return;
+      seen[p]=1; into.push(p);
+    });
+  }
+  var banks=[]; 
+  if(typeof RECOG!=="undefined" && RECOG) banks.push(RECOG);
+  if(typeof HANZI!=="undefined" && HANZI) banks.push(HANZI);
+  banks.forEach(function(b){ if(it.lesson && b[it.lesson]) add(b[it.lesson], near); });
+  banks.forEach(function(b){ Object.keys(b).forEach(function(k){
+    if(k!==it.lesson) add(b[k], far); }); });
+  function shuffle(a){ return a.sort(function(){ return Math.random()-0.5; }); }
+  var pool=shuffle(near).concat(shuffle(far)).slice(0,3);
+  if(pool.length<3) return null;              /* not enough to choose from */
+  it.opts=shuffle([want].concat(pool));       /* kept on the item so they do not jump */
+  return it.opts;
+}
+
 function hzOpts(it){
   if(it.opts && it.opts.length>=2) return it.opts;
   var pool=[];
@@ -612,11 +641,17 @@ function quizHTML(){
        '<input type="hidden" id="qa" value="">';
   }
   else if(it.k==="rn"){
+    var po=pyOpts(it);
     s+='<div class="hz">'+it.h+'</div>'+
-       '<div class="ctx">'+(q.graded?esc(it.word)+' · '+esc(it.m):"Write the pinyin with its tone number")+'</div>'+
-       '<div class="lbl">Pinyin with tones</div>'+
-       '<input type="text" id="qa" class="pyin" autocomplete="off" autocapitalize="none" '+
-       'spellcheck="false" placeholder="yong3">'+
+       '<div class="ctx">'+(q.graded?esc(it.word)+' · '+esc(it.m)
+         :"Which pinyin is this?")+'</div>'+
+       (po
+        ? '<div class="opts pyopts">'+po.map(function(c){
+            return '<button class="opt" data-opt="'+esc(c)+'">'+esc(c)+'</button>'; }).join("")+
+          '</div><input type="hidden" id="qa" value="">'
+        : '<div class="lbl">Pinyin with tones</div>'+
+          '<input type="text" id="qa" class="pyin" autocomplete="off" autocapitalize="none" '+
+          'spellcheck="false" placeholder="yong3">')+
        '<div class="switch"><button class="addlink" id="qP">🔊 Hear it</button></div>';
   }
   else if(it.k==="hz"){
