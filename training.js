@@ -225,7 +225,7 @@ function practiceLabel(code){
 /* One mark per character the answer needs. A four-character phrase with one
    slip should not score the same as a blank. */
 function itemMarks(it){
-  return it.k==="tx" ? Math.max(1, String(it.h||"").length) : 1;
+  return (it.k==="tx"||it.k==="bd") ? Math.max(1, String(it.h||"").length) : 1;
 }
 function totalMarks(items){
   var n=0; (items||[]).forEach(function(it){ n+=itemMarks(it); }); return n;
@@ -263,10 +263,10 @@ function itemsFor(code, kid){
     else if(p[0]==="hz"){
       subject="\u534e\u6587"; test="\u6211\u4f1a\u5199 "+k; lang="zh-CN";
       var set=HANZI[k];
+      /* HANZI stores [char, pinyin, tone, word, meaning]; the build question
+         wants the cue word in .word and the characters to find in .h */
       items=set.slice().sort(function(){ return Math.random()-0.5; }).map(function(x){
-        var pool=set.filter(function(y){ return y[0]!==x[0]; }).sort(function(){ return Math.random()-0.5; });
-        var opts=[x[0], pool[0][0], pool[1][0], pool[2][0]].sort(function(){ return Math.random()-0.5; });
-        return {k:"hz", h:x[0], a:x[1], tone:x[2], word:x[3], m:x[4], opts:opts};
+        return {k:"bd", h:x[0], a:x[1], tone:x[2], word:x[3], m:x[4], lesson:k};
       });
     }
     else if(p[0]==="rn"){
@@ -282,7 +282,7 @@ function itemsFor(code, kid){
          was easy to get backwards. */
       var bank = kid==="tc" ? TC_PINYIN : SC_TINGXIE;
       items=bank[k].slice().sort(function(){ return Math.random()-0.5; })
-        .map(function(x){ return {k:"py",h:x[0],word:x[1],a:x[2],tone:x[3],m:x[4]}; }); }
+        .map(function(x){ return {k:"bd",h:x[0],word:x[1],a:x[2],tone:x[3],m:x[4],lesson:k}; }); }
     else if(p[0]==="ma"){ subject="Math";
       test="Math \u00b7 "+(k==="easy"?"Warm up":k==="times"?"Times tables":"Challenge");
       items=mathItems(k); }
@@ -293,7 +293,6 @@ function itemsFor(code, kid){
 
 function start(code){
   /* Chinese tests want the stroke data; it loads once and is then cached. */
-  if(/^(hz|rn|zh)/.test(String(code)) && !strokesReady) loadStrokes(function(){ render(); });
   if(code==="weak")  return startWeak();
   if(code==="daily") return startDaily(who());
   var q=itemsFor(code);
@@ -409,16 +408,85 @@ function pyOpts(it){
   return it.opts;
 }
 
+/* ==========================================================================
+   BUILD IT — the one Chinese mechanic both boys use. He hears the whole word,
+   sees it with the tested characters blanked, and taps them back in order.
+   No pinyin, no keyboard, no writing.
+   ========================================================================== */
+function bdSlots(it){ return String(it.h||"").split(""); }
+/* The cue word with the tested characters knocked out. 小蛇 -> 小 □ */
+function bdMasked(it, filled){
+  var wd=String(it.word||it.h), tgt=String(it.h||""), at=wd.indexOf(tgt);
+  if(at<0){ wd=tgt; at=0; }
+  var out="";
+  for(var i=0;i<wd.length;i++){
+    if(i>=at && i<at+tgt.length){
+      var j=i-at, got=(filled||[])[j];
+      out+='<span class="bslot'+(got?" on":"")+'" data-slot="'+j+'">'+(got?esc(got):"\u25a1")+'</span>';
+    } else out+='<span class="bfix">'+esc(wd.charAt(i))+'</span>';
+  }
+  return out;
+}
+/* Tiles: the right characters plus a few from his own bank, so everything on
+   screen is something he is actually learning. */
+function bdTiles(it){
+  if(it.tiles) return it.tiles;
+  var need=bdSlots(it), seen={}, pool=[];
+  need.forEach(function(c){ seen[c]=1; });
+  /* Only ever his own characters — a K2 tile in a P2 question, or the reverse,
+     is rejected on sight and teaches nothing. */
+  var banks=[];
+  if(who()==="sc"){
+    if(typeof SC_TINGXIE!=="undefined" && SC_TINGXIE) banks.push(SC_TINGXIE);
+  } else {
+    if(typeof TC_PINYIN!=="undefined" && TC_PINYIN) banks.push(TC_PINYIN);
+    if(typeof HANZI!=="undefined" && HANZI)         banks.push(HANZI);
+    if(typeof RECOG!=="undefined" && RECOG)         banks.push(RECOG);
+  }
+  var near=[], far=[];
+  banks.forEach(function(b){
+    Object.keys(b).forEach(function(k){
+      (b[k]||[]).forEach(function(x){
+        String(x[0]||"").split("").forEach(function(c){
+          if(!c || seen[c]) return; seen[c]=1;
+          (k===it.lesson ? near : far).push(c);
+        });
+      });
+    });
+  });
+  function shuffle(a){ return a.sort(function(){ return Math.random()-0.5; }); }
+  var extra = Math.min(4, Math.max(2, 7-need.length));
+  var d=shuffle(near).concat(shuffle(far)).slice(0, extra);
+  it.tiles=shuffle(need.concat(d));
+  return it.tiles;
+}
+function bdFilled(){ return (quiz.bd||[]).slice(); }
+
 function hzOpts(it){
   if(it.opts && it.opts.length>=2) return it.opts;
-  var pool=[];
-  Object.keys(HANZI).forEach(function(k){
-    HANZI[k].forEach(function(x){ if(x[0]!==it.h) pool.push(x[0]); });
-  });
-  pool=pool.sort(function(){ return Math.random()-0.5; }).slice(0,3);
-  if(pool.length<3) return null;                 /* not enough to choose from */
-  /* kept on the item, so the four do not jump about between redraws */
-  it.opts=[it.h].concat(pool).sort(function(){ return Math.random()-0.5; });
+  /* The question already shows the pinyin, so random distractors give it away.
+     Characters sharing a syllable almost always share a phonetic part —
+     请 清 情 晴 — so a same-sound pool is also the lookalike pool, and he has
+     to know the shape rather than the sound. */
+  var bare=function(v){ return String(v||"").toLowerCase().replace(/[^a-z]/g,""); };
+  var mine=bare(it.a), sameSyl=[], sameTone=[], rest=[], seen={};
+  seen[it.h]=1;
+  var banks=[];
+  if(typeof HANZI!=="undefined" && HANZI) banks.push(HANZI);
+  if(typeof RECOG!=="undefined" && RECOG) banks.push(RECOG);
+  banks.forEach(function(b){ Object.keys(b).forEach(function(k){
+    (b[k]||[]).forEach(function(x){
+      var ch=x[0]; if(!ch || seen[ch] || String(ch).length!==1) return;
+      seen[ch]=1;
+      if(bare(x[1])===mine){ (String(x[2])===String(it.tone) ? sameTone : sameSyl).push(ch); }
+      else rest.push(ch);
+    });
+  }); });
+  function shuffle(a){ return a.sort(function(){ return Math.random()-0.5; }); }
+  /* same sound and same tone is the hardest confusion, so it goes first */
+  var pool=shuffle(sameTone).concat(shuffle(sameSyl)).concat(shuffle(rest)).slice(0,3);
+  if(pool.length<3) return null;
+  it.opts=shuffle([it.h].concat(pool));
   return it.opts;
 }
 
@@ -431,7 +499,8 @@ function hzOpts(it){
    In the boxes, the strokes are checked where the data allows; where it does
    not — long words — he writes freely and it is marked by eye. Either way he
    does the same thing: hear it, write it in the box. */
-function handwritten(it){ return it.k==="hz" || it.k==="tx"; }
+/* Nothing in the app is written by hand. 我会写 is answered on screen. */
+function handwritten(it){ return false; }
 /* Stroke checking is for TC's single 我会写 characters only. A six-year-old
    writing a whole word gets his work marked by a person: recognition that
    refuses a perfectly readable character is worse than no recognition. */
@@ -637,18 +706,28 @@ function quizHTML(){
        '<input type="hidden" id="qa" value="">';
   }
   else if(it.k==="rn"){
-    var po=pyOpts(it);
     s+='<div class="hz">'+it.h+'</div>'+
        '<div class="ctx">'+(q.graded?esc(it.word)+' · '+esc(it.m)
-         :"Which pinyin is this?")+'</div>'+
-       (po
-        ? '<div class="opts pyopts">'+po.map(function(c){
-            return '<button class="opt" data-opt="'+esc(c)+'">'+esc(c)+'</button>'; }).join("")+
-          '</div><input type="hidden" id="qa" value="">'
-        : '<div class="lbl">Pinyin with tones</div>'+
-          '<input type="text" id="qa" class="pyin" autocomplete="off" autocapitalize="none" '+
-          'spellcheck="false" placeholder="yong3">')+
+         :"Type the pinyin, with its tone number")+'</div>'+
+       '<div class="lbl">Pinyin with tones</div>'+
+       '<input type="text" id="qa" class="pyin" autocomplete="off" autocapitalize="none" '+
+       'spellcheck="false" placeholder="yong3">'+
        '<div class="switch"><button class="addlink" id="qP">🔊 Hear it</button></div>';
+  }
+  else if(it.k==="bd"){
+    var fl=bdFilled(), need=bdSlots(it);
+    s+='<div class="qq">Listen, then tap the '+
+         (need.length>1?need.length+' characters':'character')+' you hear</div>'+
+       '<button class="btn play wide" id="qP">\uD83D\uDD0A Hear the word</button>'+
+       '<div class="bword">'+bdMasked(it, fl)+'</div>'+
+       (q.graded
+        ? '<div class="hint2">'+esc(it.h)+' \u00b7 <b>'+esc(it.a)+(it.tone||"")+'</b>'+
+          (it.m?' \u00b7 '+esc(it.m):"")+'</div>'
+        : '<div class="btiles">'+bdTiles(it).map(function(c){
+            var used=fl.indexOf(c)>=0;
+            return '<button class="btile'+(used?" used":"")+'" data-tile="'+esc(c)+'">'+esc(c)+'</button>';
+          }).join("")+'</div>')+
+       '<input type="hidden" id="qa" value="'+esc(fl.join(""))+'">';
   }
   else if(it.k==="hz"){
     /* Say plainly which character is wanted: the word with one box missing,
@@ -660,8 +739,12 @@ function quizHTML(){
     s+='<div class="qq">Write the '+(tgt.length>1?tgt.length+' characters':'character')+
          ' that goes in the box</div>'+
        '<div class="ctx big-word">'+blanked+'</div>'+
-       '<div class="hint2">\u25a2 = <b>'+esc(it.a)+(it.tone||"")+'</b>'+
-         (it.m?' \u00b7 '+esc(it.m):"")+'</div>'+
+       /* The pinyin is the answer when the other three are random characters,
+          so it is held back until the question has been marked. */
+       (q.graded
+        ? '<div class="hint2">\u25a2 = <b>'+esc(it.a)+(it.tone||"")+'</b>'+
+          (it.m?' \u00b7 '+esc(it.m):"")+'</div>'
+        : '')+
        '<div class="tip">Listen, then tap the character that belongs in the box.</div>'+
        '<button class="btn play wide" id="qP">\uD83D\uDD0A Hear the word</button>'+
        (hzOpts(it)
@@ -754,6 +837,26 @@ function wireQuiz(){
   var my=document.getElementById("mkY"), mn=document.getElementById("mkN");
   if(my) my.onclick=function(){ grade(true); };
   if(mn) mn.onclick=function(){ grade(false); };
+
+  /* Build it: tiles fill the blanks left to right; tapping a filled blank
+     clears it, so a wrong tap costs nothing but a second tap. */
+  document.querySelectorAll("[data-tile]").forEach(function(b){
+    b.onclick=function(){
+      if(q.graded) return;
+      var need=bdSlots(it).length;
+      q.bd = q.bd || [];
+      if(q.bd.length>=need) return;
+      sfxTap(); q.bd.push(b.dataset.tile); render();
+    };
+  });
+  document.querySelectorAll("[data-slot]").forEach(function(b){
+    b.onclick=function(){
+      if(q.graded) return;
+      q.bd = q.bd || [];
+      if(!q.bd.length) return;
+      sfxTap(); q.bd.splice(+b.dataset.slot, 1); render();
+    };
+  });
 
   document.querySelectorAll("[data-opt]").forEach(function(b){
     b.onclick=function(){
@@ -935,6 +1038,15 @@ function grade(forced){
       (right?"\u2713 "+esc(pyWant(it)):"\u2717 \u2192 <b>"+esc(pyWant(it))+"</b>")+
       '<br>'+esc(it.m);
   }
+  else if(it.k==="bd"){
+    var need=bdSlots(it), got=String(given||"").split("");
+    gained=0;
+    need.forEach(function(c,i){ if(got[i]===c) gained++; });
+    right = gained===need.length;
+    detail='<b style="font-size:34px">'+esc(it.h)+'</b><br>'+esc(it.word||"")+
+      ' \u00b7 '+esc(it.a)+(it.tone||"")+(it.m?'<br>'+esc(it.m):"")+
+      (right?"":'<br>You put: '+(esc(got.join(""))||"nothing"));
+  }
   else if(it.k==="hz"){
     var gv=String(given||"").trim();
     right = gv===it.h;
@@ -973,11 +1085,14 @@ function grade(forced){
     q.marks[q.i]="pend";                     /* neither right nor wrong yet */
   }
   else if(right){
-    q.score++; q.streak++; q.best=Math.max(q.best,q.streak);
+    q.score+=itemMarks(it); q.streak++; q.best=Math.max(q.best,q.streak);
     weakDrop(it);
   } else {
     q.streak=0;
-    q.missed.push((it.k==="py"||it.k==="tx")?it.h+" ("+it.a+(it.tone||"")+")":it.k==="math"?it.q:it.a);
+    /* Part marks: 乌龟 with only 龟 wrong scores 1 of 2, and it is 龟 that goes
+       into the tricky-ones bank, not the whole word. */
+    if(gained) q.score+=gained;
+    q.missed.push((it.k==="py"||it.k==="tx"||it.k==="bd")?it.h+" ("+it.a+(it.tone||"")+")":it.k==="math"?it.q:it.a);
     q.wrong.push(it);
     if(it.k!=="tx") weakAdd(it, q.code);
   }
@@ -987,7 +1102,7 @@ function grade(forced){
   var a=document.getElementById("qa");
   if(a){ a.value=given; a.disabled=true; }
   if(document.getElementById("qt")) document.getElementById("qt").disabled=true;
-  var cnQ = (it.k==="py"||it.k==="hz"||it.k==="rn"||it.k==="tx");
+  var cnQ = (it.k==="py"||it.k==="hz"||it.k==="rn"||it.k==="tx"||it.k==="bd");
   var pr = right ? praise(cnQ, q.streak) : oops(cnQ);
   q.say = pr;
   document.getElementById("qf").innerHTML='<div class="fb '+(right?"ok":"no")+'">'+
@@ -1012,11 +1127,11 @@ function grade(forced){
 
   hush();
   if(right) say(q.say.t, q.say.lang?0.95:0.95, q.say.lang||undefined);
-  else if(it.k==="py"||it.k==="hz"||it.k==="rn"||it.k==="tx") say(it.word,0.85,"zh-CN");
+  else if(it.k==="py"||it.k==="hz"||it.k==="rn"||it.k==="tx"||it.k==="bd") say(it.word,0.85,"zh-CN");
   else if(it.k!=="math") say(it.a,0.6);
 }
 function next(){
-  var q=quiz; q.i++; q.graded=false; q.show=false; q.trMiss=0; q.trDone=0; q.mk=null; q.img=null;
+  var q=quiz; q.i++; q.graded=false; q.show=false; q.trMiss=0; q.trDone=0; q.mk=null; q.img=null; q.bd=null;
   if(q.i>=q.items.length){ q.done=true;
     addResult({who:who(),subject:q.subject,code:q.code,test:q.test,score:q.score,
                total:q.total||q.items.length,missed:q.missed,ts:Date.now(),

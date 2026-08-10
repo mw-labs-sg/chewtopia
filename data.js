@@ -17,7 +17,7 @@
 
 /* subj: which subjects this child practises. SC is in K2 and does not get
    maths here — the school sends home spelling and 听写 only. */
-var KIDS = [ {id:"tc",init:"TC",level:"Primary 2",   subj:["en","zh","ma"]},
+var KIDS = [ {id:"tc",init:"TC",level:"Primary 2",   subj:["en","zh"]},
              {id:"sc",init:"SC",level:"Kindergarten",subj:["en","zh"]} ];
 
 var TC_SPELL = {

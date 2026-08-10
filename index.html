@@ -528,6 +528,17 @@
   .tbox .tv.small{font-size:13px;font-weight:700}
   /* one wide pinyin box, typed as da4 ma3 */
   .pyin{font-size:20px;letter-spacing:.02em}
+  /* build it: the cue word with blanks, then the tiles to fill them */
+  .bword{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:16px 0 6px}
+  .bfix{font-size:40px;line-height:1.1;color:var(--soft)}
+  .bslot{font-size:40px;line-height:1.1;min-width:52px;text-align:center;
+    border-bottom:3px solid var(--line);color:#C3D2DF}
+  .bslot.on{color:var(--ink);border-bottom-color:var(--blue);cursor:pointer}
+  .btiles{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:14px}
+  .btile{font-family:inherit;font-size:34px;line-height:1;padding:12px 16px;border:none;
+    border-radius:14px;background:var(--bg);color:var(--ink);cursor:pointer}
+  .btile.used{opacity:.28;pointer-events:none}
+  .btile:active{transform:translateY(1px)}
   /* 我会认: four pinyin to choose from, wide enough to tap cleanly */
   .pyopts .opt{font-size:22px;font-weight:700;letter-spacing:.02em;
     font-family:inherit;padding:14px 8px}
