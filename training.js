@@ -168,10 +168,16 @@ function vTests(){
   return s;
 }
 
-function wTests(){
+/* The TC/SC tabs appear on both Training and Progress and share one setting,
+   so switching boy on one screen lands you on the same boy on the other. */
+function wKidBar(){
   document.querySelectorAll("[data-tk]").forEach(function(b){
     b.onclick=function(){ W("tkid", b.dataset.tk); render(); };
   });
+}
+
+function wTests(){
+  wKidBar();
   document.querySelectorAll("[data-t]").forEach(function(b){
     b.onclick=function(){
       if(b.dataset.kid) W("who", b.dataset.kid);

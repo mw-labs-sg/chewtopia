@@ -560,7 +560,7 @@ function vResults(){
   var g=gradeGrid(), any=false;
 
   var m='<div class="mx6">';
-  shownKids().forEach(function(k){
+  shownKids().filter(function(k){ return k.id===tKid(); }).forEach(function(k){
     var runs=runsFor(k.id).filter(function(r){
       return !isFixing(r) && runSubject(r)!=="rv"; });
     var full=runs.filter(function(r){ return r.score>=r.total; }).length;
@@ -588,14 +588,16 @@ function vResults(){
        '<span><span class="dot" style="background:#FFB627"></span> <b>70% or better</b></span>'+
        '<span><span class="dot" style="background:#FF6F52"></span> <b>below 70%</b></span>'+
        '<span>best score \u00b7 tap to sit it again</span></div>'+
+     tKidBar()+
      (any ? m : '<p class="empty">No tests yet. Anything done in Training turns up here.</p>')+
      '</div>';
 
   /* what each of them keeps missing, side by side */
-  var wk=shownKids().map(function(k){ return {k:k, w:weakTop(k.id, 6)}; });
+  var wk=shownKids().filter(function(k){ return k.id===tKid(); })
+    .map(function(k){ return {k:k, w:weakTop(k.id, 6)}; });
   if(wk.some(function(x){ return x.w.length; })){
     s+='<div class="panel"><h2><span class="em">\uD83C\uDFAF</span> Keeps getting these wrong</h2>'+
-       '<div class="mxwk">'+wk.map(function(x){
+       '<div class="mxwk one">'+wk.map(function(x){
          return '<div class="weak"><div class="wt">'+esc(pname(x.k.id))+'</div>'+
            (x.w.length ? x.w.map(function(y){
              return '<span class="wi">'+esc(weakLabel(y))+'<i>'+y.n+'\u00d7</i></span>'; }).join("")
@@ -635,6 +637,7 @@ function syncPanel(){
 }
 
 function wResults(){
+  wKidBar();
   var i=document.getElementById("cIn");
   if(i){
     var goIn=function(){
