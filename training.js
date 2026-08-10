@@ -97,9 +97,7 @@ function tColumn(kid, subj){
     }
   }
   else {
-    [["easy","Warm up","Add and take away to 20"],
-     ["times","Times tables","2 to 10"],
-     ["hard","Challenge","Bigger numbers, division"]].forEach(function(m){
+    MA_SETS.forEach(function(m){
       out+=tCell(kid, "ma|"+m[0], m[1], "Math \u00b7 "+m[1], m[2]);
     });
   }
@@ -199,23 +197,341 @@ function wTests(){
   });
 }
 
+/* ==========================================================================
+   MATHS — Primary 2, following the MOE 2021 primary syllabus (Oct 2025).
+   One set per sub-strand, so a red box points at a topic he needs rather
+   than at a bag of mixed sums. Everything here is on the P2 syllabus except
+   the last set, which reaches into P3 and says so on the box, so a low score
+   there is never mistaken for falling behind.
+   ========================================================================== */
 function rnd(a,b){ return Math.floor(Math.random()*(b-a+1))+a; }
+function maPick(a){ return a[Math.floor(Math.random()*a.length)]; }
+
+var MA_SETS = [
+  ["nums",    "Numbers to 1000",  "Place value, comparing, patterns, odd and even"],
+  ["addsub",  "Add and subtract", "Up to 3 digits, with renaming"],
+  ["times",   "Times tables",     "2, 3, 4, 5 and 10 \u2014 both ways"],
+  ["frac",    "Fractions",        "Unit and like fractions"],
+  ["money",   "Money",            "Dollars, cents and change"],
+  ["time",    "Time",             "To the minute, and how long"],
+  ["measure", "Measuring",        "Length, mass and volume"],
+  ["reach",   "Next year",        "P3 tables \u2014 6, 7, 8 and 9"]
+];
+function maName(k){
+  for(var i=0;i<MA_SETS.length;i++) if(MA_SETS[i][0]===k) return MA_SETS[i][1];
+  return k;
+}
+function maSub(k){
+  for(var i=0;i<MA_SETS.length;i++) if(MA_SETS[i][0]===k) return MA_SETS[i][2];
+  return "";
+}
+
+/* Numbers in words, Singapore style: four hundred and sixty-two. */
+var MA_ONES=["zero","one","two","three","four","five","six","seven","eight","nine","ten",
+  "eleven","twelve","thirteen","fourteen","fifteen","sixteen","seventeen","eighteen","nineteen"];
+var MA_TENS=["","","twenty","thirty","forty","fifty","sixty","seventy","eighty","ninety"];
+function numWords(n){
+  if(n<20) return MA_ONES[n];
+  if(n<100){ var t=Math.floor(n/10), o=n%10; return MA_TENS[t]+(o?"-"+MA_ONES[o]:""); }
+  var h=Math.floor(n/100), r=n%100;
+  return MA_ONES[h]+" hundred"+(r?" and "+numWords(r):"");
+}
+function ordWord(n){
+  return ["","first","second","third","fourth","fifth","sixth","seventh","eighth","ninth",
+          "tenth","eleventh","twelfth"][n] || (n+"th");
+}
+/* one thirds, one quarters — the plain names a P2 child reads on the page */
+function fracWord(d){
+  return {2:"halves",3:"thirds",4:"quarters",5:"fifths",6:"sixths",7:"sevenths",
+          8:"eighths",9:"ninths",10:"tenths",11:"elevenths",12:"twelfths"}[d];
+}
+function money(c){ return "$"+(c/100).toFixed(2); }
+function hhmm(m){
+  m=((m%720)+720)%720; var h=Math.floor(m/60); if(h===0) h=12;
+  return h+":"+String(m%60).padStart(2,"0");
+}
+
+/* q     what he is asked
+   a     the answer, exactly as it should read
+   alt   other spellings that are just as right
+   w     a question in words, so no " = ?" is tacked on the end
+   im    keyboard: numbers unless the answer has letters in it            */
+function maQ(q,a,o){
+  var it={k:"math", q:q, a:String(a)};
+  if(o){ if(o.alt) it.alt=o.alt; if(o.w) it.w=1; if(o.im) it.im=o.im; if(o.ph) it.ph=o.ph; }
+  return it;
+}
+
+function maNums(){
+  switch(rnd(1,7)){
+    case 1: {
+      var n=rnd(102,999), p=maPick(["hundreds","tens","ones"]);
+      var d = p==="hundreds"?Math.floor(n/100) : p==="tens"?Math.floor(n/10)%10 : n%10;
+      return maQ("In "+n+", which digit is in the "+p+" place?", d, {w:1});
+    }
+    case 2: {
+      var h=rnd(1,9), t=rnd(1,9), o=rnd(1,9);
+      return maQ(h*100+" + "+t*10+" + "+o, h*100+t*10+o);
+    }
+    case 3: {
+      var n=rnd(101,999);
+      return maQ("Write this in numerals: "+numWords(n), n, {w:1});
+    }
+    case 4: {
+      var a=rnd(120,899), b=a+maPick([-1,1])*maPick([9,11,90,99,101]);
+      if(b<100||b>999||b===a) b=a+9;
+      var big=maPick([0,1]);
+      return maQ("Which number is "+(big?"greater":"smaller")+", "+a+" or "+b+"?",
+                 big?Math.max(a,b):Math.min(a,b), {w:1});
+    }
+    case 5: {
+      /* P2 stops at 1000, so the whole run and its answer must fit inside it */
+      var st=maPick([2,3,5,10,25,100]), top=Math.floor(1000/st), up=maPick([0,1]);
+      var s = up ? rnd(1, Math.max(1, top-3))*st : rnd(4, top)*st;
+      var seq=[s, up?s+st:s-st, up?s+2*st:s-2*st];
+      return maQ("What comes next?  "+seq.join(", ")+", ___",
+                 up?seq[2]+st:seq[2]-st, {w:1});
+    }
+    case 6: {
+      var n=rnd(100,999);
+      return maQ("Is "+n+" odd or even?", n%2?"odd":"even", {w:1, im:"text", ph:"odd or even"});
+    }
+    default: {
+      var n=rnd(120,880), j=maPick([1,10,100]), more=maPick([0,1]);
+      return maQ("What is "+j+" "+(more?"more than":"less than")+" "+n+"?",
+                 more?n+j:n-j, {w:1});
+    }
+  }
+}
+
+function maAddSub(){
+  switch(rnd(1,5)){
+    case 1: {  /* renaming in at least one column, which is the whole point */
+      var a=rnd(115,650), b=rnd(115,340);
+      if((a%10)+(b%10)<10) b+=10-((a%10)+(b%10));
+      return maQ(a+" + "+b, a+b);
+    }
+    case 2: {
+      var a=rnd(200,999), b=rnd(105,a-20);
+      if((a%10)>=(b%10)) b+=(a%10)-(b%10)+1;
+      if(b>=a) b=a-13;
+      return maQ(a+" \u2212 "+b, a-b);
+    }
+    case 3: {  /* the mental one the syllabus names: 3 digits and ones/tens/hundreds.
+                  Pick what is being added first, then a number that leaves the
+                  answer inside 1000, which is as far as P2 goes. */
+      var plus=maPick([0,1]), b=maPick([rnd(2,9), rnd(1,8)*10, rnd(1,7)*100]);
+      var a = plus ? rnd(210, 1000-b) : rnd(b+110, 999);
+      return maQ(a+(plus?" + ":" \u2212 ")+b, plus?a+b:a-b);
+    }
+    case 4: {
+      var s=rnd(300,900), a=rnd(120,s-60);
+      return maQ("What goes in the blank?  "+a+" + ___ = "+s, s-a, {w:1});
+    }
+    default: {
+      var a=rnd(150,700), b=rnd(120,290), c=rnd(20,90);
+      return maQ(a+" + "+b+" \u2212 "+c, a+b-c);
+    }
+  }
+}
+
+/* Every question here lives inside the tables of 2, 3, 4, 5 and 10.
+   That is the whole of P2 multiplication, and nothing beyond it. */
+var MA_TABLES=[2,3,4,5,10];
+function maTimes(){
+  var t=maPick(MA_TABLES), n=rnd(2,10);
+  switch(rnd(1,4)){
+    case 1: return maQ(maPick([0,1]) ? t+" \u00d7 "+n : n+" \u00d7 "+t, t*n);
+    case 2: return maQ((t*n)+" \u00f7 "+t, n);
+    case 3: return maQ("What goes in the blank?  "+t+" \u00d7 ___ = "+(t*n), n, {w:1});
+    default:
+      return maQ(t+" \u00d7 "+n+" = "+(t*n)+".  So what is "+(t*n)+" \u00f7 "+n+"?", t, {w:1});
+  }
+}
+
+function maFrac(){
+  var d=rnd(2,12);
+  switch(rnd(1,6)){
+    case 1: {
+      var n=rnd(1,d-1);
+      return maQ("A cake is cut into "+d+" equal parts.  "+n+
+                 " part"+(n>1?"s are":" is")+" eaten.  What fraction is eaten?",
+                 n+"/"+d, {w:1, im:"text", ph:"3/8"});
+    }
+    case 2: {
+      var e=rnd(2,12); while(e===d) e=rnd(2,12);
+      var big=maPick([0,1]), lo=Math.min(d,e), hi=Math.max(d,e);
+      /* the smaller the bottom number, the bigger the piece */
+      return maQ("Which is "+(big?"bigger":"smaller")+", 1/"+d+" or 1/"+e+"?",
+                 "1/"+(big?lo:hi), {w:1, im:"text", ph:"1/4"});
+    }
+    case 3: {
+      var dd=rnd(3,12), a=rnd(1,dd-2), b=rnd(1,dd-a-1)+0;
+      if(a+b>=dd) b=dd-a-1;
+      if(b<1){ a=1; b=1; }
+      return maQ(a+"/"+dd+" + "+b+"/"+dd, (a+b)+"/"+dd, {im:"text", ph:"5/7"});
+    }
+    case 4: {
+      var dd=rnd(3,12), a=rnd(2,dd), b=rnd(1,a-1), g=(function(x,y){ while(y){var t=y;y=x%y;x=t;} return x; })(a-b,dd);
+      var alt=[]; if(g>1) alt.push(((a-b)/g)+"/"+(dd/g));
+      if(a-b===dd) alt.push("1");
+      return maQ(a+"/"+dd+" \u2212 "+b+"/"+dd, (a-b)+"/"+dd, {im:"text", ph:"3/9", alt:alt});
+    }
+    case 5:
+      return maQ("How many "+fracWord(d)+" make one whole?", d, {w:1});
+    default: {
+      var dd=rnd(4,12), s=[], u={};
+      while(s.length<3){ var n=rnd(1,dd-1); if(!u[n]){ u[n]=1; s.push(n); } }
+      var big=maPick([0,1]);
+      var want = big?Math.max.apply(null,s):Math.min.apply(null,s);
+      return maQ("Which is "+(big?"the largest":"the smallest")+": "+
+                 s.map(function(n){ return n+"/"+dd; }).join(", ")+"?",
+                 want+"/"+dd, {w:1, im:"text", ph:"3/8"});
+    }
+  }
+}
+
+function maMoney(){
+  switch(rnd(1,5)){
+    case 1: {
+      var c=rnd(105,995);
+      return maQ("How many cents is "+money(c)+"?", c, {w:1});
+    }
+    case 2: {
+      var c=rnd(105,995);
+      return maQ("Write "+c+" cents in dollars.", money(c),
+                 {w:1, im:"text", ph:"$1.20", alt:[(c/100).toFixed(2)]});
+    }
+    case 3: {
+      var a=rnd(105,600), b=rnd(105,395);
+      if((a%10)+(b%10)<10) b+=10-((a%10)+(b%10));
+      return maQ(money(a)+" + "+money(b), money(a+b),
+                 {im:"text", ph:"$7.15", alt:[((a+b)/100).toFixed(2)]});
+    }
+    case 4: {
+      var paid=maPick([500,1000,2000]), cost=rnd(105,paid-40);
+      return maQ("He pays "+money(paid)+" for a book costing "+money(cost)+
+                 ".  How much change does he get?", money(paid-cost),
+                 {w:1, im:"text", ph:"$3.60", alt:[((paid-cost)/100).toFixed(2)]});
+    }
+    default: {
+      var a=rnd(105,900), b=a+maPick([-1,1])*maPick([5,45,50,90]);
+      if(b<100) b=a+45;
+      var more=maPick([0,1]);
+      return maQ("Which is "+(more?"more":"less")+", "+money(a)+" or "+money(b)+"?",
+                 money(more?Math.max(a,b):Math.min(a,b)),
+                 {w:1, im:"text", ph:"$5.50",
+                  alt:[((more?Math.max(a,b):Math.min(a,b))/100).toFixed(2)]});
+    }
+  }
+}
+
+function maTime(){
+  switch(rnd(1,5)){
+    case 1: {
+      var h=rnd(1,5), m=rnd(1,59);
+      return maQ("How many minutes is "+h+" h "+m+" min?", h*60+m, {w:1});
+    }
+    case 2: {
+      var t=rnd(70,340);
+      return maQ("Write "+t+" minutes in hours and minutes.",
+                 Math.floor(t/60)+" h "+(t%60)+" min",
+                 {w:1, im:"text", ph:"3 h 20 min",
+                  alt:[Math.floor(t/60)+"h"+(t%60)]});
+    }
+    case 3: {
+      var s=rnd(8,10)*60+rnd(0,55), d=rnd(15,55);
+      return maQ("A lesson starts at "+hhmm(s)+" am and ends at "+hhmm(s+d)+
+                 " am.  How many minutes long is it?", d, {w:1});
+    }
+    case 4: {
+      var s=rnd(1,10)*60+rnd(0,55), d=rnd(10,55);
+      return maQ("It is "+hhmm(s)+".  What time will it be in "+d+" minutes?",
+                 hhmm(s+d), {w:1, im:"text", ph:"4:05",
+                 alt:[hhmm(s+d).replace(":",".")]});
+    }
+    default: {
+      var h=rnd(1,4), m=maPick([5,10,15,20,25,30,40,45,50]);
+      return maQ("How many minutes is "+h+" h "+m+" min?", h*60+m, {w:1});
+    }
+  }
+}
+
+function maMeasure(){
+  switch(rnd(1,5)){
+    case 1: {
+      var x=maPick([["an apple","g","kg"],["a bag of rice","kg","g"],
+                    ["a school bag","kg","g"],["a coin","g","kg"]]);
+      return maQ("Which unit would you use for the mass of "+x[0]+" \u2014 g or kg?",
+                 x[1], {w:1, im:"text", ph:"g or kg"});
+    }
+    case 2: {
+      var a=rnd(2,9), b=rnd(2,9);
+      return maQ("A jug holds "+a+" \u2113 and a pail holds "+b+
+                 " \u2113.  How many litres altogether?", a+b, {w:1});
+    }
+    case 3: {
+      var a=rnd(120,900), b=rnd(120,900); while(b===a) b=rnd(120,900);
+      var hv=maPick([0,1]);
+      return maQ("Which is "+(hv?"heavier":"lighter")+", "+a+" g or "+b+" g?",
+                 (hv?Math.max(a,b):Math.min(a,b))+" g",
+                 {w:1, im:"text", ph:"520 g", alt:[String(hv?Math.max(a,b):Math.min(a,b))]});
+    }
+    case 4: {
+      var a=rnd(6,20), b=rnd(2,a-2);
+      return maQ("A ribbon is "+a+" m long.  "+b+
+                 " m is cut off.  How many metres are left?", a-b, {w:1});
+    }
+    default: {
+      var x=maPick([["a bottle of water","\u2113"],["the length of a classroom","m"],
+                    ["a pencil","cm"]]);
+      return maQ("Which unit fits "+x[0]+" \u2014 cm, m or \u2113?", x[1],
+                 {w:1, im:"text", ph:"cm, m or \u2113"});
+    }
+  }
+}
+
+/* The stretch set. Off the P2 syllabus on purpose — these are the tables
+   he meets in P3 — so the box is labelled next year and a poor score there
+   means nothing has gone wrong. */
+function maReach(){
+  var t=maPick([6,7,8,9]), n=rnd(2,10);
+  switch(rnd(1,3)){
+    case 1: return maQ(maPick([0,1]) ? t+" \u00d7 "+n : n+" \u00d7 "+t, t*n);
+    case 2: return maQ((t*n)+" \u00f7 "+t, n);
+    default: return maQ("What goes in the blank?  "+t+" \u00d7 ___ = "+(t*n), n, {w:1});
+  }
+}
+
 function mathItems(kind){
-  var o=[];
-  for(var i=0;i<10;i++){
-    var a,b,q,ans;
-    if(kind==="easy"){
-      a=rnd(2,18); b=rnd(1,Math.max(1,18-a));
-      if(Math.random()<0.5){ q=a+" + "+b; ans=a+b; }
-      else { if(b>a){var t=a;a=b;b=t;} q=a+" − "+b; ans=a-b; }
-    } else if(kind==="times"){ a=rnd(2,10); b=rnd(2,10); q=a+" × "+b; ans=a*b; }
-    else { var r=Math.random();
-      if(r<0.34){ a=rnd(3,12); b=rnd(3,12); q=a+" × "+b; ans=a*b; }
-      else if(r<0.67){ b=rnd(2,12); ans=rnd(2,12); q=(b*ans)+" ÷ "+b; }
-      else { a=rnd(21,89); b=rnd(11,49); q=a+" + "+b; ans=a+b; } }
-    o.push({k:"math",q:q,a:String(ans)});
+  var gen = {nums:maNums, addsub:maAddSub, times:maTimes, frac:maFrac,
+             money:maMoney, time:maTime, measure:maMeasure, reach:maReach}[kind] || maNums;
+  var o=[], seen={};
+  /* ten different questions: a repeat inside one round reads as a mistake */
+  for(var guard=0; o.length<10 && guard<200; guard++){
+    var it=gen();
+    if(seen[it.q]) continue;
+    seen[it.q]=1; o.push(it);
   }
   return o;
+}
+
+/* Numbers can be written more than one way and still be right: $3.60 or 3.6,
+   3 h 20 min or 3h20. Compare what they mean, not how it was typed. */
+function maNorm(s){
+  return String(s||"").toLowerCase()
+    .replace(/hours?|hrs?/g,"h").replace(/minutes?|mins?/g,"m")
+    .replace(/[\s,$]/g,"").replace(/[.\u3002]+$/,"");
+}
+function mathOK(given, it){
+  var g=maNorm(given), opts=[it.a].concat(it.alt||[]);
+  for(var i=0;i<opts.length;i++){
+    var w=maNorm(opts[i]);
+    if(g===w) return true;
+    if(/^-?\d+(\.\d+)?$/.test(g) && /^-?\d+(\.\d+)?$/.test(w) &&
+       Math.abs(parseFloat(g)-parseFloat(w))<1e-9) return true;
+  }
+  return false;
 }
 
 /* What a practice code opens, for labelling the button on Upcoming. */
@@ -225,7 +541,7 @@ function practiceLabel(code){
   if(p[0]==="hz") return "\u6211\u4f1a\u5199 "+p[1];
   if(p[0]==="rn") return "\u6211\u4f1a\u8ba4 "+p[1];
   if(p[0]==="tx") return "\u542c\u5199 "+p[1];
-  if(p[0]==="ma") return "Maths \u00b7 "+(p[1]==="easy"?"Warm up":p[1]==="times"?"Times tables":"Challenge");
+  if(p[0]==="ma") return "Maths \u00b7 "+maName(p[1]);
   return p[1];
 }
 
@@ -306,8 +622,7 @@ function itemsFor(code, kid){
       items=bank[k].slice().sort(function(){ return Math.random()-0.5; })
         .map(function(x){ return {k:"bd",h:x[0],word:x[1],a:x[2],tone:x[3],m:x[4],lesson:k}; });
     }
-    else if(p[0]==="ma"){ subject="Math";
-      test="Math \u00b7 "+(k==="easy"?"Warm up":k==="times"?"Times tables":"Challenge");
+    else if(p[0]==="ma"){ subject="Math"; test="Math \u00b7 "+maName(k);
       items=mathItems(k); }
   }catch(e){ return null; }
   if(!items || !items.length) return null;
@@ -345,7 +660,7 @@ function allCodes(kid){
     out.push("rn|"+k); out.push("hz|"+k);
     if(typeof TC_TINGXIE!=="undefined" && TC_TINGXIE[k]) out.push("tx|"+k);
   });
-  if(hasSubj(kid,"ma")) ["easy","times","hard"].forEach(function(k){ out.push("ma|"+k); });
+  if(hasSubj(kid,"ma")) MA_SETS.forEach(function(m){ out.push("ma|"+m[0]); });
   return out;
 }
 function untriedCodes(kid){
@@ -810,8 +1125,11 @@ function quizHTML(){
        'spellcheck="false" placeholder="'+(pn>1?"da4 ma3":"ma3")+'">'+
        '';
   } else if(it.k==="math"){
-    s+='<div class="qq">'+it.q+' = ?</div>'+
-       '<input type="text" id="qa" inputmode="numeric" autocomplete="off" placeholder="Answer">';
+    /* A sum gets " = ?" after it; a question already asks for itself. */
+    s+='<div class="qq'+(it.w?" qw":"")+'">'+esc(it.q)+(it.w?"":" = ?")+'</div>'+
+       '<input type="text" id="qa" inputmode="'+(it.im==="text"?"text":"numeric")+
+       '" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="'+
+       esc(it.ph||"Answer")+'">';
   } else {
     s+='<div class="qq">'+(it.k==="dict"?"Write the sentence":"Spell the word")+'</div>'+
        '<div class="tip">Word, then the sentence, then the word again.</div>'+
@@ -1113,8 +1431,8 @@ function grade(forced){
       (right?"\u2713 "+esc(pyWant(it)):"\u2717 \u2192 <b>"+esc(pyWant(it))+"</b>")+
       '<br>'+esc(it.m);
   } else if(it.k==="math"){
-    right=clean(given)===it.a;
-    if(!right) detail=it.q+' = <b>'+it.a+'</b>';
+    right=mathOK(given, it);
+    if(!right) detail=esc(it.q)+(it.w?'<br>':' = ')+'<b>'+esc(it.a)+'</b>';
   } else { right=clean(given)===clean(it.a); detail=ltRow(it.a,given); }
 
   /* Keep what he actually put down, so it can be looked at afterwards:
