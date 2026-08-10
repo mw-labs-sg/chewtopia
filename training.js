@@ -987,7 +987,7 @@ function speakIt(it){
     sayLater(function(){ say(it.h,0.7,"zh-CN"); },      hasCtx?2200:800);    /* 来 */
     sayLater(function(){ say(it.h,0.6,"zh-CN"); },      hasCtx?3600:2200);   /* 来 */
   }
-  else if(it.k==="py"||it.k==="hz"||it.k==="rn"){
+  else if(it.k==="py"||it.k==="hz"||it.k==="rn"||it.k==="bd"){
     /* here the whole word is right: 更, 长, 乐, 种 and 教 all have two
        readings and the engine guesses wrong without the context */
     say(it.word,0.9,"zh-CN");
