@@ -699,6 +699,7 @@ function wResults(){
 }
 
 seedOnce();
+dropUnmarked();
 cloudInit();
 tab = tabFromHash() || tab;
 if(!location.hash){ try{ location.replace("#"+SLUGS[tab]); }catch(e){} }

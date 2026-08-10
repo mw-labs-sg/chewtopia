@@ -155,6 +155,14 @@ function uuid(){
 }
 
 function results(){ return SJ("results",[]); }
+
+/* Nothing produces hand-marked runs any more — 华文 is typed for both boys.
+   An unmarked run has no real score, and lastFor() was showing it as 0, so any
+   left over from the handwriting days are dropped rather than counted. */
+function dropUnmarked(){
+  var a=results(), keep=a.filter(function(r){ return !r.pend; });
+  if(keep.length!==a.length) WJ("results", keep);
+}
 function addResult(r){
   if(!r.id) r.id=uuid();
   r.up=0;                                  /* not yet uploaded */

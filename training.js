@@ -17,8 +17,10 @@ function tKid(){
 function tKidBar(){
   var v=tKid();
   return '<div class="whobar tkbar">'+KIDS.map(function(k){
+    var st=streak(k.id).n;
     return '<button class="wb w-'+k.id+(v===k.id?" on":"")+'" data-tk="'+k.id+'">'+
-      esc(pname(k.id))+'<small>'+k.level+'</small></button>';
+      esc(pname(k.id))+'<small>'+k.level+
+      (st?' \u00b7 '+st+"\uD83D\uDD25":"")+'</small></button>';
   }).join("")+'</div>';
 }
 
@@ -126,10 +128,6 @@ function dailyBtn(kid){
 }
 
 function vTests(){
-  /* The marking sheet used to open from Progress; with that tab gone it opens
-     over Training instead. Only reachable if old handwriting runs are pending. */
-  if(markRun) return vMarkRun();
-
   var pick=SUBJ_COLS.slice();     /* everything, always — one screen, no filter */
 
   var s='<div class="panel"><h2><span class="em">📝</span> Training</h2>'+
@@ -146,9 +144,7 @@ function vTests(){
     var cols=pick.filter(function(c){ return hasSubj(k.id, c[0]); });
     if(!cols.length) return;
     var wk=weakTop(k.id, 12);
-    s+='<div class="kidbox"><div class="kidname '+whoCls(k.id)+'">'+
-       esc(pname(k.id))+'<small>'+k.level+
-       (streak(k.id).n?' \u00b7 '+streak(k.id).n+"\uD83D\uDD25":"")+'</small></div>'+
+    s+='<div class="kidbox">'+
        dailyBtn(k.id)+
        (wk.length?'<button class="fixbtn" data-t="weak" data-kid="'+k.id+'">'+
          '<span class="nm">Practise the '+wk.length+' he keeps missing</span>'+
@@ -165,7 +161,7 @@ function vTests(){
   /* Sync used to live on Progress. That tab is gone, so it sits here, at the
      foot of the screen the grown-ups already open. markPanel() renders nothing
      unless old handwriting runs are still waiting to be marked. */
-  s+=markPanel()+syncPanel();
+  s+=syncPanel();
 
   /* A word if the tablet has no Mandarin voice — otherwise nothing to set. */
   if(!bestVoice("zh-CN")){
