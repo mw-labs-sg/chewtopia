@@ -283,6 +283,25 @@ var HANZI = {
 };
 
 /* --- SC, Kindergarten K2 --- */
+
+/* ==========================================================================
+   TC_TINGXIE — the 听写 sheets themselves, 南洋小学 二年级高级华文.
+   Section (二) 填写字词: a sentence with the tested characters knocked out.
+   s   the sentence, □ where a character is missing
+   a   the missing characters, in order
+   Read off the workbook and checked against the 生字表: the answers for a
+   lesson use every character on its 写字 list exactly once.
+   ========================================================================== */
+var TC_TINGXIE = {
+  "\u542c\u5199 13 \u00b7 \u7b2c\u5341\u4e09\u8bfe": [
+    ["\u25a1\u53ea\u5c0f\u9e1f\u75c5\u4e86\uff0c\u4e3b\u4eba\u8981\u5e26\u5b83\u53bb\u770b\u517d\u25a1\u3002", "\u90a3\u533b"],
+    ["\u5c0f\u7f8e\u89c1\u5230\u8001\u5e08\u5c31\u6253\u62db\u547c\uff0c\u5927\u5bb6\u90fd\u25a1\u25a1\u5979\u5f88\u6709\u793c\u8c8c\u3002", "\u89c9\u5f97"],
+    ["\u25a1\u548c\u25a1\u662f\u6211\u4eec\u751f\u6d3b\u4e2d\u5e38\u89c1\u7684\u5ba0\u7269\u3002", "\u732b\u72d7"],
+    ["\u6628\u5929\u25a1\u4e0a\uff0c\u6211\u25a1\u89c1\u5988\u5988\u9001\u7ed9\u6211\u4e00\u53ea\u5c0f\u767d\u25a1\u3002", "\u665a\u68a6\u5154"],
+    ["\u5c0f\u660e\u4ee5\u25a1\u25a1\u662f\u4e71\u25a1\u5783\u573e\uff0c\u540e\u6765\u6539\u6389\u4e86\u574f\u4e60\u60ef\u3002", "\u524d\u603b\u4e22"]
+  ]
+};
+
 var SC_TINGXIE = {
   "Week 6 · 6 Aug": [
     ["去","去学校","qu","4","to go"], ["来","过来","lai","2","to come"],

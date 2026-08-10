@@ -531,6 +531,10 @@
   /* build it: the cue word with blanks, then the tiles to fill them */
   .bword{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:16px 0 6px}
   .bfix{font-size:40px;line-height:1.1;color:var(--soft)}
+  /* a whole 听写 sentence needs to wrap and sit smaller than a single word */
+  .bword.sent{font-size:0;line-height:1.5;gap:0;margin:14px 0 4px}
+  .bword.sent .bfix{font-size:26px;color:var(--ink)}
+  .bword.sent .bslot{font-size:26px;min-width:34px;margin:0 2px}
   .bslot{font-size:40px;line-height:1.1;min-width:52px;text-align:center;
     border-bottom:3px solid var(--line);color:#C3D2DF}
   .bslot.on{color:var(--ink);border-bottom-color:var(--blue);cursor:pointer}

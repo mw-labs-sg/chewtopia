@@ -281,9 +281,22 @@ function itemsFor(code, kid){
       /* Both boys type the pinyin, same format, tones included. SC used to
          write the characters on the pad, but that needed marking by hand and
          was easy to get backwards. */
-      var bank = kid==="tc" ? TC_PINYIN : SC_TINGXIE;
-      items=bank[k].slice().sort(function(){ return Math.random()-0.5; })
-        .map(function(x){ return {k:"bd",h:x[0],word:x[1],a:x[2],tone:x[3],m:x[4],lesson:k}; }); }
+      if(kid==="tc" && typeof TC_TINGXIE!=="undefined" && TC_TINGXIE[k]){
+        /* the school sheet: whole sentences with the characters knocked out */
+        items=TC_TINGXIE[k].slice().sort(function(){ return Math.random()-0.5; })
+          .map(function(x){
+            var said=x[0].split("").map(function(c,i){ return c; }).join("");
+            var full=""; var j=0;
+            for(var i=0;i<x[0].length;i++){
+              full += x[0].charAt(i)==="\u25a1" ? x[1].charAt(j++) : x[0].charAt(i);
+            }
+            return {k:"bd", s:x[0], h:x[1], word:full, a:"", tone:"", m:"", lesson:k};
+          });
+      } else {
+        var bank = kid==="tc" ? TC_PINYIN : SC_TINGXIE;
+        items=bank[k].slice().sort(function(){ return Math.random()-0.5; })
+          .map(function(x){ return {k:"bd",h:x[0],word:x[1],a:x[2],tone:x[3],m:x[4],lesson:k}; });
+      } }
     else if(p[0]==="ma"){ subject="Math";
       test="Math \u00b7 "+(k==="easy"?"Warm up":k==="times"?"Times tables":"Challenge");
       items=mathItems(k); }
@@ -417,6 +430,21 @@ function pyOpts(it){
 function bdSlots(it){ return String(it.h||"").split(""); }
 /* The cue word with the tested characters knocked out. 小蛇 -> 小 □ */
 function bdMasked(it, filled){
+  /* A 听写 sentence carries its own gaps, which need not be next to each other:
+     昨天□上，我□见妈妈送给我一只小白□。 */
+  if(it.s){
+    var out="", j=0;
+    for(var i=0;i<it.s.length;i++){
+      var ch=it.s.charAt(i);
+      if(ch==="\u25a1"){
+        var got=(filled||[])[j];
+        out+='<span class="bslot'+(got?" on":"")+'" data-slot="'+j+'">'+
+             (got?esc(got):"\u25a1")+'</span>';
+        j++;
+      } else out+='<span class="bfix">'+esc(ch)+'</span>';
+    }
+    return out;
+  }
   var wd=String(it.word||it.h), tgt=String(it.h||""), at=wd.indexOf(tgt);
   if(at<0){ wd=tgt; at=0; }
   var out="";
@@ -456,7 +484,7 @@ function bdTiles(it){
     });
   });
   function shuffle(a){ return a.sort(function(){ return Math.random()-0.5; }); }
-  var extra = Math.min(4, Math.max(2, 7-need.length));
+  var extra = it.s ? 4 : Math.min(4, Math.max(2, 7-need.length));
   var d=shuffle(near).concat(shuffle(far)).slice(0, extra);
   it.tiles=shuffle(need.concat(d));
   return it.tiles;
@@ -717,10 +745,11 @@ function quizHTML(){
   }
   else if(it.k==="bd"){
     var fl=bdFilled(), need=bdSlots(it);
-    s+='<div class="qq">Listen, then tap the '+
-         (need.length>1?need.length+' characters':'character')+' you hear</div>'+
+    s+='<div class="qq">'+(it.s
+         ? "Listen, then fill in the missing characters"
+         : "Listen, then tap the "+(need.length>1?need.length+" characters":"character")+" you hear")+'</div>'+
        '<button class="btn play wide" id="qP">\uD83D\uDD0A Hear the word</button>'+
-       '<div class="bword">'+bdMasked(it, fl)+'</div>'+
+       '<div class="bword'+(it.s?" sent":"")+'">'+bdMasked(it, fl)+'</div>'+
        (q.graded
         ? '<div class="hint2">'+esc(it.h)+' \u00b7 <b>'+esc(it.a)+(it.tone||"")+'</b>'+
           (it.m?' \u00b7 '+esc(it.m):"")+'</div>'
@@ -1044,9 +1073,12 @@ function grade(forced){
     gained=0;
     need.forEach(function(c,i){ if(got[i]===c) gained++; });
     right = gained===need.length;
-    detail='<b style="font-size:34px">'+esc(it.h)+'</b><br>'+esc(it.word||"")+
-      ' \u00b7 '+esc(it.a)+(it.tone||"")+(it.m?'<br>'+esc(it.m):"")+
-      (right?"":'<br>You put: '+(esc(got.join(""))||"nothing"));
+    detail = it.s
+      ? '<b style="font-size:20px;line-height:1.6">'+esc(it.word||"")+'</b>'+
+        (right?"":'<br>You put: '+(esc(got.join(""))||"nothing"))
+      : '<b style="font-size:34px">'+esc(it.h)+'</b><br>'+esc(it.word||"")+
+        ' \u00b7 '+esc(it.a)+(it.tone||"")+(it.m?'<br>'+esc(it.m):"")+
+        (right?"":'<br>You put: '+(esc(got.join(""))||"nothing"));
   }
   else if(it.k==="hz"){
     var gv=String(given||"").trim();
