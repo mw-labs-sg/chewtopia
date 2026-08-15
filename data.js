@@ -626,7 +626,12 @@ var SEED_EVENTS = [
    n:"Mdm Leong set an SLS activity, Introduction to Fractions, to revise what the class has covered — plus pages 72\u201375 of the practice book. Unit and like fractions: naming them, comparing them, adding and subtracting with the same bottom number."},
   {id:"e27", t:"Connectogram — parents to fill in", d:"2026-08-26", w:"tc",
    n:"Miss Lee \u674e\u8001\u5e08 asked parents to help their child complete it by 26 August, so the teachers understand how the class gets on together.",
-   url:"https://forms.moe.edu.sg/sna/forms/vK3M45"}
+   url:"https://forms.moe.edu.sg/sna/forms/vK3M45"},
+
+  /* Nanyang Kindergarten, K2 English teachers — coins for the counting-money
+     unit. Dated the day they are due in, not the day the letter came. */
+  {id:"e29", t:"Bring $3 in coins — counting money", d:"2026-08-24", w:"sc",
+   n:"Exactly 4 × 10¢, 3 × 20¢, 2 × 50¢ and 1 × $1 — $3 altogether. In a small purse or ziplock bag with his name on it, in school by Monday 24 August. The coins stay in class for the counting activities and come back at the end of Term 4. Teachers are not liable for any that go missing."}
 ];
 
 /* ==========================================================================
