@@ -577,7 +577,30 @@ var SEED_EVENTS = [
   {id:"e18", t:"Spelling test", d:"2026-08-26", w:"sc", p:"es|Week 9 · 26 Aug",
    n:"Week 9, Wednesday. cookies, bake, juice, tray, flour, and the sentence."},
   {id:"e16", t:"华文 test — 我学会了 第九至十二课", d:"2026-08-06", w:"tc", p:"hz|第九课",
-   n:"All four lessons are now in Training. 我会写 生字 for 第九课 (weather), 第十课 (小动物), 第十一课 and 第十二课, plus 词表 word lists for 11 and 12. Work through them in order."}
+   n:"All four lessons are now in Training. 我会写 生字 for 第九课 (weather), 第十课 (小动物), 第十一课 and 第十二课, plus 词表 word lists for 11 and 12. Work through them in order."},
+
+  /* TC spelling runs two Tuesdays on, one Tuesday off. 3.3 on 28 Jul, 3.4 on
+     4 Aug, the 11th was the rest week (and the PSLE oral closure), so the run
+     picks up again here. After 25 Aug comes another rest week, then the Term 3
+     holiday, so 3.6 is the last one this term. */
+  {id:"e19", t:"Spelling test — List 3.5", d:"2026-08-18", w:"tc", p:"en|3.5",
+   n:"Unit 10. Seven words plus three dictation sentences."},
+  {id:"e20", t:"Spelling test — List 3.6", d:"2026-08-25", w:"tc", p:"en|3.6",
+   n:"Unit 10. Seven words plus three dictation sentences. Last spelling test of Term 3."},
+
+  /* 听写 is a Thursday. The 13 Aug one moved to Friday the 14th because of the
+     PSLE oral closure; this is the next one. */
+  {id:"e21", t:"华文听写 — 第十四课", d:"2026-08-27", w:"tc", p:"hz|第十四课",
+   n:"Thursday. 第十四课 生字: 难, 该, 作, 易, 伤, 脸, 争, 容, 吵, 能, 应, 呢. Training has 我会认 and 我会写 for it; the 听写 sheet itself is not in yet."},
+
+  /* MOE school calendar 2026 — Term 3 runs 29 Jun to 4 Sept, Term 4 from 14 Sept. */
+  {id:"e22", t:"Teachers' Day — no school", d:"2026-09-04", w:"tc",
+   n:"Also the last day of Term 3."},
+  {id:"e23", t:"Term 3 holidays", d:"2026-09-05", d2:"2026-09-13", w:"tc",
+   n:"Term 4 starts Monday 14 September."},
+  {id:"e24", t:"Children's Day — no school", d:"2026-10-02", w:"tc"},
+  {id:"e25", t:"End of school year", d:"2026-11-21", d2:"2026-12-31", w:"tc",
+   n:"Term 4 ends Friday 20 November."}
 ];
 
 /* ==========================================================================
