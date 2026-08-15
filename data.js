@@ -579,6 +579,39 @@ var SEED_EVENTS = [
   {id:"e16", t:"华文 test — 我学会了 第九至十二课", d:"2026-08-06", w:"tc", p:"hz|第九课",
    n:"All four lessons are now in Training. 我会写 生字 for 第九课 (weather), 第十课 (小动物), 第十一课 and 第十二课, plus 词表 word lists for 11 and 12. Work through them in order."}
 ];
+
+/* ==========================================================================
+   SINGAPORE PUBLIC HOLIDAYS — the gazetted list from the Ministry of Manpower.
+   Everyone's, so they run the full width of Upcoming, and hol:1 gives them
+   their own quiet colour: these are days off, not things to do.
+
+   Where a holiday lands on a Sunday the Monday after is gazetted in its place,
+   and that Monday is the one that matters — it is the day there is no school.
+   Both are listed so the reason is never a mystery.
+   ========================================================================== */
+var SG_HOLIDAYS = [
+  /* --- 2026 --- */
+  {id:"ph26-1108", t:"Deepavali",                d:"2026-11-08", hol:1},
+  {id:"ph26-1109", t:"Public holiday — Deepavali (in lieu)", d:"2026-11-09", hol:1,
+   n:"Deepavali falls on a Sunday, so the Monday is the day off."},
+  {id:"ph26-1225", t:"Christmas Day",            d:"2026-12-25", hol:1},
+  /* --- 2027 --- */
+  {id:"ph27-0101", t:"New Year's Day",           d:"2027-01-01", hol:1},
+  {id:"ph27-0206", t:"Chinese New Year",         d:"2027-02-06", d2:"2027-02-07", hol:1,
+   n:"初一 Saturday, 初二 Sunday."},
+  {id:"ph27-0208", t:"Public holiday — Chinese New Year (in lieu)", d:"2027-02-08", hol:1,
+   n:"初二 falls on a Sunday, so the Monday is the day off."},
+  {id:"ph27-0310", t:"Hari Raya Puasa",          d:"2027-03-10", hol:1},
+  {id:"ph27-0326", t:"Good Friday",              d:"2027-03-26", hol:1},
+  {id:"ph27-0501", t:"Labour Day",               d:"2027-05-01", hol:1},
+  {id:"ph27-0517", t:"Hari Raya Haji",           d:"2027-05-17", hol:1},
+  {id:"ph27-0520", t:"Vesak Day",                d:"2027-05-20", hol:1},
+  {id:"ph27-0809", t:"National Day",             d:"2027-08-09", hol:1},
+  {id:"ph27-1028", t:"Deepavali",                d:"2027-10-28", hol:1},
+  {id:"ph27-1225", t:"Christmas Day",            d:"2027-12-25", hol:1}
+];
+SEED_EVENTS = SEED_EVENTS.concat(SG_HOLIDAYS);
+
 var SEED_ACTS = [
   /* SC — from the printed weekly schedule */
   {id:"sa1", who:"sc", day:"Monday",    from:"16:00", to:"17:00", t:"Phonics"},

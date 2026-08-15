@@ -60,12 +60,13 @@ function todayFood(){
 }
 
 /* ==========================================================================
-   UPCOMING — a rolling agenda. Date down the left, then a column per boy, so
-   the eye lands on "when" first and "who" second. Empty days are skipped.
+   UPCOMING — a rolling four-week agenda. Date down the left, then a column per
+   boy, so the eye lands on "when" first and "who" second. Every day is listed,
+   including the empty ones, so a quiet week can be seen to be quiet.
    ========================================================================== */
 function evCard(e){
   var st=evState(e);
-  return '<div class="evc e-'+(e.w||"all")+(st.live?" live":"")+'">'+
+  return '<div class="evc e-'+(e.w||"all")+(st.live?" live":"")+(e.hol?" hol":"")+'">'+
     '<span class="evt">'+esc(e.t)+'</span>'+
     '<span class="evw">'+(st.live?(e.d2?"On now":"Today"):evWhen(e))+
       (e.time?' \u00b7 '+e.time:'')+
@@ -77,48 +78,110 @@ function evCard(e){
     '</div>';
 }
 
+/* ---------- the rolling window ---------- */
+/* Four weeks, every single day, so a quiet fortnight reads as a quiet fortnight
+   instead of the screen looking broken. Skipping the empty days made the list
+   shorter but you could no longer tell "nothing on" from "nothing entered". */
+var AGENDA_DAYS = 28;
+function isoOf(d){
+  return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+
+         "-"+String(d.getDate()).padStart(2,"0");
+}
+function rollingDays(n){
+  var d=new Date(); d.setHours(0,0,0,0);
+  var out=[];
+  for(var i=0;i<n;i++){ var x=new Date(d); x.setDate(d.getDate()+i); out.push(isoOf(x)); }
+  return out;
+}
+/* Which Monday a date belongs to, and what to call that week. */
+function mondayOf(isoStr){
+  var d=new Date(isoStr+"T00:00:00");
+  d.setDate(d.getDate()-((d.getDay()+6)%7));
+  return isoOf(d);
+}
+function weekLabel(monIso){
+  var here=mondayOf(isoOf(new Date()));
+  var gap=Math.round((new Date(monIso+"T00:00:00")-new Date(here+"T00:00:00"))/604800000);
+  if(gap===0) return "This week";
+  if(gap===1) return "Next week";
+  var a=new Date(monIso+"T00:00:00"), b=new Date(a); b.setDate(a.getDate()+6);
+  return "Week of "+a.getDate()+" "+a.toLocaleDateString("en-GB",{month:"short"})+
+         " – "+b.getDate()+" "+b.toLocaleDateString("en-GB",{month:"short"});
+}
+function isWeekend(isoStr){ var g=new Date(isoStr+"T00:00:00").getDay(); return g===0||g===6; }
+
 function vHome(){
   var f=vwho(), kids=shownKids();
   var evs=SJ("events",[]).filter(function(e){ return !evState(e).gone; })
     .filter(function(e){ return f==="all" || !e.w || e.w===f; })
     .sort(function(a,b){ return evState(a).start-evState(b).start; });
 
-  var s='<div class="panel"><h2><span class="em">📅</span> What is coming</h2>';
+  var s='<div class="panel"><h2><span class="em">📅</span> What is coming'+
+        '<span class="side">next 4 weeks</span></h2>';
 
-  if(evs.length){
-    /* one block per date, in order, so nothing empty takes up room */
-    var days=[], byDay={};
-    evs.forEach(function(e){
-      if(!byDay[e.d]){ byDay[e.d]=[]; days.push(e.d); }
-      byDay[e.d].push(e);
+  var days=rollingDays(AGENDA_DAYS), today=days[0], last=days[days.length-1];
+  /* A trip that started before today still belongs on today, not off the top. */
+  var byDay={}, later=[], laterDays=[];
+  evs.forEach(function(e){
+    var key = e.d < today ? today : e.d;
+    if(key>last){
+      if(!byDay[e.d]){ byDay[e.d]=[]; laterDays.push(e.d); }
+      byDay[e.d].push(e); later.push(e); return;
+    }
+    (byDay[key]=byDay[key]||[]).push(e);
+  });
+
+  s+='<div class="agenda'+(kids.length===1?" solo":"")+'">'+
+     '<span class="agh"></span>'+
+     kids.map(function(k){ return '<span class="agh '+whoCls(k.id)+'">'+esc(pname(k.id))+'</span>'; }).join("");
+
+  function dayRows(list, d, dim){
+    var out="", has=!!(list&&list.length);
+    out+='<span class="agd'+(d===today?" now":"")+(isWeekend(d)?" we":"")+
+         (has?"":" bare")+'"><b>'+dnum(d)+'</b><i>'+dday(d).slice(0,3)+'</i></span>';
+    kids.forEach(function(k){
+      var mine=has ? list.filter(function(e){ return e.w===k.id; }) : [];
+      out+='<span class="agc'+(has?"":" bare")+'">'+mine.map(evCard).join("")+'</span>';
     });
-
-    s+='<div class="agenda'+(kids.length===1?" solo":"")+'">'+
-       '<span class="agh"></span>'+
-       kids.map(function(k){ return '<span class="agh '+whoCls(k.id)+'">'+esc(pname(k.id))+'</span>'; }).join("");
-
-    var lastMonth="";
-    days.forEach(function(d){
-      var mon=dmon(d);
-      if(mon!==lastMonth){
-        lastMonth=mon;
-        s+='<span class="agmon">'+mon+'</span>';
-      }
-      var list=byDay[d], st=evState(list[0]);
-      s+='<span class="agd'+(st.live?" now":"")+'"><b>'+dnum(d)+'</b><i>'+
-         dday(d).slice(0,3)+'</i></span>';
-      kids.forEach(function(k){
-        var mine=list.filter(function(e){ return e.w===k.id; });
-        s+='<span class="agc">'+(mine.length?mine.map(evCard).join(""):'')+'</span>';
-      });
-      var all=list.filter(function(e){ return !e.w; });
-      if(all.length){
-        s+='<span class="agd sp"></span><span class="agc both">'+
+    var all=has ? list.filter(function(e){ return !e.w; }) : [];
+    if(all.length){
+      out+='<span class="agd sp"></span><span class="agc both">'+
            all.map(evCard).join("")+'</span>';
-      }
-    });
-    s+='</div>';
-  } else s+='<p class="empty">Nothing coming up'+(f==="all"?"":" for "+esc(pname(f)))+'.</p>';
+    }
+    return out;
+  }
+
+  var lastWk="";
+  days.forEach(function(d){
+    var mon=mondayOf(d);
+    if(mon!==lastWk){
+      lastWk=mon;
+      var mine=days.filter(function(x){ return mondayOf(x)===mon && (byDay[x]||[]).length; });
+      s+='<span class="agwk">'+esc(weekLabel(mon))+
+         '<i>'+(mine.length ? mine.length+(mine.length===1?" day on":" days on") : "clear")+'</i></span>';
+    }
+    s+=dayRows(byDay[d], d);
+  });
+
+  /* Past the four weeks, only the next few — the holiday list runs to the end
+     of next year and nobody needs Christmas 2027 under this week's spelling. */
+  if(laterDays.length){
+    laterDays.sort();
+    var show=laterDays.slice(0,3);
+    var restDays=laterDays.length-show.length;
+    var restEvs=0;
+    laterDays.slice(3).forEach(function(d){ restEvs+=byDay[d].length; });
+    s+='<span class="agwk">After that<i>'+
+       (restDays?"next 3 of "+laterDays.length:laterDays.length+
+         (laterDays.length===1?" day":" days"))+'</i></span>';
+    show.forEach(function(d){ s+=dayRows(byDay[d], d); });
+    if(restEvs){
+      s+='<span class="agd sp"></span><span class="agc both">'+
+         '<p class="empty" style="padding:2px 0">and '+restEvs+' more further out, '+
+         'the last on '+dfull(laterDays[laterDays.length-1])+'.</p></span>';
+    }
+  }
+  s+='</div>';
 
   if(showAdd){
     var opts='<option value="">Everyone</option>'+KIDS.map(function(k){

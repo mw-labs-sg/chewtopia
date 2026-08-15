@@ -422,6 +422,21 @@
   .agmon{grid-column:1/-1;font-size:11px;letter-spacing:.1em;text-transform:uppercase;
     font-weight:800;color:var(--soft);border-bottom:1px solid var(--line);
     padding:0 0 4px;margin:12px 0 6px}
+  /* one band per week, so a quiet fortnight still reads as a fortnight */
+  .agwk{grid-column:1/-1;display:flex;align-items:baseline;gap:8px;
+    font-size:11px;letter-spacing:.09em;text-transform:uppercase;font-weight:800;
+    color:var(--soft);border-bottom:1px solid var(--line);
+    padding:0 0 5px;margin:14px 0 7px}
+  .agwk:first-of-type{margin-top:2px}
+  .agwk i{margin-left:auto;font-style:normal;letter-spacing:.02em;text-transform:none;
+    font-weight:700;opacity:.75}
+  /* a day with nothing on it: still there, just quiet */
+  .agd.bare{background:transparent;color:var(--soft);opacity:.55;padding:3px 4px}
+  .agd.bare b{font-size:15px;font-weight:700}
+  .agd.we{background:#F0EAFE}
+  .agd.we.bare{background:transparent}
+  .agd.now.we{background:var(--ink)}
+  .agc.bare{min-height:0;padding-bottom:0}
   .agd{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
     background:var(--bg);border-radius:12px;padding:7px 4px 6px;line-height:1.05}
   .agd b{font-size:20px;font-weight:800}
@@ -438,6 +453,9 @@
   .evc.e-sc{background:#FFF6EC}
   .evc.e-all{background:#F5F3FE}
   .evc.live{box-shadow:0 0 0 2px var(--sun) inset}
+  /* a public holiday is a day off, not a thing to do */
+  .evc.hol{background:#FFF1D6}
+  .evc.hol .evt{color:#8A6100}
   .evt{display:block;font-weight:700;font-size:14.5px;line-height:1.25;color:var(--ink)}
   .evw{display:block;font-size:11.5px;font-weight:700;color:var(--soft);margin-top:2px}
   .evc .nt{display:block;font-size:12px;color:var(--soft);margin-top:5px;line-height:1.35}
@@ -694,14 +712,14 @@ body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;-
   </div>
   <div class="tabs" id="tabs"></div>
   <div id="view"></div>
-  <div class="foot">Saved on this device · build 78</div>
+  <div class="foot">Saved on this device · build 79</div>
 </div>
 <!-- load order matters: data, then core, then screens, app last -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="data.js?v=19"></script>
+<script src="data.js?v=20"></script>
 <script src="core.js?v=38"></script>
 <script src="timetable.js?v=5"></script>
 <script src="training.js?v=37"></script>
-<script src="app.js?v=68"></script>
+<script src="app.js?v=69"></script>
 </body>
 </html>

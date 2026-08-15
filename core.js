@@ -154,6 +154,13 @@ function evWhen(e){ var s=evState(e);
 function dday(i){ return new Date(i+"T00:00:00").toLocaleDateString("en-GB",{weekday:"long"}); }
 function dnum(i){ return new Date(i+"T00:00:00").getDate(); }
 function dmon(i){ return new Date(i+"T00:00:00").toLocaleDateString("en-GB",{month:"short"}); }
+/* Day and month, plus the year when it is not this one — "25 Dec" a year and a
+   half out reads as this December unless it says otherwise. */
+function dfull(i){
+  var d=new Date(i+"T00:00:00");
+  return dnum(i)+" "+dmon(i)+(d.getFullYear()!==new Date().getFullYear()
+    ? " "+d.getFullYear() : "");
+}
 var ft={};
 function flash(id){ var e=document.getElementById(id); if(!e) return;
   e.textContent="Saved"; clearTimeout(ft[id]); ft[id]=setTimeout(function(){e.textContent="";},1100); }
