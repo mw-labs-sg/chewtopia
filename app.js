@@ -32,8 +32,8 @@ function render(){
 
   var v=document.getElementById("view");
   if(quiz){ v.innerHTML=quizHTML(); wireQuiz(); return; }
-  var V={home:vHome,schedule:vWeek,meals:vMeals,practice:vTests,reading:vRead};
-  var Wr={home:wHome,schedule:wWeek,meals:wMeals,practice:wTests,reading:wRead};
+  var V={home:vHome,schedule:vWeek,meals:vMeals,practice:vTests,reading:vRead,links:vLinks};
+  var Wr={home:wHome,schedule:wWeek,meals:wMeals,practice:wTests,reading:wRead,links:wLinks};
   /* the child switch belongs inside the first panel, under its heading */
   var html=V[tab]();
   if(tab==="home"||tab==="schedule") html=html.replace("</h2>", "</h2>"+whoBar());
@@ -110,6 +110,32 @@ function weekLabel(monIso){
 }
 function isWeekend(isoStr){ var g=new Date(isoStr+"T00:00:00").getDay(); return g===0||g===6; }
 
+/* ==========================================================================
+   SCHOOL — the handful of sites the school sends you to, one tap each.
+   They open in a new tab and log in there. Nothing is stored here.
+   ========================================================================== */
+function vLinks(){
+  var s='<div class="panel"><h2><span class="em">\uD83C\uDFEB</span> School sites'+
+        '<span class="side">opens in a new tab</span></h2>'+
+        '<div class="lnks">';
+  (typeof SCHOOL_LINKS!=="undefined" ? SCHOOL_LINKS : []).forEach(function(l){
+    s+='<a class="lnk l-'+esc(l.k)+'" href="'+esc(l.u)+'" target="_blank" rel="noopener noreferrer">'+
+       '<span class="lnt">'+esc(l.t)+(l.cn?' <b>'+esc(l.cn)+'</b>':'')+'</span>'+
+       '<span class="lns">'+esc(l.s)+'</span>'+
+       '<span class="lnu">'+esc(String(l.u).replace(/^https:\/\//,""))+'</span>'+
+       '<span class="lngo">\u2197</span></a>';
+  });
+  s+='</div><div class="key">Chewtopia never asks for or keeps a password. '+
+     'Each of these takes you to the school\u2019s own login page, where the '+
+     'usual MIMS details go in.</div></div>';
+  return s;
+}
+function wLinks(){
+  document.querySelectorAll(".lnk").forEach(function(a){
+    a.addEventListener("click", function(){ sfxTap(); });
+  });
+}
+
 function vHome(){
   var f=vwho(), kids=shownKids();
   var evs=SJ("events",[]).filter(function(e){ return !evState(e).gone; })
@@ -137,8 +163,12 @@ function vHome(){
 
   function dayRows(list, d, dim){
     var out="", has=!!(list&&list.length);
+    /* a day off colours its own date too, so no-school days can be counted
+       down the left edge without reading a word */
+    var off = has && list.some(function(e){ return e.hol; });
     out+='<span class="agd'+(d===today?" now":"")+(isWeekend(d)?" we":"")+
-         (has?"":" bare")+'"><b>'+dnum(d)+'</b><i>'+dday(d).slice(0,3)+'</i></span>';
+         (off?" off":"")+(has?"":" bare")+'"><b>'+dnum(d)+'</b><i>'+
+         dday(d).slice(0,3)+'</i></span>';
     kids.forEach(function(k){
       var mine=has ? list.filter(function(e){ return e.w===k.id; }) : [];
       out+='<span class="agc'+(has?"":" bare")+'">'+mine.map(evCard).join("")+'</span>';

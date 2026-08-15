@@ -386,6 +386,18 @@ var TC_TINGXIE = {
     ["昨天□上，我□见妈妈送给我一只小白□。", "晚梦兔"],
     ["小明以□□是乱□垃圾，后来改掉了坏习惯。", "前总丢"]
   ],
+  /* 第十四课 — NOT off the workbook. The school's sheet for this lesson has not
+     come home yet, so these are practice sentences written to the same shape:
+     every character on the 我会写 list used once, inside a sentence a P2 child
+     would actually meet. Swap them for the real ones when the page turns up. */
+  "第十四课": [
+    ["这道题很□，那道题却很□□。", "难容易"],
+    ["做完功课后，我们□□早点休息。", "应该"],
+    ["哥哥的□业写完了，你的□？", "作呢"],
+    ["弟弟和妹妹为了一个玩具□□起来。", "争吵"],
+    ["他跌倒了，□上受了点□。", "脸伤"],
+    ["只要多练习，你就□写好这些字。", "能"]
+  ],
   "第十八课": [
     ["小丽把故事书放回□□的书架上。", "干净"],
     ["爸妈带我坐缆车到圣淘沙□□□洋□。", "参观海馆"],
@@ -560,7 +572,7 @@ var SEED_EVENTS = [
   /* Nanyang Primary, August info sheet NYPS2026/07/093 */
   {id:"e10", t:"National Day celebration", d:"2026-08-07", time:"07:30", w:"tc",
    n:"Be there by 7.30am at the Basketball and Multi-purpose Courts, King's Road campus. Red top with school shorts. In a small bag: a storybook for silent reading, healthy snacks, a water bottle, a National Day food item that means something about Singapore (his own to eat), and a hand-held flag if he wants one. Out at 10.30am — school bus runs as usual, or drive in between 10.50 and 11.15am."},
-  {id:"e11", t:"No school — PSLE oral", d:"2026-08-12", d2:"2026-08-13", w:"tc",
+  {id:"e11", t:"No school — PSLE oral", d:"2026-08-12", d2:"2026-08-13", w:"tc", hol:1,
    n:"P1 to P5 stay home both days while the P6 oral exams run. Only children booked into Student Care go in."},
   {id:"e12", t:"Founders' Day — 109th", d:"2026-08-14", w:"tc",
    n:"The school was founded 15 August 1917. Every child gets a longevity bun with lotus paste, halal option available. Normal school day, nothing to bring."},
@@ -568,7 +580,7 @@ var SEED_EVENTS = [
   /* Nanyang Kindergarten, National Day letter 28 Jul 2026 */
   {id:"e13", t:"National Day learning journey", d:"2026-08-07", time:"07:45", w:"sc",
    n:"Drop off at the 118 King's Road campus — teachers take them from 7.45am. Journey runs 8.00 to 11.15am, walking to places from Singapore's founding. Red top with white bottoms. Pack in a backpack: a cap, a water bottle, a light raincoat, and shoes he can walk in. Breakfast is given at school. No school bus at all today, so both trips are on us."},
-  {id:"e14", t:"Public holiday — National Day (in lieu)", d:"2026-08-10",
+  {id:"e14", t:"Public holiday — National Day (in lieu)", d:"2026-08-10", hol:1,
    n:"9 August falls on a Sunday. Kindergarten reopens Tuesday 11 August."},
   {id:"e15", t:"Spelling test — List 3.4", d:"2026-08-04", w:"tc", p:"en|3.4",
    n:"Unit 9. Eight words plus two dictation sentences."},
@@ -590,16 +602,16 @@ var SEED_EVENTS = [
 
   /* 听写 is a Thursday. The 13 Aug one moved to Friday the 14th because of the
      PSLE oral closure; this is the next one. */
-  {id:"e21", t:"华文听写 — 第十四课", d:"2026-08-27", w:"tc", p:"hz|第十四课",
-   n:"Thursday. 第十四课 生字: 难, 该, 作, 易, 伤, 脸, 争, 容, 吵, 能, 应, 呢. Training has 我会认 and 我会写 for it; the 听写 sheet itself is not in yet."},
+  {id:"e21", t:"华文听写 — 第十四课", d:"2026-08-27", w:"tc", p:"tx|第十四课",
+   n:"Thursday, fortnightly. 第十四课 生字: 难, 该, 作, 易, 伤, 脸, 争, 容, 吵, 能, 应, 呢. Training has all three: 我会认, 我会写 and a 听写 sheet."},
 
   /* MOE school calendar 2026 — Term 3 runs 29 Jun to 4 Sept, Term 4 from 14 Sept. */
-  {id:"e22", t:"Teachers' Day — no school", d:"2026-09-04", w:"tc",
+  {id:"e22", t:"Teachers' Day — no school", d:"2026-09-04", w:"tc", hol:1,
    n:"Also the last day of Term 3."},
-  {id:"e23", t:"Term 3 holidays", d:"2026-09-05", d2:"2026-09-13", w:"tc",
+  {id:"e23", t:"Term 3 holidays", d:"2026-09-05", d2:"2026-09-13", w:"tc", hol:1,
    n:"Term 4 starts Monday 14 September."},
-  {id:"e24", t:"Children's Day — no school", d:"2026-10-02", w:"tc"},
-  {id:"e25", t:"End of school year", d:"2026-11-21", d2:"2026-12-31", w:"tc",
+  {id:"e24", t:"Children's Day — no school", d:"2026-10-02", w:"tc", hol:1},
+  {id:"e25", t:"End of school year", d:"2026-11-21", d2:"2026-12-31", w:"tc", hol:1,
    n:"Term 4 ends Friday 20 November."}
 ];
 
@@ -634,6 +646,26 @@ var SG_HOLIDAYS = [
   {id:"ph27-1225", t:"Christmas Day",            d:"2027-12-25", hol:1}
 ];
 SEED_EVENTS = SEED_EVENTS.concat(SG_HOLIDAYS);
+
+/* ==========================================================================
+   SCHOOL LINKS — the sites the school actually sends you to. These open the
+   real login page in a new tab; nothing here stores a username or a password,
+   and it never should on a tablet the boys use.
+   ========================================================================== */
+var SCHOOL_LINKS = [
+  {id:"sls", t:"SLS", cn:"\u5b66\u4e60\u7a7a\u95f4",
+   s:"Student Learning Space \u2014 where the class activities are set. Log in with MIMS.",
+   u:"https://vle.learning.moe.edu.sg", k:"sls"},
+  {id:"icon", t:"Student iCON", cn:"",
+   s:"His school Google account \u2014 Docs, Slides and school email.",
+   u:"https://workspace.google.com/dashboard", k:"icon"},
+  {id:"dojo", t:"ClassDojo", cn:"",
+   s:"Messages from the teachers, and what has been set for home.",
+   u:"https://home.classdojo.com", k:"dojo"},
+  {id:"mims", t:"MIMS password reset", cn:"",
+   s:"When the SLS or iCON password stops working, reset it here.",
+   u:"https://go.gov.sg/mims-selfservice-passwordreset", k:"mims"}
+];
 
 var SEED_ACTS = [
   /* SC — from the printed weekly schedule */

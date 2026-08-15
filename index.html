@@ -453,9 +453,17 @@
   .evc.e-sc{background:#FFF6EC}
   .evc.e-all{background:#F5F3FE}
   .evc.live{box-shadow:0 0 0 2px var(--sun) inset}
-  /* a public holiday is a day off, not a thing to do */
-  .evc.hol{background:#FFF1D6}
-  .evc.hol .evt{color:#8A6100}
+  /* a day off — public holiday or school holiday. Red, so the days with no
+     school jump out of the column before anything else does. */
+  .evc.hol{background:#FFE3DC;box-shadow:inset 3px 0 0 #FF6F52}
+  .evc.hol .evt{color:#B03A22}
+  .evc.hol .evw{color:#C0563C}
+  .evc.hol .nt{color:#A8664F}
+  /* and the date itself, so a day off reads at a glance down the left edge */
+  .agd.off{background:#FFE3DC;color:#B03A22}
+  .agd.off i{color:#C0563C}
+  .agd.off.now{background:var(--ink);color:#fff}
+  .agd.off.now i{color:rgba(255,255,255,.8)}
   .evt{display:block;font-weight:700;font-size:14.5px;line-height:1.25;color:var(--ink)}
   .evw{display:block;font-size:11.5px;font-weight:700;color:var(--soft);margin-top:2px}
   .evc .nt{display:block;font-size:12px;color:var(--soft);margin-top:5px;line-height:1.35}
@@ -469,6 +477,32 @@
     .evt{font-size:13px}
     .evc{padding:8px 24px 8px 9px}
   }
+
+  /* ---- school sites: one card each, big enough for a thumb ---- */
+  .lnks{display:grid;grid-template-columns:1fr;gap:10px}
+  @media(min-width:620px){ .lnks{grid-template-columns:1fr 1fr} }
+  .lnk{position:relative;display:block;text-decoration:none;border-radius:16px;
+    padding:15px 44px 14px 16px;background:var(--bg);color:var(--ink);
+    border:2px solid var(--line);transition:transform .1s,border-color .12s}
+  .lnk:active{transform:translateY(2px)}
+  .lnt{display:block;font-family:'Baloo 2',cursive;font-size:19px;font-weight:700;
+    line-height:1.15}
+  .lnt b{font-family:'Noto Sans SC',sans-serif;font-size:16px;font-weight:700;opacity:.75}
+  .lns{display:block;font-size:13.5px;color:var(--soft);margin-top:3px;line-height:1.45}
+  .lnu{display:block;font-size:11.5px;font-weight:700;color:var(--soft);opacity:.7;
+    margin-top:7px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .lngo{position:absolute;top:14px;right:14px;width:28px;height:28px;border-radius:50%;
+    font-size:15px;font-weight:800;line-height:28px;text-align:center;
+    background:#fff;color:var(--soft)}
+  /* each site keeps its own colour so the eye learns the row */
+  .lnk.l-sls {border-color:#BBD7FA;background:var(--sky)}
+  .lnk.l-sls  .lnt,.lnk.l-sls  .lngo{color:var(--blue)}
+  .lnk.l-icon{border-color:#BFE3CB;background:#DFF3E4}
+  .lnk.l-icon .lnt,.lnk.l-icon .lngo{color:#2F7A45}
+  .lnk.l-dojo{border-color:#D5C8F7;background:#F0EAFE}
+  .lnk.l-dojo .lnt,.lnk.l-dojo .lngo{color:var(--grape)}
+  .lnk.l-mims{border-color:#F5D2C6;background:var(--peach)}
+  .lnk.l-mims .lnt,.lnk.l-mims .lngo{color:var(--tang)}
 
   /* ---- one test in full ---- */
   .wchips{display:flex;flex-wrap:wrap;gap:7px;margin:4px 0 6px}
@@ -712,14 +746,14 @@ body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;-
   </div>
   <div class="tabs" id="tabs"></div>
   <div id="view"></div>
-  <div class="foot">Saved on this device · build 80</div>
+  <div class="foot">Saved on this device · build 83</div>
 </div>
 <!-- load order matters: data, then core, then screens, app last -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="data.js?v=21"></script>
-<script src="core.js?v=38"></script>
+<script src="data.js?v=24"></script>
+<script src="core.js?v=39"></script>
 <script src="timetable.js?v=5"></script>
-<script src="training.js?v=37"></script>
-<script src="app.js?v=69"></script>
+<script src="training.js?v=39"></script>
+<script src="app.js?v=71"></script>
 </body>
 </html>

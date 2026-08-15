@@ -110,12 +110,12 @@ var DAYS = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunda
    Training rather than nowhere. */
 var TABS = [["home","Upcoming","t1"],["schedule","Timetable","t2"],
             ["meals","Meals","t3"],["practice","Training","t4"],
-            ["reading","Reading","t6"]];
+            ["reading","Reading","t6"],["links","School","t5"]];
 var tab="home", quiz=null, showAdd=false, openTest=null, openRun=null, markRun=null, markState=null;
 /* Each tab gets a readable address, e.g. .../chewtopia/#meals, so a link can
    be bookmarked or sent straight to one screen. */
 var SLUGS = {home:"upcoming", schedule:"timetable", meals:"meals",
-             practice:"training", reading:"reading"};
+             practice:"training", reading:"reading", links:"school"};
 function tabFromHash(){
   var h=(location.hash||"").replace(/^#\/?/,"").toLowerCase();
   for(var k in SLUGS){ if(SLUGS[k]===h) return k; }
@@ -123,6 +123,9 @@ function tabFromHash(){
   return null;
 }
 function go(id, quiet){
+  /* A name nothing can draw used to blank the screen and leave "#undefined" in
+     the address bar, with no way back except tapping a tab. */
+  if(!SLUGS[id]) id="home";
   tab=id; quiz=null; showAdd=false; openTest=null; openRun=null; markRun=null; markState=null; hush();
   if(!quiet){ try{ location.hash="#"+SLUGS[id]; }catch(e){} }
   render(); scrollTo(0,0);

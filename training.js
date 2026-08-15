@@ -987,6 +987,27 @@ function wireTrace(it){
   if(skip) skip.onclick=function(){ grade(false); };
 }
 
+/* What to call the question on screen. The Chinese questions all arrive as
+   k:"bd" — the build-it mechanic — so the kind has to come from the shape of
+   the item and the test it came from, or a 听写 ends up labelled "Spelling". */
+function quizKind(it){
+  if(it.k==="rn")   return "\u6211\u4f1a\u8ba4";          /* 我会认 */
+  if(it.k==="hz")   return "\u6211\u4f1a\u5199";          /* 我会写 */
+  if(it.k==="py")   return "\u6c49\u8bed\u62fc\u97f3";    /* 汉语拼音 */
+  if(it.k==="tx")   return "\u542c\u5199";                /* 听写 */
+  if(it.k==="dict") return "Dictation";
+  if(it.k==="math") return "Question";
+  if(it.k==="bd"){
+    /* a sentence with gaps is a 听写 sheet, whatever it was started from */
+    if(it.s) return "\u542c\u5199";
+    var p=String((quiz&&quiz.code)||"").split("|")[0];
+    if(p==="hz") return "\u6211\u4f1a\u5199";
+    if(p==="zh") return who()==="tc" ? "\u6c49\u8bed\u62fc\u97f3" : "\u542c\u5199";
+    return "\u534e\u6587";                                 /* mixed review */
+  }
+  return "Spelling";
+}
+
 function quizHTML(){
   var q=quiz, it=q.items[q.i];
   if(q.done) return doneHTML();
@@ -1006,10 +1027,7 @@ function quizHTML(){
     botSVG()+
     '<div class="track">'+dots+'</div>'+
     '<div class="meter"><i style="width:'+(q.i/q.items.length*100)+'%"></i></div>'+
-    '<div class="kind">'+(it.k==="rn"?"我会认":it.k==="hz"?"我会写":
-      it.k==="py"?"\u6c49\u8bed\u62fc\u97f3":              /* TC writes pinyin, not 听写 */
-      it.k==="tx"?"\u542c\u5199":
-      it.k==="dict"?"Dictation":it.k==="math"?"Question":"Spelling")+
+    '<div class="kind">'+quizKind(it)+
       ' '+(q.i+1)+' of '+q.items.length+'</div>';
   if(tracing(it) && !q.graded){
     var tg=traceTarget(it), tk=writeAsk(it);
@@ -1178,7 +1196,9 @@ function wireQuiz(){
   if(q.done){
     document.getElementById("dBack").onclick=function(){ newBuddy(); go("practice"); };
     var ds=document.getElementById("dScore");
-    if(ds) ds.onclick=function(){ newBuddy(); go("results"); };
+    /* Progress is not a tab of its own any more — every score lives on
+       Training, which is also where this test was started from. */
+    if(ds) ds.onclick=function(){ newBuddy(); go("practice"); };
     document.getElementById("dAgain").onclick=function(){ hush(); newBuddy(); start(q.code); };
     var fx=document.getElementById("dFix");
     if(fx) fx.onclick=function(){
