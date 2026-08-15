@@ -338,6 +338,10 @@
   .syncrow .btn{flex:1;font-size:17px;padding:15px 10px}
   .synced{font-size:14px;font-weight:700;color:var(--ink);background:var(--bg);
     border-radius:11px;padding:10px 12px;margin:0 0 10px}
+  .synced.bad{background:#FFE3DC;color:#B03A22}
+  .synced.warn2{background:#FFF1D6;color:#8A6100}
+  .whoami{font-size:13px;font-weight:600;color:var(--soft);margin:0 0 10px}
+  .whoami b{color:var(--ink);font-weight:800}
 
   /* ---- one square per character, checked stroke by stroke ---- */
   .tracerow{display:flex;gap:10px;justify-content:center;margin:14px 0 6px;flex-wrap:wrap}
@@ -754,14 +758,14 @@ body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;-
   </div>
   <div class="tabs" id="tabs"></div>
   <div id="view"></div>
-  <div class="foot">Saved on this device · build 86</div>
+  <div class="foot">Saved on this device · build 87</div>
 </div>
 <!-- load order matters: data, then core, then screens, app last -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="data.js?v=27"></script>
-<script src="core.js?v=39"></script>
+<script src="core.js?v=40"></script>
 <script src="timetable.js?v=5"></script>
 <script src="training.js?v=40"></script>
-<script src="app.js?v=73"></script>
+<script src="app.js?v=74"></script>
 </body>
 </html>

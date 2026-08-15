@@ -722,9 +722,19 @@ function syncPanel(){
   if(cloudUser) s+='<span class="side">'+esc(familyName(cloudUser.email))+'</span>';
   s+='</h2>';
   if(cloudUser){
-    var p=pending();
-    s+='<div class="syncrow"><button class="btn go" id="cSync">\u21bb Sync'+
+    var p=pending(), er=(typeof syncErr==="function") ? syncErr() : "";
+    var bad = er && er!=="insert-only";
+    /* Which family this device is signed in to. Two devices on two different
+       names each sync perfectly and never see one another, and the only way to
+       spot it is to read the name on both. */
+    s+='<p class="whoami">Signed in as <b>'+esc(familyName(cloudUser.email))+
+       '</b> \u00b7 '+results().length+' scores here, '+p+' waiting</p>'+
+       '<div class="syncrow"><button class="btn go" id="cSync">\u21bb Sync'+
        (p?' \u00b7 '+p+' waiting':'')+'</button></div>'+
+       (bad ? '<p class="synced bad">Nothing has gone up. The server said: '+
+              esc(er)+'</p>' : '')+
+       (er==="insert-only" ? '<p class="synced warn2">Scores are going up, but this '+
+              'database will not take a correction to one already sent.</p>' : '')+
        '<p class="synced">'+(syncNote()
           ? esc(syncNote())
           : (p ? p+(p===1?" score":" scores")+" on this device not sent up yet."

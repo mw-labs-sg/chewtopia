@@ -355,18 +355,38 @@ function cloudPushAll(quiet, done){
             test_name:x.test, score:x.score, total:x.total,
             completed_at:new Date(x.ts).toISOString()};
   });
-  /* No ignoreDuplicates: a row that already exists must be updated, not
-     skipped. Without this a score corrected on one device stayed wrong on
-     every other one, because the cloud kept the very first version forever. */
-  c.from("results").upsert(rows,{onConflict:"id"}).then(function(r){
-    if(r.error){ syncBusy=false; setNote("Could not sync: "+r.error.message); return done(0); }
+  function marchOn(){
     var sent={}; todo.forEach(function(x){ sent[x.id]=1; });
     var l=results(); l.forEach(function(x){ if(sent[x.id]) x.up=1; });
     WJ("results", l);
     afterResults();
-  }, function(e){ syncBusy=false;
-    setNote("Could not sync · "+((e&&e.message)||"no connection")); done(0); });
+  }
+  function giveUp(msg){
+    syncBusy=false;
+    W("syncerr", msg||"no connection");
+    setNote("Could not send · "+(msg||"no connection"));
+    done(0);
+  }
+  /* Sending a score twice has to update the row, not be quietly dropped, or a
+     score corrected on one device stays wrong on every other one forever.
+     Updating needs more permission than inserting though, and not every
+     database is set up to grant it — so if the update is refused, fall back to
+     insert-only. New scores always get up; only corrections have to wait. */
+  c.from("results").upsert(rows,{onConflict:"id"}).then(function(r){
+    if(!r.error){ W("syncerr",""); marchOn(); return; }
+    var m=String(r.error.message||"");
+    var refused=/row-level security|permission|denied|policy|not allowed|42501/i.test(m);
+    if(!refused) return giveUp(m);
+    c.from("results").upsert(rows,{onConflict:"id", ignoreDuplicates:true}).then(function(r2){
+      if(r2.error) return giveUp(r2.error.message);
+      W("syncerr","insert-only");     /* up, but this table cannot take a correction */
+      marchOn();
+    }, function(e2){ giveUp((e2&&e2.message)||"no connection"); });
+  }, function(e){ giveUp((e&&e.message)||"no connection"); });
 }
+/* What went wrong last time, so the screen can say so rather than sit there
+   with a number that never goes down. */
+function syncErr(){ return S("syncerr",""); }
 
 /* ---------- the rest: mistakes, books, events, activities ---------- */
 /* "seedgone" is the list of school-set events that were removed in the app.
@@ -445,11 +465,20 @@ function cloudSync(){
   setNote("Syncing\u2026");
   cloudPull(true, function(got){
     cloudPushAll(true, function(sent){
+      /* Never claim success over a failed send. Saying "Synced · nothing new"
+         while scores sat unsent is how fifteen of them piled up on one device
+         without anybody noticing. */
+      var err=syncErr(), left=pending();
+      if(err && err!=="insert-only"){
+        setNote("Brought "+got+" down, but nothing could be sent up \u00b7 "+err+
+                " \u00b7 "+stamp());
+        return;
+      }
       var bits=[];
       if(got)  bits.push("brought "+got+" down");
       if(sent) bits.push("sent "+sent+" up");
       setNote((bits.length ? "Synced \u00b7 "+bits.join(", ") : "Synced \u00b7 nothing new")+
-              " \u00b7 "+stamp());
+              (left ? " \u00b7 "+left+" still waiting" : "")+" \u00b7 "+stamp());
     });
   });
 }
