@@ -23,4 +23,5 @@ create policy "own state" on public.state
 --   books:tc, books:sc the reading log
 --   events             anything added to Upcoming
 --   acts               weekly after-school activities
---   gone               events that were ticked off or removed
+--   seedgone           events and activities removed in the app
+--   gone               the old name for seedgone; still read, no longer written

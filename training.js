@@ -46,12 +46,19 @@ function tCell(kid, code, name, testName, meta){
     val = l.score+"/"+l.total;
     sub = dshort(l.ts) + ((b && b.score>l.score) ? " \u00b7 best "+b.score : "");
   } else { val = "Not tried"; sub = meta||""; }
+  /* The last three goes, so one lucky run does not read as "he has it" and one
+     bad morning does not read as "he has lost it". A star means all three were
+     full marks \u2014 that is the one that means he can finally do it. */
+  var a3 = testName ? avgLast(testName, kid, 3) : null;
   return '<button class="tbox '+cls+(nx?" next":"")+'" data-t="'+esc(code)+'" data-kid="'+kid+'">'+
     (name===null ? '' : '<span class="tn">'+esc(name)+'</span>')+
     (ev ? '<span class="tdt">'+esc(dday(ev.d).slice(0,3)+" "+dnum(ev.d)+" "+dmon(ev.d))+
           (nx?' \u00b7 next up':'')+'</span>' : '')+
     '<span class="tv'+(l?'':' small')+'">'+val+'</span>'+
-    (sub?'<span class="td">'+esc(sub)+'</span>':'')+'</button>';
+    (sub?'<span class="td">'+esc(sub)+'</span>':'')+
+    (a3?'<span class="tavg'+(a3.full?" full":"")+'">'+(a3.full?"\u2605 ":"")+
+        'avg '+a3.avg+' \u00b7 '+esc(a3.scores.join(" "))+'</span>':'')+
+    '</button>';
 }
 
 function tColumn(kid, subj){
@@ -558,7 +565,7 @@ function totalMarks(items){
 function startItems(items, test, subject, lang, code){
   if(!items || !items.length) return;
   quiz={code:code||"review", subject:subject||"Review", test:test, lang:lang||"en-GB",
-        items:items.slice().sort(function(){ return Math.random()-0.5; }),
+        items:shuffled(items),
         i:0,score:0,streak:0,best:0,missed:[],wrong:[],graded:false,done:false,review:true};
   quiz.total=totalMarks(quiz.items);
   render(); scrollTo(0,0);
@@ -580,23 +587,26 @@ function itemsFor(code, kid){
   kid = kid || who();
   var p=String(code).split("|"), k=p[1], items, subject, test, lang="en-GB";
   try{
+    /* Shuffled like every other list. In printed order he learns the running
+       order as much as the words, and a run of eight right in a row says less
+       than it looks. */
     if(p[0]==="en"){ subject="English"; test="Spelling "+k;
-      items=TC_SPELL[k][1].map(function(x){ return {k:x[0],s:x[1],a:x[2]}; }); }
+      items=shuffled(TC_SPELL[k][1]).map(function(x){ return {k:x[0],s:x[1],a:x[2]}; }); }
     else if(p[0]==="es"){ subject="English"; test=k;
-      items=SC_SPELL[k][1].map(function(x){ return {k:x[0],s:x[1],a:x[2]}; }); }
+      items=shuffled(SC_SPELL[k][1]).map(function(x){ return {k:x[0],s:x[1],a:x[2]}; }); }
     else if(p[0]==="hz"){
       subject="\u534e\u6587"; test="\u6211\u4f1a\u5199 "+k; lang="zh-CN";
       var set=HANZI[k];
       /* HANZI stores [char, pinyin, tone, word, meaning]; the build question
          wants the cue word in .word and the characters to find in .h */
-      items=set.slice().sort(function(){ return Math.random()-0.5; }).map(function(x){
+      items=shuffled(set).map(function(x){
         return {k:"bd", h:x[0], a:x[1], tone:x[2], word:x[3], m:x[4], lesson:k};
       });
     }
     else if(p[0]==="rn"){
       subject="\u534e\u6587"; test="\u6211\u4f1a\u8ba4 "+k; lang="zh-CN";
       var rb=(typeof RECOG!=="undefined" && RECOG[k]) ? RECOG[k] : HANZI[k];
-      items=rb.slice().sort(function(){ return Math.random()-0.5; }).map(function(x){
+      items=shuffled(rb).map(function(x){
         return {k:"rn", h:x[0], a:x[1], tone:x[2], word:x[3], m:x[4], lesson:k};
       });
     }
@@ -605,7 +615,7 @@ function itemsFor(code, kid){
          out. He has to work out which word belongs in the gap, not just how to
          write a character he has already been handed. */
       subject="\u534e\u6587"; test="\u542c\u5199 "+k; lang="zh-CN";
-      items=TC_TINGXIE[k].slice().sort(function(){ return Math.random()-0.5; })
+      items=shuffled(TC_TINGXIE[k])
         .map(function(x){
           var full="", j=0;
           for(var i=0;i<x[0].length;i++){
@@ -619,7 +629,7 @@ function itemsFor(code, kid){
          write the characters on the pad, but that needed marking by hand and
          was easy to get backwards. */
       var bank = kid==="tc" ? TC_PINYIN : SC_TINGXIE;
-      items=bank[k].slice().sort(function(){ return Math.random()-0.5; })
+      items=shuffled(bank[k])
         .map(function(x){ return {k:"bd",h:x[0],word:x[1],a:x[2],tone:x[3],m:x[4],lesson:k}; });
     }
     else if(p[0]==="ma"){ subject="Math"; test="Math \u00b7 "+maName(k);
@@ -670,7 +680,7 @@ function untriedCodes(kid){
   });
 }
 function some(items, n){
-  return (items||[]).slice().sort(function(){ return Math.random()-0.5; }).slice(0,n);
+  return shuffled(items).slice(0,n);
 }
 /* What the button says before it is pressed, so it is never a mystery box. */
 function dailyPlan(kid){
@@ -742,7 +752,7 @@ function pyOpts(it){
   banks.forEach(function(b){ if(it.lesson && b[it.lesson]) add(b[it.lesson], near); });
   banks.forEach(function(b){ Object.keys(b).forEach(function(k){
     if(k!==it.lesson) add(b[k], far); }); });
-  function shuffle(a){ return a.sort(function(){ return Math.random()-0.5; }); }
+  function shuffle(a){ return shuffled(a); }
   var pool=shuffle(near).concat(shuffle(far)).slice(0,3);
   if(pool.length<3) return null;              /* not enough to choose from */
   it.opts=shuffle([want].concat(pool));       /* kept on the item so they do not jump */
@@ -810,7 +820,7 @@ function bdTiles(it){
       });
     });
   });
-  function shuffle(a){ return a.sort(function(){ return Math.random()-0.5; }); }
+  function shuffle(a){ return shuffled(a); }
   var extra = it.s ? 4 : Math.min(4, Math.max(2, 7-need.length));
   var d=shuffle(near).concat(shuffle(far)).slice(0, extra);
   it.tiles=shuffle(need.concat(d));
@@ -838,7 +848,7 @@ function hzOpts(it){
       else rest.push(ch);
     });
   }); });
-  function shuffle(a){ return a.sort(function(){ return Math.random()-0.5; }); }
+  function shuffle(a){ return shuffled(a); }
   /* same sound and same tone is the hardest confusion, so it goes first */
   var pool=shuffle(sameTone).concat(shuffle(sameSyl)).concat(shuffle(rest)).slice(0,3);
   if(pool.length<3) return null;
@@ -1508,8 +1518,7 @@ function next(){
     addResult({who:who(),subject:q.subject,code:q.code,test:q.test,score:q.score,
                total:q.total||q.items.length,missed:q.missed,ts:Date.now(),
                pend:q.pend?1:0, ans:(q.ans||[]).filter(Boolean)});
-    bumpStreak();
-    autoSend(); }                   /* send it up while the tablet is still awake */
+    bumpStreak(); }                 /* addResult syncs it up on its own */
   render(); scrollTo(0,0);
 }
 function doneHTML(){

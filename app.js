@@ -456,7 +456,7 @@ function saveMarks(){
   r.score=score; r.total=total; r.missed=missed; r.pend=0; r.up=0;   /* re-upload */
   WJ("results", all);
   markRun=null; markState=null;
-  if(typeof cloudPushAll==="function" && cloudUser) cloudPushAll(true);
+  autoSend();                    /* both ways, so the new marks reach the phone */
   render(); scrollTo(0,0);
 }
 
@@ -545,7 +545,13 @@ function vTestDetail(){
          return row + (open ? answerSheet(r) : "");
        }).join("")+'</div>'+
        (best?'<p class="empty">Best so far '+best.score+'/'+best.total+
-         ' \u00b7 '+runs.length+(runs.length===1?' go':' goes')+'</p>':'');
+         ' \u00b7 '+runs.length+(runs.length===1?' go':' goes')+
+         (function(){
+           var a=avgLast(q.test, kid, 3);
+           if(!a) return "";
+           return ' \u00b7 last '+a.n+' averaged <b>'+a.avg+'/'+a.total+'</b>'+
+                  (a.full?' \u2014 full marks every time':'');
+         })()+'</p>':'');
   } else s+='<p class="empty">Not tried yet.</p>';
 
   return s+'<div class="btnrow">'+

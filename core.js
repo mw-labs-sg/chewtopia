@@ -90,7 +90,18 @@ function mergeSeed(key, seed){
   });
   if(changed) WJ(key, out);
 }
-function seedOnce(){ mergeSeed("events", SEED_EVENTS); mergeSeed("acts", SEED_ACTS); }
+/* Anything deleted on any device is deleted on all of them. Merging two lists
+   is a union, so without this the device that had not heard about a deletion
+   handed the entry straight back on the next sync and it never stayed gone. */
+function dropGone(){
+  var g=seedGone(); if(!g.length) return;
+  var bad={}; g.forEach(function(id){ bad[id]=1; });
+  ["events","acts"].forEach(function(k){
+    var a=SJ(k,[]), keep=a.filter(function(x){ return !bad[x.id]; });
+    if(keep.length!==a.length) WJ(k, keep);
+  });
+}
+function seedOnce(){ mergeSeed("events", SEED_EVENTS); mergeSeed("acts", SEED_ACTS); dropGone(); }
 
 var DAYS = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
 /* Each tab keeps its own colour, so the eye learns where things live. */
@@ -148,6 +159,35 @@ function flash(id){ var e=document.getElementById(id); if(!e) return;
   e.textContent="Saved"; clearTimeout(ft[id]); ft[id]=setTimeout(function(){e.textContent="";},1100); }
 function grow(t){ t.style.height="auto"; t.style.height=(t.scrollHeight)+"px"; }
 
+/* A real shuffle. sort(() => Math.random()-0.5) looks like one but is not: the
+   comparator is inconsistent, so the first few items barely move and a list
+   comes out in nearly the order it went in. Fisher-Yates gives every order the
+   same chance, which is the whole point of not learning a list by its order. */
+function shuffled(a){
+  var o=(a||[]).slice();
+  for(var i=o.length-1;i>0;i--){
+    var j=Math.floor(Math.random()*(i+1)), t=o[i]; o[i]=o[j]; o[j]=t;
+  }
+  return o;
+}
+
+/* The last few goes at one test, oldest first — enough to see whether he is
+   closing in on full marks or still bouncing around. */
+function lastRuns(t, kid, n){
+  return runsFor(kid).filter(function(r){ return r.test===t; }).slice(-(n||3));
+}
+function avgLast(t, kid, n){
+  var a=lastRuns(t, kid, n||3);
+  if(a.length<2) return null;                /* one go is not an average */
+  var sc=0, tot=0;
+  a.forEach(function(r){ sc+=r.score; tot+=r.total||0; });
+  var out=Math.round(sc/a.length*10)/10;
+  return {n:a.length, avg:out, total:Math.round(tot/a.length),
+          pct:tot?Math.round(sc/tot*100):0,
+          scores:a.map(function(r){ return r.score; }),
+          full:a.every(function(r){ return r.score>=r.total; })};
+}
+
 function uuid(){
   if(window.crypto && crypto.randomUUID) return crypto.randomUUID();
   return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g,function(ch){
@@ -172,9 +212,11 @@ function addResult(r){
   var seen=0;
   a.forEach(function(x){ if(x.ans){ seen++; if(seen>20) delete x.ans; } });
   WJ("results", a.slice(0,600));
-  /* straight up to the cloud, if signed in — the sync button is only ever
-     needed for the other direction or after being offline */
-  if(typeof cloudPushAll==="function" && cloudUser) cloudPushAll(true);
+  /* Straight up to the cloud, if signed in — but as a full two-way sync. It
+     used to push only, which sent this device's lists up without bringing the
+     other device's down first, so a tablet that had been asleep for a week
+     wiped the reading log and the events the phone had added. */
+  autoSend();
 }
 
 /* ==========================================================================
@@ -241,23 +283,37 @@ function cloudPull(quiet, done){
   syncBusy=true; if(!quiet) setNote("Getting\u2026");
   c.from("results").select("*").then(function(r){
     if(r.error){ syncBusy=false; setNote("Could not sync: "+r.error.message); return done(0); }
-    var local=results(), byId={}, added=0;
+    var local=results(), byId={}, added=0, fixed=0;
     local.forEach(function(x){ if(x.id) byId[x.id]=x; });
     (r.data||[]).forEach(function(row){
-      if(byId[row.id]){ byId[row.id].up=1; return; }
-      added++;
-      local.push({id:row.id, who:row.child_id, code:row.test_code, test:row.test_name,
-                  score:row.score, total:row.total,
-                  ts:new Date(row.completed_at).getTime(), up:1});
+      var mine=byId[row.id];
+      if(!mine){
+        added++;
+        local.push({id:row.id, who:row.child_id, code:row.test_code, test:row.test_name,
+                    score:row.score, total:row.total,
+                    ts:new Date(row.completed_at).getTime(), up:1});
+        return;
+      }
+      /* A score changed here and not sent yet wins \u2014 it is the newer one.
+         Otherwise the cloud copy is the truth, so a run re-marked on the other
+         device turns up here instead of staying wrong on this one forever. */
+      if(!mine.up) return;
+      if(mine.score!==row.score || mine.total!==row.total){
+        mine.score=row.score; mine.total=row.total; fixed++;
+      }
+      mine.up=1;
     });
     local.sort(function(a,b){ return b.ts-a.ts; });
     WJ("results", local.slice(0,600));
+    pulledOnce=true;                 /* it is now safe to send our lists up */
     pullState(function(stMsg){
       syncBusy=false;
-      if(!quiet) setNote("Got "+added+(added===1?" new score":" new scores")+stMsg+" \u00b7 "+stamp());
-      done(added);
+      if(!quiet) setNote("Got "+added+(added===1?" new score":" new scores")+
+        (fixed?", "+fixed+" corrected":"")+stMsg+" \u00b7 "+stamp());
+      done(added+fixed);
     });
-  });
+  }, function(e){ syncBusy=false;
+    setNote("Could not sync \u00b7 "+((e&&e.message)||"no connection")); done(0); });
 }
 
 /* ---------- SEND ---------- */
@@ -289,18 +345,28 @@ function cloudPushAll(quiet, done){
             test_name:x.test, score:x.score, total:x.total,
             completed_at:new Date(x.ts).toISOString()};
   });
-  c.from("results").upsert(rows,{onConflict:"id", ignoreDuplicates:true}).then(function(r){
+  /* No ignoreDuplicates: a row that already exists must be updated, not
+     skipped. Without this a score corrected on one device stayed wrong on
+     every other one, because the cloud kept the very first version forever. */
+  c.from("results").upsert(rows,{onConflict:"id"}).then(function(r){
     if(r.error){ syncBusy=false; setNote("Could not sync: "+r.error.message); return done(0); }
-    var done={}; todo.forEach(function(x){ done[x.id]=1; });
-    var l=results(); l.forEach(function(x){ if(done[x.id]) x.up=1; });
+    var sent={}; todo.forEach(function(x){ sent[x.id]=1; });
+    var l=results(); l.forEach(function(x){ if(sent[x.id]) x.up=1; });
     WJ("results", l);
     afterResults();
-  });
+  }, function(e){ syncBusy=false;
+    setNote("Could not sync · "+((e&&e.message)||"no connection")); done(0); });
 }
 
 /* ---------- the rest: mistakes, books, events, activities ---------- */
-var STATE_KEYS=["weak:tc","weak:sc","books:tc","books:sc","events","acts","gone"];
+/* "seedgone" is the list of school-set events that were removed in the app.
+   It used to be listed here as "gone", which is not a key anything writes, so
+   an event deleted on the iPad came straight back on the phone. */
+var STATE_KEYS=["weak:tc","weak:sc","books:tc","books:sc","events","acts","seedgone"];
 function stateIdent(k){ return k.indexOf("weak:")===0 ? "k" : "id"; }
+/* Nothing goes up until something has come down this session. Sending our
+   lists first would hand a week-old tablet the last word over everything. */
+var pulledOnce=false;
 function mergeList(a, b, key){
   var out=[], seen={};
   (a||[]).concat(b||[]).forEach(function(x){
@@ -329,25 +395,32 @@ function pullState(done){
     (r.data||[]).forEach(function(row){ remote[row.k]=row.v; });
     var touched=0;
     STATE_KEYS.forEach(function(k){
-      if(remote[k]===undefined) return;
+      var far=remote[k];
+      /* older devices wrote the deleted-events list under "gone" */
+      if(k==="seedgone" && far===undefined) far=remote["gone"];
+      if(far===undefined) return;
       var mine=SJ(k,[]);
-      var merged = k==="gone" ? uniq(mine.concat(remote[k]||[]))
-                              : mergeList(mine, remote[k], stateIdent(k));
+      var merged = k==="seedgone" ? uniq(mine.concat(far||[]))
+                                  : mergeList(mine, far, stateIdent(k));
       if(JSON.stringify(merged)!==JSON.stringify(mine)) touched++;
       WJ(k, merged);
     });
+    dropGone();                 /* a union puts deleted entries back; take them out again */
     done(touched?", plus the rest":"");
-  });
+  }, function(){ done(", the rest could not be reached"); });
 }
 function pushState(done){
   var c=sbc();
   if(!c||!cloudUser) return done("");
+  /* Never send up before something has come down: our lists would replace the
+     other device's rather than join them. */
+  if(!pulledOnce) return done("");
   var rows=STATE_KEYS.map(function(k){
     return {user_id:cloudUser.id, k:k, v:SJ(k,[]), updated_at:new Date().toISOString()};
   });
   c.from("state").upsert(rows,{onConflict:"user_id,k"}).then(function(r){
     done(r.error ? ", the rest needs the state table" : ", plus the rest");
-  });
+  }, function(){ done(", the rest could not be sent"); });
 }
 
 /* ==========================================================================
