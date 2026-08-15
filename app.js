@@ -382,7 +382,11 @@ function isFixing(r){ return /^Fixing/.test(String(r.test||"")); }
 
 /* Which subject a run belongs to. The code comes first because runs pulled
    back down from the cloud do not carry the subject with them. */
-var SUBJ_COLS=[["en","English"],["zh","\u534e\u6587"],["ma","Maths"]];
+/* The code the school and the boys actually use, with the plain word under it
+   so nobody has to translate. The timetable two tabs away already says EL, CL
+   and MA; these columns used to say English, 华文 and Maths, which meant the
+   app disagreed with itself about what its own subjects are called. */
+var SUBJ_COLS=[["en","EL","English"],["zh","CL","\u534e\u6587"],["ma","MA","Maths"]];
 function runSubject(r){
   var c=String(r.code||"").split("|")[0];
   if(c==="en"||c==="es") return "en";
@@ -673,7 +677,7 @@ function vResults(){
        '<div class="mxcols'+(kidSubj(k.id).length===2?" two":"")+'">';
     /* three headers first, then the three columns under them */
     var mine=SUBJ_COLS.filter(function(sub){ return hasSubj(k.id, sub[0]); });
-    mine.forEach(function(sub){ m+='<div class="mxsub">'+sub[1]+'</div>'; });
+    mine.forEach(function(sub){ m+='<div class="mxsub">'+sub[1]+'<i>'+sub[2]+'</i></div>'; });
     mine.forEach(function(sub){
       var row=g[sub[0]]||{}, out="";
       Object.keys(row).filter(function(t){ return row[t][k.id]; })

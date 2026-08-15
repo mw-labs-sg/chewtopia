@@ -565,13 +565,20 @@
   .duo .btx{font-size:15px}
   .kidname small{display:block;font-size:10.5px;font-weight:600;opacity:.85}
   .mxcols{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
-  .mxsub{font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;font-weight:800;
-    color:var(--soft);text-align:center;padding-bottom:5px;border-bottom:1px solid var(--line)}
+  .mxsub{font-size:13px;letter-spacing:.06em;font-weight:800;
+    color:var(--ink);text-align:center;padding-bottom:5px;border-bottom:1px solid var(--line)}
+  /* the school's code first, the plain word under it */
+  .mxsub i{display:block;font-style:normal;font-size:9.5px;font-weight:700;
+    letter-spacing:.02em;text-transform:none;color:var(--soft);
+    font-family:'Noto Sans SC','Lexend',sans-serif}
   .mxcol{display:flex;flex-direction:column;gap:6px;padding-top:6px;min-width:0}
   .tbox{border:none;font-family:inherit;text-align:left;width:100%;cursor:pointer;
     border-radius:12px;padding:8px 8px 7px;line-height:1.2;display:block}
   .tbox .tn{display:block;font-size:11.5px;font-weight:700;color:var(--ink);
     white-space:normal;overflow-wrap:anywhere}
+  /* what the teachers call it, under what the app calls it */
+  .tbox .tn i{display:block;font-style:normal;font-size:9.5px;font-weight:700;
+    opacity:.6;letter-spacing:.01em;margin-top:1px}
   .tbox .tv{display:block;font-size:19px;font-weight:800;margin-top:2px}
   .tbox .td{display:block;font-size:10px;font-weight:600;opacity:.7}
   /* the last three goes: the average, then the scores themselves, newest last */
@@ -747,14 +754,14 @@ body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;-
   </div>
   <div class="tabs" id="tabs"></div>
   <div id="view"></div>
-  <div class="foot">Saved on this device · build 85</div>
+  <div class="foot">Saved on this device · build 86</div>
 </div>
 <!-- load order matters: data, then core, then screens, app last -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="data.js?v=26"></script>
+<script src="data.js?v=27"></script>
 <script src="core.js?v=39"></script>
 <script src="timetable.js?v=5"></script>
-<script src="training.js?v=39"></script>
-<script src="app.js?v=72"></script>
+<script src="training.js?v=40"></script>
+<script src="app.js?v=73"></script>
 </body>
 </html>

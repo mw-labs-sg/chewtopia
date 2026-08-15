@@ -36,7 +36,7 @@ function testEvent(code, kid){
 }
 function dueId(kid){ var e=dueEvent(kid); return e?e.id:""; }
 
-function tCell(kid, code, name, testName, meta){
+function tCell(kid, code, name, testName, meta, unit){
   var l = testName ? lastFor(testName, kid) : null;
   var cls = l ? scoreCls(l.score, l.total) : "none";
   var ev = testEvent(code, kid), nx = !!(ev && ev.id===dueId(kid));
@@ -51,7 +51,8 @@ function tCell(kid, code, name, testName, meta){
      full marks \u2014 that is the one that means he can finally do it. */
   var a3 = testName ? avgLast(testName, kid, 3) : null;
   return '<button class="tbox '+cls+(nx?" next":"")+'" data-t="'+esc(code)+'" data-kid="'+kid+'">'+
-    (name===null ? '' : '<span class="tn">'+esc(name)+'</span>')+
+    (name===null ? '' : '<span class="tn">'+esc(name)+
+       (unit?'<i>'+esc(unit)+'</i>':'')+'</span>')+
     (ev ? '<span class="tdt">'+esc(dday(ev.d).slice(0,3)+" "+dnum(ev.d)+" "+dmon(ev.d))+
           (nx?' \u00b7 next up':'')+'</span>' : '')+
     '<span class="tv'+(l?'':' small')+'">'+val+'</span>'+
@@ -66,8 +67,12 @@ function tColumn(kid, subj){
   if(subj==="en"){
     var eb = kid==="tc" ? TC_SPELL : SC_SPELL, ec = kid==="tc" ? "en" : "es";
     Object.keys(eb).forEach(function(k){
+      /* TC_SPELL has carried the STELLAR unit all along and nothing ever showed
+         it. Ms Huang refers to the units by name when she sends work home, so
+         it is the label that connects the app to the worksheet on the table. */
       out+=tCell(kid, ec+"|"+k, kid==="tc"?("List "+k):k,
-                 kid==="tc"?("Spelling "+k):k, eb[k][1].length+" questions");
+                 kid==="tc"?("Spelling "+k):k, eb[k][1].length+" questions",
+                 kid==="tc" ? "STELLAR "+eb[k][0] : "");
     });
   }
   else if(subj==="zh"){
@@ -164,7 +169,7 @@ function vTests(){
          (wk.length>4?", \u2026":"")+'</span></button>':'')+
        '<div class="mxcols'+(cols.length===1?" one":cols.length===2?" two":"")+
        (k.id==="tc" && cols.length===3 ? " wide":"")+'">';
-    cols.forEach(function(c){ s+='<div class="mxsub">'+c[1]+'</div>'; });
+    cols.forEach(function(c){ s+='<div class="mxsub">'+c[1]+'<i>'+c[2]+'</i></div>'; });
     cols.forEach(function(c){ s+='<div class="mxcol">'+tColumn(k.id, c[0])+'</div>'; });
     s+='</div></div>';
   });

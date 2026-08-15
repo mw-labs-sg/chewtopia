@@ -583,7 +583,7 @@ var SEED_EVENTS = [
   {id:"e14", t:"Public holiday — National Day (in lieu)", d:"2026-08-10", hol:1,
    n:"9 August falls on a Sunday. Kindergarten reopens Tuesday 11 August."},
   {id:"e15", t:"Spelling test — List 3.4", d:"2026-08-04", w:"tc", p:"en|3.4",
-   n:"Unit 9. Eight words plus two dictation sentences."},
+   n:"STELLAR Unit 9. Eight words plus two dictation sentences."},
   {id:"e17", t:"华文听写", d:"2026-08-20", w:"sc", p:"zh|Week 8 · 20 Aug",
    n:"第八周 · 八月二十日 (星期四). 狼, 蛇, 鸭子, 乌龟, 小花猫."},
   {id:"e18", t:"Spelling test", d:"2026-08-26", w:"sc", p:"es|Week 9 · 26 Aug",
@@ -596,9 +596,9 @@ var SEED_EVENTS = [
      picks up again here. After 25 Aug comes another rest week, then the Term 3
      holiday, so 3.6 is the last one this term. */
   {id:"e19", t:"Spelling test — List 3.5", d:"2026-08-18", w:"tc", p:"en|3.5",
-   n:"Unit 10. Seven words plus three dictation sentences."},
+   n:"STELLAR Unit 10. Seven words plus three dictation sentences."},
   {id:"e20", t:"Spelling test — List 3.6", d:"2026-08-25", w:"tc", p:"en|3.6",
-   n:"Unit 10. Seven words plus three dictation sentences. Last spelling test of Term 3."},
+   n:"STELLAR Unit 10. Seven words plus three dictation sentences. Last spelling test of Term 3."},
 
   /* 听写 is a Thursday. The 13 Aug one moved to Friday the 14th because of the
      PSLE oral closure; this is the next one. */
