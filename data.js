@@ -612,7 +612,21 @@ var SEED_EVENTS = [
    n:"Term 4 starts Monday 14 September."},
   {id:"e24", t:"Children's Day — no school", d:"2026-10-02", w:"tc", hol:1},
   {id:"e25", t:"End of school year", d:"2026-11-21", d2:"2026-12-31", w:"tc", hol:1,
-   n:"Term 4 ends Friday 20 November."}
+   n:"Term 4 ends Friday 20 November."},
+
+  /* From ClassDojo, class 2J. Only the ones still open — the filing reminders
+     and the worksheets already handed back have all been and gone. */
+  {id:"e26", t:"Book cover competition — entries close", d:"2026-08-16", time:"23:59", w:"tc",
+   n:"Inter-school \u201cCelebrate Singapore Together\u201d library competition: design a book cover on what Singapore means to him. Book vouchers and a certificate for winners, and the winning covers go into the school library e-book system. Queries to the librarian, poh_yeow_khoon@nanyangpri.edu.sg."},
+  /* Mdm Leong's fractions revision. The SLS deadline itself has gone, but
+     fractions is what the class is on, so it sits on the next school day with
+     a practice button rather than nowhere. Being dated also means the "Ten
+     minutes of practice" button pulls questions from it. */
+  {id:"e28", t:"Maths — Fractions", d:"2026-08-17", w:"tc", p:"ma|frac",
+   n:"Mdm Leong set an SLS activity, Introduction to Fractions, to revise what the class has covered — plus pages 72\u201375 of the practice book. Unit and like fractions: naming them, comparing them, adding and subtracting with the same bottom number."},
+  {id:"e27", t:"Connectogram — parents to fill in", d:"2026-08-26", w:"tc",
+   n:"Miss Lee \u674e\u8001\u5e08 asked parents to help their child complete it by 26 August, so the teachers understand how the class gets on together.",
+   url:"https://forms.moe.edu.sg/sna/forms/vK3M45"}
 ];
 
 /* ==========================================================================
@@ -679,5 +693,8 @@ var SEED_ACTS = [
   {id:"sa8", who:"sc", day:"Saturday",  from:"13:00", to:"14:00", t:"Golf"},
   {id:"sa9", who:"sc", day:"Sunday",    from:"09:00", to:"10:45", t:"Swimming & Tennis"},
   /* TC */
-  {id:"ta1", who:"tc", day:"Sunday",    from:"09:00", to:"11:00", t:"Coach Lee"}
+  {id:"ta1", who:"tc", day:"Sunday",    from:"09:00", to:"11:00", t:"Coach Lee"},
+  /* 书法 runs inside the Monday PAL lesson, so the bag has to be packed the
+     night before. Sits before the school day rather than on top of PAL. */
+  {id:"ta2", who:"tc", day:"Monday",    from:"07:00", to:"07:30", t:"\u5e26\u4e66\u6cd5\u5305 calligraphy bag"}
 ];

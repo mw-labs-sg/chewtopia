@@ -74,6 +74,10 @@ function evCard(e){
     (e.n?'<span class="nt">'+esc(e.n)+'</span>':'')+
     (e.p?'<button class="prac '+whoCls(e.w)+'" data-go="'+esc(e.p)+'" data-who="'+esc(e.w||"")+'">'+
          '\u25b6 '+esc(practiceLabel(e.p))+'</button>':'')+
+    /* school forms arrive as a link; a note you cannot tap is a note you
+       have to go and find again later */
+    (e.url?'<a class="prac evlink" href="'+esc(e.url)+'" target="_blank" '+
+         'rel="noopener noreferrer">Open the form \u2197</a>':'')+
     (fromSeed(e.id)?'':'<button class="x" data-del="'+e.id+'" title="Remove">&times;</button>')+
     '</div>';
 }

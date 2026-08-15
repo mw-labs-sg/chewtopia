@@ -470,6 +470,7 @@
   .evc .prac{display:inline-block;margin-top:7px;border:none;font-family:inherit;
     font-size:12.5px;font-weight:800;border-radius:9px;padding:6px 10px;cursor:pointer}
   .evc .x{position:absolute;top:5px;right:5px}
+  .evc .evlink{display:inline-block;text-decoration:none;background:var(--ink);color:#fff}
   @media(max-width:560px){
     .agenda{grid-template-columns:44px 1fr 1fr;column-gap:5px}
     .agenda.solo{grid-template-columns:44px 1fr}
@@ -746,14 +747,14 @@ body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;-
   </div>
   <div class="tabs" id="tabs"></div>
   <div id="view"></div>
-  <div class="foot">Saved on this device · build 83</div>
+  <div class="foot">Saved on this device · build 85</div>
 </div>
 <!-- load order matters: data, then core, then screens, app last -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="data.js?v=24"></script>
+<script src="data.js?v=26"></script>
 <script src="core.js?v=39"></script>
 <script src="timetable.js?v=5"></script>
 <script src="training.js?v=39"></script>
-<script src="app.js?v=71"></script>
+<script src="app.js?v=72"></script>
 </body>
 </html>
