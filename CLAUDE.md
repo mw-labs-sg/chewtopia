@@ -9,12 +9,16 @@ reading log, and the spelling / 华文 / maths practice that gets sat on an iPad
 Vanilla ES5 in five plain `<script>` tags. **No build step, no bundler, no npm,
 no framework, no TypeScript.** Open `index.html` and it runs.
 
-- `@supabase/supabase-js@2` — the only runtime dependency, from jsdelivr.
-- `hanzi-writer` + `strokes.js` — vendored, currently unused (see Dead weight).
+- `@supabase/supabase-js` — the only runtime dependency, from jsdelivr, pinned
+  to an exact version with an SRI hash. If the hash stops matching, the browser
+  refuses the file, `sbc()` finds no `window.supabase`, and the app carries on
+  per-device. To bump it: fetch the new file, recompute the sha384, change both.
 - Google Fonts: Baloo 2, Lexend, Noto Sans SC.
 
 State lives in `localStorage` under the `chew:` prefix; the cloud is a mirror,
-never the source of truth.
+never the source of truth. `results()` is cached in memory and dropped whenever
+`WJ("results", …)` runs — Training reads it once per box, so re-parsing it each
+time cost about a sixth of a second per draw.
 
 ## Layout
 
@@ -30,7 +34,15 @@ Load order matters and is fixed in `index.html`:
 
 `render()` redraws the whole `#view` from scratch on every state change. There
 is no diffing and no component model — a `v*()` function returns an HTML string
-and the matching `w*()` function wires its handlers. Keep that pairing.
+and the matching `w*()` function wires its handlers. Keep that pairing, and
+remember that `render()` runs on every tile tap inside a quiz: anything it
+calls is on a hot path.
+
+Every Chinese question reaches the quiz as `k:"bd"` (tap the characters into
+the gaps) or `k:"rn"` (type the pinyin). The item kinds actually in play are
+`bd`, `rn`, `spell`, `dict` and `math` — nothing else. Branches for `hz`, `py`
+and `tx` were unreachable and have been removed; do not add them back without
+something that produces those kinds.
 
 ## Supabase
 
@@ -41,16 +53,27 @@ account; sign-in takes a bare name and `asEmail()` appends `@chewtopia.family`.
   test_code, test_name, score, total, completed_at`).
 - **`state`** — key/value for everything else, one row per `(user_id, k)`.
   See `supabase-state.sql`. Keys are in `STATE_KEYS`: `weak:tc`, `weak:sc`,
-  `books:tc`, `books:sc`, `events`, `acts`, `seedgone`.
+  `books:tc`, `books:sc`, `events`, `acts`, `seedgone` — plus `struck`, which
+  is not in that list because it is a map, not a list, and is pushed by hand.
 
 Sync model: **merge, never overwrite.** `cloudSync()` pulls then pushes.
 `mergeList()` unions by id (or by `k` for weak items), taking `max(n)` and
-letting the newer `ts` win other fields. Deletions need a tombstone —
-`seedgone` — because a union alone hands a deleted row straight back.
-`pulledOnce` gates every push: nothing goes up until something has come down,
-or a stale device's lists replace a fresh one's.
+letting the newer `ts` win other fields.
 
-Meals, groceries, names and streaks are deliberately **not** synced.
+Three rules keep that honest, and each exists because breaking it lost work:
+
+- **Deletions need a tombstone.** A union alone hands a deleted row straight
+  back. `seedgone` covers events and activities; `struck` covers books and the
+  tricky-ones bank. `dropGone()` and `dropStruck()` run after every merge.
+  Missing a cleared weak item again calls `unstrike()`.
+- **`pulledOnce` gates every push,** and is set only when the *state* read
+  succeeds — not the results read. The lists are what a push replaces
+  wholesale, so a state read that fails on its own must not open the gate.
+- **Neither direction may claim success for the other.** `syncErr()` is what
+  went wrong going up, `pullErr()` going down; `cloudSync` reports both.
+
+Meals, groceries, names and streaks are deliberately **not** synced, and the
+Meals panel says so on screen.
 
 ## Curriculum sources
 
@@ -81,6 +104,12 @@ python -m http.server 8899
 Bump the `?v=` on any script you change in `index.html`, and bump the build
 number in `.foot` — the boys' iPads cache aggressively.
 
+There is no test runner, but the app will run headless: stub `document`,
+`window` and `localStorage`, concatenate `data.js` `core.js` `timetable.js`
+`training.js`, and drive `start()` → `grade()` → `next()` over `allCodes()`.
+Answering everything correctly must score full marks on every code; that one
+check catches most marking regressions in under a second.
+
 ## Conventions
 
 - ES5 only: `var`, `function`, string concatenation. No arrow functions, no
@@ -103,10 +132,18 @@ number in `.foot` — the boys' iPads cache aggressively.
 - PowerShell is the shell here: chain with `;`, not `&&`.
 - Always end a set of file changes with a commit **and** a push.
 
-## Dead weight (known)
+## Removed, on purpose
 
-`handwritten()` returns `false`, so the stroke-tracing and handwriting-marking
-subsystem is unreachable — `strokes.js`, both copies of `hanzi-writer.min.js`,
-`wireTrace`, `wirePad*`, `wireMarks`. `vResults()` in `app.js` is orphaned, so
-the whole Progress screen and PIN-gated marking flow are unreachable too. Don't
-extend either until they're revived or removed.
+Both dead subsystems are gone as of build 89, and the files with them:
+
+- **Stroke tracing, the writing pad and hand-marking.** `handwritten()`
+  returned `false` unconditionally, so none of it could run. `strokes.js`
+  (420 KB) and two byte-identical copies of `hanzi-writer.min.js` were never
+  fetched. Nothing is written by hand now — 我会写 is answered by tapping the
+  character, 听写 by filling the gaps in the sentence.
+- **The Progress screen and the PIN-gated marking sheet.** `vResults()` was
+  never in `render()`'s view map. Training shows every score and every tricky
+  one; the sync panel is what the grown-ups actually open.
+
+If either comes back, it needs a route in `render()`'s view map and a producer
+for the item kinds it expects — that is exactly what both were missing.
