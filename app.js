@@ -441,13 +441,10 @@ function syncPanel(){
   if(cloudUser) s+='<span class="side">'+esc(familyName(cloudUser.email))+'</span>';
   s+='</h2>';
   if(cloudUser){
-    var p=pending(), er=(typeof syncErr==="function") ? syncErr() : "";
-    var down=(typeof pullErr==="function") ? pullErr() : "";
-    /* Two very different failures. down = the scores did not come down, which
-       is the sync being broken. st = the optional state table could not be
-       read, which is a setup gap that leaves the scores working perfectly. */
-    var st=(typeof stateErr==="function") ? stateErr() : "";
-    var bad = er && er!=="insert-only";
+    var p=pending();
+    var bad = (typeof syncErr==="function" ? syncErr() : "")||"";
+    if(bad==="insert-only") bad="";      /* scores still go up; not a failure */
+    if(!bad) bad=(typeof pullErr==="function" ? pullErr() : "")||"";
     /* Which family this device is signed in to. Two devices on two different
        names each sync perfectly and never see one another, and the only way to
        spot it is to read the name on both. */
@@ -456,28 +453,7 @@ function syncPanel(){
        '<div class="syncrow"><button class="btn go" id="cSync">\u21bb Sync'+
        (p?' \u00b7 '+p+' waiting':'')+'</button>'+
        '<button class="btn soft" id="cOut">Sign out</button></div>'+
-       (bad ? '<p class="synced bad">Scores are not going up. The server said: '+
-              esc(er)+'</p>' : '')+
-       (down ? '<p class="synced bad">Scores are not coming down, so this device may be '+
-              'behind the other one. The server said: '+esc(down)+'</p>' : '')+
-       (er==="insert-only" ? '<p class="synced warn2">New scores go up fine, but this '+
-              'database will not let one already sent be corrected \u2014 so a run re-marked '+
-              'here stays as it was on the other device. Fixable: the results table needs '+
-              'an update policy as well as an insert one.</p>' : '')+
-       (st ? '<p class="synced warn2"><b>Scores sync; the rest does not.</b> Books, '+
-              'Upcoming and the tricky-ones bank stay on this device, because the '+
-              '<code>state</code> table could not be read. The server said: \u201c'+esc(st)+
-              '\u201d \u2014 most likely it has not been created yet. Run '+
-              '<code>supabase-state.sql</code> once in the Supabase SQL editor and press '+
-              'Sync again. Nothing is lost meanwhile: this device will not send its lists '+
-              'up until it has managed to read what is already there.</p>' : '')+
-       '<p class="synced">'+(syncNote()
-          ? esc(syncNote())
-          : (p ? p+(p===1?" score":" scores")+" on this device not sent up yet."
-               : "Nothing waiting."))+'</p>'+
-       '<div class="key">One press does both ways: it brings down anything from the other '+
-       'device and sends up anything from this one. Nothing is ever overwritten, so press it '+
-       'as often as you like. A finished test syncs itself.</div>';
+       '<p class="synced'+(bad?" bad":"")+'">'+esc(syncNote()||"Not synced yet.")+'</p>';
   } else {
     s+='<div class="pair"><span class="f1"><div class="lbl">Family name</div>'+
        '<input type="text" id="cEm" autocomplete="username" placeholder="chewtopia"></span>'+

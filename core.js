@@ -423,7 +423,9 @@ function cloudPushAll(quiet, done){
   function giveUp(msg){
     syncBusy=false;
     W("syncerr", msg||"no connection");
-    setNote("Could not send · "+(msg||"no connection"));
+    /* cloudSync writes the one line the screen shows; this ignored quiet
+       and overwrote it with a longer version of the same news. */
+    if(!quiet) setNote("Could not send · "+(msg||"no connection"));
     done(0);
   }
   /* Sending a score twice has to update the row, not be quietly dropped, or a
@@ -578,31 +580,16 @@ function cloudSync(){
   setNote("Syncing\u2026");
   cloudPull(true, function(got){
     cloudPushAll(true, function(sent){
-      /* Never claim success over a failure in EITHER direction. Saying
-         "Synced · nothing new" while scores sat unsent is how fifteen of them
-         piled up on one device without anybody noticing — and the download
-         half had exactly the same hole: a device that could not read the cloud
-         but could still write to it reported a clean sync and looked healthy. */
-      var err=syncErr(), down=pullErr(), left=pending();
-      if(err && err!=="insert-only"){
-        setNote("Brought "+got+" down, but nothing could be sent up \u00b7 "+err+
-                " \u00b7 "+stamp());
-        return;
-      }
-      if(down){
-        setNote((sent?"Sent "+sent+" up, but n":"N")+
-                "othing could be brought down \u00b7 "+down+" \u00b7 "+stamp());
-        return;
-      }
-      var bits=[];
-      if(got)  bits.push("brought "+got+" down");
-      if(sent) bits.push("sent "+sent+" up");
-      /* The scores are the sync. The extras are a bonus that needs one more
-         table, so they get a trailing clause, not a headline. */
-      setNote((bits.length ? "Scores synced \u00b7 "+bits.join(", ") : "Scores synced \u00b7 nothing new")+
-              (left ? " \u00b7 "+left+" still waiting" : "")+
-              (stateErr() ? " \u00b7 books, events and tricky ones still on this device only" : "")+
-              " \u00b7 "+stamp());
+      /* One line: did it sync or not. The scores are the sync \u2014 they are what
+         the panel counts and what the boys earn. The optional state table
+         failing takes the extras with it but leaves the scores correct, so it
+         is not a failure to report here. Never claim success over a real one
+         though, in either direction: fifteen scores once piled up unsent on
+         one device because the note said "nothing new" instead of "stuck". */
+      var err=syncErr(), down=pullErr();
+      if(err && err!=="insert-only"){ setNote("Not synced \u00b7 "+stamp()); return; }
+      if(down){ setNote("Not synced \u00b7 "+stamp()); return; }
+      setNote("Synced \u00b7 "+stamp());
     });
   });
 }
