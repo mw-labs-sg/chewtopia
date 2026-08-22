@@ -4,9 +4,35 @@
    ========================================================================== */
 
 function S(k,d){ try{ var v=localStorage.getItem("chew:"+k); return v===null?d:v; }catch(e){ return d; } }
-function W(k,v){ try{ localStorage.setItem("chew:"+k,v); }catch(e){} }
+/* A full disk used to be swallowed here, so a finished test simply did not
+   save and the score he had just earned was never seen again. Now the answer
+   sheets — far and away the biggest thing in the store, and the least
+   important — are let go to make room, and if that is still not enough the
+   screen says so rather than failing in silence. */
+var storeFull="";
+function W(k,v){
+  try{ localStorage.setItem("chew:"+k,v); storeFull=""; return true; }
+  catch(e){
+    if(!trimStore()) { storeFull="This device is out of room."; return false; }
+    try{ localStorage.setItem("chew:"+k,v); storeFull=""; return true; }
+    catch(e2){ storeFull="This device is out of room, so the last thing was not saved."; return false; }
+  }
+}
+/* Drop the oldest answer sheets, then the oldest runs. Scores are kept as long
+   as anything can be: a number is worth far more than the working. */
+function trimStore(){
+  var a=null;
+  try{ a=JSON.parse(localStorage.getItem("chew:results")||"[]"); }catch(e){ return false; }
+  if(!a || !a.length) return false;
+  var freed=false;
+  for(var i=a.length-1;i>=0;i--){ if(a[i].ans){ delete a[i].ans; freed=true; if(a.length-i>40) break; } }
+  if(!freed && a.length>120){ a=a.slice(0,120); freed=true; }
+  if(!freed) return false;
+  try{ localStorage.setItem("chew:results", JSON.stringify(a)); RES=null; return true; }
+  catch(e){ return false; }
+}
 function SJ(k,d){ try{ var v=JSON.parse(localStorage.getItem("chew:"+k)); return (v===null||v===undefined)?d:v; }catch(e){ return d; } }
-function WJ(k,v){ W(k, JSON.stringify(v)); }
+function WJ(k,v){ if(k==="results") RES=null; return W(k, JSON.stringify(v)); }
 
 /* ---------- who the whole app is showing ---------- */
 /* One choice at the top, used by every screen, instead of a filter per tab. */
@@ -111,7 +137,7 @@ var DAYS = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunda
 var TABS = [["home","Upcoming","t1"],["schedule","Timetable","t2"],
             ["meals","Meals","t3"],["practice","Training","t4"],
             ["reading","Reading","t6"],["links","School","t5"]];
-var tab="home", quiz=null, showAdd=false, openTest=null, openRun=null, markRun=null, markState=null;
+var tab="home", quiz=null, showAdd=false;
 /* Each tab gets a readable address, e.g. .../chewtopia/#meals, so a link can
    be bookmarked or sent straight to one screen. */
 var SLUGS = {home:"upcoming", schedule:"timetable", meals:"meals",
@@ -126,7 +152,10 @@ function go(id, quiet){
   /* A name nothing can draw used to blank the screen and leave "#undefined" in
      the address bar, with no way back except tapping a tab. */
   if(!SLUGS[id]) id="home";
-  tab=id; quiz=null; showAdd=false; openTest=null; openRun=null; markRun=null; markState=null; hush();
+  /* Everything a screen was left in the middle of. wkOff was missed, so
+     browsing four weeks ahead on the Timetable, going to Meals and coming
+     back landed you four weeks ahead again with no way to tell why. */
+  tab=id; quiz=null; showAdd=false; showBook=false; wkOff=0; hush();
   if(!quiet){ try{ location.hash="#"+SLUGS[id]; }catch(e){} }
   render(); scrollTo(0,0);
 }
@@ -141,7 +170,11 @@ function subjCls(x){
   return "s-other";
 }
 function whoCls(w){ return w==="tc" ? "c-tc" : w==="sc" ? "c-sc" : "c-all"; }
-function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+/* Quotes matter as much as angle brackets: nearly every use of this is inside
+   an attribute, and a title carrying a straight quote would otherwise close it
+   and hand the rest of the string to the browser as markup. */
+function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;")
+  .replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;"); }
 function todayIdx(){ return (new Date().getDay()+6)%7; }
 function monKey(){ var d=new Date(); d.setDate(d.getDate()-todayIdx());
   return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate(); }
@@ -204,7 +237,15 @@ function uuid(){
     var r=Math.random()*16|0; return (ch==="x"?r:(r&0x3|0x8)).toString(16); });
 }
 
-function results(){ return SJ("results",[]); }
+/* Every box on Training asks for the last score, the best score and the last
+   three goes, and each of those used to re-read and re-parse the whole run
+   history out of localStorage. Drawing the screen once did that 133 times over
+   a 49KB string — about a sixth of a second of nothing, on every single tap
+   inside a Chinese test. It is parsed once now and thrown away the moment
+   anything writes to it. */
+var RES=null;
+function results(){ if(!RES) RES=SJ("results",[]); return RES; }
+function resultsDirty(){ RES=null; }
 
 /* Nothing produces hand-marked runs any more — 华文 is typed for both boys.
    An unmarked run has no real score, and lastFor() was showing it as 0, so any
@@ -278,6 +319,10 @@ function cloudLogout(){
 var syncBusy=false;
 function syncNote(){ return S("syncnote",""); }
 function setNote(t){ W("syncnote", t); render(); }
+/* What went wrong on the way DOWN. The way up already had this; without the
+   matching half, a device that could not read the cloud but could still write
+   to it said "Synced" and looked perfectly healthy. */
+function pullErr(){ return S("pullerr",""); }
 function stamp(){
   var d=new Date();
   return String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0");
@@ -291,8 +336,13 @@ function cloudPull(quiet, done){
   if(!c||!cloudUser){ if(!quiet) setNote("Not signed in."); return done(0); }
   if(syncBusy) return done(0);
   syncBusy=true; if(!quiet) setNote("Getting\u2026");
+  function pullFailed(msg, note){
+    syncBusy=false; W("pullerr", msg||"no connection");
+    if(!quiet) setNote(note+" \u00b7 "+(msg||"no connection"));
+    done(0);
+  }
   c.from("results").select("*").then(function(r){
-    if(r.error){ syncBusy=false; setNote("Could not sync: "+r.error.message); return done(0); }
+    if(r.error) return pullFailed(r.error.message, "Could not get the scores");
     var local=results(), byId={}, added=0, fixed=0;
     local.forEach(function(x){ if(x.id) byId[x.id]=x; });
     (r.data||[]).forEach(function(row){
@@ -315,15 +365,21 @@ function cloudPull(quiet, done){
     });
     local.sort(function(a,b){ return b.ts-a.ts; });
     WJ("results", local.slice(0,600));
-    pulledOnce=true;                 /* it is now safe to send our lists up */
-    pullState(function(stMsg){
+    /* pulledOnce used to be set right here, on the SCORES having come down.
+       But it is the lists \u2014 books, events, the tricky-ones bank \u2014 that a
+       push replaces wholesale, and those live in the state table, which is
+       read a moment later and can fail on its own. Setting the flag before
+       that read meant a blocked state read still let this device push its
+       un-merged lists over the other device's. It is set where it is earned. */
+    pullState(function(stMsg, stOK){
       syncBusy=false;
+      if(stOK){ pulledOnce=true; W("pullerr",""); }
+      else W("pullerr","the rest of the sync could not be read");
       if(!quiet) setNote("Got "+added+(added===1?" new score":" new scores")+
         (fixed?", "+fixed+" corrected":"")+stMsg+" \u00b7 "+stamp());
       done(added+fixed);
     });
-  }, function(e){ syncBusy=false;
-    setNote("Could not sync \u00b7 "+((e&&e.message)||"no connection")); done(0); });
+  }, function(e){ pullFailed((e&&e.message)||"no connection", "Could not sync"); });
 }
 
 /* ---------- SEND ---------- */
@@ -394,6 +450,41 @@ function syncErr(){ return S("syncerr",""); }
    an event deleted on the iPad came straight back on the phone. */
 var STATE_KEYS=["weak:tc","weak:sc","books:tc","books:sc","events","acts","seedgone"];
 function stateIdent(k){ return k.indexOf("weak:")===0 ? "k" : "id"; }
+
+/* ---------- tombstones ----------
+   Merging two lists is a union, so a plain delete never sticks: the device
+   that had not heard about it hands the entry straight back on the next sync.
+   Events and activities already had "seedgone". Books and the tricky-ones bank
+   did not, so a book struck off the reading log came back every single time,
+   and a tricky-one cleared by two clean goes came back at its worst count.
+   One list of what has been struck off, synced like everything else. */
+function tombs(){ return SJ("struck",{}); }
+function strike(key, id){
+  var t=tombs(); (t[key]=t[key]||{})[id]=Date.now(); WJ("struck", t);
+}
+function struckOff(key, id){ var t=tombs()[key]; return !!(t && t[id]); }
+/* Anything struck off, taken back out after every merge. */
+function dropStruck(){
+  var t=tombs();
+  Object.keys(t).forEach(function(key){
+    var ids=t[key], a=SJ(key,null); if(!a || !a.length) return;
+    var idf=stateIdent(key);
+    var keep=a.filter(function(x){ return !ids[x[idf]]; });
+    if(keep.length!==a.length) WJ(key, keep);
+  });
+}
+/* Two devices each keep their own strike list; the union is the truth. */
+function mergeTombs(far){
+  var mine=tombs(), touched=false;
+  Object.keys(far||{}).forEach(function(key){
+    var m=(mine[key]=mine[key]||{});
+    Object.keys(far[key]||{}).forEach(function(id){
+      if(!m[id]){ m[id]=far[key][id]; touched=true; }
+    });
+  });
+  if(touched) WJ("struck", mine);
+  return mine;
+}
 /* Nothing goes up until something has come down this session. Sending our
    lists first would hand a week-old tablet the last word over everything. */
 var pulledOnce=false;
@@ -418,11 +509,14 @@ function uniq(a){
 }
 function pullState(done){
   var c=sbc();
-  if(!c||!cloudUser) return done("");
+  if(!c||!cloudUser) return done("", false);
   c.from("state").select("*").then(function(r){
-    if(r.error) return done(", the rest needs the state table");
+    if(r.error) return done(", the rest needs the state table", false);
     var remote={};
     (r.data||[]).forEach(function(row){ remote[row.k]=row.v; });
+    /* strike lists first, so the merge below never re-adds something that this
+       device or the other one has already struck off */
+    mergeTombs(remote["struck"]);
     var touched=0;
     STATE_KEYS.forEach(function(k){
       var far=remote[k];
@@ -436,8 +530,9 @@ function pullState(done){
       WJ(k, merged);
     });
     dropGone();                 /* a union puts deleted entries back; take them out again */
-    done(touched?", plus the rest":"");
-  }, function(){ done(", the rest could not be reached"); });
+    dropStruck();               /* and the same for books and the tricky-ones bank */
+    done(touched?", plus the rest":"", true);
+  }, function(){ done(", the rest could not be reached", false); });
 }
 function pushState(done){
   var c=sbc();
@@ -445,9 +540,11 @@ function pushState(done){
   /* Never send up before something has come down: our lists would replace the
      other device's rather than join them. */
   if(!pulledOnce) return done("");
+  var now=new Date().toISOString();
   var rows=STATE_KEYS.map(function(k){
-    return {user_id:cloudUser.id, k:k, v:SJ(k,[]), updated_at:new Date().toISOString()};
+    return {user_id:cloudUser.id, k:k, v:SJ(k,[]), updated_at:now};
   });
+  rows.push({user_id:cloudUser.id, k:"struck", v:tombs(), updated_at:now});
   c.from("state").upsert(rows,{onConflict:"user_id,k"}).then(function(r){
     done(r.error ? ", the rest needs the state table" : ", plus the rest");
   }, function(){ done(", the rest could not be sent"); });
@@ -465,13 +562,20 @@ function cloudSync(){
   setNote("Syncing\u2026");
   cloudPull(true, function(got){
     cloudPushAll(true, function(sent){
-      /* Never claim success over a failed send. Saying "Synced · nothing new"
-         while scores sat unsent is how fifteen of them piled up on one device
-         without anybody noticing. */
-      var err=syncErr(), left=pending();
+      /* Never claim success over a failure in EITHER direction. Saying
+         "Synced · nothing new" while scores sat unsent is how fifteen of them
+         piled up on one device without anybody noticing — and the download
+         half had exactly the same hole: a device that could not read the cloud
+         but could still write to it reported a clean sync and looked healthy. */
+      var err=syncErr(), down=pullErr(), left=pending();
       if(err && err!=="insert-only"){
         setNote("Brought "+got+" down, but nothing could be sent up \u00b7 "+err+
                 " \u00b7 "+stamp());
+        return;
+      }
+      if(down){
+        setNote((sent?"Sent "+sent+" up, but n":"N")+
+                "othing could be brought down \u00b7 "+down+" \u00b7 "+stamp());
         return;
       }
       var bits=[];
@@ -535,7 +639,10 @@ function mealPlan(off){ return MEALS_ROTATION[rotIdx(off)]; }
 /* ---------- reading log ---------- */
 function books(w){ return SJ("books:"+w, []); }
 function addBook(w, rec){ var a=books(w); a.unshift(rec); WJ("books:"+w, a.slice(0,400)); }
-function delBook(w, id){ WJ("books:"+w, books(w).filter(function(b){ return b.id!==id; })); }
+function delBook(w, id){
+  strike("books:"+w, id);       /* or the next sync hands it straight back */
+  WJ("books:"+w, books(w).filter(function(b){ return b.id!==id; }));
+}
 function booksSince(w, days){
   var cut=Date.now()-days*86400000;
   return books(w).filter(function(b){ return b.ts>=cut; });
@@ -634,21 +741,41 @@ function oops(cn){ return cn ? {t:pick(OOPS_CN), lang:"zh-CN"} : {t:pick(OOPS_EN
 
 /* ---------- weak items: everything missed, kept per child ---------- */
 function weakKey(it){ return it.k+"|"+(it.h||it.a||it.q||it.s||""); }
+/* The question, without whatever the screen decorated it with last time. */
+function bareItem(it){
+  var o={}; Object.keys(it||{}).forEach(function(f){
+    if(f!=="tiles" && f!=="opts") o[f]=it[f]; });
+  return o;
+}
+function unstrike(key, id){
+  var t=tombs(); if(!t[key] || !t[key][id]) return;
+  delete t[key][id]; WJ("struck", t);
+}
 function weakAll(w){ return SJ("weak:"+(w||who()), []); }
 function weakAdd(it, code){ return weakAddFor(who(), it, code); }
 function weakAddFor(w, it, code){
+  /* Missed again after having been cleared: it is a tricky one once more, so
+     the strike has to be lifted or the next merge would delete it again. */
+  unstrike("weak:"+w, weakKey(it));
   var a=weakAll(w), k=weakKey(it), hit=null;
   a.forEach(function(x){ if(x.k===k) hit=x; });
   if(hit){ hit.n++; hit.ts=Date.now(); }
-  else a.push({k:k, n:1, ts:Date.now(), it:it, code:code||""});
+  /* Bank the question, never the four tiles it happened to be shown with.
+     Those are cached on the item so they do not jump about mid-question;
+     stored, they made every replay of a tricky one identical, so it could be
+     learnt by the shape of the row rather than by the character. */
+  else a.push({k:k, n:1, ts:Date.now(), it:bareItem(it), code:code||""});
   WJ("weak:"+w, a.slice(-120));
 }
 function weakDrop(it){
-  var w=who(), k=weakKey(it), a=weakAll(w), out=[];
+  var w=who(), k=weakKey(it), a=weakAll(w), out=[], cleared=false;
   a.forEach(function(x){
     if(x.k!==k){ out.push(x); return; }
-    x.n--; if(x.n>0) out.push(x);          /* two clean goes clears it */
+    x.n--; if(x.n>0) out.push(x); else cleared=true;   /* two clean goes clears it */
   });
+  /* Merging takes the higher count, so without this the other device simply
+     handed it back at its worst and the bank never emptied. */
+  if(cleared) strike("weak:"+w, k);
   WJ("weak:"+w, out);
 }
 function weakTop(w, n){
@@ -656,11 +783,20 @@ function weakTop(w, n){
     return (b.n-a.n) || (b.ts-a.ts);
   }).slice(0, n||5);
 }
+/* Every Chinese question now arrives as k:"bd" — the build-it mechanic — so
+   this fell through to it.a and printed the raw pinyin, or to it.s and printed
+   a whole 听写 sentence. "Keeps getting these wrong" read
+   "pin, wan, 识 · 认识, 昨天□上，我□见妈妈…" instead of naming four characters. */
 function weakLabel(x){
   var it=x.it||{};
-  if(it.k==="hz"||it.k==="rn") return it.h+" \u00b7 "+(it.word||"");
-  if(it.k==="py"||it.k==="tx") return (it.word||it.h||"");
   if(it.k==="math") return it.q||"";
+  if(it.k==="bd"){
+    /* a 听写 sentence: name the characters, not the sentence */
+    if(it.s) return String(it.h||"").split("").join(" ");
+    return (it.h||"")+(it.word && it.word!==it.h ? " \u00b7 "+it.word : "");
+  }
+  if(it.k==="hz"||it.k==="rn"||it.k==="py"||it.k==="tx")
+    return (it.h||"")+(it.word ? " \u00b7 "+it.word : "");
   return it.a||it.s||"";
 }
 

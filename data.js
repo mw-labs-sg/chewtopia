@@ -102,7 +102,7 @@ var RECOG = {
     ["\u5f20","zhang","1","\u4e00\u5f20\u5361","(flat things)"], ["\u5361","ka","3","\u751f\u65e5\u5361","card"],
     ["\u5f71","ying","3","\u7535\u5f71\u7968","film"],     ["\u7968","piao","4","\u7535\u5f71\u7968","ticket"],
     ["\u793c","li","3","\u793c\u7269","gift"],         ["\u5385","ting","1","\u5ba2\u5385","hall"],
-    ["\u602a","guai","4","\u5947\u602a","strange"],      ["\u6d3b","huo","2","\u6d3b\u52a8","活 alive"],
+    ["\u602a","guai","4","\u5947\u602a","strange"],      ["\u6d3b","huo","2","\u6d3b\u52a8","alive"],
     ["\u5b9d","bao","3","\u5b9d\u8d1d","treasure"]
   ],
   "第十三课": [
@@ -130,10 +130,10 @@ var RECOG = {
     ["争","zheng","1","争吵","to argue"], ["晶","jing","1","亮晶晶","sparkling"]
   ],
   "第十五课": [
-    ["茄","qie","2","番茄","aubergine"], ["卜","bo","","萝卜","radish"],
+    ["茄","qie","2","番茄","aubergine in 茄子 — 番茄 is a tomato"], ["卜","bo","","萝卜","radish"],
     ["考","kao","3","考试","to test"], ["紫","zi","3","紫色","purple"],
     ["煮","zhu","3","煮汤","to boil"], ["根","gen","1","树根","root"],
-    ["番","fan","1","番茄","tomato"], ["鼠","shu","3","老鼠","mouse"],
+    ["番","fan","1","番茄","foreign — 番茄 is a tomato"], ["鼠","shu","3","老鼠","mouse"],
     ["实","shi","2","果实","fruit"], ["芽","ya","2","豆芽","sprout"],
     ["或","huo","4","或者","or"], ["扁","bian","3","扁豆","flat"],
     ["者","zhe","3","或者","one who"], ["玉","yu","4","玉米","jade"],
@@ -374,8 +374,10 @@ var HANZI = {
    Section (二) 填写字词: a sentence with the tested characters knocked out.
    s   the sentence, □ where a character is missing
    a   the missing characters, in order
-   Read off the workbook and checked against the 生字表: the answers for a
-   lesson use every character on its 写字 list exactly once.
+   Read off the workbook and checked against the 生字表. Lessons 13 and 14 use
+   every character on their 我会写 list exactly once; 18 and 19 do not, because
+   the school's own sentences do not — 18 reaches for 干 and 馆 off the 我会认
+   list, and 19 never tests 重 or 猜. Left as the school wrote them.
    ========================================================================== */
 var TC_TINGXIE = {
   /* Keyed by lesson so it lines up with HANZI and RECOG on the 生字表 grid. */

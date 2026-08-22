@@ -133,15 +133,23 @@ function dailyBtn(kid){
   var title = ev ? "Coming up: "+esc(practiceLabel(ev.p)) : "Ten minutes of practice";
   var when  = ev ? evWhen(ev) : "";
 
-  /* the same shares startDaily uses, so the label never lies */
-  var bits=[], left=10;
-  if(p.due.length){ var n=Math.min(4,left); bits.push(n+" from it"); left-=n; }
-  if(p.weak.length){ var m=Math.min(4,left,p.weak.length); bits.push(m+" he keeps missing"); left-=m; }
-  if(left>0 && p.untried.length) bits.push(left+" not tried yet");
+  /* The label is built from the set itself, not from a guess at what the set
+     will be. It used to say "10 questions \u00b7 4 from it, 4 he keeps missing"
+     while startDaily took four from EACH of two due lists and often finished
+     eight questions short of ten. Counting the real thing costs nothing and
+     the button stops lying. */
+  var set=buildDaily(kid), tally={}, bits=[];
+  set.forEach(function(x){ tally[x.from]=(tally[x.from]||0)+1; });
+  if(tally.due)     bits.push(tally.due+" from it");
+  if(tally.weak)    bits.push(tally.weak+" he keeps missing");
+  if(tally.untried) bits.push(tally.untried+" not tried yet");
+  if(tally.any)     bits.push(tally.any+" from anywhere");
+  if(!set.length) return "";
 
   return '<button class="daily k-'+kid+'" data-t="daily" data-kid="'+kid+'">'+
     '<span class="dl">'+title+(when?' <i>'+esc(when)+'</i>':'')+'</span>'+
-    '<span class="dm">10 questions \u00b7 '+esc(bits.join(", "))+'</span></button>';
+    '<span class="dm">'+set.length+(set.length===1?" question":" questions")+
+      (bits.length?' \u00b7 '+esc(bits.join(", ")):'')+'</span></button>';
 }
 
 function vTests(){
@@ -256,6 +264,16 @@ function ordWord(n){
 function fracWord(d){
   return {2:"halves",3:"thirds",4:"quarters",5:"fifths",6:"sixths",7:"sevenths",
           8:"eighths",9:"ninths",10:"tenths",11:"elevenths",12:"twelfths"}[d];
+}
+function gcd(x,y){ x=Math.abs(x); y=Math.abs(y); while(y){ var t=y; y=x%y; x=t; } return x||1; }
+/* Every fraction answer, plus the same fraction in its simplest form, because
+   that is the form the school asks for and the one he is most likely to give. */
+function fracAlts(n,d){
+  var out=[], g=gcd(n,d);
+  if(g>1) out.push((n/g)+"/"+(d/g));
+  if(n===d) out.push("1");
+  if(n===0) out.push("0");
+  return out;
 }
 function money(c){ return "$"+(c/100).toFixed(2); }
 function hhmm(m){
@@ -381,13 +399,18 @@ function maFrac(){
       var dd=rnd(3,12), a=rnd(1,dd-2), b=rnd(1,dd-a-1)+0;
       if(a+b>=dd) b=dd-a-1;
       if(b<1){ a=1; b=1; }
-      return maQ(a+"/"+dd+" + "+b+"/"+dd, (a+b)+"/"+dd, {im:"text", ph:"5/7"});
+      /* Subtraction always accepted the simplified answer; addition never did,
+         so 1/8 + 3/8 wanted 4/8 and a boy who wrote 1/2 — the form the school
+         actually asks for — was told he was wrong. */
+      return maQ(a+"/"+dd+" + "+b+"/"+dd, (a+b)+"/"+dd,
+                 {im:"text", ph:"5/7", alt:fracAlts(a+b,dd)});
     }
     case 4: {
-      var dd=rnd(3,12), a=rnd(2,dd), b=rnd(1,a-1), g=(function(x,y){ while(y){var t=y;y=x%y;x=t;} return x; })(a-b,dd);
-      var alt=[]; if(g>1) alt.push(((a-b)/g)+"/"+(dd/g));
-      if(a-b===dd) alt.push("1");
-      return maQ(a+"/"+dd+" \u2212 "+b+"/"+dd, (a-b)+"/"+dd, {im:"text", ph:"3/9", alt:alt});
+      /* a stops one short of the bottom number: P2 works within one whole, so
+         10/10 - 2/10 was a question off his syllabus dressed up as one on it */
+      var dd=rnd(3,12), a=rnd(2,dd-1), b=rnd(1,a-1);
+      return maQ(a+"/"+dd+" \u2212 "+b+"/"+dd, (a-b)+"/"+dd,
+                 {im:"text", ph:"3/9", alt:fracAlts(a-b,dd)});
     }
     case 5:
       return maQ("How many "+fracWord(d)+" make one whole?", d, {w:1});
@@ -472,10 +495,10 @@ function maTime(){
 function maMeasure(){
   switch(rnd(1,5)){
     case 1: {
-      var x=maPick([["an apple","g","kg"],["a bag of rice","kg","g"],
-                    ["a school bag","kg","g"],["a coin","g","kg"]]);
+      var x=maPick([["an apple","g",["gram","grams"]],["a bag of rice","kg",["kilogram","kilograms","kilo","kilos"]],
+                    ["a school bag","kg",["kilogram","kilograms","kilo","kilos"]],["a coin","g",["gram","grams"]]]);
       return maQ("Which unit would you use for the mass of "+x[0]+" \u2014 g or kg?",
-                 x[1], {w:1, im:"text", ph:"g or kg"});
+                 x[1], {w:1, im:"text", ph:"g or kg", alt:x[2]});
     }
     case 2: {
       var a=rnd(2,9), b=rnd(2,9);
@@ -495,10 +518,15 @@ function maMeasure(){
                  " m is cut off.  How many metres are left?", a-b, {w:1});
     }
     default: {
-      var x=maPick([["a bottle of water","\u2113"],["the length of a classroom","m"],
-                    ["a pencil","cm"]]);
-      return maQ("Which unit fits "+x[0]+" \u2014 cm, m or \u2113?", x[1],
-                 {w:1, im:"text", ph:"cm, m or \u2113"});
+      /* The answer used to be \u2113, U+2113, which no iPad or Windows keyboard can
+         produce \u2014 so "l", "L" and "litres" were all marked wrong and the
+         question could not be got right by anybody. It is asked in the letters
+         he can actually reach, and every reasonable spelling is accepted. */
+      var x=maPick([["a bottle of water","l",["\u2113","litre","litres","liter","liters"]],
+                    ["the length of a classroom","m",["metre","metres","meter","meters"]],
+                    ["a pencil","cm",["centimetre","centimetres","centimeter","centimeters"]]]);
+      return maQ("Which unit fits "+x[0]+" \u2014 cm, m or l (litres)?", x[1],
+                 {w:1, im:"text", ph:"cm, m or l", alt:x[2]});
     }
   }
 }
@@ -531,8 +559,11 @@ function mathItems(kind){
 /* Numbers can be written more than one way and still be right: $3.60 or 3.6,
    3 h 20 min or 3h20. Compare what they mean, not how it was typed. */
 function maNorm(s){
+  /* Anchored on word boundaries: without them "min" matched inside "minus",
+     so a typed "minus 5" normalised to "mus5" and could never be right. */
   return String(s||"").toLowerCase()
-    .replace(/hours?|hrs?/g,"h").replace(/minutes?|mins?/g,"m")
+    .replace(/\b(hours?|hrs?)\b/g,"h").replace(/\b(minutes?|mins?)\b/g,"m")
+    .replace(/\u2113/g,"l")
     .replace(/[\s,$]/g,"").replace(/[.\u3002]+$/,"");
 }
 function mathOK(given, it){
@@ -561,7 +592,7 @@ function practiceLabel(code){
 /* One mark per character the answer needs. A four-character phrase with one
    slip should not score the same as a blank. */
 function itemMarks(it){
-  return (it.k==="tx"||it.k==="bd") ? Math.max(1, String(it.h||"").length) : 1;
+  return it.k==="bd" ? Math.max(1, String(it.h||"").length) : 1;
 }
 function totalMarks(items){
   var n=0; (items||[]).forEach(function(it){ n+=itemMarks(it); }); return n;
@@ -578,9 +609,10 @@ function startItems(items, test, subject, lang, code){
 /* Everything this child has got wrong before, hardest first. */
 function startWeak(){
   var a=weakTop(who(), 12).map(function(x){ return x.it; }).filter(Boolean)
-    /* Old handwriting entries have no pinyin banked, so they cannot be asked
-       as a typed question. Drop them rather than show an unanswerable one. */
-    .filter(function(i){ return i.k!=="tx"; });
+    /* Entries left over from the handwriting days have no pinyin and no tiles
+       banked, so they cannot be asked at all. Drop them rather than show an
+       unanswerable one. */
+    .filter(function(i){ return i && i.k!=="tx" && i.k!=="hz" && i.k!=="py"; });
   if(!a.length) return;
   var cn=a.every(function(i){ return i.k==="hz"||i.k==="rn"||i.k==="py"||(i.k==="bd"&&i.lesson); });
   startItems(a, "Review \u00b7 tricky ones", "Review", cn?"zh-CN":"en-GB", "weak");
@@ -693,33 +725,45 @@ function dailyPlan(kid){
   return {due:due, weak:weak, untried:untried,
           any: !!(due.length || weak.length || untried.length)};
 }
+/* The set itself, each question tagged with where it came from, so the button
+   can describe exactly what it is about to hand over. Ten is the target; if
+   there is genuinely less than that to practise, it says the smaller number
+   rather than pretending. */
+function buildDaily(kid){
+  var plan=dailyPlan(kid), out=[], seen={};
+  function push(list, from){
+    (list||[]).forEach(function(it){
+      if(!it || out.length>=10) return;
+      var k=weakKey(it); if(seen[k]) return;
+      seen[k]=1; it.from=from; out.push(it);
+    });
+  }
+  /* four from each of the two things being tested soonest */
+  plan.due.slice(0,2).forEach(function(c){
+    if(out.length>=10) return;
+    var q=itemsFor(c, kid); if(q) push(some(q.items, 4), "due");
+  });
+  /* the ones he keeps getting wrong */
+  push(some(plan.weak.map(function(x){ return x.it; }).filter(Boolean),
+            Math.min(4, 10-out.length)), "weak");
+  /* something never tried */
+  if(out.length<10 && plan.untried.length){
+    var q2=itemsFor(some(plan.untried,1)[0], kid);
+    if(q2) push(some(q2.items, 10-out.length), "untried");
+  }
+  /* still short: top it up from anywhere, taking a fresh list each time rather
+     than giving up at six and handing over a half-length set */
+  var guard=0;
+  while(out.length<10 && guard++<8){
+    var q3=itemsFor(some(allCodes(kid),1)[0], kid);
+    if(q3) push(some(q3.items, 10-out.length), "any");
+  }
+  return out;
+}
 function startDaily(kid){
   kid=kid||who();
   W("who", kid);
-  var plan=dailyPlan(kid), items=[], seen={};
-  function push(list){
-    (list||[]).forEach(function(it){
-      if(!it || items.length>=10) return;
-      var k=weakKey(it); if(seen[k]) return;
-      seen[k]=1; items.push(it);
-    });
-  }
-  /* four from whatever is being tested soonest */
-  plan.due.slice(0,2).forEach(function(c){
-    var q=itemsFor(c, kid); if(q) push(some(q.items, 4));
-  });
-  /* four they keep getting wrong */
-  push(some(plan.weak.map(function(x){ return x.it; }).filter(Boolean), 4));
-  /* two from something never tried */
-  if(items.length<10 && plan.untried.length){
-    var q2=itemsFor(some(plan.untried,1)[0], kid);
-    if(q2) push(some(q2.items, 10-items.length));
-  }
-  /* still short? top it up from anything at all */
-  if(items.length<6){
-    var q3=itemsFor(some(allCodes(kid),1)[0], kid);
-    if(q3) push(some(q3.items, 10-items.length));
-  }
+  var items=buildDaily(kid);
   if(!items.length){ alert("Nothing to practise yet."); return; }
   var cn=items.every(function(i){ return i.k==="hz"||i.k==="rn"||i.k==="py"||(i.k==="bd"&&i.lesson); });
   startItems(items, "Today \u00b7 ten minutes", "Review", cn?"zh-CN":"en-GB", "daily");
@@ -727,42 +771,30 @@ function startDaily(kid){
 
 function clean(s){ return String(s||"").toLowerCase()
   .replace(/[.,!?;:'"\u2018\u2019\u201c\u201d]/g,"").replace(/\s+/g," ").trim(); }
+/* A dictation sentence is marked on its punctuation and its capital letter as
+   well as its spelling \u2014 those carry marks on the real paper. clean() threw all
+   of it away, so "he frowned with concern" scored the same as the right
+   answer. Curly quotes and apostrophes are still folded to straight ones,
+   because which one the keyboard produced is not the child's doing. */
+function cleanDict(s){
+  return String(s||"")
+    .replace(/[\u2018\u2019]/g,"'").replace(/[\u201c\u201d]/g,'"')
+    .replace(/\s+/g," ").trim();
+}
+/* What he got wrong in a sentence, so the feedback can say more than "no". */
+function dictSlip(given, want){
+  var g=cleanDict(given), w=cleanDict(want);
+  if(g===w) return "";
+  if(g.toLowerCase()===w.toLowerCase()) return "Check the capital letters.";
+  if(g.replace(/[.,!?;:']/g,"")===w.replace(/[.,!?;:']/g,"")) return "The words are right \u2014 check the punctuation.";
+  return "";
+}
 function ltRow(t,g){ var h='<div class="lts">';
   t.split("").forEach(function(c,k){
     var ok=g[k]!==undefined&&g[k].toLowerCase()===c.toLowerCase();
     h+='<span class="lt '+(ok?"h":"s")+'">'+(c===" "?"&nbsp;":c)+'</span>'; });
   return h+'</div>'; }
 
-/* Weak items are stored bare, without the four choices they were first shown
-   with, so anything replaying them has to build a fresh set. */
-/* 我会认 is recognition, not production: he sees the character and picks its
-   pinyin from four. Distractors come from the same lesson where possible, so
-   they are a real choice rather than a giveaway.
-   RECOG and HANZI both store [char, pinyin, tone, word, meaning]. */
-function pyOpts(it){
-  if(it.opts && it.opts.length>=2) return it.opts;
-  var want=pyWant(it), seen={}, near=[], far=[];
-  seen[want]=1;
-  function add(rows, into){
-    (rows||[]).forEach(function(x){
-      if(!x || x[0]===it.h) return;
-      var p=String(x[1]||"")+String(x[2]||"");
-      if(!p || seen[p]) return;
-      seen[p]=1; into.push(p);
-    });
-  }
-  var banks=[]; 
-  if(typeof RECOG!=="undefined" && RECOG) banks.push(RECOG);
-  if(typeof HANZI!=="undefined" && HANZI) banks.push(HANZI);
-  banks.forEach(function(b){ if(it.lesson && b[it.lesson]) add(b[it.lesson], near); });
-  banks.forEach(function(b){ Object.keys(b).forEach(function(k){
-    if(k!==it.lesson) add(b[k], far); }); });
-  function shuffle(a){ return shuffled(a); }
-  var pool=shuffle(near).concat(shuffle(far)).slice(0,3);
-  if(pool.length<3) return null;              /* not enough to choose from */
-  it.opts=shuffle([want].concat(pool));       /* kept on the item so they do not jump */
-  return it.opts;
-}
 
 /* ==========================================================================
    BUILD IT — the one Chinese mechanic both boys use. He hears the whole word,
@@ -831,175 +863,42 @@ function bdTiles(it){
   it.tiles=shuffle(need.concat(d));
   return it.tiles;
 }
+/* One entry per gap, held apart from the others. It used to be a dense list
+   that tiles were pushed on to and spliced out of, so clearing the FIRST gap
+   of 前总丢 slid 总 into it and emptied the last one — correcting one
+   character quietly rewrote the other two. */
 function bdFilled(){ return (quiz.bd||[]).slice(); }
-
-function hzOpts(it){
-  if(it.opts && it.opts.length>=2) return it.opts;
-  /* The question already shows the pinyin, so random distractors give it away.
-     Characters sharing a syllable almost always share a phonetic part —
-     请 清 情 晴 — so a same-sound pool is also the lookalike pool, and he has
-     to know the shape rather than the sound. */
-  var bare=function(v){ return String(v||"").toLowerCase().replace(/[^a-z]/g,""); };
-  var mine=bare(it.a), sameSyl=[], sameTone=[], rest=[], seen={};
-  seen[it.h]=1;
-  var banks=[];
-  if(typeof HANZI!=="undefined" && HANZI) banks.push(HANZI);
-  if(typeof RECOG!=="undefined" && RECOG) banks.push(RECOG);
-  banks.forEach(function(b){ Object.keys(b).forEach(function(k){
-    (b[k]||[]).forEach(function(x){
-      var ch=x[0]; if(!ch || seen[ch] || String(ch).length!==1) return;
-      seen[ch]=1;
-      if(bare(x[1])===mine){ (String(x[2])===String(it.tone) ? sameTone : sameSyl).push(ch); }
-      else rest.push(ch);
-    });
-  }); });
-  function shuffle(a){ return shuffled(a); }
-  /* same sound and same tone is the hardest confusion, so it goes first */
-  var pool=shuffle(sameTone).concat(shuffle(sameSyl)).concat(shuffle(rest)).slice(0,3);
-  if(pool.length<3) return null;
-  it.opts=shuffle([it.h].concat(pool));
-  return it.opts;
+function bdNextGap(it){
+  var need=bdSlots(it).length, f=quiz.bd||[];
+  for(var i=0;i<need;i++){ if(!f[i]) return i; }
+  return -1;
 }
-
-/* Writing mode. Any Chinese question can be answered on the pad instead of the
-   keyboard, and marked by eye afterwards. SC starts there because he cannot
-   type pinyin at six; TC starts on the keyboard and can switch any time. */
-/* One rule, and nothing to set. A test that asks him to WRITE A CHARACTER
-   gets boxes to write in: 我会写 for TC, 听写 for SC. A test that asks for
-   PINYIN keeps the keyboard, because pinyin is letters.
-   In the boxes, the strokes are checked where the data allows; where it does
-   not — long words — he writes freely and it is marked by eye. Either way he
-   does the same thing: hear it, write it in the box. */
-/* Nothing in the app is written by hand. 我会写 is answered on screen. */
-function handwritten(it){ return false; }
-/* Stroke checking is for TC's single 我会写 characters only. A six-year-old
-   writing a whole word gets his work marked by a person: recognition that
-   refuses a perfectly readable character is worse than no recognition. */
-function writing(it){ return handwritten(it) && !tracing(it); }
-
-/* What goes on the pad, and what is revealed when it is time to mark. */
-/* Exactly what to write: one character, a word of two, or the whole sentence. */
-function askCount(it){
-  var s=String(traceTarget(it)||it.h||""), n=s.length;
-  if(it.k==="hz") return n===1 ? "Just the one character" : "Both characters";
-  var stop = /[\u3002\uff01\uff1f]/.test(String(it.word||""));
-  if(n===1) return "One character";
-  if(n<=3) return "One word \u00b7 "+n+" characters";
-  return "A whole sentence \u00b7 "+n+" characters"+(stop?" and the full stop":"");
-}
-function writeAsk(it){
-  if(it.k==="hz"){
-    var wd=String(it.word||it.h), tgt=String(it.h);
-    var box='<b class="blank">'+"\u25a2".repeat(tgt.length)+'</b>';
-    return {title:"\u5199\u4e00\u5199",
-            sub:(wd.indexOf(tgt)>=0 ? esc(wd).replace(esc(tgt),box) : box),
-            count:askCount(it)};
-  }
-  if(it.k==="rn"){
-    return {title:"\u5199\u62fc\u97f3", sub:'<b class="blank">'+esc(it.h)+'</b>',
-            count:"The pinyin and the tone"};
-  }
-  var n=String(it.h||"").length;
-  return {title:"\u542c\u4e00\u542c\uff0c\u5199\u4e00\u5199", sub:"", count:askCount(it)};
+function bdCount(){ var f=quiz.bd||[], n=0;
+  for(var i=0;i<f.length;i++){ if(f[i]) n++; } return n; }
+/* What he handed in, gap by gap, with a marker where he left one empty so the
+   marking never slides a later answer into an earlier gap's place. */
+function bdAnswer(it){
+  var need=bdSlots(it).length, f=quiz.bd||[], out=[];
+  for(var i=0;i<need;i++) out.push(f[i]||"\u3000");
+  return out.join("");
 }
 
 /* ==========================================================================
-   TRACING — the character is checked as he writes it.
-   Not handwriting recognition: it compares each stroke against the real stroke
-   data for that character, so a right answer is never marked wrong. He has to
-   know the shape and the stroke order; nothing appears until he gets a stroke
-   right. The library and the stroke data load only when a writing test opens.
+   REMOVED: stroke tracing, the writing pad and hand-marking.
+   handwritten() returned false unconditionally, so writing(), tracing(),
+   wireTrace(), wirePad*(), wireMarks() and loadStrokes() could never run, and
+   strokes.js and hanzi-writer.min.js were never fetched. hzOpts() and pyOpts()
+   went the same way: every Chinese question now arrives as k:"bd" or k:"rn",
+   so the k:"hz"/"py"/"tx" branches they served were unreachable too.
+   Nothing in the app is written by hand any more — 我会写 is answered on screen
+   by tapping the character, and 听写 by filling the gaps in the sentence.
    ========================================================================== */
-var strokesReady=false, strokesLoading=false;
-function haveStrokes(s){
-  if(!strokesReady) return false;
-  /* both halves have to be on board, or fall back to the plain pad */
-  if(typeof HanziWriter==="undefined" || typeof STROKES==="undefined") return false;
-  var ok=true;
-  String(s||"").split("").forEach(function(ch){ if(!STROKES[ch]) ok=false; });
-  return ok && String(s||"").length>0;
-}
-function loadStrokes(then){
-  if(strokesReady) return then(true);
-  if(strokesLoading) return;
-  strokesLoading=true;
-  var left=2, bad=false;
-  function one(src){
-    var el=document.createElement("script");
-    el.src=src;
-    el.onload=function(){ if(!--left){ strokesLoading=false; strokesReady=!bad; then(!bad); } };
-    el.onerror=function(){ bad=true; if(!--left){ strokesLoading=false; then(false); } };
-    document.head.appendChild(el);
-  }
-  one("vendor/hanzi-writer.min.js");
-  one("strokes.js?v=1");
-}
-/* What he has to write for this question, as characters. */
-function traceTarget(it){ return handwritten(it) ? String(it.h||"") : ""; }
-function tracing(it){
-  if(it.k!=="hz") return false;
-  var s=traceTarget(it);
-  return s.length===1 && haveStrokes(s);
-}
-/* Build one writing square per character and mark the question when they are
-   all done. Misses are counted: two or more and it goes down as not known. */
-function wireTrace(it){
-  var q=quiz, s=traceTarget(it), boxes=document.querySelectorAll("[data-tr]");
-  if(!boxes.length) return;
-  if(typeof HanziWriter==="undefined"){ strokesReady=false; render(); return; }
-  q.trMiss = q.trMiss || 0;
-  q.trDone = 0;
-  boxes.forEach(function(box, idx){
-    box.innerHTML="";
-    var size=box.clientWidth||150;
-    var wr=HanziWriter.create(box, s.charAt(idx), {
-      width:size, height:size, padding:6,
-      showCharacter:false, showOutline:false, showHintAfterMisses:3,
-      strokeColor:"#16202B", drawingColor:"#2F73E8", drawingWidth:26,
-      highlightColor:"#4FB86B", leniency:1.4,
-      charDataLoader:function(ch, done){ done(STROKES[ch]); }
-    });
-    box.hzWriter=wr;
-    wr.quiz({
-      onMistake:function(){ q.trMiss++; sfxLose(); },
-      onCorrectStroke:function(){ sfxTap(); },
-      onComplete:function(){
-        box.classList.add("filled");
-        if(++q.trDone>=s.length){
-          /* he wrote every character: two or more wrong strokes and it counts
-             as not known yet, which is what brings it back in the mistakes set */
-          setTimeout(function(){ grade(q.trMiss<2); }, 350);
-        }
-      }
-    });
-  });
-  var clr=document.getElementById("trClear");
-  if(clr) clr.onclick=function(){
-    /* wipe the squares and start the character again. Free: a child who has
-       gone wrong should be able to start over without being punished twice. */
-    sfxTap();
-    q.trDone=0;
-    boxes.forEach(function(b){ b.classList.remove("filled"); });
-    wireTrace(it);
-  };
-  var hint=document.getElementById("trHint");
-  if(hint) hint.onclick=function(){
-    q.trMiss+=2;                       /* asking to be shown is not knowing it */
-    boxes.forEach(function(b,i){ if(b.hzWriter && !b.classList.contains("filled")){
-      b.hzWriter.animateCharacter(); } });
-  };
-  var skip=document.getElementById("trSkip");
-  if(skip) skip.onclick=function(){ grade(false); };
-}
 
 /* What to call the question on screen. The Chinese questions all arrive as
    k:"bd" — the build-it mechanic — so the kind has to come from the shape of
    the item and the test it came from, or a 听写 ends up labelled "Spelling". */
 function quizKind(it){
   if(it.k==="rn")   return "\u6211\u4f1a\u8ba4";          /* 我会认 */
-  if(it.k==="hz")   return "\u6211\u4f1a\u5199";          /* 我会写 */
-  if(it.k==="py")   return "\u6c49\u8bed\u62fc\u97f3";    /* 汉语拼音 */
-  if(it.k==="tx")   return "\u542c\u5199";                /* 听写 */
   if(it.k==="dict") return "Dictation";
   if(it.k==="math") return "Question";
   if(it.k==="bd"){
@@ -1034,67 +933,7 @@ function quizHTML(){
     '<div class="meter"><i style="width:'+(q.i/q.items.length*100)+'%"></i></div>'+
     '<div class="kind">'+quizKind(it)+
       ' '+(q.i+1)+' of '+q.items.length+'</div>';
-  if(tracing(it) && !q.graded){
-    var tg=traceTarget(it), tk=writeAsk(it);
-    s+='<div class="qq">'+tk.title+'</div>'+
-       (tk.sub?'<div class="ctx big-word">'+tk.sub+'</div>':'')+
-       '<button class="btn play wide" id="qP">\uD83D\uDD0A Hear it</button>'+
-       '<div class="ctx wcount">'+esc(tk.count)+'</div>'+
-       '<div class="tip">It only inks in when the stroke is right.</div>'+
-       '<div class="tracerow">'+tg.split("").map(function(_,i){
-          return '<div class="trbox" data-tr="'+i+'"></div>'; }).join("")+'</div>'+
-       '<div class="trbtns">'+
-         '<button class="trbtn" id="trClear">\u21ba Rub out</button>'+
-         '<button class="trbtn" id="trHint">\uD83D\uDC40 Show me</button>'+
-         '<button class="trbtn skip" id="trSkip">I don\u2019t know it</button>'+
-       '</div>'+
-       '<input type="hidden" id="qa" value="">';
-  }
-  else if(it.k==="tx"){
-    var chs=String(it.h||"").split(""), ask=writeAsk(it);
-    s+='<div class="qq">'+ask.title+'</div>'+
-       '<button class="btn play wide" id="qP">\uD83D\uDD0A Hear it again</button>'+
-       '<div class="ctx wcount">'+esc(ask.count)+'</div>';
-    if(!q.show && !q.graded){
-      /* he writes, with nothing on screen to copy */
-      s+='<div class="padrow n'+Math.min(5,chs.length)+'">'+chs.map(function(_,i){
-           return '<div class="padcell"><canvas class="pad" data-pad="'+i+'"></canvas></div>';
-         }).join("")+'</div>'+
-         '<div class="trbtns"><button class="trbtn" id="padClr">\u21ba Rub out</button>'+
-         '<button class="trbtn skip" id="qShow">I have finished \u2192</button></div>';
-    } else {
-      /* His writing with the right answer beside it, so he can see straight
-         away how close he was. He does not mark it — that is a grown-up job,
-         and a child marking his own 听写 is not a score anyone can use. */
-      s+='<div class="marktip">Here is how it should look.</div>'+
-         '<div class="padrow n'+Math.min(5,chs.length)+'">'+chs.map(function(ch,i){
-           return '<div class="markcell show">'+
-             (q.img&&q.img[i] ? '<img src="'+q.img[i]+'" alt="">' : '<span class="noimg">\u2014</span>')+
-             '<span class="ansch">'+esc(ch)+'</span></div>';
-         }).join("")+'</div>'+
-         '<div class="ctx">'+esc(it.word||"")+' \u00b7 '+esc(it.a||"")+(it.tone||"")+
-           (it.m?' \u00b7 '+esc(it.m):"")+'</div>'+
-         '<p class="empty" style="text-align:center">Dad will mark this one.</p>';
-    }
-    s+='<input type="hidden" id="qa" value="">';
-  }
-  else if(writing(it) || (tracing(it) && q.graded)){
-    var ask=writeAsk(it);
-    s+='<div class="qq">'+ask.title+'</div>'+
-       (ask.sub?'<div class="ctx big-word">'+ask.sub+'</div>':'')+
-       '<button class="btn play wide" id="qP">\uD83D\uDD0A Hear it again</button>'+
-       '<div class="ctx wcount">'+esc(ask.count)+'</div>'+
-       ((q.show||q.graded)
-        ? '<div class="hz">'+esc(it.k==="rn"?(it.a+(it.tone||"")):it.h)+'</div>'+
-          '<div class="ctx">'+esc(it.word||"")+
-            (it.k==="rn"?"":' \u00b7 '+esc(it.a)+(it.tone||""))+
-            (it.m?' \u00b7 '+esc(it.m):"")+'</div>'
-        : '<div class="padwrap"><canvas id="pad" class="pad"></canvas>'+
-          '<button class="padclr" id="padClr">Rub out</button></div>'+
-          '')+
-       '<input type="hidden" id="qa" value="">';
-  }
-  else if(it.k==="rn"){
+  if(it.k==="rn"){
     s+='<div class="hz">'+it.h+'</div>'+
        '<div class="ctx">'+(q.graded?esc(it.word)+' · '+esc(it.m)
          :"Type the pinyin, with its tone number")+'</div>'+
@@ -1113,51 +952,18 @@ function quizHTML(){
        (q.graded
         ? '<div class="hint2">'+esc(it.h)+' \u00b7 <b>'+esc(it.a)+(it.tone||"")+'</b>'+
           (it.m?' \u00b7 '+esc(it.m):"")+'</div>'
-        : '<div class="btiles">'+bdTiles(it).map(function(c){
-            var used=fl.indexOf(c)>=0;
-            return '<button class="btile'+(used?" used":"")+'" data-tile="'+esc(c)+'">'+esc(c)+'</button>';
-          }).join("")+'</div>')+
-       '<input type="hidden" id="qa" value="'+esc(fl.join(""))+'">';
+        : '<div class="btiles">'+(function(){
+            /* a tile the same character as another is only used up once */
+            var left={}; fl.forEach(function(c){ if(c) left[c]=(left[c]||0)+1; });
+            return bdTiles(it).map(function(c){
+              var used=left[c]>0; if(used) left[c]--;
+              return '<button class="btile'+(used?" used":"")+'" data-tile="'+esc(c)+
+                     '"'+(used?' aria-disabled="true"':'')+'>'+esc(c)+'</button>';
+            }).join("");
+          })()+'</div>')+
+       '<input type="hidden" id="qa" value="'+esc(bdAnswer(it))+'">';
   }
-  else if(it.k==="hz"){
-    /* Say plainly which character is wanted: the word with one box missing,
-       the pinyin of that character only, and how many to write. */
-    var wd=String(it.word||it.h), tgt=String(it.h);
-    var blanked = wd.indexOf(tgt)>=0
-      ? esc(wd).replace(esc(tgt), '<b class="blank">'+"\u25a2".repeat(tgt.length)+'</b>')
-      : '<b class="blank">'+"\u25a2".repeat(tgt.length)+'</b>';
-    s+='<div class="qq">Write the '+(tgt.length>1?tgt.length+' characters':'character')+
-         ' that goes in the box</div>'+
-       '<div class="ctx big-word">'+blanked+'</div>'+
-       /* The pinyin is the answer when the other three are random characters,
-          so it is held back until the question has been marked. */
-       (q.graded
-        ? '<div class="hint2">\u25a2 = <b>'+esc(it.a)+(it.tone||"")+'</b>'+
-          (it.m?' \u00b7 '+esc(it.m):"")+'</div>'
-        : '')+
-       '<div class="tip">Listen, then tap the character that belongs in the box.</div>'+
-       '<button class="btn play wide" id="qP">\uD83D\uDD0A Hear the word</button>'+
-       (hzOpts(it)
-        ? '<div class="opts">'+hzOpts(it).map(function(c){
-            return '<button class="opt" data-opt="'+c+'">'+c+'</button>'; }).join("")+
-          '</div>'+
-          '<input type="hidden" id="qa" value="">'+
-          ''
-        : '<input type="text" id="qa" autocomplete="off" spellcheck="false" '+
-          'class="hzin" placeholder="'+esc(tgt.length>1?"写这两个字":"写这个字")+'" lang="zh">'+
-          '');
-  }
-  else if(it.k==="py"||it.k==="tx"){
-    var pn=String(it.h||"").length;
-    s+='<div class="hz'+(q.graded?"":" q")+'">'+(q.graded?esc(it.h):"?")+'</div>'+
-       '<div class="ctx">'+(q.graded?esc(it.word)
-         :"Listen, then type the pinyin with tones"+(pn>1?" for all "+pn+" characters":""))+'</div>'+
-       '<button class="btn play wide" id="qP">🔊 Hear the word</button>'+
-       '<div class="lbl">Pinyin with tones</div>'+
-       '<input type="text" id="qa" class="pyin" autocomplete="off" autocapitalize="none" '+
-       'spellcheck="false" placeholder="'+(pn>1?"da4 ma3":"ma3")+'">'+
-       '';
-  } else if(it.k==="math"){
+  else if(it.k==="math"){
     /* A sum gets " = ?" after it; a question already asks for itself. */
     s+='<div class="qq'+(it.w?" qw":"")+'">'+esc(it.q)+(it.w?"":" = ?")+'</div>'+
        '<input type="text" id="qa" inputmode="'+(it.im==="text"?"text":"numeric")+
@@ -1170,29 +976,6 @@ function quizHTML(){
        (it.k==="dict"
         ? '<textarea id="qa" spellcheck="false" placeholder="Type the whole sentence" style="margin-top:12px"></textarea>'
         : '<input type="text" id="qa" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Type here" style="margin-top:12px">');
-  }
-  if(it.k==="tx"){
-    if(!q.show && !q.graded) return s+'<div id="qf"></div></div>';
-    return s+'<div class="btnrow"><button class="btn go" id="qG">'+
-      (q.i===q.items.length-1?"Finished \u2192":"Next word")+'</button></div>'+
-      '<div id="qf"></div></div>';
-  }
-  if(tracing(it) && !q.graded){
-    return s+'<div id="qf"></div></div>';
-  }
-  if(tracing(it) && q.graded){
-    return s+'<div class="btnrow"><button class="btn go" id="qG">'+
-      (q.i===q.items.length-1?"Finished \u2192":"Next")+'</button></div>'+
-      '<div id="qf"></div></div>';
-  }
-  if(writing(it)){
-    s += q.graded
-      ? '<div class="btnrow"><button class="btn go" id="qG">Next</button></div>'
-      : (q.show
-         ? '<div class="btnrow"><button class="btn go" id="mkY">\u2713 He got it</button>'+
-           '<button class="btn soft" id="mkN">\u2717 Not yet</button></div>'
-         : '<div class="btnrow"><button class="btn go" id="qShow">Show the answer</button></div>');
-    return s+'<div id="qf"></div></div>';
   }
   return s+'<div class="btnrow"><button class="btn go" id="qG">Check</button></div><div id="qf"></div></div>';
 }
@@ -1218,38 +1001,24 @@ function wireQuiz(){
   var g=document.getElementById("qG");
   if(g) g.onclick=function(){ q.graded?next():grade(); };
 
-  /* the writing pad: finger or Apple Pencil, and a rub-out */
-  var pad=document.getElementById("pad");
-  if(pad) wirePad(pad);
-  if(document.querySelector("[data-pad]")) wirePadRow(it);
-  if(document.querySelector("[data-tr]")) wireTrace(it);
-  var shw=document.getElementById("qShow");
-  if(shw) shw.onclick=function(){
-    var p=document.getElementById("pad");
-    if(p){ try{ q.img=[p.toDataURL("image/png")]; }catch(e){} }
-    sfxTap(); q.show=true; render();
-  };
-  var my=document.getElementById("mkY"), mn=document.getElementById("mkN");
-  if(my) my.onclick=function(){ grade(true); };
-  if(mn) mn.onclick=function(){ grade(false); };
-
-  /* Build it: tiles fill the blanks left to right; tapping a filled blank
-     clears it, so a wrong tap costs nothing but a second tap. */
+  /* Build it: a tile drops into the first empty gap; tapping a filled gap
+     clears that gap alone, so a wrong tap costs nothing but a second tap. */
   document.querySelectorAll("[data-tile]").forEach(function(b){
     b.onclick=function(){
       if(q.graded) return;
-      var need=bdSlots(it).length;
       q.bd = q.bd || [];
-      if(q.bd.length>=need) return;
-      sfxTap(); q.bd.push(b.dataset.tile); render();
+      var slot=bdNextGap(it);
+      if(slot<0) return;                       /* every gap already filled */
+      sfxTap(); q.bd[slot]=b.dataset.tile; render();
     };
   });
   document.querySelectorAll("[data-slot]").forEach(function(b){
     b.onclick=function(){
       if(q.graded) return;
       q.bd = q.bd || [];
-      if(!q.bd.length) return;
-      sfxTap(); q.bd.splice(+b.dataset.slot, 1); render();
+      var i=+b.dataset.slot;
+      if(!q.bd[i]) return;
+      sfxTap(); q.bd[i]=""; render();          /* only this gap, never its neighbours */
     };
   });
 
@@ -1266,122 +1035,16 @@ function wireQuiz(){
   if(a) a.addEventListener("keydown",function(e){ if(e.key==="Enter"&&it.k!=="dict"){ e.preventDefault(); g.click(); } });
   var t=document.getElementById("qt");
   if(t) t.addEventListener("keydown",function(e){ if(e.key==="Enter"&&g){ e.preventDefault(); g.click(); } });
-  if(!q.graded && !q.show){
+  if(!q.graded){
     if(a && a.type!=="hidden") a.focus();
     if(it.k!=="math" && it.k!=="rn") setTimeout(function(){ speakIt(it); },250);
   }
 }
-/* One square per character. Whatever he draws is kept as a picture so it can
-   sit next to the answer while you mark it. */
-function wirePadRow(it){
-  var q=quiz, pads=document.querySelectorAll("[data-pad]");
-  if(!pads.length) return;
-  q.img = q.img || [];
-  pads.forEach(function(cv){ wirePad(cv, true); });
-  var clr=document.getElementById("padClr");
-  if(clr) clr.onclick=function(){
-    sfxTap();
-    pads.forEach(function(cv){ if(cv.rubOut) cv.rubOut(); });
-  };
-  var shw=document.getElementById("qShow");
-  if(shw) shw.onclick=function(){
-    /* photograph each square before the screen changes */
-    q.img=[];
-    pads.forEach(function(cv){
-      try{ q.img.push(cv.toDataURL("image/png")); }catch(e){ q.img.push(""); }
-    });
-    q.mk=null; q.show=true; sfxTap(); render();
-  };
-}
-/* Tapping a character flips it between right and wrong. */
-function wireMarks(it){
-  var q=quiz, chs=String(it.h||"").split("");
-  function tally(){
-    var n=0; q.mk.forEach(function(x){ if(x!==false) n++; });
-    var el=document.getElementById("mkScore");
-    if(el) el.textContent=n+" of "+chs.length+" correct";
-    return n;
-  }
-  q.mk = q.mk || chs.map(function(){ return true; });
-  document.querySelectorAll("[data-mk]").forEach(function(cell){
-    cell.onclick=function(){
-      var i=+cell.dataset.mk;
-      q.mk[i] = q.mk[i]===false;
-      cell.classList.toggle("ok", q.mk[i]!==false);
-      cell.classList.toggle("no", q.mk[i]===false);
-      cell.querySelector(".mkflag").textContent = q.mk[i]===false ? "\u2715" : "\u2713";
-      sfxTap(); tally();
-    };
-  });
-  tally();
-}
-
-/* A plain writing pad. Nothing is recognised — a six-year-old writing 快乐 with
-   a finger cannot be graded by software honestly, so it is marked by eye. */
-function wirePad(cv, square){
-  var box=cv.parentNode, w=box.clientWidth-2;
-  var h=square ? w : Math.round(Math.min(300, w*0.42));
-  var dpr=window.devicePixelRatio||1;
-  cv.style.width=w+"px"; cv.style.height=h+"px";
-  cv.width=w*dpr; cv.height=h*dpr;
-  var x=cv.getContext && cv.getContext("2d");
-  if(!x) return;                      /* no canvas: paper still works fine */
-  x.scale(dpr,dpr);
-  x.lineWidth=7; x.lineCap="round"; x.lineJoin="round"; x.strokeStyle="#16202B";
-
-  /* A 田字格 square: a solid edge, and one faint cross to aim at. Nothing else
-     — more lines than that and the child cannot see his own writing. */
-  function grid(){
-    x.save();
-    x.strokeStyle="#E6EDF5"; x.lineWidth=1; x.setLineDash([5,7]);
-    x.beginPath();
-    x.moveTo(8,h/2); x.lineTo(w-8,h/2);
-    x.moveTo(w/2,8); x.lineTo(w/2,h-8);
-    x.stroke(); x.restore();
-  }
-  grid();
-
-  var down=false, px=0, py=0;
-  function pos(e){
-    var r=cv.getBoundingClientRect();
-    var t=e.touches?e.touches[0]:e;
-    return [t.clientX-r.left, t.clientY-r.top];
-  }
-  function begin(e){ e.preventDefault(); down=true; var p=pos(e); px=p[0]; py=p[1]; }
-  function move(e){
-    if(!down) return; e.preventDefault();
-    var p=pos(e);
-    x.beginPath(); x.moveTo(px,py); x.lineTo(p[0],p[1]); x.stroke();
-    px=p[0]; py=p[1];
-  }
-  function end(){ down=false; }
-  cv.addEventListener("pointerdown",begin); cv.addEventListener("pointermove",move);
-  cv.addEventListener("pointerup",end);     cv.addEventListener("pointerleave",end);
-  cv.addEventListener("touchstart",begin,{passive:false});
-  cv.addEventListener("touchmove",move,{passive:false});
-  cv.addEventListener("touchend",end);
-
-  cv.rubOut=function(){ x.clearRect(0,0,w,h); grid(); };
-  var clr=document.getElementById("padClr");
-  if(clr && !square) clr.onclick=function(){ cv.rubOut(); sfxTap(); };
-}
-
 function speakIt(it){
   hush();
   /* Always read the whole word, never a lone character: 更, 长, 乐, 种 and 教
      all have two readings and the engine guesses wrong without the context. */
-  if(it.k==="tx"){
-    /* A teacher dictates like this: the phrase so the meaning is clear, then
-       the word on its own, twice, the second time slowly. The last thing he
-       hears is always the word that goes in the boxes. */
-    var ctx=String(it.word||"").replace(/[\u3002\uff01\uff1f]/g,"");
-    var hasCtx = ctx && ctx!==it.h;
-    if(hasCtx) say(ctx,0.8,"zh-CN");                       /* 过来 */
-    sayLater(function(){ say("\u5199",0.75,"zh-CN"); }, hasCtx?1500:200);   /* 写 */
-    sayLater(function(){ say(it.h,0.7,"zh-CN"); },      hasCtx?2200:800);    /* 来 */
-    sayLater(function(){ say(it.h,0.6,"zh-CN"); },      hasCtx?3600:2200);   /* 来 */
-  }
-  else if(it.k==="bd" && it.s){
+  if(it.k==="bd" && it.s){
     /* A 听写 sentence, read the way the teacher reads it: the whole thing
        through, a gap long enough to write in, then again more slowly. The gap
        has to grow with the sentence, or the second reading lands on top of
@@ -1390,7 +1053,7 @@ function speakIt(it){
     say(it.word,0.9,"zh-CN");
     sayLater(function(){ say(it.word,0.75,"zh-CN"); }, gap);
   }
-  else if(it.k==="py"||it.k==="hz"||it.k==="rn"||it.k==="bd"){
+  else if(it.k==="rn"||it.k==="bd"){
     /* here the whole word is right: 更, 长, 乐, 种 and 教 all have two
        readings and the engine guesses wrong without the context */
     say(it.word,0.9,"zh-CN");
@@ -1417,25 +1080,16 @@ function pyOK(given, it){
   var norm=function(v){ return clean(v).replace(/\s+/g,""); };
   var w=norm(pyWant(it)), g=norm(given);
   if(/\d/.test(w)) return g===w;
-  return g===w || g.replace(/\d/g,"")===w;
+  /* No tone stored means a neutral tone \u2014 \u5427, \u535c, \u5462. Stripping every digit
+     here meant ba1, ba2 and ba4 were all accepted for \u5427, so a plainly wrong
+     tone was marked right. Bare, or the 5 and 0 that both stand for neutral. */
+  return g===w || g===w+"5" || g===w+"0";
 }
 
 function grade(forced){
   var q=quiz, it=q.items[q.i], right, detail="";
   var ga=document.getElementById("qa"), given = ga ? ga.value : "";
   var gained=null;
-  if(it.k==="tx"){
-    /* Written, not yet marked. The score waits for a grown-up. */
-    q.pend=true;
-    right=null;
-    detail="";
-  }
-  else if(writing(it) || tracing(it)){
-    right = forced===true;
-    detail='<b style="font-size:34px">'+esc(it.h)+'</b><br>'+esc(it.word||"")+' \u00b7 '+
-           esc(it.a)+(it.tone||"")+(it.m?'<br>'+esc(it.m):"");
-  }
-  else
   if(it.k==="rn"){
     right=pyOK(given, it);
     detail='<b style="font-size:30px">'+it.h+'</b> &nbsp; '+esc(it.word)+'<br>'+
@@ -1447,6 +1101,7 @@ function grade(forced){
     gained=0;
     need.forEach(function(c,i){ if(got[i]===c) gained++; });
     right = gained===need.length;
+    got=got.map(function(c){ return c==="\u3000" ? "\uff3f" : c; });   /* show a gap as a gap */
     detail = it.s
       ? '<b style="font-size:20px;line-height:1.6">'+esc(it.word||"")+'</b>'+
         (right?"":'<br>You put: '+(esc(got.join(""))||"nothing"))
@@ -1454,44 +1109,33 @@ function grade(forced){
         ' \u00b7 '+esc(it.a)+(it.tone||"")+(it.m?'<br>'+esc(it.m):"")+
         (right?"":'<br>You put: '+(esc(got.join(""))||"nothing"));
   }
-  else if(it.k==="hz"){
-    var gv=String(given||"").trim();
-    right = gv===it.h;
-    detail='<b style="font-size:34px">'+it.h+'</b><br>'+esc(it.word)+' · '+esc(it.a)+(it.tone||"")+
-           '<br>'+esc(it.m)+(right?"":'<br>You put: '+(esc(gv)||"nothing"));
-  }
-  else if(it.k==="py"||it.k==="tx"){
-    right=pyOK(given, it);
-    detail='<b style="font-size:23px">'+it.h+'</b> &nbsp; '+esc(it.word)+'<br>'+
-      (right?"\u2713 "+esc(pyWant(it)):"\u2717 \u2192 <b>"+esc(pyWant(it))+"</b>")+
-      '<br>'+esc(it.m);
-  } else if(it.k==="math"){
+  else if(it.k==="math"){
     right=mathOK(given, it);
     if(!right) detail=esc(it.q)+(it.w?'<br>':' = ')+'<b>'+esc(it.a)+'</b>';
+  } else if(it.k==="dict"){
+    right = cleanDict(given)===cleanDict(it.a);
+    var slip = right ? "" : dictSlip(given, it.a);
+    detail = '<b>'+esc(it.a)+'</b>'+
+             (right?"":'<br>You wrote: '+(esc(String(given||"").trim())||"nothing")+
+                       (slip?'<br><i>'+esc(slip)+'</i>':""));
   } else { right=clean(given)===clean(it.a); detail=ltRow(it.a,given); }
 
-  /* Keep what he actually put down, so it can be looked at afterwards:
-     the typing as text, the handwriting as small pictures. */
+  /* Keep what he actually put down, so the run can be looked at afterwards. */
   q.ans = q.ans || [];
   q.ans[q.i] = {
-    ask: (it.k==="hz"||it.k==="rn"||it.k==="py"||it.k==="tx") ? (it.word||it.h||"")
+    ask:  (it.k==="rn"||it.k==="bd") ? (it.word||it.h||"")
         : (it.k==="math" ? it.q : it.s || ""),
-    want: (it.k==="hz"||it.k==="tx") ? it.h
-        : (it.k==="rn"||it.k==="py") ? (it.a+(it.tone||""))
+    want: it.k==="rn" ? (it.a+(it.tone||""))
+        : it.k==="bd" ? it.h
         : (it.a||""),
-    got:  (it.k==="tx"||it.k==="hz") ? "" : String(given||""),
-    img:  (it.k==="tx" && q.img && q.img.length) ? q.img.slice() : null,
-    marks:(it.k==="tx" && q.mk) ? q.mk.slice() : null,
+    got:  String(given||"").replace(/\u3000/g,"\uff3f"),
     right: right
   };
 
   q.marks = q.marks || [];
   q.marks[q.i] = right;
   q.wrong = q.wrong || [];
-  if(right===null){
-    q.marks[q.i]="pend";                     /* neither right nor wrong yet */
-  }
-  else if(right){
+  if(right){
     q.score+=itemMarks(it); q.streak++; q.best=Math.max(q.best,q.streak);
     weakDrop(it);
   } else {
@@ -1499,17 +1143,22 @@ function grade(forced){
     /* Part marks: 乌龟 with only 龟 wrong scores 1 of 2, and it is 龟 that goes
        into the tricky-ones bank, not the whole word. */
     if(gained) q.score+=gained;
-    q.missed.push((it.k==="py"||it.k==="tx"||it.k==="bd")?it.h+" ("+it.a+(it.tone||"")+")":it.k==="math"?it.q:it.a);
+    /* A 听写 sentence has no single pinyin, so naming one read "\u524d\u603b\u4e18 ()".
+       Name the characters, and the word only where there is one. */
+    q.missed.push(
+      it.k==="math" ? it.q
+      : (it.k==="bd"||it.k==="rn")
+        ? it.h+(it.a?" ("+it.a+(it.tone||"")+")":"")
+        : it.a);
     q.wrong.push(it);
-    if(it.k!=="tx") weakAdd(it, q.code);
+    weakAdd(it, q.code);
   }
   q.graded=true;
-  if(right===null){ next(); return; }        /* nothing to celebrate yet */
   render();
   var a=document.getElementById("qa");
   if(a){ a.value=given; a.disabled=true; }
   if(document.getElementById("qt")) document.getElementById("qt").disabled=true;
-  var cnQ = (it.k==="py"||it.k==="hz"||it.k==="rn"||it.k==="tx"||it.k==="bd");
+  var cnQ = (it.k==="rn"||it.k==="bd");
   var pr = right ? praise(cnQ, q.streak) : oops(cnQ);
   q.say = pr;
   document.getElementById("qf").innerHTML='<div class="fb '+(right?"ok":"no")+'">'+
@@ -1538,27 +1187,16 @@ function grade(forced){
   else if(it.k!=="math") say(it.a,0.6);
 }
 function next(){
-  var q=quiz; q.i++; q.graded=false; q.show=false; q.trMiss=0; q.trDone=0; q.mk=null; q.img=null; q.bd=null;
+  var q=quiz; q.i++; q.graded=false; q.bd=null;
   if(q.i>=q.items.length){ q.done=true;
     addResult({who:who(),subject:q.subject,code:q.code,test:q.test,score:q.score,
                total:q.total||q.items.length,missed:q.missed,ts:Date.now(),
-               pend:q.pend?1:0, ans:(q.ans||[]).filter(Boolean)});
+               ans:(q.ans||[]).filter(Boolean)});
     bumpStreak(); }                 /* addResult syncs it up on its own */
   render(); scrollTo(0,0);
 }
 function doneHTML(){
   var q=quiz;
-  if(q.pend){
-    if(!q.cheered){ q.cheered=true; sfxDone(); burst(24); }
-    return '<div class="panel done">'+botSVG()+
-      '<div class="kind">'+esc(q.test)+'</div>'+
-      '<div class="big">\u2713</div>'+
-      '<div class="rk">All written</div>'+
-      '<div class="streakline">'+q.items.length+' words written \u00b7 waiting to be marked</div>'+
-      '<p class="empty" style="text-align:center">Ask Dad to mark it in Progress.</p>'+
-      '<div class="btnrow"><button class="btn go" id="dScore">Show Dad \u2192</button>'+
-      '<button class="btn soft" id="dBack">More practice</button></div></div>';
-  }
   var p=q.score/(q.total||q.items.length);
   var cn = String(q.lang||"").indexOf("zh")===0;
   var st=p===1?"★★★":p>=.8?"★★☆":p>=.5?"★☆☆":"☆☆☆";

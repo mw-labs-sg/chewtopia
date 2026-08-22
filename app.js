@@ -411,309 +411,19 @@ function dshort(ts){
 }
 
 /* subject -> test name -> child -> {best, total, tries, last} */
-function gradeGrid(){
-  var g={};
-  KIDS.forEach(function(k){
-    runsFor(k.id).forEach(function(r){
-      if(isFixing(r)) return;
-      if(runSubject(r)==="rv") return;   /* mixed-subject review goes */
-      var sj=runSubject(r), t=String(r.test||"?");
-      var row=(g[sj]=g[sj]||{});
-      var cell=(row[t]=row[t]||{});
-      var c=cell[k.id];
-      if(!c) c=cell[k.id]={best:r.score,total:r.total,tries:0,last:r.ts,code:r.code||"",pend:0};
-      if(r.code) c.code=r.code;
-      if(r.pend) c.pend=1;
-      c.tries++;
-      if(r.score>c.best){ c.best=r.score; c.total=r.total; }
-      if(r.ts>c.last) c.last=r.ts;
-    });
-  });
-  return g;
-}
-
-function kidHead(k){
-  var runs=runsFor(k.id).filter(function(r){ return !isFixing(r); });
-  var full=runs.filter(function(r){ return r.score>=r.total; }).length;
-  return '<div class="mxh '+whoCls(k.id)+'">'+esc(pname(k.id))+
-    '<small>'+(streak(k.id).n?streak(k.id).n+"\uD83D\uDD25 \u00b7 ":"")+
-    runs.length+' tests \u00b7 '+full+' full</small></div>';
-}
-
-/* Is this test still in the books? Old scores can name a list that has since
-   been replaced, and tapping one of those should not open an empty quiz. */
-function codeLive(code, kid){
-  var p=String(code||"").split("|"), k=p[1];
-  if(p[0]==="en") return !!(typeof TC_SPELL!=="undefined" && TC_SPELL[k]);
-  if(p[0]==="es") return !!(typeof SC_SPELL!=="undefined" && SC_SPELL[k]);
-  if(p[0]==="hz"||p[0]==="rn") return !!(typeof HANZI!=="undefined" && HANZI[k]);
-  if(p[0]==="zh"){
-    var bank = kid==="tc" ? TC_PINYIN : SC_TINGXIE;
-    return !!(bank && bank[k]);
-  }
-  if(p[0]==="ma") return k==="easy"||k==="times"||k==="hard";
-  return false;
-}
-
-/* One box per test: what it was, the best score, when. Tap to sit it again. */
-function testBox(kid, test, c){
-  var cls=scoreCls(c.best,c.total), live=codeLive(c.code, kid);
-  return '<button class="tbox '+cls+'"'+
-    (live ? ' data-open="'+esc(c.code)+'" data-kid="'+kid+'"' : ' disabled')+'>'+
-    '<span class="tn">'+esc(test)+'</span>'+
-    (c.pend && !c.tries2 ? '<span class="tv small">To mark</span>'
-                          : '<span class="tv">'+c.best+'/'+c.total+'</span>')+
-    '<span class="td">'+dshort(c.last)+(c.tries>1?" \u00b7 "+c.tries+" goes":"")+'</span>'+
-    '</button>';
-}
-
 /* ==========================================================================
-   MARKING — 听写 is written by the child and marked by a grown-up.
-   Behind a PIN, so the marking is not done by the boy who wrote it.
+   REMOVED: the Progress screen and the PIN-gated marking sheet.
+   vResults() was never reachable \u2014 render()'s view map has no entry for it \u2014
+   so gradeGrid(), testBox(), codeLive(), vTestDetail(), answerSheet(),
+   markPanel(), vMarkRun() and saveMarks() were all dead, and wResults() was
+   still walking [data-open], [data-mark] and [data-q] selectors on every
+   Training draw that could never match. codeLive() had also gone stale: it
+   still tested for maths sets called "easy" and "hard", which have not existed
+   since the sets were split by sub-strand, so seven of the eight would have
+   come back disabled had anything ever called it.
+   Training already shows every score, every test and everything he keeps
+   getting wrong, and the sync panel below is what the grown-ups actually open.
    ========================================================================== */
-var unlocked=false, pinTry="";        /* both reset when the app is reopened */
-
-function PIN(){ return S("pin","1234"); }
-function pendingRuns(){
-  return results().filter(function(r){ return r.pend && r.ans && r.ans.length; })
-    .sort(function(x,y){ return y.ts-x.ts; });
-}
-function markPanel(){
-  var p=pendingRuns();
-  if(!p.length) return "";
-  if(!unlocked){
-    return '<div class="panel"><h2><span class="em">\u270D\uFE0F</span> Waiting to be marked'+
-      '<span class="side">'+p.length+'</span></h2>'+
-      '<p class="empty">'+p.map(function(r){
-        return esc(pname(r.who))+" \u00b7 "+esc(r.test); }).slice(0,3).join("<br>")+
-        (p.length>3?"<br>and "+(p.length-3)+" more":"")+'</p>'+
-      '<div class="lbl">Grown-up code</div>'+
-      '<input type="password" id="pinIn" inputmode="numeric" maxlength="8" '+
-        'autocomplete="off" placeholder="\u2022\u2022\u2022\u2022">'+
-      (pinTry==="bad"?'<p class="empty" style="color:var(--coral)">Not that one.</p>':'')+
-      '<div class="btnrow"><button class="btn go" id="pinGo">Unlock marking</button></div></div>';
-  }
-  var s='<div class="panel"><h2><span class="em">\u270D\uFE0F</span> To mark'+
-        '<span class="side">'+p.length+'</span></h2>';
-  p.forEach(function(r){
-    s+='<button class="mkrun" data-mark="'+esc(r.id)+'">'+
-       '<span class="nm">'+esc(r.test)+'</span>'+
-       '<span class="mt">'+esc(pname(r.who))+' \u00b7 '+dshort(r.ts)+' \u00b7 '+
-         r.ans.length+' words</span></button>';
-  });
-  return s+'</div>';
-}
-
-/* The marking sheet itself: his writing, the answer, tap what is wrong. */
-function vMarkRun(){
-  var r=results().filter(function(x){ return x.id===markRun; })[0];
-  if(!r) { markRun=null; return vTests(); }
-  markState = markState || r.ans.map(function(x){
-    return (x.want||"").split("").map(function(){ return true; });
-  });
-
-  var s='<div class="panel"><h2><span class="em">\u270D\uFE0F</span> '+esc(r.test)+
-        '<span class="side '+whoCls(r.who)+'">'+esc(pname(r.who))+'</span></h2>'+
-        '<div class="marktip">Tap any character he got wrong.</div>';
-
-  r.ans.forEach(function(x, qi){
-    var chs=String(x.want||"").split("");
-    s+='<div class="mkitem"><div class="mkask">'+esc(x.ask||"")+'</div><div class="padrow">'+
-      chs.map(function(ch,i){
-        var ok=markState[qi][i]!==false;
-        return '<div class="markcell '+(ok?"ok":"no")+'" data-q="'+qi+'" data-c="'+i+'">'+
-          (x.img&&x.img[i] ? '<img src="'+x.img[i]+'" alt="">' : '<span class="noimg">\u2014</span>')+
-          '<span class="ansch">'+esc(ch)+'</span>'+
-          '<span class="mkflag">'+(ok?"\u2713":"\u2715")+'</span></div>';
-      }).join("")+'</div></div>';
-  });
-
-  var got=0, all=0;
-  markState.forEach(function(row){ row.forEach(function(ok){ all++; if(ok!==false) got++; }); });
-  return s+'<div class="markscore">'+got+' of '+all+' characters correct</div>'+
-    '<div class="btnrow"><button class="btn go" id="mkSave">Save the marks</button>'+
-    '<button class="btn soft" id="mkCancel">Later</button></div></div>';
-}
-
-/* Write the marks back: the score, and the characters that need more work. */
-function saveMarks(){
-  var all=results(), r=null;
-  all.forEach(function(x){ if(x.id===markRun) r=x; });
-  if(!r){ markRun=null; markState=null; render(); return; }
-  var score=0, total=0, missed=[];
-  r.ans.forEach(function(x, qi){
-    var chs=String(x.want||"").split("");
-    chs.forEach(function(ch,i){
-      total++;
-      if(markState[qi][i]!==false) score++;
-      else {
-        missed.push(ch);
-        weakAddFor(r.who, {k:"tx",h:ch,word:x.ask,a:"",tone:"",m:""}, r.code);
-      }
-    });
-    x.marks=markState[qi].slice();
-    x.right=markState[qi].every(function(ok){ return ok!==false; });
-  });
-  r.score=score; r.total=total; r.missed=missed; r.pend=0; r.up=0;   /* re-upload */
-  WJ("results", all);
-  markRun=null; markState=null;
-  autoSend();                    /* both ways, so the new marks reach the phone */
-  render(); scrollTo(0,0);
-}
-
-/* ==========================================================================
-   ONE TEST, IN FULL — every word in the list, how it went, and every attempt.
-   Training is where a test is started; this is where it is looked at.
-   ========================================================================== */
-
-function itemLabel(it){
-  if(it.k==="hz"||it.k==="rn"||it.k==="py"||it.k==="tx") return it.h;
-  if(it.k==="math") return it.q;
-  if(it.k==="dict"){                       /* a whole sentence needs shortening */
-    var w=String(it.a||it.s||"").split(/\s+/);
-    return w.slice(0,4).join(" ")+(w.length>4?" \u2026":"");
-  }
-  return it.a || it.s || "";
-}
-/* Green means he has it. Amber means he slipped once. Red means it keeps
-   going wrong. Grey means he has not met it yet. */
-function itemState(it, kid, attempted){
-  var k=weakKey(it), hit=null;
-  weakAll(kid).forEach(function(x){ if(x.k===k) hit=x; });
-  if(hit) return hit.n>=2 ? "low" : "mid";
-  return attempted ? "good" : "none";
-}
-
-/* What he actually put down, question by question. */
-function answerSheet(r){
-  var s='<div class="sheet">';
-  (r.ans||[]).forEach(function(x){
-    s+='<div class="shrow '+(x.right?"ok":"no")+'">'+
-       '<span class="shask">'+esc(x.ask||"")+'</span>';
-    if(x.img && x.img.length){
-      s+='<span class="shimgs">'+x.img.map(function(src,i){
-           var bad = x.marks && x.marks[i]===false;
-           return '<img class="'+(bad?"no":"ok")+'" src="'+src+'" alt="">';
-         }).join("")+'</span>';
-    } else if(x.marks){
-      /* handwriting from an older run whose pictures have been let go */
-      s+='<span class="shgot">'+x.marks.map(function(ok){
-           return '<b class="'+(ok===false?"no":"ok")+'">'+(ok===false?"\u2715":"\u2713")+'</b>';
-         }).join(" ")+'</span>';
-    } else {
-      s+='<span class="shgot">'+(x.got ? esc(x.got) : '<i>nothing</i>')+'</span>';
-    }
-    s+='<span class="shwant">'+esc(x.want||"")+'</span>'+
-       '<span class="shflag">'+(x.right?"\u2713":"\u2715")+'</span></div>';
-  });
-  return s+'</div>';
-}
-
-function vTestDetail(){
-  var kid=openTest.kid, code=openTest.code;
-  var q=itemsFor(code, kid);
-  if(!q) return '<div class="panel"><p class="empty">That list is not in the app any more.</p>'+
-                '<div class="btnrow"><button class="btn go" id="dtBack">Back</button></div></div>';
-
-  var runs=runsFor(kid).filter(function(r){ return r.test===q.test && !isFixing(r); });
-  var attempted=runs.length>0;
-  var best=runs.reduce(function(x,y){ return (!x||y.score/y.total>x.score/x.total)?y:x; }, null);
-
-  /* the words themselves, one chip each */
-  var chips=q.items.map(function(it){
-    var st=itemState(it, kid, attempted);
-    return '<span class="wchip '+st+'">'+esc(itemLabel(it))+'</span>';
-  }).join("");
-
-  var s='<div class="panel"><h2><span class="em">\uD83D\uDD0E</span> '+esc(q.test)+
-        '<span class="side '+whoCls(kid)+'">'+esc(pname(kid))+'</span></h2>'+
-        '<div class="mxkey"><span><span class="dot" style="background:#4FB86B"></span> <b>knows it</b></span>'+
-          '<span><span class="dot" style="background:#FFB627"></span> <b>slipped once</b></span>'+
-          '<span><span class="dot" style="background:#FF6F52"></span> <b>keeps missing</b></span>'+
-          '<span><span class="dot" style="background:#C3D2DF"></span> <b>not met yet</b></span></div>'+
-        '<div class="wchips">'+chips+'</div>';
-
-  if(runs.length){
-    s+='<div class="mxg">Every go</div><div class="runlist">'+
-       runs.slice().reverse().map(function(r){
-         var cls=scoreCls(r.score,r.total), open=(openRun===r.id);
-         var row='<div class="runrow'+(r.ans?" can":"")+'"'+(r.ans?' data-run="'+esc(r.id)+'"':'')+'>'+
-           '<span class="rundate">'+dshort(r.ts)+'</span>'+
-           '<span class="runbar"><i class="'+cls+'" style="width:'+
-             Math.round(r.score/r.total*100)+'%"></i></span>'+
-           '<span class="runsc '+cls+'">'+r.score+'/'+r.total+'</span>'+
-           (r.ans?'<span class="runarw">'+(open?"\u2303":"\u2304")+'</span>':'')+'</div>';
-         return row + (open ? answerSheet(r) : "");
-       }).join("")+'</div>'+
-       (best?'<p class="empty">Best so far '+best.score+'/'+best.total+
-         ' \u00b7 '+runs.length+(runs.length===1?' go':' goes')+
-         (function(){
-           var a=avgLast(q.test, kid, 3);
-           if(!a) return "";
-           return ' \u00b7 last '+a.n+' averaged <b>'+a.avg+'/'+a.total+'</b>'+
-                  (a.full?' \u2014 full marks every time':'');
-         })()+'</p>':'');
-  } else s+='<p class="empty">Not tried yet.</p>';
-
-  return s+'<div class="btnrow">'+
-    '<button class="btn go" id="dtGo">\u25b6 Practise this now</button>'+
-    '<button class="btn soft" id="dtBack">Back</button></div></div>';
-}
-
-function vResults(){
-  if(markRun) return vMarkRun();
-  if(openTest) return vTestDetail();
-  var s=syncPanel()+markPanel();
-  var g=gradeGrid(), any=false;
-
-  var m='<div class="mx6">';
-  shownKids().filter(function(k){ return k.id===tKid(); }).forEach(function(k){
-    var runs=runsFor(k.id).filter(function(r){
-      return !isFixing(r) && runSubject(r)!=="rv"; });
-    var full=runs.filter(function(r){ return r.score>=r.total; }).length;
-    m+='<div class="kidbox"><div class="kidname '+whoCls(k.id)+'">'+esc(pname(k.id))+
-       '<small>'+(streak(k.id).n?streak(k.id).n+"\uD83D\uDD25 \u00b7 ":"")+
-       runs.length+' tests \u00b7 '+full+' full</small></div>'+
-       '<div class="mxcols'+(kidSubj(k.id).length===2?" two":"")+'">';
-    /* three headers first, then the three columns under them */
-    var mine=SUBJ_COLS.filter(function(sub){ return hasSubj(k.id, sub[0]); });
-    mine.forEach(function(sub){ m+='<div class="mxsub">'+sub[1]+'<i>'+sub[2]+'</i></div>'; });
-    mine.forEach(function(sub){
-      var row=g[sub[0]]||{}, out="";
-      Object.keys(row).filter(function(t){ return row[t][k.id]; })
-        .sort(function(a,b){ return row[b][k.id].last - row[a][k.id].last; })
-        .forEach(function(t){ any=true; out+=testBox(k.id, t, row[t][k.id]); });
-      m+='<div class="mxcol">'+(out||'<div class="mxnone">\u2014</div>')+'</div>';
-    });
-    m+='</div></div>';
-  });
-  m+='</div>';
-
-  s+='<div class="panel"><h2><span class="em">\uD83D\uDCCA</span> How they are doing</h2>'+
-     '<div class="mxkey"><span><span class="dot" style="background:#4FB86B"></span> '+
-       '<b>full marks</b></span>'+
-       '<span><span class="dot" style="background:#FFB627"></span> <b>70% or better</b></span>'+
-       '<span><span class="dot" style="background:#FF6F52"></span> <b>below 70%</b></span>'+
-       '<span>best score \u00b7 tap to sit it again</span></div>'+
-     tKidBar()+
-     (any ? m : '<p class="empty">No tests yet. Anything done in Training turns up here.</p>')+
-     '</div>';
-
-  /* what each of them keeps missing, side by side */
-  var wk=shownKids().filter(function(k){ return k.id===tKid(); })
-    .map(function(k){ return {k:k, w:weakTop(k.id, 6)}; });
-  if(wk.some(function(x){ return x.w.length; })){
-    s+='<div class="panel"><h2><span class="em">\uD83C\uDFAF</span> Keeps getting these wrong</h2>'+
-       '<div class="mxwk one">'+wk.map(function(x){
-         return '<div class="weak"><div class="wt">'+esc(pname(x.k.id))+'</div>'+
-           (x.w.length ? x.w.map(function(y){
-             return '<span class="wi">'+esc(weakLabel(y))+'<i>'+y.n+'\u00d7</i></span>'; }).join("")
-            : '<span class="wi">Nothing stuck</span>')+'</div>';
-       }).join("")+'</div></div>';
-  }
-
-  return s;
-}
 
 /* Sync sits at the top: two buttons, and a line saying what happened last.
    Nothing clever, nothing in the background you cannot see. */
@@ -723,6 +433,7 @@ function syncPanel(){
   s+='</h2>';
   if(cloudUser){
     var p=pending(), er=(typeof syncErr==="function") ? syncErr() : "";
+    var down=(typeof pullErr==="function") ? pullErr() : "";
     var bad = er && er!=="insert-only";
     /* Which family this device is signed in to. Two devices on two different
        names each sync perfectly and never see one another, and the only way to
@@ -730,9 +441,12 @@ function syncPanel(){
     s+='<p class="whoami">Signed in as <b>'+esc(familyName(cloudUser.email))+
        '</b> \u00b7 '+results().length+' scores here, '+p+' waiting</p>'+
        '<div class="syncrow"><button class="btn go" id="cSync">\u21bb Sync'+
-       (p?' \u00b7 '+p+' waiting':'')+'</button></div>'+
+       (p?' \u00b7 '+p+' waiting':'')+'</button>'+
+       '<button class="btn soft" id="cOut">Sign out</button></div>'+
        (bad ? '<p class="synced bad">Nothing has gone up. The server said: '+
               esc(er)+'</p>' : '')+
+       (down ? '<p class="synced bad">Nothing has come down, so this device may be '+
+              'behind the other one. The server said: '+esc(down)+'</p>' : '')+
        (er==="insert-only" ? '<p class="synced warn2">Scores are going up, but this '+
               'database will not take a correction to one already sent.</p>' : '')+
        '<p class="synced">'+(syncNote()
@@ -750,9 +464,14 @@ function syncPanel(){
        '<div class="btnrow"><button class="btn go" id="cIn">Sign in</button></div>';
   }
   if(cloudMsg) s+='<p class="empty" style="color:var(--coral);margin-bottom:0">'+esc(cloudMsg)+'</p>';
+  if(storeFull) s+='<p class="synced bad">'+esc(storeFull)+
+    ' Old answer sheets have been let go to make room; the scores themselves are safe.</p>';
   return s+'</div>';
 }
 
+/* Everything the sync panel needs, and nothing else. This used to walk half a
+   dozen selectors belonging to the Progress screen on every single Training
+   draw, none of which have existed for some time. */
 function wResults(){
   wKidBar();
   var i=document.getElementById("cIn");
@@ -772,46 +491,13 @@ function wResults(){
   }
   var sy=document.getElementById("cSync");
   if(sy) sy.onclick=function(){ sfxTap(); cloudSync(); };
-  document.querySelectorAll("[data-open]").forEach(function(b){
-    b.onclick=function(){
-      openTest={kid:b.dataset.kid, code:b.dataset.open}; openRun=null;
-      sfxTap(); render(); scrollTo(0,0);
-    };
-  });
-  document.querySelectorAll(".runrow[data-run]").forEach(function(row){
-    row.onclick=function(){
-      openRun = (openRun===row.dataset.run) ? null : row.dataset.run;
-      sfxTap(); render();
-    };
-  });
-  var pg=document.getElementById("pinGo"), pi=document.getElementById("pinIn");
-  if(pg) pg.onclick=function(){
-    if((pi.value||"").trim()===PIN()){ unlocked=true; pinTry=""; sfxWin(); }
-    else { pinTry="bad"; sfxLose(); }
-    render();
-  };
-  if(pi) pi.addEventListener("keydown",function(e){ if(e.key==="Enter"){ e.preventDefault(); pg.click(); } });
-  document.querySelectorAll("[data-mark]").forEach(function(b){
-    b.onclick=function(){ markRun=b.dataset.mark; markState=null; sfxTap(); render(); scrollTo(0,0); };
-  });
-  document.querySelectorAll("[data-q]").forEach(function(cell){
-    cell.onclick=function(){
-      var qi=+cell.dataset.q, ci=+cell.dataset.c;
-      markState[qi][ci] = markState[qi][ci]===false;
-      sfxTap(); render();
-    };
-  });
-  var ms=document.getElementById("mkSave");
-  if(ms) ms.onclick=function(){ saveMarks(); };
-  var mc=document.getElementById("mkCancel");
-  if(mc) mc.onclick=function(){ markRun=null; markState=null; render(); };
-
-  var dtb=document.getElementById("dtBack");
-  if(dtb) dtb.onclick=function(){ openTest=null; render(); scrollTo(0,0); };
-  var dtg=document.getElementById("dtGo");
-  if(dtg) dtg.onclick=function(){
-    var o=openTest; openTest=null;
-    W("who", o.kid); tab="practice"; start(o.code);
+  /* Signing out was written and then never given a button, so the only way off
+     a wrong family account was to clear the site data \u2014 on the one screen whose
+     job is to make a wrong account obvious. */
+  var so=document.getElementById("cOut");
+  if(so) so.onclick=function(){
+    if(!confirm("Sign out of this family account on this device?\n\nScores already on this device stay here.")) return;
+    sfxTap(); cloudLogout();
   };
 }
 

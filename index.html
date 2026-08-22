@@ -758,14 +758,20 @@ body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;-
   </div>
   <div class="tabs" id="tabs"></div>
   <div id="view"></div>
-  <div class="foot">Saved on this device · build 88</div>
+  <div class="foot">Saved on this device · build 89</div>
 </div>
 <!-- load order matters: data, then core, then screens, app last -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="data.js?v=28"></script>
-<script src="core.js?v=40"></script>
-<script src="timetable.js?v=5"></script>
-<script src="training.js?v=40"></script>
-<script src="app.js?v=74"></script>
+<!-- Pinned to an exact version with a hash to match: "@2" floats, so a bad
+     release or a compromised CDN would have walked straight into a signed-in
+     family account. If the hash ever stops matching, the browser refuses the
+     file, sbc() finds no window.supabase and the app carries on per-device. -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3"
+        integrity="sha384-l8ah+VgaWtk1mvOe9VC+OirC6qHFF4yH7l7mKRidV9MSti3E9F463bMp6ZVN4kuC"
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="data.js?v=29"></script>
+<script src="core.js?v=41"></script>
+<script src="timetable.js?v=6"></script>
+<script src="training.js?v=41"></script>
+<script src="app.js?v=75"></script>
 </body>
 </html>

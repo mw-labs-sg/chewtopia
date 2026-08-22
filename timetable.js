@@ -33,13 +33,23 @@ function vWeek(){
   var isThis = wkOff===0;
   var rows=slotCount();
 
-  /* all-day events falling in this week */
+  /* Anything that cannot be drawn as a block on the grid: the all-day items,
+     and anything timed outside the hours the grid covers. A 23:59 deadline
+     used to fall between the two \u2014 excluded from this strip because it had a
+     time, and clipped off the bottom of the grid because 23:59 is past 20:00,
+     so it appeared nowhere at all. */
+  var gridFrom=toMin(WK_FROM), gridTo=toMin(WK_TO);
+  function offGrid(e){
+    if(!e.time) return true;
+    var m=toMin(e.time);
+    return m<gridFrom || m>=gridTo;
+  }
   var allday=[];
   SJ("events",[]).forEach(function(e){
     DAYS.forEach(function(_,i){
       var day=iso(dates[i]);
       var inRange = e.d2 ? (day>=e.d && day<=e.d2) : (day===e.d);
-      if(inRange && !e.time) allday.push({col:i, e:e});
+      if(inRange && offGrid(e)) allday.push({col:i, e:e});
     });
   });
 
@@ -63,7 +73,8 @@ function vWeek(){
     Object.keys(byCol).forEach(function(c){
       g+='<span class="wkallday" style="grid-column:'+(+c+2)+';grid-row:2">'+
          byCol[c].map(function(e){
-           return '<span class="chip '+whoCls(e.w)+'">'+esc(e.t)+'</span>'; }).join("")+'</span>';
+           return '<span class="chip '+whoCls(e.w)+(e.hol?" hol":"")+'" title="'+esc(e.t)+'">'+
+             esc(e.t)+(e.time?' <i>'+esc(e.time)+'</i>':'')+'</span>'; }).join("")+'</span>';
     });
     rowOffset=3;
   }
@@ -109,13 +120,15 @@ function vWeek(){
     g+=block(i, a.from, a.to, esc(a.t), 'own '+whoCls(own?a.who:'')+(own?side(a.who):""), ' data-act="'+a.id+'"');
   });
 
-  /* timed events this week */
+  /* timed events this week that do fit on the grid */
   SJ("events",[]).forEach(function(e){
-    if(!e.time) return;
+    if(offGrid(e)) return;                 /* it is up on the strip instead */
     DAYS.forEach(function(_,i){
       if(iso(dates[i])!==e.d) return;
-      var end=String(Math.min(20,(+e.time.split(":")[0])+1)).padStart(2,"0")+":"+e.time.split(":")[1];
-      g+=block(i, e.time, end, esc(e.t), 'own '+whoCls(e.w));
+      /* an hour long, but never running off the bottom of the grid */
+      var end=Math.min(toMin(e.time)+60, gridTo);
+      var eh=String(Math.floor(end/60)).padStart(2,"0")+":"+String(end%60).padStart(2,"0");
+      g+=block(i, e.time, eh, esc(e.t), 'own '+whoCls(e.w));
     });
   });
 
