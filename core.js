@@ -789,7 +789,13 @@ function weakTop(w, n){
    "pin, wan, 识 · 认识, 昨天□上，我□见妈妈…" instead of naming four characters. */
 function weakLabel(x){
   var it=x.it||{};
-  if(it.k==="math") return it.q||"";
+  /* A maths chip wants the sum, not the sentence around it: "What goes in the
+     blank?  10 × ___ = 80" is most of a line for one item in a list of twenty. */
+  if(it.k==="math"){
+    var q=String(it.q||"").replace(/^[^?]*\?\s*/,"").replace(/\s+/g," ").trim();
+    if(!q) q=String(it.q||"").trim();
+    return q.length>28 ? q.slice(0,27)+"\u2026" : q;
+  }
   if(it.k==="bd"){
     /* a 听写 sentence: name the characters, not the sentence */
     if(it.s) return String(it.h||"").split("").join(" ");

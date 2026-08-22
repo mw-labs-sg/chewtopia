@@ -9,7 +9,10 @@ function render(){
   if(sb){
     sb.innerHTML=sceneBar()+sndToggle();
     var sn=sb.querySelector("#sndBtn");
-    if(sn) sn.onclick=function(){ W("snd", snd()?"off":"on"); sfxTap(); render(); };
+    if(sn){
+      sn.setAttribute("aria-pressed", snd()?"true":"false");
+      sn.onclick=function(){ W("snd", snd()?"off":"on"); sfxTap(); render(); };
+    }
     sb.querySelectorAll("[data-scene]").forEach(function(b){
       b.onclick=function(){ W("scene", b.dataset.scene); sfxTap(); render(); };
     });
@@ -26,6 +29,8 @@ function render(){
     var b=document.createElement("button");
     b.className="tab "+(t[2]||"t-blue")+(t[0]===tab?" on":"");
     b.textContent=t[1];
+    /* the ring says which tab you are on; this says it out loud too */
+    if(t[0]===tab) b.setAttribute("aria-current","page");
     b.onclick=function(){ sfxSwipe(); go(t[0]); };
     tb.appendChild(b);
   });
@@ -251,7 +256,11 @@ function vMeals(){
        '</div></div>';
   });
   return s+'<div class="btnrow"><button class="btn soft" id="mR">Reset to week '+(rotIdx()+1)+'</button></div>'+
-    '<div class="saved" id="mS"></div></div>'+
+    '<div class="saved" id="mS"></div>'+
+    /* Scores, books and Upcoming all sync; this does not, and it looks
+       identical, so it has to say so rather than be found out. */
+    '<div class="key">Meals and the grocery list stay on this device \u2014 they are '+
+    'not part of the family sync.</div></div>'+
     '<div class="panel"><h2><span class="em">\uD83D\uDED2</span> Groceries</h2>'+
     '<textarea class="cell" id="gr" style="min-height:130px" placeholder="What to buy">'+
     esc(S("groc:"+monKey(),""))+'</textarea><div class="saved" id="gS"></div></div>';

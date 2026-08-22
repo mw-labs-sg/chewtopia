@@ -183,19 +183,47 @@ function vTests(){
   });
   s+='</div></div>';
 
+  s+=weakPanel(tKid());
+
   /* Sync used to live on Progress. That tab is gone, so it sits here, at the
-     foot of the screen the grown-ups already open. markPanel() renders nothing
-     unless old handwriting runs are still waiting to be marked. */
+     foot of the screen the grown-ups already open. */
   s+=syncPanel();
 
-  /* A word if the tablet has no Mandarin voice — otherwise nothing to set. */
+  /* The voices the tests are read in. The picker was written and then never
+     given a home, so bestVoice() always took whatever came first and the
+     setting it reads was never written by anything. */
+  s+='<div class="panel"><h2><span class="em">\uD83D\uDD0A</span> Voices'+
+     '<span class="side">this device</span></h2>';
   if(!bestVoice("zh-CN")){
-    s+='<div class="panel"><p class="warn" style="margin:0">'+
-       'This device has no Mandarin voice, so the Chinese tests stay silent rather than '+
-       'being read out in an English accent. On an iPad: Settings \u2192 Accessibility \u2192 '+
-       'Spoken Content \u2192 Voices \u2192 Chinese (Mandarin).</p></div>';
+    s+='<p class="warn">This device has no Mandarin voice, so the Chinese tests stay '+
+       'silent rather than being read out in an English accent. On an iPad: Settings '+
+       '\u2192 Accessibility \u2192 Spoken Content \u2192 Voices \u2192 Chinese (Mandarin).</p>';
   }
+  s+=voiceBox("en-GB")+voiceBox("zh-CN")+
+     '<div class="key">Pick one and it reads a line back so you can hear it. '+
+     '\u2728 marks the modern voices, which sound far more like a person.</div></div>';
   return s;
+}
+
+/* What he keeps getting wrong, in full, with a way to strike one off. This
+   lived on Progress, which no longer exists, so the only trace left was four
+   items squeezed into the subtitle of a button. */
+function weakPanel(kid){
+  var w=weakTop(kid, 24);
+  if(!w.length) return "";
+  return '<div class="panel"><h2><span class="em">\uD83C\uDFAF</span> Keeps getting these wrong'+
+    '<span class="side ' +whoCls(kid)+'">'+esc(pname(kid))+'</span></h2>'+
+    '<div class="mxwk one"><div class="weak">'+
+    '<div class="wt">'+w.length+(w.length===1?" thing":" things")+' \u00b7 hardest first</div>'+
+    w.map(function(y){
+      return '<span class="wi'+(y.n>=3?" hot":"")+'">'+esc(weakLabel(y))+
+             '<i>'+y.n+'\u00d7</i>'+
+             '<button class="wx" data-weakgo="'+esc(kid+"\u0001"+y.k)+'" '+
+             'title="He knows this one now" aria-label="Clear this one">\u00d7</button>'+
+             '</span>';
+    }).join("")+'</div></div>'+
+    '<div class="key">Two clean goes clears one on its own. Tap the \u00d7 if he has it '+
+    'already and it is only cluttering up his practice.</div></div>';
 }
 
 /* The TC/SC tabs appear on both Training and Progress and share one setting,
@@ -208,7 +236,17 @@ function wKidBar(){
 
 function wTests(){
   wKidBar();
-  wResults();          /* the sync and marking buttons now live on this screen */
+  wResults();          /* the sync buttons now live on this screen */
+  wireVoices();
+  document.querySelectorAll("[data-weakgo]").forEach(function(b){
+    b.onclick=function(e){
+      e.stopPropagation();
+      var p=b.dataset.weakgo.split("\u0001"), kid=p[0], key=p[1];
+      WJ("weak:"+kid, weakAll(kid).filter(function(x){ return x.k!==key; }));
+      strike("weak:"+kid, key);      /* and it stays gone on the other device too */
+      sfxTap(); render();
+    };
+  });
   document.querySelectorAll("[data-t]").forEach(function(b){
     b.onclick=function(){
       if(b.dataset.kid) W("who", b.dataset.kid);
@@ -812,8 +850,10 @@ function bdMasked(it, filled){
       var ch=it.s.charAt(i);
       if(ch==="\u25a1"){
         var got=(filled||[])[j];
-        out+='<span class="bslot'+(got?" on":"")+'" data-slot="'+j+'">'+
-             (got?esc(got):"\u25a1")+'</span>';
+        out+='<button type="button" class="bslot'+(got?" on":"")+'" data-slot="'+j+'"'+
+             (got?' title="Tap to clear this one" aria-label="Gap '+(j+1)+', '+esc(got)+
+                  '. Tap to clear."':' aria-label="Gap '+(j+1)+', empty"')+'>'+
+             (got?esc(got):"\u25a1")+'</button>';
         j++;
       } else out+='<span class="bfix">'+esc(ch)+'</span>';
     }
@@ -825,7 +865,8 @@ function bdMasked(it, filled){
   for(var i=0;i<wd.length;i++){
     if(i>=at && i<at+tgt.length){
       var j=i-at, got=(filled||[])[j];
-      out+='<span class="bslot'+(got?" on":"")+'" data-slot="'+j+'">'+(got?esc(got):"\u25a1")+'</span>';
+      out+='<button type="button" class="bslot'+(got?" on":"")+'" data-slot="'+j+'"'+
+           (got?' title="Tap to clear this one"':'')+'>'+(got?esc(got):"\u25a1")+'</button>';
     } else out+='<span class="bfix">'+esc(wd.charAt(i))+'</span>';
   }
   return out;
@@ -930,11 +971,13 @@ function quizHTML(){
     '</span></div>'+
     botSVG()+
     '<div class="track">'+dots+'</div>'+
-    '<div class="meter"><i style="width:'+(q.i/q.items.length*100)+'%"></i></div>'+
+    '<div class="meter" role="progressbar" aria-valuemin="0" aria-valuemax="'+q.items.length+
+      '" aria-valuenow="'+q.i+'" aria-label="Question '+(q.i+1)+' of '+q.items.length+'">'+
+      '<i style="width:'+(q.i/q.items.length*100)+'%"></i></div>'+
     '<div class="kind">'+quizKind(it)+
       ' '+(q.i+1)+' of '+q.items.length+'</div>';
   if(it.k==="rn"){
-    s+='<div class="hz">'+it.h+'</div>'+
+    s+='<div class="hz" lang="zh-CN">'+it.h+'</div>'+
        '<div class="ctx">'+(q.graded?esc(it.word)+' · '+esc(it.m)
          :"Type the pinyin, with its tone number")+'</div>'+
        '<div class="lbl">Pinyin with tones</div>'+
@@ -948,11 +991,11 @@ function quizHTML(){
          ? "Listen, then fill in the missing characters"
          : "Listen, then tap the "+(need.length>1?need.length+" characters":"character")+" you hear")+'</div>'+
        '<button class="btn play wide" id="qP">\uD83D\uDD0A Hear the word</button>'+
-       '<div class="bword'+(it.s?" sent":"")+'">'+bdMasked(it, fl)+'</div>'+
+       '<div class="bword'+(it.s?" sent":"")+'" lang="zh-CN">'+bdMasked(it, fl)+'</div>'+
        (q.graded
         ? '<div class="hint2">'+esc(it.h)+' \u00b7 <b>'+esc(it.a)+(it.tone||"")+'</b>'+
           (it.m?' \u00b7 '+esc(it.m):"")+'</div>'
-        : '<div class="btiles">'+(function(){
+        : '<div class="btiles" role="group" aria-label="Characters to choose from">'+(function(){
             /* a tile the same character as another is only used up once */
             var left={}; fl.forEach(function(c){ if(c) left[c]=(left[c]||0)+1; });
             return bdTiles(it).map(function(c){
@@ -977,7 +1020,8 @@ function quizHTML(){
         ? '<textarea id="qa" spellcheck="false" placeholder="Type the whole sentence" style="margin-top:12px"></textarea>'
         : '<input type="text" id="qa" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Type here" style="margin-top:12px">');
   }
-  return s+'<div class="btnrow"><button class="btn go" id="qG">Check</button></div><div id="qf"></div></div>';
+  return s+'<div class="btnrow"><button class="btn go" id="qG">Check</button></div>'+
+    '<div id="qf" role="status" aria-live="polite"></div></div>';
 }
 function wireQuiz(){
   var q=quiz;
@@ -1022,15 +1066,6 @@ function wireQuiz(){
     };
   });
 
-  document.querySelectorAll("[data-opt]").forEach(function(b){
-    b.onclick=function(){
-      if(q.graded) return;
-      sfxTap();
-      document.getElementById("qa").value=b.dataset.opt;
-      document.querySelectorAll("[data-opt]").forEach(function(x){ x.classList.remove("sel"); });
-      b.classList.add("sel");
-    };
-  });
   var a=document.getElementById("qa");
   if(a) a.addEventListener("keydown",function(e){ if(e.key==="Enter"&&it.k!=="dict"){ e.preventDefault(); g.click(); } });
   var t=document.getElementById("qt");

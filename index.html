@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#0A0F26">
+<meta name="theme-color" content="#F4F6FD" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0A0F26" media="(prefers-color-scheme: dark)">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Chewtopia">
 <link rel="apple-touch-icon" href="icon.png">
@@ -23,11 +24,9 @@
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   html,body{overscroll-behavior-y:contain}          /* no pull-to-refresh mid-test */
-  button,select,.tab,.wb,.trbtn,.markcell,.mkrun,.runrow,.tbox,.daily,.fixbtn{
+  button,select,.tab,.wb,.tbox,.daily,.fixbtn,.btile{
     touch-action:manipulation;                      /* no double-tap zoom */
     -webkit-user-select:none;user-select:none}
-  canvas,.markcell img,.shimgs img{-webkit-touch-callout:none;-webkit-user-select:none;
-    user-select:none;pointer-events:auto}
   html{-webkit-text-size-adjust:100%}
   html,body{margin:0;padding:0;min-height:100%}
   body{
@@ -38,6 +37,13 @@
             calc(13px + env(safe-area-inset-left));
   }
   .shell{width:100%;max-width:760px;position:relative;z-index:1}
+  main:focus{outline:none}
+  /* Keyboard users land here first and can jump the tab strip. Invisible until
+     it is focused, which is the only time it is any use. */
+  .skip{position:absolute;left:-9999px;top:8px;z-index:9;background:var(--card);
+    color:var(--blue);font-weight:800;border-radius:12px;padding:12px 16px;
+    text-decoration:none;box-shadow:0 6px 18px rgba(0,0,0,.25)}
+  .skip:focus{left:14px}
   .warn{background:#FFF4E4;color:#8A6100;border-radius:12px;padding:11px 13px;
     font-size:14px;font-weight:600;margin:0 0 12px}
   @media(min-width:900px){ .shell{max-width:900px} }
@@ -50,14 +56,6 @@
   .mark span:nth-child(5n+3){color:var(--coral)}
   .mark span:nth-child(5n+4){color:var(--grape)}
   .mark span:nth-child(5n+5){color:var(--sun)}
-
-  .pk{flex:1;border:2px solid var(--line);background:var(--card);color:var(--soft);
-    border-radius:14px;padding:10px 8px;font-family:inherit;font-size:15px;font-weight:700;
-    cursor:pointer;box-shadow:0 2px 0 var(--line);line-height:1.2}
-  .pk small{display:block;font-size:11px;font-weight:500;opacity:.8}
-  .pk.on{color:#fff;background:var(--ink);border-color:var(--ink);box-shadow:0 3px 0 var(--ink)}
-  .pk.k-tc.on{background:var(--blue);border-color:var(--blue);box-shadow:0 3px 0 var(--blue)}
-  .pk.k-sc.on{background:var(--tang);border-color:var(--tang);box-shadow:0 3px 0 var(--tang)}
 
   .tabs{display:flex;gap:8px;margin-bottom:14px;overflow-x:auto;
     scrollbar-width:none;-webkit-overflow-scrolling:touch;padding-bottom:2px}
@@ -98,6 +96,16 @@
   .wi{display:inline-block;background:#fff;border-radius:9px;padding:5px 10px;
     margin:0 6px 6px 0;font-size:14px;font-weight:700;color:var(--ink)}
   .wi i{font-style:normal;font-weight:500;color:var(--coral);margin-left:6px;font-size:12px}
+  .wi.hot{box-shadow:inset 0 0 0 2px #FFC9BC}
+  /* the count and the clear button need daylight between them, or on a small
+     screen "3x" and the x read as one smudge */
+  .wi .wx{border:none;background:none;color:#C6B08A;font-size:16px;line-height:1;
+    cursor:pointer;padding:4px 2px 4px 10px;margin:-4px -4px -4px 4px;
+    font-family:inherit;border-left:1px solid #EFE0C8}
+  .wi .wx:hover,.wi .wx:focus-visible{color:var(--coral)}
+  .mxwk{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .mxwk.one{grid-template-columns:1fr}
+  .mxwk .wt{margin-top:0}
 
   /* ---- reading ---- */
   .rdc{font-size:13px;font-weight:800;border-radius:9px;padding:5px 11px}
@@ -156,6 +164,11 @@
   .btn.play{background:var(--coral);color:#fff}
   .btn.soft{background:var(--sky);color:var(--blue)}
   .btn:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+  /* One ring for everything, so tabbing through on a keyboard is followable.
+     :focus-visible keeps it off for taps and mouse clicks. */
+  button:focus-visible,a:focus-visible,select:focus-visible,
+  [tabindex]:focus-visible{outline:3px solid var(--sun);outline-offset:2px;
+    border-radius:10px}
   .btnrow{display:flex;gap:9px;margin-top:12px;flex-wrap:wrap;clear:both}
   .quizcard .btnrow .btn{min-height:56px;font-size:18px}
   .quizcard .btnrow{position:sticky;bottom:6px;z-index:3}
@@ -271,7 +284,7 @@
   .lt.h{background:#7FD394;color:#12401F}
   .lt.s{background:#FF9A82;color:#5E1B0B}
   .pair{display:flex;gap:10px;margin-top:12px}
-  .pair .f1{flex:2} .pair .f2{flex:1;min-width:92px}
+  .pair .f1{flex:1;min-width:140px}
   .done{text-align:center}
   .done .big{font-family:'Baloo 2',cursive;font-size:56px;margin:8px 0 0;color:var(--lime)}
   .done .st{font-size:27px;letter-spacing:.08em;margin:2px 0 4px}
@@ -280,17 +293,6 @@
   .done .again b{color:var(--coral)}
 
   /* ---- 我会写 ---- */
-  .big-word{font-family:'Noto Sans SC',serif;font-size:clamp(30px,8vw,42px);
-    font-weight:700;color:var(--ink);letter-spacing:.06em;margin-bottom:2px}
-  .opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
-  @media(min-width:520px){ .opts{grid-template-columns:repeat(4,1fr)} }
-  .opt{font-family:'Noto Sans SC',serif;font-size:clamp(38px,10vw,52px);font-weight:700;
-    background:var(--bg);border:2px solid var(--line);border-radius:16px;
-    padding:14px 6px;cursor:pointer;color:var(--ink);min-height:78px;transition:.08s}
-  .opt:active{transform:translateY(2px)}
-  .opt.sel{border-color:var(--blue);background:var(--sky);color:var(--blue)}
-  .hzin{font-family:'Noto Sans SC',serif;font-size:40px;text-align:center;
-    margin-top:14px;padding:14px;letter-spacing:.1em}
   .switch{text-align:center}
   .switch .addlink{font-size:14px}
 
@@ -343,89 +345,12 @@
   .whoami{font-size:13px;font-weight:600;color:var(--soft);margin:0 0 10px}
   .whoami b{color:var(--ink);font-weight:800}
 
-  /* ---- one square per character, checked stroke by stroke ---- */
-  .tracerow{display:flex;gap:10px;justify-content:center;margin:14px 0 6px;flex-wrap:wrap}
-  .trbox{width:148px;height:148px;background:#fff;border-radius:14px;touch-action:none;
-    box-shadow:inset 0 0 0 2px var(--line);
-    background-image:linear-gradient(var(--line),var(--line)),
-                     linear-gradient(var(--line),var(--line));
-    background-size:100% 1px, 1px 100%;
-    background-position:center center, center center;
-    background-repeat:no-repeat}
-  .trbox.filled{box-shadow:inset 0 0 0 2px #4FB86B}
-  .trbtns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:10px 0 2px}
-  .trbtn{border:none;font-family:inherit;font-size:14px;font-weight:800;cursor:pointer;
-    border-radius:12px;padding:11px 15px;background:var(--bg);color:var(--ink);
-    min-height:44px}
-  .trbtn:active{transform:translateY(1px)}
-  .trbtn.skip{background:#FFF1D6;color:#8A6100}
-  @media(max-width:460px){ .trbox{width:min(104px,29vw);height:min(104px,29vw)} }
-
-  /* ---- 听写: a square per character, then marked by eye ---- */
-  .padrow{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:14px 0 4px}
-  /* the fewer the characters, the bigger each square gets */
-  .padcell,.markcell{width:132px}
-  .padrow.n1 .padcell,.padrow.n1 .markcell{width:min(230px,64vw)}
-  .padrow.n2 .padcell,.padrow.n2 .markcell{width:min(200px,42vw)}
-  .padrow.n3 .padcell,.padrow.n3 .markcell{width:min(165px,29vw)}
-  .padrow.n4 .padcell,.padrow.n4 .markcell{width:min(140px,22vw)}
-  .padrow.n5 .padcell,.padrow.n5 .markcell{width:min(130px,18vw)}
-  .padcell .pad{width:100%;display:block;border-radius:12px;
-    box-shadow:inset 0 0 0 2px #CFDCE8}
-  .marktip{font-size:14px;font-weight:600;color:var(--soft);text-align:center;margin:12px 0 2px}
-  .markcell{cursor:pointer;border-radius:14px;padding:6px;position:relative;
-    background:var(--bg);text-align:center}
-  .markcell img{display:block;width:100%;border-radius:10px;background:#fff}
-  .markcell .noimg{display:block;height:96px;line-height:96px;color:#C3D2DF;background:#fff;
-    border-radius:10px}
-  .markcell .ansch{display:block;font-size:34px;font-weight:800;line-height:1.25;
-    margin-top:4px;font-family:'Noto Sans SC',sans-serif}
-  .markcell .mkflag{position:absolute;top:10px;right:10px;width:28px;height:28px;
-    border-radius:50%;font-size:15px;font-weight:800;line-height:28px;color:#fff}
-  .markcell.ok{box-shadow:inset 0 0 0 2.5px #4FB86B}
-  .markcell.ok .mkflag{background:#4FB86B}
-  .markcell.no{box-shadow:inset 0 0 0 2.5px #FF6F52}
-  .markcell.no .mkflag{background:#FF6F52}
-  .markcell.no .ansch{color:#B03A22}
-  .markscore{text-align:center;font-size:18px;font-weight:800;margin:12px 0 2px}
-  .markcell.show{cursor:default;box-shadow:inset 0 0 0 2px #DFE8F0}
-  .mkitem{padding:10px 0;border-bottom:1px solid var(--line)}
-  .mkitem:last-of-type{border-bottom:0}
-  .mkask{font-size:14px;font-weight:700;color:var(--soft);text-align:center}
-  .mkrun{display:block;width:100%;border:none;font-family:inherit;text-align:left;
-    cursor:pointer;border-radius:12px;padding:12px 14px;margin-bottom:8px;
-    background:var(--bg);color:var(--ink)}
-  .mkrun .nm{display:block;font-size:15px;font-weight:800}
-  .mkrun .mt{display:block;font-size:12px;font-weight:600;color:var(--soft);margin-top:1px}
-  .mkrun:active{transform:translateY(1px)}
-  @media(max-width:460px){
-    .padrow.n1 .padcell,.padrow.n1 .markcell{width:min(230px,70vw)}
-    .padrow.n2 .padcell,.padrow.n2 .markcell{width:min(170px,44vw)}
-    .padrow.n3 .padcell,.padrow.n3 .markcell{width:min(130px,29vw)}
-    .padrow.n4 .padcell,.padrow.n4 .markcell{width:min(110px,22vw)}
-    .padrow.n5 .padcell,.padrow.n5 .markcell{width:min(96px,18vw)}
-    .markcell .ansch{font-size:28px} .markcell .noimg{height:76px;line-height:76px} }
-
-  /* ---- long answers: one wide pad, marked by eye ---- */
-  .padwrap{position:relative;margin:12px 0 4px}
-  .pad{display:block;width:100%;background:#fff;border-radius:14px;
-    box-shadow:inset 0 0 0 2px #CFDCE8;touch-action:none;cursor:crosshair}
-  .padclr{position:absolute;top:8px;right:8px;border:none;font-family:inherit;
-    font-size:12px;font-weight:700;color:var(--soft);background:var(--bg);
-    border-radius:9px;padding:6px 10px;cursor:pointer}
-  .wcount{font-weight:700;color:var(--soft)}
-  .blank{display:inline-block;color:var(--coral);letter-spacing:2px}
-  .hint2{text-align:center;font-size:16px;font-weight:700;color:var(--ink);margin:2px 0 6px}
-
   /* ---- upcoming: date on the left, a column per boy ---- */
   .agenda{display:grid;grid-template-columns:56px 1fr 1fr;column-gap:8px;row-gap:2px;
     align-items:start}
   .agenda.solo{grid-template-columns:56px 1fr}
   .agh{font-size:11px;letter-spacing:.07em;text-transform:uppercase;font-weight:800;
     text-align:center;border-radius:9px;padding:5px 4px;margin-bottom:4px}
-  .agmon{grid-column:1/-1;font-size:11px;letter-spacing:.1em;text-transform:uppercase;
-    font-weight:800;color:var(--soft);border-bottom:1px solid var(--line);
-    padding:0 0 4px;margin:12px 0 6px}
   /* one band per week, so a quiet fortnight still reads as a fortnight */
   .agwk{grid-column:1/-1;display:flex;align-items:baseline;gap:8px;
     font-size:11px;letter-spacing:.09em;text-transform:uppercase;font-weight:800;
@@ -509,48 +434,6 @@
   .lnk.l-mims{border-color:#F5D2C6;background:var(--peach)}
   .lnk.l-mims .lnt,.lnk.l-mims .lngo{color:var(--tang)}
 
-  /* ---- one test in full ---- */
-  .wchips{display:flex;flex-wrap:wrap;gap:7px;margin:4px 0 6px}
-  .wchip{font-size:15.5px;font-weight:700;border-radius:10px;padding:7px 11px;
-    max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
-    font-family:'Noto Sans SC','Lexend',sans-serif}
-  .wchip.good{background:#DFF3E4;color:#2F7A45}
-  .wchip.mid{background:#FFF1D6;color:#8A6100}
-  .wchip.low{background:#FFE3DC;color:#B03A22}
-  .wchip.none{background:var(--bg);color:var(--soft)}
-  .runlist{margin-bottom:8px}
-  .runrow{display:flex;align-items:center;gap:10px;padding:5px 0}
-  .rundate{font-size:12px;font-weight:700;color:var(--soft);width:52px;flex:0 0 52px}
-  .runbar{flex:1;height:10px;border-radius:6px;background:var(--bg);overflow:hidden}
-  .runbar i{display:block;height:100%;border-radius:6px}
-  .runbar i.good{background:#4FB86B} .runbar i.mid{background:#FFB627}
-  .runbar i.low{background:#FF6F52}
-  .runsc{font-size:13px;font-weight:800;width:52px;text-align:right}
-  .runrow.can{cursor:pointer;border-radius:10px}
-  .runrow.can:active{background:var(--bg)}
-  .runarw{color:var(--soft);font-size:13px;width:14px;text-align:right}
-  /* what he actually put down */
-  .sheet{background:var(--bg);border-radius:12px;padding:8px 10px;margin:2px 0 10px}
-  .shrow{display:flex;align-items:center;gap:10px;padding:7px 0;
-    border-bottom:1px solid rgba(0,0,0,.05)}
-  .shrow:last-child{border-bottom:0}
-  .shask{flex:1;min-width:0;font-size:13px;color:var(--soft);font-weight:600;
-    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .shgot{font-size:15px;font-weight:700;color:var(--ink);max-width:42%;
-    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .shgot i{color:#C3D2DF;font-style:normal}
-  .shgot b.ok{color:#4FB86B} .shgot b.no{color:#FF6F52}
-  .shimgs{display:flex;gap:4px}
-  .shimgs img{width:46px;height:46px;border-radius:8px;background:#fff;
-    box-shadow:inset 0 0 0 2px #DFE8F0}
-  .shimgs img.no{box-shadow:0 0 0 2px #FF6F52}
-  .shwant{font-size:16px;font-weight:800;color:#2F7A45;
-    font-family:'Noto Sans SC','Lexend',sans-serif}
-  .shrow.no .shwant{color:#B03A22}
-  .shflag{width:18px;text-align:right;font-weight:800}
-  .shrow.ok .shflag{color:#4FB86B} .shrow.no .shflag{color:#FF6F52}
-  .runsc.good{color:#2F7A45} .runsc.mid{color:#8A6100} .runsc.low{color:#B03A22}
-
   /* ---- progress matrix: each boy gets three subject columns ---- */
   .mxkey{display:flex;gap:12px;flex-wrap:wrap;align-items:center;font-size:12.5px;
     color:var(--soft);font-weight:600;margin-bottom:12px}
@@ -603,17 +486,18 @@
   .bword.sent{font-size:0;line-height:1.5;gap:0;margin:14px 0 4px}
   .bword.sent .bfix{font-size:26px;color:var(--ink)}
   .bword.sent .bslot{font-size:26px;min-width:34px;margin:0 2px}
-  .bslot{font-size:40px;line-height:1.1;min-width:52px;text-align:center;
-    border-bottom:3px solid var(--line);color:#C3D2DF}
+  /* a real button now, so a keyboard can reach a gap and clear it */
+  .bslot{font-family:inherit;background:none;border:none;padding:0 0 2px;
+    font-size:40px;line-height:1.1;min-width:52px;text-align:center;display:inline-block;
+    border-bottom:3px solid var(--line);color:#C3D2DF;cursor:default}
   .bslot.on{color:var(--ink);border-bottom-color:var(--blue);cursor:pointer}
+  .bslot.on:hover{border-bottom-color:var(--coral)}
   .btiles{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:14px}
   .btile{font-family:inherit;font-size:34px;line-height:1;padding:12px 16px;border:none;
     border-radius:14px;background:var(--bg);color:var(--ink);cursor:pointer}
   .btile.used{opacity:.28;pointer-events:none}
   .btile:active{transform:translateY(1px)}
   /* 我会认: four pinyin to choose from, wide enough to tap cleanly */
-  .pyopts .opt{font-size:22px;font-weight:700;letter-spacing:.02em;
-    font-family:inherit;padding:14px 8px}
   /* every box in a subject column is the same height, whatever it holds */
   .mxcol > .tbox, .zhwrap .tbox{min-height:80px;display:flex;flex-direction:column;
     justify-content:center}
@@ -661,9 +545,6 @@
   .tbox:active{transform:translateY(1px)}
   .tbox[disabled]{cursor:default}
   .mxnone{color:#C3D2DF;font-size:12px;text-align:center;padding:8px 0;font-weight:600}
-  .mxwk{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-  .mxwk.one{grid-template-columns:1fr}
-  .mxwk .wt{margin-top:0}
   .foot{text-align:center;margin-top:16px;color:var(--soft);font-size:12px;line-height:1.7}
   @media(min-width:700px){
     .day{grid-template-columns:80px 1fr}
@@ -751,14 +632,15 @@ body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;-
 </style>
 </head>
 <body>
+<a class="skip" href="#view">Skip to the page</a>
 <div class="shell">
-  <div class="head">
-    <button class="mark" id="mark" onclick="go('home')" title="Home"></button>
+  <header class="head">
+    <button class="mark" id="mark" onclick="go('home')" title="Home" aria-label="Chewtopia, go home"></button>
     <div class="scenes" id="scenes"></div>
-  </div>
-  <div class="tabs" id="tabs"></div>
-  <div id="view"></div>
-  <div class="foot">Saved on this device · build 89</div>
+  </header>
+  <nav class="tabs" id="tabs" aria-label="Sections"></nav>
+  <main id="view" tabindex="-1"></main>
+  <p class="foot">Saved on this device · build 89</p>
 </div>
 <!-- load order matters: data, then core, then screens, app last -->
 <!-- Pinned to an exact version with a hash to match: "@2" floats, so a bad
