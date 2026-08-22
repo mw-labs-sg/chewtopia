@@ -683,9 +683,13 @@ var SCHOOL_LINKS = [
   {id:"dojo", t:"ClassDojo", cn:"",
    s:"Messages from the teachers, and what has been set for home.",
    u:"https://home.classdojo.com", k:"dojo"},
-  {id:"mims", t:"MIMS password reset", cn:"",
-   s:"When the SLS or iCON password stops working, reset it here.",
-   u:"https://go.gov.sg/mims-selfservice-passwordreset", k:"mims"}
+  /* The MIMS sign-in. The address the school hands out is a one-visit link: it
+     carries a client_id, a redirect back to whichever site sent you, and a
+     single-use state token, so it belongs to that one sign-in and is stale by
+     the next. Only the stable part is kept, which lands on the same page. */
+  {id:"mims", t:"MIMS", cn:"",
+   s:"The MOE sign-in behind SLS, iCON and the school forms.",
+   u:"https://idp.mims.moe.gov.sg/nidp/app/login?id=mims", k:"mims"}
 ];
 
 var SEED_ACTS = [
