@@ -155,7 +155,13 @@ function dailyBtn(kid){
 function vTests(){
   var pick=SUBJ_COLS.slice();     /* everything, always — one screen, no filter */
 
-  var s='<div class="panel"><h2><span class="em">📝</span> Training</h2>'+
+  /* Sync goes first. It sat at the foot of the screen, which is the wrong end:
+     the moment it matters is BEFORE a test, so the tablet has whatever the other
+     device recorded and the scores in the boxes are the real ones. Below the
+     tests it was only ever found after the fact. */
+  var s=syncPanel();
+
+  s+='<div class="panel"><h2><span class="em">📝</span> Training</h2>'+
         '<div class="mxkey"><span><span class="dot" style="background:#C3D2DF"></span> '+
           '<b>not tried</b></span>'+
           '<span><span class="dot" style="background:#4FB86B"></span> <b>full marks</b></span>'+
@@ -184,10 +190,6 @@ function vTests(){
   s+='</div></div>';
 
   s+=weakPanel(tKid());
-
-  /* Sync used to live on Progress. That tab is gone, so it sits here, at the
-     foot of the screen the grown-ups already open. */
-  s+=syncPanel();
 
   /* The voices the tests are read in. The picker was written and then never
      given a home, so bestVoice() always took whatever came first and the

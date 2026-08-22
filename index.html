@@ -342,6 +342,10 @@
     border-radius:11px;padding:10px 12px;margin:0 0 10px}
   .synced.bad{background:#FFE3DC;color:#B03A22}
   .synced.warn2{background:#FFF1D6;color:#8A6100}
+  .synced b{font-weight:800}
+  /* a table or a file named in a sentence, so it reads as a thing to type */
+  .synced code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    font-size:12.5px;background:rgba(0,0,0,.07);border-radius:5px;padding:1px 5px}
   .whoami{font-size:13px;font-weight:600;color:var(--soft);margin:0 0 10px}
   .whoami b{color:var(--ink);font-weight:800}
 
@@ -640,7 +644,7 @@ body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;-
   </header>
   <nav class="tabs" id="tabs" aria-label="Sections"></nav>
   <main id="view" tabindex="-1"></main>
-  <p class="foot">Saved on this device · build 89</p>
+  <p class="foot">Saved on this device · build 90</p>
 </div>
 <!-- load order matters: data, then core, then screens, app last -->
 <!-- Pinned to an exact version with a hash to match: "@2" floats, so a bad
@@ -651,9 +655,9 @@ body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;-
         integrity="sha384-l8ah+VgaWtk1mvOe9VC+OirC6qHFF4yH7l7mKRidV9MSti3E9F463bMp6ZVN4kuC"
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="data.js?v=29"></script>
-<script src="core.js?v=41"></script>
+<script src="core.js?v=42"></script>
 <script src="timetable.js?v=6"></script>
-<script src="training.js?v=41"></script>
-<script src="app.js?v=75"></script>
+<script src="training.js?v=42"></script>
+<script src="app.js?v=76"></script>
 </body>
 </html>

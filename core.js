@@ -373,8 +373,11 @@ function cloudPull(quiet, done){
        un-merged lists over the other device's. It is set where it is earned. */
     pullState(function(stMsg, stOK){
       syncBusy=false;
-      if(stOK){ pulledOnce=true; W("pullerr",""); }
-      else W("pullerr","the rest of the sync could not be read");
+      /* The scores came down \u2014 that select succeeded to get here. Only the
+         extras did not, which is a different and much smaller thing, so it
+         must not be reported as a failed sync. pullerr is for the scores. */
+      W("pullerr","");
+      if(stOK) pulledOnce=true;
       if(!quiet) setNote("Got "+added+(added===1?" new score":" new scores")+
         (fixed?", "+fixed+" corrected":"")+stMsg+" \u00b7 "+stamp());
       done(added+fixed);
@@ -507,11 +510,17 @@ function uniq(a){
   (a||[]).forEach(function(x){ if(!seen[x]){ seen[x]=1; out.push(x); } });
   return out;
 }
+/* The state table is optional: scores live in their own table and sync without
+   it. So a failure here is a setup gap, not a broken sync, and has to read
+   differently from one \u2014 and it has to repeat what the server actually said,
+   because "could not be read" covers a missing table, a missing policy and a
+   dropped connection, which want three different fixes. */
 function pullState(done){
   var c=sbc();
   if(!c||!cloudUser) return done("", false);
   c.from("state").select("*").then(function(r){
-    if(r.error) return done(", the rest needs the state table", false);
+    if(r.error){ W("stateerr", r.error.message||"the state table could not be read");
+                 return done(", the rest needs the state table", false); }
     var remote={};
     (r.data||[]).forEach(function(row){ remote[row.k]=row.v; });
     /* strike lists first, so the merge below never re-adds something that this
@@ -531,9 +540,13 @@ function pullState(done){
     });
     dropGone();                 /* a union puts deleted entries back; take them out again */
     dropStruck();               /* and the same for books and the tricky-ones bank */
+    W("stateerr","");
     done(touched?", plus the rest":"", true);
-  }, function(){ done(", the rest could not be reached", false); });
+  }, function(e){ W("stateerr", (e&&e.message)||"no connection");
+                  done(", the rest could not be reached", false); });
 }
+/* What the server said about the state table last time, verbatim. */
+function stateErr(){ return S("stateerr",""); }
 function pushState(done){
   var c=sbc();
   if(!c||!cloudUser) return done("");
@@ -546,8 +559,11 @@ function pushState(done){
   });
   rows.push({user_id:cloudUser.id, k:"struck", v:tombs(), updated_at:now});
   c.from("state").upsert(rows,{onConflict:"user_id,k"}).then(function(r){
-    done(r.error ? ", the rest needs the state table" : ", plus the rest");
-  }, function(){ done(", the rest could not be sent"); });
+    if(r.error){ W("stateerr", r.error.message||"the state table would not take a write");
+                 return done(", the rest needs the state table"); }
+    W("stateerr",""); done(", plus the rest");
+  }, function(e){ W("stateerr",(e&&e.message)||"no connection");
+                  done(", the rest could not be sent"); });
 }
 
 /* ==========================================================================
@@ -581,8 +597,12 @@ function cloudSync(){
       var bits=[];
       if(got)  bits.push("brought "+got+" down");
       if(sent) bits.push("sent "+sent+" up");
-      setNote((bits.length ? "Synced \u00b7 "+bits.join(", ") : "Synced \u00b7 nothing new")+
-              (left ? " \u00b7 "+left+" still waiting" : "")+" \u00b7 "+stamp());
+      /* The scores are the sync. The extras are a bonus that needs one more
+         table, so they get a trailing clause, not a headline. */
+      setNote((bits.length ? "Scores synced \u00b7 "+bits.join(", ") : "Scores synced \u00b7 nothing new")+
+              (left ? " \u00b7 "+left+" still waiting" : "")+
+              (stateErr() ? " \u00b7 books, events and tricky ones still on this device only" : "")+
+              " \u00b7 "+stamp());
     });
   });
 }
