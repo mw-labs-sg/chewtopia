@@ -549,6 +549,24 @@
   .qq.qw{font-size:19px;line-height:1.45;font-weight:600;letter-spacing:0}
   .hzgrid{display:grid;grid-template-columns:1fr 1fr;gap:7px;align-items:stretch}
 
+  /* ---- 生字表: the reference list, laid out like the page in the book ---- */
+  .clist{margin-top:12px}
+  .cl-l{font-size:13px;font-weight:800;color:var(--tang);letter-spacing:.02em;
+    padding:10px 0 3px;border-top:1px solid var(--line)}
+  .clist .cl-l:first-child{border-top:0;padding-top:2px}
+  .cl-b{display:grid;grid-template-columns:1fr;gap:4px;padding-bottom:6px}
+  @media(min-width:620px){ .cl-b{grid-template-columns:1fr 1fr;gap:12px} }
+  .cl-r{display:flex;align-items:baseline;gap:8px;background:var(--bg);
+    border-radius:10px;padding:7px 10px}
+  .cl-r i{flex:0 0 auto;font-style:normal;font-size:10.5px;font-weight:800;
+    color:var(--soft);letter-spacing:.03em}
+  .cl-r b{flex:1;font-family:'Noto Sans SC',serif;font-size:19px;font-weight:500;
+    line-height:1.5;letter-spacing:.04em;word-break:break-word}
+  .cl-r b.w{font-weight:700;color:var(--ink)}
+  .cl-r u{flex:0 0 auto;text-decoration:none;font-size:10.5px;font-weight:700;
+    color:var(--soft);opacity:.75}
+  .cl-none{flex:1;font-size:12.5px;color:var(--soft);opacity:.7}
+
   /* ---- 默写: Dad's job, so its own panel and its own quieter shape ---- */
   .pchips{display:flex;flex-wrap:wrap;gap:8px}
   .pchip{flex:1 1 96px;border:2px dashed var(--line);background:var(--card);
@@ -571,6 +589,9 @@
   .pw{display:block;font-family:'Noto Sans SC',serif;font-size:30px;line-height:1.25;
     color:var(--soft);font-weight:500}
   .pw b{color:var(--ink);font-weight:700;border-bottom:3px solid var(--sun)}
+  /* the words to actually say, set apart so the eye lands on them first */
+  .psay{display:block;font-family:'Noto Sans SC',serif;font-size:17px;font-weight:700;
+    color:var(--tang);margin-top:3px;line-height:1.3}
   .pm{display:block;font-size:13px;color:var(--soft);margin-top:2px}
   .pspk{position:absolute;top:14px;right:8px;font-size:17px;opacity:.55}
   .hzh{font-size:10px;letter-spacing:.04em;font-weight:800;color:var(--soft);
@@ -678,7 +699,7 @@ body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;-
   </header>
   <nav class="tabs" id="tabs" aria-label="Sections"></nav>
   <main id="view" tabindex="-1"></main>
-  <p class="foot">Saved on this device · build 98</p>
+  <p class="foot">Saved on this device · build 100</p>
 </div>
 <!-- load order matters: data, then core, then screens, app last -->
 <!-- Pinned to an exact version with a hash to match: "@2" floats, so a bad
@@ -691,7 +712,7 @@ body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;-
 <script src="data.js?v=31"></script>
 <script src="core.js?v=46"></script>
 <script src="timetable.js?v=6"></script>
-<script src="training.js?v=46"></script>
+<script src="training.js?v=48"></script>
 <script src="app.js?v=79"></script>
 </body>
 </html>

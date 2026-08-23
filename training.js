@@ -65,6 +65,41 @@ function tCell(kid, code, name, testName, meta, unit){
 /* \u9ed8\u5199: the one test in here the app does not run. Its own panel, because it
    is Dad's job rather than the boy's screen, and because it is never scored \u2014
    putting it among the coloured boxes would suggest it could be. */
+/* ==========================================================================
+   生字表 — the whole list, the way the book prints it
+   A reference, not a test: page 116 of the textbook, every lesson at once, so
+   the answers are to hand while marking a paper sheet and so you can see what
+   is coming without opening anything. Folded away by default, because it is
+   long and it is not what you came to Training for — and it remembers whether
+   you left it open.
+   ========================================================================== */
+function charsOpen(){ return S("charlist","off")==="on"; }
+function charTable(){
+  var open=charsOpen();
+  var s='<div class="panel"><h2><span class="em">\uD83D\uDCD6</span> \u751f\u5b57\u8868'+
+        '<span class="side">every lesson</span></h2>'+
+        '<button class="btn soft wide" id="clTog" aria-expanded="'+(open?"true":"false")+'">'+
+        (open?"\u25be Fold it away":"\u25b8 Show the whole list")+'</button>';
+  if(!open) return s+'</div>';
+  s+='<div class="clist" lang="zh-CN">';
+  Object.keys(HANZI).forEach(function(k){
+    var rb=(typeof RECOG!=="undefined" && RECOG[k]) ? RECOG[k] : null;
+    s+='<div class="cl-l">'+esc(k)+'</div>'+
+       '<div class="cl-b">'+
+         '<div class="cl-r"><i>\u6211\u4f1a\u8ba4</i>'+
+           (rb ? '<b>'+rb.map(function(x){ return esc(x[0]); }).join(" ")+'</b>'+
+                 '<u>'+rb.length+'</u>'
+               : '<span class="cl-none">not on this page</span>')+'</div>'+
+         '<div class="cl-r"><i>\u6211\u4f1a\u5199</i><b class="w">'+
+           HANZI[k].map(function(x){ return esc(x[0]); }).join(" ")+'</b>'+
+           '<u>'+HANZI[k].length+'</u></div>'+
+       '</div>';
+  });
+  return s+'</div><div class="key">\u6211\u4f1a\u5199 is what he has to write; \u6211\u4f1a\u8ba4 he only '+
+    'has to recognise. Straight off the \u751f\u5b57\u8868 in the back of the book.</div></div>';
+}
+
+
 function paperPanel(){
   return '<div class="panel"><h2><span class="em">\u270D\uFE0F</span> \u9ed8\u5199'+
     '<span class="side">on paper \u00b7 not marked here</span></h2>'+
@@ -220,6 +255,7 @@ function vTests(){
 
   if(tKid()==="tc") s+=paperPanel();
   s+=weakPanel(tKid());
+  if(tKid()==="tc") s+=charTable();
 
   /* No voice picker. The ranking in bestVoice() already knows which is the good
      one — a modern neural voice, a woman, the right accent, and never one of
@@ -267,6 +303,8 @@ function wKidBar(){
 function wTests(){
   wKidBar();
   wResults();          /* the sync buttons now live on this screen */
+  var cl=document.getElementById("clTog");
+  if(cl) cl.onclick=function(){ W("charlist", charsOpen()?"off":"on"); sfxTap(); render(); };
   document.querySelectorAll("[data-weakgo]").forEach(function(b){
     b.onclick=function(e){
       e.stopPropagation();
@@ -314,6 +352,16 @@ function paperWord(it){
   if(at<0) return '<b>'+esc(tgt)+'</b>';
   return esc(wd.slice(0,at))+'<b>'+esc(tgt)+'</b>'+esc(wd.slice(at+tgt.length));
 }
+/* Which character of the word he is being asked for. Reading out \u5e94\u8be5 alone
+   does not say whether to write \u5e94 or \u8be5, and \u5bb9\u6613 does not say \u5bb9 or \u6613 \u2014 the
+   word is only there to fix the sound and the meaning. Chinese has one phrase
+   for exactly this and every teacher uses it: \u300c\u5bb9\u6613\u300d\u7684\u300c\u5bb9\u300d, the r\u00f3ng of r\u00f3ngy\u00ec.
+   A word that is a single character on its own \u2014 \u5462 \u2014 has nothing to pick out,
+   so it is just said twice. */
+function paperSay(it){
+  var wd=String(it.word||it.h), tgt=String(it.h);
+  return (wd===tgt || wd.indexOf(tgt)<0) ? tgt : wd+"\u7684"+tgt;
+}
 function paperHTML(){
   var q=paper, n=q.items.length;
   return '<div class="panel"><div class="qtop">'+
@@ -321,13 +369,16 @@ function paperHTML(){
     '<span class="hudchips"><span class="hud">'+n+' \u5b57</span></span></div>'+
     '<h2><span class="em">\u270D\uFE0F</span> \u9ed8\u5199 '+esc(q.lesson)+
       '<span class="side">on paper</span></h2>'+
-    '<p class="papertip">Read each one out. He writes the <b>bold</b> character on '+
-      'paper \u2014 the rest of the word is only there so you both know which one it is. '+
-      'Tap a row to hear it. Nothing here is marked, so mark the paper with a pen.</p>'+
+    '<p class="papertip">Read out the line in quotes \u2014 the word, then which '+
+      'character of it he writes, the way the teacher says it: \u201c\u5bb9\u6613\u201d\u7684\u201c\u5bb9\u201d. '+
+      'He writes the <b>bold</b> one on paper. Tap a row to hear it. Nothing here '+
+      'is marked, so mark the paper with a pen.</p>'+
     '<ol class="psheet'+(q.shown?"":" hide")+'" lang="zh-CN">'+
       q.items.map(function(it,i){
         return '<li class="prow" data-say="'+i+'">'+
           '<span class="pw">'+paperWord(it)+'</span>'+
+          /* the exact words to read out, so you are not working it out mid-test */
+          '<span class="psay">\u201c'+esc(paperSay(it))+'\u201d</span>'+
           '<span class="pm">'+esc(it.a)+(it.tone||"")+
             (it.m?' \u00b7 '+esc(it.m):'')+'</span>'+
           '<span class="pspk" aria-hidden="true">\uD83D\uDD0A</span></li>';
@@ -354,9 +405,14 @@ function wirePaper(){
     row.onclick=function(){
       var it=q.items[+row.dataset.say];
       hush(); sfxTap();
-      /* the way a teacher dictates: the word, a gap to write in, then again */
+      /* The way a teacher dictates: the word so the sound and meaning are
+         fixed, then which character of it to write, a gap long enough to
+         write in, then that again more slowly. It used to say only the word,
+         twice \u2014 which for \u5e94\u8be5 left him guessing between \u5e94 and \u8be5. */
+      var cue=paperSay(it);
       say(it.word,0.85,"zh-CN");
-      sayLater(function(){ say(it.word,0.7,"zh-CN"); }, 2200);
+      sayLater(function(){ say(cue,0.72,"zh-CN"); }, 1500);
+      sayLater(function(){ say(cue,0.62,"zh-CN"); }, 4600);
     };
   });
 }
