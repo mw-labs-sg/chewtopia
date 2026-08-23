@@ -138,6 +138,9 @@ var TABS = [["home","Upcoming","t1"],["schedule","Timetable","t2"],
             ["meals","Meals","t3"],["practice","Training","t4"],
             ["reading","Reading","t6"],["links","School","t5"]];
 var tab="home", quiz=null, showAdd=false;
+/* The paper dictation sheet: not a quiz, because nothing on it is answered on
+   the screen. Dad reads, he writes on paper, and there is no score to keep. */
+var paper=null;
 /* Each tab gets a readable address, e.g. .../chewtopia/#meals, so a link can
    be bookmarked or sent straight to one screen. */
 var SLUGS = {home:"upcoming", schedule:"timetable", meals:"meals",
@@ -155,7 +158,7 @@ function go(id, quiet){
   /* Everything a screen was left in the middle of. wkOff was missed, so
      browsing four weeks ahead on the Timetable, going to Meals and coming
      back landed you four weeks ahead again with no way to tell why. */
-  tab=id; quiz=null; showAdd=false; showBook=false; wkOff=0; hush();
+  tab=id; quiz=null; paper=null; showAdd=false; showBook=false; wkOff=0; hush();
   if(!quiet){ try{ location.hash="#"+SLUGS[id]; }catch(e){} }
   render(); scrollTo(0,0);
 }
@@ -245,6 +248,10 @@ function uuid(){
    anything writes to it. */
 var RES=null;
 function results(){ if(!RES) RES=SJ("results",[]); return RES; }
+/* The paper sheets keep no score \u2014 nothing on them is marked in the app \u2014 but
+   a date is worth having, or the box can never say whether it has been done. */
+function readOut(code){ return S("paper:"+code,""); }
+function markReadOut(code){ W("paper:"+code, todayISO()); }
 function resultsDirty(){ RES=null; }
 
 /* Nothing produces hand-marked runs any more — 华文 is typed for both boys.

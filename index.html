@@ -536,6 +536,31 @@
   .zhwrap{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:6px}
   .qq.qw{font-size:19px;line-height:1.45;font-weight:600;letter-spacing:0}
   .hzgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;align-items:stretch}
+
+  /* ---- 默写: Dad's job, so its own panel and its own quieter shape ---- */
+  .pchips{display:flex;flex-wrap:wrap;gap:8px}
+  .pchip{flex:1 1 96px;border:2px dashed var(--line);background:var(--card);
+    border-radius:13px;padding:10px 8px;font-family:inherit;font-size:15px;
+    font-weight:700;color:var(--ink);cursor:pointer;line-height:1.2;text-align:center}
+  .pchip small{display:block;font-size:11px;font-weight:600;color:var(--soft);
+    margin-top:2px}
+  .pchip:active{transform:translateY(1px)}
+  .pchip.done{border-style:solid;border-color:#CFE3D6;background:#F2FAF5}
+
+  .papertip{font-size:14px;line-height:1.5;color:var(--soft);background:var(--bg);
+    border-radius:12px;padding:11px 13px;margin:0 0 14px}
+  .papertip b{color:var(--ink)}
+  .psheet{list-style:decimal;margin:0;padding:0 0 0 30px}
+  .psheet.hide{filter:blur(7px);pointer-events:none;user-select:none}
+  .prow{padding:11px 8px;border-bottom:1px solid var(--line);cursor:pointer;
+    border-radius:10px;position:relative;display:block}
+  .prow:last-child{border-bottom:0}
+  .prow:active{background:var(--sky)}
+  .pw{display:block;font-family:'Noto Sans SC',serif;font-size:30px;line-height:1.25;
+    color:var(--soft);font-weight:500}
+  .pw b{color:var(--ink);font-weight:700;border-bottom:3px solid var(--sun)}
+  .pm{display:block;font-size:13px;color:var(--soft);margin-top:2px}
+  .pspk{position:absolute;top:14px;right:8px;font-size:17px;opacity:.55}
   .hzgap{border:1px dashed var(--line);border-radius:10px;min-height:66px;
          display:flex;align-items:center;justify-content:center;
          color:var(--soft);opacity:.45;font-size:13px}
@@ -644,7 +669,7 @@ body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;-
   </header>
   <nav class="tabs" id="tabs" aria-label="Sections"></nav>
   <main id="view" tabindex="-1"></main>
-  <p class="foot">Saved on this device · build 92</p>
+  <p class="foot">Saved on this device · build 93</p>
 </div>
 <!-- load order matters: data, then core, then screens, app last -->
 <!-- Pinned to an exact version with a hash to match: "@2" floats, so a bad
@@ -655,9 +680,9 @@ body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;-
         integrity="sha384-l8ah+VgaWtk1mvOe9VC+OirC6qHFF4yH7l7mKRidV9MSti3E9F463bMp6ZVN4kuC"
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="data.js?v=30"></script>
-<script src="core.js?v=43"></script>
+<script src="core.js?v=44"></script>
 <script src="timetable.js?v=6"></script>
-<script src="training.js?v=42"></script>
-<script src="app.js?v=77"></script>
+<script src="training.js?v=43"></script>
+<script src="app.js?v=78"></script>
 </body>
 </html>

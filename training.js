@@ -62,6 +62,24 @@ function tCell(kid, code, name, testName, meta, unit){
     '</button>';
 }
 
+/* \u9ed8\u5199: the one test in here the app does not run. Its own panel, because it
+   is Dad's job rather than the boy's screen, and because it is never scored \u2014
+   putting it among the coloured boxes would suggest it could be. */
+function paperPanel(){
+  return '<div class="panel"><h2><span class="em">\u270D\uFE0F</span> \u9ed8\u5199'+
+    '<span class="side">on paper \u00b7 not marked here</span></h2>'+
+    '<p class="empty" style="padding:0 0 10px">Pick a lesson. You read each word out, '+
+    'he writes the character on paper. The app keeps no score for these \u2014 mark the '+
+    'paper with a pen.</p><div class="pchips">'+
+    Object.keys(HANZI).map(function(k){
+      var was=readOut("mo|"+k);
+      return '<button class="pchip'+(was?" done":"")+'" data-t="mo|'+esc(k)+'" data-kid="tc">'+
+        esc(k)+'<small>'+HANZI[k].length+'\u5b57'+
+        (was?' \u00b7 '+esc(dshort(new Date(was+"T00:00:00").getTime())):'')+
+        '</small></button>';
+    }).join("")+'</div></div>';
+}
+
 function tColumn(kid, subj){
   var out="";
   if(subj==="en"){
@@ -92,6 +110,11 @@ function tColumn(kid, subj){
       /* One row per lesson, three ways the school tests it: read it, write it,
          then the 听写 sheet where the characters sit inside a sentence.
          A lesson with no 听写 sheet gets a quiet placeholder, not a dead box. */
+      /* Three columns, because three is what fits: on a phone the whole
+         Chinese column is 154px, and a fourth left every box 49px wide. \u9ed8\u5199
+         is Dad reading and the boy writing on paper \u2014 a different kind of
+         thing from the three the app marks \u2014 so it has its own panel below,
+         full width, instead of a squeezed column here. */
       out+='<div class="mxtag">\u751f\u5b57\u8868</div><div class="hzgrid">'+
            '<span class="hzh">\u6211\u4f1a\u8ba4</span>'+
            '<span class="hzh">\u6211\u4f1a\u5199</span>'+
@@ -189,6 +212,7 @@ function vTests(){
   });
   s+='</div></div>';
 
+  if(tKid()==="tc") s+=paperPanel();
   s+=weakPanel(tKid());
 
   /* The voices the tests are read in. The picker was written and then never
@@ -253,6 +277,83 @@ function wTests(){
     b.onclick=function(){
       if(b.dataset.kid) W("who", b.dataset.kid);
       start(b.dataset.t);
+    };
+  });
+}
+
+/* ==========================================================================
+   默写 — THE PAPER SHEET
+   The only test in here the app does not run. Dad reads a word out, the boy
+   writes the character on paper, and it is marked with a pen like the real
+   thing. So the screen is a reading list, not a quiz: the words in a shuffled
+   order that stays put while the sheet is open, big enough to read at arm's
+   length, with the character to be written picked out of each word.
+
+   Nothing is scored. A score the app did not see is a score it should not
+   claim, and a half-marked run is worse than none — so the box on Training
+   stays grey and only carries the date it was last read out.
+   ========================================================================== */
+function startPaper(code){
+  var k=String(code).split("|")[1], set=HANZI[k];
+  if(!set || !set.length){ alert("That list is not in the app any more."); return; }
+  paper={ code:code, lesson:k,
+          /* shuffled so the order is not learnt, fixed so the answer column
+             beside it still lines up with what he was actually asked */
+          items:shuffled(set).map(function(x){
+            return {h:x[0], a:x[1], tone:x[2], word:x[3], m:x[4]};
+          }),
+          shown:false };
+  render(); scrollTo(0,0);
+}
+/* The word with the character he has to write picked out of it. */
+function paperWord(it){
+  var wd=String(it.word||it.h), tgt=String(it.h), at=wd.indexOf(tgt);
+  if(at<0) return '<b>'+esc(tgt)+'</b>';
+  return esc(wd.slice(0,at))+'<b>'+esc(tgt)+'</b>'+esc(wd.slice(at+tgt.length));
+}
+function paperHTML(){
+  var q=paper, n=q.items.length;
+  return '<div class="panel"><div class="qtop">'+
+    '<button class="btn soft" id="pB">&larr; Back</button>'+
+    '<span class="hudchips"><span class="hud">'+n+' \u5b57</span></span></div>'+
+    '<h2><span class="em">\u270D\uFE0F</span> \u9ed8\u5199 '+esc(q.lesson)+
+      '<span class="side">on paper</span></h2>'+
+    '<p class="papertip">Read each one out. He writes the <b>bold</b> character on '+
+      'paper \u2014 the rest of the word is only there so you both know which one it is. '+
+      'Tap a row to hear it. Nothing here is marked, so mark the paper with a pen.</p>'+
+    '<ol class="psheet'+(q.shown?"":" hide")+'" lang="zh-CN">'+
+      q.items.map(function(it,i){
+        return '<li class="prow" data-say="'+i+'">'+
+          '<span class="pw">'+paperWord(it)+'</span>'+
+          '<span class="pm">'+esc(it.a)+(it.tone||"")+
+            (it.m?' \u00b7 '+esc(it.m):'')+'</span>'+
+          '<span class="pspk" aria-hidden="true">\uD83D\uDD0A</span></li>';
+      }).join("")+'</ol>'+
+    (q.shown ? '' :
+      '<p class="empty" style="text-align:center">The list is covered so he cannot '+
+      'read it over your shoulder.</p>')+
+    '<div class="btnrow">'+
+      '<button class="btn '+(q.shown?"soft":"go")+'" id="pShow">'+
+        (q.shown?"\uD83D\uDC41 Cover the list":"\uD83D\uDC41 Show me the list")+'</button>'+
+      '<button class="btn go" id="pDone">Done \u2192</button>'+
+    '</div></div>';
+}
+function wirePaper(){
+  var q=paper;
+  document.getElementById("pB").onclick=function(){ paper=null; go("practice"); };
+  document.getElementById("pShow").onclick=function(){ q.shown=!q.shown; sfxTap(); render(); };
+  document.getElementById("pDone").onclick=function(){
+    /* No score \u2014 only that it happened, so the grey box can carry a date. */
+    markReadOut(q.code);
+    paper=null; sfxDone(); go("practice");
+  };
+  document.querySelectorAll("[data-say]").forEach(function(row){
+    row.onclick=function(){
+      var it=q.items[+row.dataset.say];
+      hush(); sfxTap();
+      /* the way a teacher dictates: the word, a gap to write in, then again */
+      say(it.word,0.85,"zh-CN");
+      sayLater(function(){ say(it.word,0.7,"zh-CN"); }, 2200);
     };
   });
 }
@@ -717,9 +818,10 @@ function itemsFor(code, kid){
 }
 
 function start(code){
-  /* Chinese tests want the stroke data; it loads once and is then cached. */
   if(code==="weak")  return startWeak();
   if(code==="daily") return startDaily(who());
+  /* 默写 is not a quiz: it opens a reading list, not a question. */
+  if(String(code).indexOf("mo|")===0) return startPaper(code);
   var q=itemsFor(code);
   if(!q){ alert("That list is not in the app any more."); return; }
   quiz={code:code,subject:q.subject,test:q.test,lang:q.lang,items:q.items,

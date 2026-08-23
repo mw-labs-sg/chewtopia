@@ -37,6 +37,7 @@ function render(){
 
   var v=document.getElementById("view");
   if(quiz){ v.innerHTML=quizHTML(); wireQuiz(); return; }
+  if(paper){ v.innerHTML=paperHTML(); wirePaper(); return; }
   var V={home:vHome,schedule:vWeek,meals:vMeals,practice:vTests,reading:vRead,links:vLinks};
   var Wr={home:wHome,schedule:wWeek,meals:wMeals,practice:wTests,reading:wRead,links:wLinks};
   /* the child switch belongs inside the first panel, under its heading */
