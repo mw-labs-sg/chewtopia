@@ -352,15 +352,22 @@ function paperWord(it){
   if(at<0) return '<b>'+esc(tgt)+'</b>';
   return esc(wd.slice(0,at))+'<b>'+esc(tgt)+'</b>'+esc(wd.slice(at+tgt.length));
 }
-/* Which character of the word he is being asked for. Reading out \u5e94\u8be5 alone
+/* Which character of the word he is being asked for — used Reading out \u5e94\u8be5 alone
+   wherever a word is read out, not only on the paper sheet.
    does not say whether to write \u5e94 or \u8be5, and \u5bb9\u6613 does not say \u5bb9 or \u6613 \u2014 the
    word is only there to fix the sound and the meaning. Chinese has one phrase
    for exactly this and every teacher uses it: \u300c\u5bb9\u6613\u300d\u7684\u300c\u5bb9\u300d, the r\u00f3ng of r\u00f3ngy\u00ec.
    A word that is a single character on its own \u2014 \u5462 \u2014 has nothing to pick out,
    so it is just said twice. */
-function paperSay(it){
-  var wd=String(it.word||it.h), tgt=String(it.h);
-  return (wd===tgt || wd.indexOf(tgt)<0) ? tgt : wd+"\u7684"+tgt;
+function cueFor(it){
+  /* The full stop has to come off before comparing, or SC's 马儿跑得快。 does
+     not match the 马儿跑得快 he has to write and the cue comes out as
+     “马儿跑得快。的马儿跑得快” — a sentence picking itself out of itself. */
+  var wd=String(it.word||it.h).replace(/[。！？，、]/g,""),
+      tgt=String(it.h);
+  /* nothing to pick out when the word IS the answer, or is not in it at all */
+  if(wd===tgt || wd.indexOf(tgt)<0) return tgt;
+  return wd+"的"+tgt;
 }
 function paperHTML(){
   var q=paper, n=q.items.length;
@@ -378,7 +385,7 @@ function paperHTML(){
         return '<li class="prow" data-say="'+i+'">'+
           '<span class="pw">'+paperWord(it)+'</span>'+
           /* the exact words to read out, so you are not working it out mid-test */
-          '<span class="psay">\u201c'+esc(paperSay(it))+'\u201d</span>'+
+          '<span class="psay">\u201c'+esc(cueFor(it))+'\u201d</span>'+
           '<span class="pm"><b>'+esc(pinyinMark(it.a,it.tone))+'</b>'+
             (pinyinMark(it.a,it.tone)!==String(it.a||"")
               ? ' <span class="pnum">'+esc(String(it.a||"")+String(it.tone||""))+'</span>' : '')+
@@ -411,7 +418,7 @@ function wirePaper(){
          fixed, then which character of it to write, a gap long enough to
          write in, then that again more slowly. It used to say only the word,
          twice \u2014 which for \u5e94\u8be5 left him guessing between \u5e94 and \u8be5. */
-      var cue=paperSay(it);
+      var cue=cueFor(it);
       say(it.word,0.85,"zh-CN");
       sayLater(function(){ say(cue,0.72,"zh-CN"); }, 1500);
       sayLater(function(){ say(cue,0.62,"zh-CN"); }, 4600);
@@ -1254,10 +1261,17 @@ function speakIt(it){
     sayLater(function(){ say(it.word,0.75,"zh-CN"); }, gap);
   }
   else if(it.k==="rn"||it.k==="bd"){
-    /* here the whole word is right: 更, 长, 乐, 种 and 教 all have two
-       readings and the engine guesses wrong without the context */
-    say(it.word,0.9,"zh-CN");
-    sayLater(function(){ say(it.word,0.8,"zh-CN"); },1300);
+    /* The whole word first, because 更, 长, 乐, 种 and 教 all have two readings
+       and the engine guesses wrong without the context — then which character
+       of it is wanted, the way a teacher says it: “小猫”的“猫”. Saying the word
+       twice left him to work that out from the screen alone, which is no use
+       to a boy who is listening rather than reading. Where the word is the
+       whole answer there is nothing to pick out, so it is said twice. */
+    var cue=cueFor(it), heard=String(it.word||it.h);
+    /* long words need a longer gap before the second reading */
+    var gap=Math.max(1400, 300*heard.length);
+    say(heard,0.9,"zh-CN");
+    sayLater(function(){ say(cue===heard ? heard : cue, 0.78, "zh-CN"); }, gap);
   }
   else if(it.k==="dict"){
     say("Write the whole sentence.",0.92); say(it.s,0.78);
