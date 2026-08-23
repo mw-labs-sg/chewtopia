@@ -604,8 +604,10 @@ var SEED_EVENTS = [
 
   /* 听写 is a Thursday. The 13 Aug one moved to Friday the 14th because of the
      PSLE oral closure; this is the next one. */
-  {id:"e21", t:"华文听写 — 第十四课", d:"2026-08-27", w:"tc", p:"tx|第十四课",
-   n:"Thursday, fortnightly. 第十四课 生字: 难, 该, 作, 易, 伤, 脸, 争, 容, 吵, 能, 应, 呢. Training has all three: 我会认, 我会写 and a 听写 sheet."},
+  /* The practice button opens 我会写, not the 听写 sheet: the sheet column is
+     no longer on Training, so this is the way he practises the lesson now. */
+  {id:"e21", t:"华文听写 — 第十四课", d:"2026-08-27", w:"tc", p:"hz|第十四课",
+   n:"Thursday, fortnightly. 第十四课 生字: 难, 该, 作, 易, 伤, 脸, 争, 容, 吵, 能, 应, 呢. Training has 我会认 and 我会写, plus 默写 to read out while he writes on paper."},
 
   /* MOE school calendar 2026 — Term 3 runs 29 Jun to 4 Sept, Term 4 from 14 Sept. */
   {id:"e22", t:"Teachers' Day — no school", d:"2026-09-04", w:"tc", hol:1,

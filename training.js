@@ -110,23 +110,19 @@ function tColumn(kid, subj){
       /* One row per lesson, three ways the school tests it: read it, write it,
          then the 听写 sheet where the characters sit inside a sentence.
          A lesson with no 听写 sheet gets a quiet placeholder, not a dead box. */
-      /* Three columns, because three is what fits: on a phone the whole
-         Chinese column is 154px, and a fourth left every box 49px wide. \u9ed8\u5199
-         is Dad reading and the boy writing on paper \u2014 a different kind of
-         thing from the three the app marks \u2014 so it has its own panel below,
-         full width, instead of a squeezed column here. */
+      /* Two columns: read it, then write it. The listening column came out \u2014
+         only four of the eleven lessons ever had a sheet, so seven rows were a
+         dash, and the sentence-gap exercise is not how he practises now.
+         TC_TINGXIE and the tx| branch of itemsFor() are still there: putting a
+         third cell back in here brings the whole thing with it. */
       out+='<div class="mxtag">\u751f\u5b57\u8868</div><div class="hzgrid">'+
            '<span class="hzh">\u6211\u4f1a\u8ba4</span>'+
-           '<span class="hzh">\u6211\u4f1a\u5199</span>'+
-           '<span class="hzh">\u542c\u5199</span>';
+           '<span class="hzh">\u6211\u4f1a\u5199</span>';
       Object.keys(HANZI).forEach(function(k){
         var rb=(typeof RECOG!=="undefined" && RECOG[k]) ? RECOG[k] : null;
-        var tx=(typeof TC_TINGXIE!=="undefined" && TC_TINGXIE[k]) ? TC_TINGXIE[k] : null;
         out+=tCell(kid, "rn|"+k, k, "\u6211\u4f1a\u8ba4 "+k,
                    (rb?rb.length+"\u8ba4":HANZI[k].length+"\u5199 \u00b7 no \u8ba4 list yet"))+
-             tCell(kid, "hz|"+k, k, "\u6211\u4f1a\u5199 "+k, HANZI[k].length+"\u5199")+
-             (tx ? tCell(kid, "tx|"+k, k, "\u542c\u5199 "+k, tx.length+" sentences")
-                 : '<span class="hzgap">\u2014</span>');
+             tCell(kid, "hz|"+k, k, "\u6211\u4f1a\u5199 "+k, HANZI[k].length+"\u5199");
       });
       out+='</div>';
     }
@@ -846,8 +842,7 @@ function allCodes(kid){
   if(hasSubj(kid,"en")) Object.keys(kid==="tc"?TC_SPELL:SC_SPELL).forEach(function(k){ out.push((kid==="tc"?"en|":"es|")+k); });
   Object.keys(kid==="tc"?TC_PINYIN:SC_TINGXIE).forEach(function(k){ out.push("zh|"+k); });
   if(kid==="tc") Object.keys(HANZI).forEach(function(k){
-    out.push("rn|"+k); out.push("hz|"+k);
-    if(typeof TC_TINGXIE!=="undefined" && TC_TINGXIE[k]) out.push("tx|"+k);
+    out.push("rn|"+k); out.push("hz|"+k);   /* the sheets are parked: see tColumn */
   });
   if(hasSubj(kid,"ma")) MA_SETS.forEach(function(m){ out.push("ma|"+m[0]); });
   return out;
