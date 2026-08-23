@@ -920,14 +920,29 @@ if(window.speechSynthesis){ loadVoices(); speechSynthesis.onvoiceschanged=loadVo
    Windows' old SAPI voices (Zira, David, Hazel) are pushed to the bottom. */
 var NEURAL=/natural|online|google|siri|premium|enhanced/i;
 var BEST_EN=/serena|martha|sonia|libby|kate|stephanie|matilda|samantha|ava|jenny|aria/i;
-var FEM=/samantha|serena|sonia|libby|maisie|aria|jenny|ava|allison|susan|kate|karen|moira|tessa|fiona|martha|shelley|nicky|female|woman|tingting|ting-ting|xiaoxiao|xiaoyi|yaoyao|xiaohan|xiaomo|meijia|huihui|\u5a77\u5a77|\u6653\u6653/i;
+/* Every female voice these devices actually ship, by name, because the name is
+   all the API gives us \u2014 SpeechSynthesisVoice has no gender field. This list
+   was missing zira and hazel, which are the two commonest female voices on
+   Windows: the app did not know they were women and they only ever won because
+   the men scored worse. Grouped by where they come from so it stays addable. */
+var FEM=new RegExp([
+  /* The short ones are anchored on word boundaries. Unanchored, "mia" sits
+     inside Damian and "eva" inside Evan, so an unknown male voice could have
+     matched one and been read as a woman. */
+  /* Apple */      "samantha|serena|karen|moira|tessa|fiona|allison|\\bava\\b|susan|nicky|\\bzoe\\b|kathy|vicki|victoria|agnes|princess|catherine|siri female",
+  /* Windows */    "zira|hazel|heera|linda|\\beva\\b|hoda|caroline",
+  /* Edge/Azure */ "aria|jenny|michelle|\\bana\\b|sonia|libby|maisie|natasha|clara|molly|\\bnova\\b|emily|amber|ashley|\\bcora\\b|elizabeth|monica|\\bsara\\b|\\bluna\\b|\\bmia\\b|abbi|bella|hollie|olivia",
+  /* Google */     "female",
+  /* generic */    "\\bwoman\\b",
+  /* Mandarin */   "tingting|ting-ting|xiaoxiao|xiaoyi|xiaohan|xiaomo|xiaoxuan|xiaorui|xiaoshuang|xiaoqiu|xiaochen|xiaoyan|yaoyao|huihui|meijia|\u5a77\u5a77|\u6653\u6653|\u6653\u4f0a"
+].join("|"), "i");
 /* Mandarin voices worth having, best first. Tingting and Siri are iOS,
    Xiaoxiao and Yunxi are the Windows neural pair, Huihui is the old SAPI one. */
 var CN_GOOD=/\u666e\u901a\u8bdd|tingting|xiaoxiao|xiaoyi|yunxi|yunyang|meijia|liangliang|kangkang|yaoyao/i;
 var CN_OLD=/huihui/i;
 var OLD=/zira|david|hazel|mark|george|james|ravi|desktop/i;
 /* Anything obviously a man, so it is never picked while a woman is available */
-var MALE=/\b(male|man|men)\b|daniel|\balex\b|fred|thomas|\bdavid\b|\bmark\b|george|james|oliver|arthur|\bryan\b|aaron|gordon|rishi|nathan|yunxi|yunyang|kangkang|liangliang/i;
+var MALE=/\b(male|man|men)\b|daniel|\balex\b|fred|thomas|\bdavid\b|\bmark\b|george|james|oliver|arthur|\bryan\b|aaron|gordon|rishi|nathan|guy|davis|tony|jason|eric|roger|steffan|william|liam|brian|christopher|yunxi|yunyang|yunjian|yunfeng|yunhao|kangkang|liangliang|\u4e91\u5e0c|\u4e91\u626c/i;
 
 function voiceScore(v){
   var n=v.name||"", l=(v.lang||"").replace("_","-"), x=0;
@@ -960,12 +975,22 @@ function langVoices(lang){
     return ye-xe;
   });
 }
-/* The top of the ranking, always. There used to be a picker whose choice was
-   read here, but choosing by hand only ever landed on a worse voice than the
-   ranking would: it already puts a modern neural voice first, prefers a woman,
-   prefers the accent they hear at school, and pushes the old SAPI voices and
-   the Cantonese and Taiwan ones to the bottom. */
-function bestVoice(lang){ return langVoices(lang)[0] || null; }
+/* A woman, by name, and not one that also reads as a man's. */
+function femaleVoice(v){
+  var n=(v&&v.name)||"";
+  return !MALE.test(n) && FEM.test(n);
+}
+/* A woman reads the tests. Preferring one with a score was not enough: it only
+   took +200 on a scale where a neural voice takes +100 and the right accent
+   +30, so a slick male voice could still come out on top of a plain female
+   one. Now it is a rule, not a weight \u2014 if the device has a female voice for
+   this language at all, one of them is used, and the rest of the ranking only
+   decides which. A male voice is the last resort, not a near miss. */
+function bestVoice(lang){
+  var o=langVoices(lang);
+  for(var i=0;i<o.length;i++){ if(femaleVoice(o[i])) return o[i]; }
+  return o[0] || null;      /* nothing identifiably female: better than silence */
+}
 /* Chinese read too slowly turns to mush and loses its tones, so it never
    drops below this however slow the English is set. */
 function say(t,rate,lang){
