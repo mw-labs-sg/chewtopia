@@ -379,7 +379,9 @@ function paperHTML(){
           '<span class="pw">'+paperWord(it)+'</span>'+
           /* the exact words to read out, so you are not working it out mid-test */
           '<span class="psay">\u201c'+esc(paperSay(it))+'\u201d</span>'+
-          '<span class="pm">'+esc(it.a)+(it.tone||"")+
+          '<span class="pm"><b>'+esc(pinyinMark(it.a,it.tone))+'</b>'+
+            (pinyinMark(it.a,it.tone)!==String(it.a||"")
+              ? ' <span class="pnum">'+esc(String(it.a||"")+String(it.tone||""))+'</span>' : '')+
             (it.m?' \u00b7 '+esc(it.m):'')+'</span>'+
           '<span class="pspk" aria-hidden="true">\uD83D\uDD0A</span></li>';
       }).join("")+'</ol>'+
@@ -1156,7 +1158,7 @@ function quizHTML(){
        '<button class="btn play wide" id="qP">\uD83D\uDD0A Hear the word</button>'+
        '<div class="bword'+(it.s?" sent":"")+'" lang="zh-CN">'+bdMasked(it, fl)+'</div>'+
        (q.graded
-        ? '<div class="hint2">'+esc(it.h)+' \u00b7 <b>'+esc(it.a)+(it.tone||"")+'</b>'+
+        ? '<div class="hint2">'+esc(it.h)+' \u00b7 <b>'+esc(pinyinBoth(it.a,it.tone))+'</b>'+
           (it.m?' \u00b7 '+esc(it.m):"")+'</div>'
         : '<div class="btiles" role="group" aria-label="Characters to choose from">'+(function(){
             /* a tile the same character as another is only used up once */
@@ -1291,7 +1293,8 @@ function grade(forced){
   if(it.k==="rn"){
     right=pyOK(given, it);
     detail='<b style="font-size:30px">'+it.h+'</b> &nbsp; '+esc(it.word)+'<br>'+
-      (right?"\u2713 "+esc(pyWant(it)):"\u2717 \u2192 <b>"+esc(pyWant(it))+"</b>")+
+      (right?"\u2713 "+esc(pinyinBoth(it.a,it.tone))
+            :"\u2717 \u2192 <b>"+esc(pinyinMark(it.a,it.tone))+"</b> \u00b7 type <b>"+esc(pyWant(it))+"</b>")+
       '<br>'+esc(it.m);
   }
   else if(it.k==="bd"){
@@ -1304,7 +1307,7 @@ function grade(forced){
       ? '<b style="font-size:20px;line-height:1.6">'+esc(it.word||"")+'</b>'+
         (right?"":'<br>You put: '+(esc(got.join(""))||"nothing"))
       : '<b style="font-size:34px">'+esc(it.h)+'</b><br>'+esc(it.word||"")+
-        ' \u00b7 '+esc(it.a)+(it.tone||"")+(it.m?'<br>'+esc(it.m):"")+
+        ' \u00b7 '+esc(pinyinBoth(it.a,it.tone))+(it.m?'<br>'+esc(it.m):"")+
         (right?"":'<br>You put: '+(esc(got.join(""))||"nothing"));
   }
   else if(it.k==="math"){

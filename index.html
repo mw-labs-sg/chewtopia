@@ -593,6 +593,9 @@
   .psay{display:block;font-family:'Noto Sans SC',serif;font-size:17px;font-weight:700;
     color:var(--tang);margin-top:3px;line-height:1.3}
   .pm{display:block;font-size:13px;color:var(--soft);margin-top:2px}
+  /* the book's spelling first, the typed one after it and quieter */
+  .pm b{font-size:15px;color:var(--ink);font-weight:700;letter-spacing:.01em}
+  .pnum{opacity:.65;font-size:12px}
   .pspk{position:absolute;top:14px;right:8px;font-size:17px;opacity:.55}
   .hzh{font-size:10px;letter-spacing:.04em;font-weight:800;color:var(--soft);
     text-align:center;padding-bottom:2px}
@@ -699,7 +702,7 @@ body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;-
   </header>
   <nav class="tabs" id="tabs" aria-label="Sections"></nav>
   <main id="view" tabindex="-1"></main>
-  <p class="foot">Saved on this device · build 100</p>
+  <p class="foot">Saved on this device · build 101</p>
 </div>
 <!-- load order matters: data, then core, then screens, app last -->
 <!-- Pinned to an exact version with a hash to match: "@2" floats, so a bad
@@ -710,9 +713,9 @@ body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;-
         integrity="sha384-l8ah+VgaWtk1mvOe9VC+OirC6qHFF4yH7l7mKRidV9MSti3E9F463bMp6ZVN4kuC"
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="data.js?v=31"></script>
-<script src="core.js?v=46"></script>
+<script src="core.js?v=47"></script>
 <script src="timetable.js?v=6"></script>
-<script src="training.js?v=48"></script>
+<script src="training.js?v=49"></script>
 <script src="app.js?v=79"></script>
 </body>
 </html>

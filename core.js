@@ -754,6 +754,46 @@ function praise(cn, streak){
 function oops(cn){ return cn ? {t:pick(OOPS_CN), lang:"zh-CN"} : {t:pick(OOPS_EN), lang:null}; }
 
 /* ---------- weak items: everything missed, kept per child ---------- */
+/* ==========================================================================
+   PINYIN WITH ITS TONE MARK
+   The banks store the tone as a trailing digit, because that is how the school
+   writes it and how he types it. shou4 is not wrong, but it is not what the
+   book prints either \u2014 the book prints sh\u00f2u, and the mark belongs on one
+   particular letter.
+
+   Where it goes is settled, not a matter of taste:
+     an "a" always takes it        h\u01ceo, ku\u00e0i, ji\u0101ng
+     otherwise an "o" or an "e"    sh\u00f2u, xu\u00e9, w\u01d2   (o and e never share a syllable)
+     otherwise the last vowel      ji\u00f9, gu\u00ec, q\u00f9
+   That last rule is the one people get wrong: in "iu" it is the u, in "ui" it
+   is the i, because the mark follows whichever vowel comes second.
+   ========================================================================== */
+var TONED={
+  a:"\u0101\u00e1\u01ce\u00e0", o:"\u014d\u00f3\u01d2\u00f2", e:"\u0113\u00e9\u011b\u00e8",
+  i:"\u012b\u00ed\u01d0\u00ec", u:"\u016b\u00fa\u01d4\u00f9", "\u00fc":"\u01d6\u01d8\u01da\u01dc"
+};
+function pinyinMark(a, tone){
+  var w=String(a==null?"":a), t=String(tone==null?"":tone);
+  /* no tone recorded, or a whole phrase with one tone between them all: leave
+     it alone rather than guess which syllable the mark belongs to */
+  if(!/^[1-4]$/.test(t) || /\s/.test(w)) return w;
+  var i, at=-1;
+  if((i=w.indexOf("a"))>=0) at=i;
+  else if((i=w.indexOf("o"))>=0) at=i;
+  else if((i=w.indexOf("e"))>=0) at=i;
+  else { for(i=w.length-1;i>=0;i--){ if("iu\u00fcv".indexOf(w.charAt(i))>=0){ at=i; break; } } }
+  if(at<0) return w;                       /* no vowel to put it on */
+  var ch=w.charAt(at); if(ch==="v") ch="\u00fc";
+  var set=TONED[ch];
+  if(!set) return w;
+  return w.slice(0,at)+set.charAt(+t-1)+w.slice(at+1);
+}
+/* The book's spelling and the one he types, together: sh\u00f2u \u00b7 shou4 */
+function pinyinBoth(a, tone){
+  var m=pinyinMark(a,tone), plain=String(a||"")+String(tone||"");
+  return m===String(a||"") ? plain : m+" \u00b7 "+plain;
+}
+
 function weakKey(it){ return it.k+"|"+(it.h||it.a||it.q||it.s||""); }
 /* The question, without whatever the screen decorated it with last time. */
 function bareItem(it){
