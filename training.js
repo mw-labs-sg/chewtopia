@@ -94,22 +94,19 @@ function tColumn(kid, subj){
     });
   }
   else if(subj==="zh"){
-    var bank = kid==="tc" ? TC_PINYIN : SC_TINGXIE;
-    if(Object.keys(bank).length){
-      /* TC has two Chinese sections and needs them labelled. SC has only 听写,
-         so the tag said nothing and pushed his column out of line with English. */
-      if(kid==="tc") out+='<div class="mxtag">\u6c49\u8bed\u62fc\u97f3 \u00b7 \u8bcd\u8868</div><div class="zhwrap">';
-      Object.keys(bank).forEach(function(k){
-        out+=tCell(kid, "zh|"+k, k, k, bank[k].length+" words");
+    /* SC's 听写 word lists. TC's 词表 boxes came off the top of this column:
+       "Lesson 12", "复习 12 字" and "第十二课 词表" were three overlapping takes on
+       the same lesson, and the 生字表 below covers those characters lesson by
+       lesson anyway. TC_PINYIN stays in data.js — it is still where the tile
+       distractors come from, and the section is four lines to restore. */
+    if(kid!=="tc"){
+      Object.keys(SC_TINGXIE).forEach(function(k){
+        out+=tCell(kid, "zh|"+k, k, k, SC_TINGXIE[k].length+" words");
       });
-      if(kid==="tc") out+='</div>';
     }
     /* 我会认 and 我会写 cover the same lessons, so they go side by side:
        one row per lesson, read it on the left, write it on the right. */
     if(kid==="tc"){
-      /* One row per lesson, three ways the school tests it: read it, write it,
-         then the 听写 sheet where the characters sit inside a sentence.
-         A lesson with no 听写 sheet gets a quiet placeholder, not a dead box. */
       /* Two columns: read it, then write it. The listening column came out \u2014
          only four of the eleven lessons ever had a sheet, so seven rows were a
          dash, and the sentence-gap exercise is not how he practises now.
@@ -840,7 +837,8 @@ function dueCodes(kid){
 function allCodes(kid){
   var out=[];
   if(hasSubj(kid,"en")) Object.keys(kid==="tc"?TC_SPELL:SC_SPELL).forEach(function(k){ out.push((kid==="tc"?"en|":"es|")+k); });
-  Object.keys(kid==="tc"?TC_PINYIN:SC_TINGXIE).forEach(function(k){ out.push("zh|"+k); });
+  /* TC's 词表 lists are off the screen, so they stay out of the daily set too. */
+  if(kid!=="tc") Object.keys(SC_TINGXIE).forEach(function(k){ out.push("zh|"+k); });
   if(kid==="tc") Object.keys(HANZI).forEach(function(k){
     out.push("rn|"+k); out.push("hz|"+k);   /* the sheets are parked: see tColumn */
   });
