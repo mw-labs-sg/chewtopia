@@ -450,11 +450,6 @@ function maName(k){
   for(var i=0;i<MA_SETS.length;i++) if(MA_SETS[i][0]===k) return MA_SETS[i][1];
   return k;
 }
-function maSub(k){
-  for(var i=0;i<MA_SETS.length;i++) if(MA_SETS[i][0]===k) return MA_SETS[i][2];
-  return "";
-}
-
 /* Numbers in words, Singapore style: four hundred and sixty-two. */
 var MA_ONES=["zero","one","two","three","four","five","six","seven","eight","nine","ten",
   "eleven","twelve","thirteen","fourteen","fifteen","sixteen","seventeen","eighteen","nineteen"];
@@ -464,10 +459,6 @@ function numWords(n){
   if(n<100){ var t=Math.floor(n/10), o=n%10; return MA_TENS[t]+(o?"-"+MA_ONES[o]:""); }
   var h=Math.floor(n/100), r=n%100;
   return MA_ONES[h]+" hundred"+(r?" and "+numWords(r):"");
-}
-function ordWord(n){
-  return ["","first","second","third","fourth","fifth","sixth","seventh","eighth","ninth",
-          "tenth","eleventh","twelfth"][n] || (n+"th");
 }
 /* one thirds, one quarters — the plain names a P2 child reads on the page */
 function fracWord(d){
@@ -1086,8 +1077,6 @@ function bdNextGap(it){
   for(var i=0;i<need;i++){ if(!f[i]) return i; }
   return -1;
 }
-function bdCount(){ var f=quiz.bd||[], n=0;
-  for(var i=0;i<f.length;i++){ if(f[i]) n++; } return n; }
 /* What he handed in, gap by gap, with a marker where he left one empty so the
    marking never slides a later answer into an earlier gap's place. */
 function bdAnswer(it){
@@ -1244,7 +1233,14 @@ function wireQuiz(){
   if(t) t.addEventListener("keydown",function(e){ if(e.key==="Enter"&&g){ e.preventDefault(); g.click(); } });
   if(!q.graded){
     if(a && a.type!=="hidden") a.focus();
-    if(it.k!=="math" && it.k!=="rn") setTimeout(function(){ speakIt(it); },250);
+    /* Once per question, not once per draw. render() rebuilds the whole card on
+       every tile tap, so this re-armed itself each time and the word started
+       over mid-sentence — three taps on 借书 meant hearing "借书" cut itself off
+       three times before the cue ever arrived. */
+    if(it.k!=="math" && it.k!=="rn" && q.spoke!==q.i){
+      q.spoke=q.i;
+      setTimeout(function(){ speakIt(it); },250);
+    }
   }
 }
 function speakIt(it){

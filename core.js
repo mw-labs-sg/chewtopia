@@ -252,8 +252,6 @@ function results(){ if(!RES) RES=SJ("results",[]); return RES; }
    a date is worth having, or the box can never say whether it has been done. */
 function readOut(code){ return S("paper:"+code,""); }
 function markReadOut(code){ W("paper:"+code, todayISO()); }
-function resultsDirty(){ RES=null; }
-
 /* Nothing produces hand-marked runs any more — 华文 is typed for both boys.
    An unmarked run has no real score, and lastFor() was showing it as 0, so any
    left over from the handwriting days are dropped rather than counted. */
@@ -474,7 +472,6 @@ function tombs(){ return SJ("struck",{}); }
 function strike(key, id){
   var t=tombs(); (t[key]=t[key]||{})[id]=Date.now(); WJ("struck", t);
 }
-function struckOff(key, id){ var t=tombs()[key]; return !!(t && t[id]); }
 /* Anything struck off, taken back out after every merge. */
 function dropStruck(){
   var t=tombs();
@@ -520,10 +517,12 @@ function uniq(a){
   return out;
 }
 /* The state table is optional: scores live in their own table and sync without
-   it. So a failure here is a setup gap, not a broken sync, and has to read
-   differently from one \u2014 and it has to repeat what the server actually said,
-   because "could not be read" covers a missing table, a missing policy and a
-   dropped connection, which want three different fixes. */
+   it, so a failure here is a setup gap rather than a broken sync.
+   "stateerr" is written but nothing shows it any more \u2014 the panel was cut back
+   to saying only whether the scores synced. It is left as a breadcrumb: when
+   the books and events are not travelling between devices, localStorage
+   chew:stateerr holds the server's own words for why, which is the difference
+   between a missing table and a missing policy. */
 function pullState(done){
   var c=sbc();
   if(!c||!cloudUser) return done("", false);
@@ -554,8 +553,6 @@ function pullState(done){
   }, function(e){ W("stateerr", (e&&e.message)||"no connection");
                   done(", the rest could not be reached", false); });
 }
-/* What the server said about the state table last time, verbatim. */
-function stateErr(){ return S("stateerr",""); }
 function pushState(done){
   var c=sbc();
   if(!c||!cloudUser) return done("");
@@ -610,18 +607,6 @@ function lastFor(t,kid){ var a=runsFor(kid).filter(function(r){ return r.test===
 function bestFor(t,kid){ var a=runsFor(kid).filter(function(r){ return r.test===t; });
   return a.length ? a.reduce(function(x,y){ return y.score>x.score?y:x; },a[0]) : null; }
 
-/* Last score, plus the score to beat when there is a better one on record. */
-function pill(t,kid){
-  var l=lastFor(t,kid);
-  if(!l) return '<span class="pills"><span class="pill">Not tried</span></span>';
-  var p=Math.round(l.score/l.total*100), c=p>=80?"good":p>=50?"mid":"low";
-  var s='<span class="pills"><span class="pill '+c+'">'+l.score+'/'+l.total+'</span>';
-  var b=bestFor(t,kid);
-  if(b && b.score>l.score) s+='<span class="pill beat">Beat '+b.score+'</span>';
-  else if(l.score===l.total) s+='<span class="pill beat">\u2605</span>';
-  return s+'</span>';
-}
-
 /* ---------- day streak ---------- */
 /* One a day, any test counts. Missing a single day is forgiven so a sick day
    does not wipe out weeks of work. Two days off and it starts again. */
@@ -664,23 +649,6 @@ function booksSince(w, days){
 
 /* ---------- child pickers ---------- */
 /* Training always needs one child. The timetable can also show both. */
-/* Tapping the child already showing lets you rename them, as the old header did. */
-
-/* A colour key naming both boys, used wherever their colours appear. */
-function kidKey(withAll){
-  var s='<div class="legend">';
-  KIDS.forEach(function(k){ s+='<span class="lg '+whoCls(k.id)+'">'+esc(pname(k.id))+'</span>'; });
-  if(withAll) s+='<span class="lg c-all">Everyone</span>';
-  return s+'</div>';
-}
-
-function streakChip(id){
-  var s=streak(id);
-  if(!s.n) return "";
-  var cold = s.last!==todayISO();
-  return '<span class="strk'+(cold?" cold":"")+'">\uD83D\uDD25 '+s.n+(s.n===1?" day":" days")+'</span>';
-}
-
 /* ---------- sound effects ---------- */
 /* One switch for every noise the app makes, including the reading voice. */
 function snd(){ return S("snd","on")!=="off"; }

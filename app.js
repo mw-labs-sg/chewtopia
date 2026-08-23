@@ -398,10 +398,6 @@ function wRead(){
    Green is full marks, amber is close, red needs work.
    ========================================================================== */
 
-/* Practice runs made straight after a test, fixing the missed ones, are not
-   a fair score of the whole list, so they never reach this screen. */
-function isFixing(r){ return /^Fixing/.test(String(r.test||"")); }
-
 /* Which subject a run belongs to. The code comes first because runs pulled
    back down from the cloud do not carry the subject with them. */
 /* The code the school and the boys actually use, with the plain word under it
@@ -409,21 +405,6 @@ function isFixing(r){ return /^Fixing/.test(String(r.test||"")); }
    and MA; these columns used to say English, 华文 and Maths, which meant the
    app disagreed with itself about what its own subjects are called. */
 var SUBJ_COLS=[["en","EL","English"],["zh","CL","\u534e\u6587"],["ma","MA","Maths"]];
-function runSubject(r){
-  var c=String(r.code||"").split("|")[0];
-  if(c==="en"||c==="es") return "en";
-  if(c==="zh"||c==="hz"||c==="rn") return "zh";
-  if(c==="ma") return "ma";
-  if(c==="weak"||c==="review"||c==="daily") return "rv";
-  if(r.subject==="English") return "en";
-  if(r.subject==="Math") return "ma";
-  if(r.subject==="\u534e\u6587") return "zh";
-  var t=String(r.test||"");
-  if(/^Math/.test(t)) return "ma";
-  if(/^Review/.test(t)) return "rv";
-  if(/[\u4e00-\u9fff]/.test(t)) return "zh";
-  return "en";
-}
 function scoreCls(sc,tot){
   if(!tot) return "none";
   return sc>=tot ? "good" : (sc/tot>=0.7 ? "mid" : "low");
