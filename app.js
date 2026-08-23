@@ -70,9 +70,21 @@ function todayFood(){
    boy, so the eye lands on "when" first and "who" second. Every day is listed,
    including the empty ones, so a quiet week can be seen to be quiet.
    ========================================================================== */
+/* Which entries are a test he actually sits. A day in Upcoming can be a trip,
+   a form to fill, a holiday or a spelling test, and only the last sort needs
+   revising for \u2014 so it gets an outline and the rest do not.
+   e.test set in data.js wins; otherwise it is read off the title, which also
+   catches a "Spelling test" typed straight into the app. Deliberately narrow:
+   "Maths \u2014 Fractions" is revision homework and carries a practice button, so
+   having one is not the signal. */
+function isTest(e){
+  if(e.test!==undefined) return !!e.test;
+  return /\btests?\b|\bspelling\b|\u542c\u5199|\u9ed8\u5199|\u8003\u8bd5/i.test(String(e.t||""));
+}
 function evCard(e){
   var st=evState(e);
-  return '<div class="evc e-'+(e.w||"all")+(st.live?" live":"")+(e.hol?" hol":"")+'">'+
+  return '<div class="evc e-'+(e.w||"all")+(st.live?" live":"")+(e.hol?" hol":"")+
+    (isTest(e)&&!e.hol?" tst":"")+'">'+
     '<span class="evt">'+esc(e.t)+'</span>'+
     '<span class="evw">'+(st.live?(e.d2?"On now":"Today"):evWhen(e))+
       (e.time?' \u00b7 '+e.time:'')+

@@ -385,6 +385,13 @@
   .evc.e-sc{background:#FFF6EC}
   .evc.e-all{background:#F5F3FE}
   .evc.live{box-shadow:0 0 0 2px var(--sun) inset}
+  /* a test he sits, outlined in his own colour so it is picked out of a column
+     of trips, forms and reminders without reading a word. An outline rather
+     than a border, so nothing shifts, and it does not fight .live's shadow. */
+  .evc.tst{outline:2.5px solid var(--grape);outline-offset:-2.5px}
+  .evc.tst.e-tc{outline-color:var(--blue)}
+  .evc.tst.e-sc{outline-color:var(--tang)}
+  .evc.tst .evt{font-weight:800}
   /* a day off — public holiday or school holiday. Red, so the days with no
      school jump out of the column before anything else does. */
   .evc.hol{background:#FFE3DC;box-shadow:inset 3px 0 0 #FF6F52}
@@ -671,7 +678,7 @@ body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;-
   </header>
   <nav class="tabs" id="tabs" aria-label="Sections"></nav>
   <main id="view" tabindex="-1"></main>
-  <p class="foot">Saved on this device · build 96</p>
+  <p class="foot">Saved on this device · build 97</p>
 </div>
 <!-- load order matters: data, then core, then screens, app last -->
 <!-- Pinned to an exact version with a hash to match: "@2" floats, so a bad
@@ -685,6 +692,6 @@ body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;-
 <script src="core.js?v=45"></script>
 <script src="timetable.js?v=6"></script>
 <script src="training.js?v=46"></script>
-<script src="app.js?v=78"></script>
+<script src="app.js?v=79"></script>
 </body>
 </html>
