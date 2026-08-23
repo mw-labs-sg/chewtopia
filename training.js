@@ -155,6 +155,7 @@ function dailyBtn(kid){
      eight questions short of ten. Counting the real thing costs nothing and
      the button stops lying. */
   var set=buildDaily(kid), tally={}, bits=[];
+  var name=esc(pname(kid));
   set.forEach(function(x){ tally[x.from]=(tally[x.from]||0)+1; });
   if(tally.due)     bits.push(tally.due+" from it");
   if(tally.weak)    bits.push(tally.weak+" he keeps missing");
@@ -163,6 +164,7 @@ function dailyBtn(kid){
   if(!set.length) return "";
 
   return '<button class="daily k-'+kid+'" data-t="daily" data-kid="'+kid+'">'+
+    '<span class="dwho">'+name+'</span>'+
     '<span class="dl">'+title+(when?' <i>'+esc(when)+'</i>':'')+'</span>'+
     '<span class="dm">'+set.length+(set.length===1?" question":" questions")+
       (bits.length?' \u00b7 '+esc(bits.join(", ")):'')+'</span></button>';
@@ -177,7 +179,19 @@ function vTests(){
      tests it was only ever found after the fact. */
   var s=syncPanel();
 
-  s+='<div class="panel"><h2><span class="em">📝</span> Training</h2>'+
+  /* What each boy is doing today, both of them, above the TC/SC switch. It sat
+     inside the switch before, so whichever boy you were not looking at had
+     nothing coming up as far as the screen was concerned — and on a morning
+     when you want to know what is due for both, that is the one question the
+     screen would not answer without a tap. */
+  var due=KIDS.map(function(k){ return dailyBtn(k.id); }).filter(Boolean);
+  if(due.length){
+    s+='<div class="panel"><h2><span class="em">\u23F1\uFE0F</span> Today'+
+       '<span class="side">ten minutes each</span></h2>'+
+       '<div class="todayrow">'+due.join("")+'</div></div>';
+  }
+
+  s+='<div class="panel"><h2><span class="em">\uD83D\uDCDD</span> Training</h2>'+
         '<div class="mxkey"><span><span class="dot" style="background:#C3D2DF"></span> '+
           '<b>not tried</b></span>'+
           '<span><span class="dot" style="background:#4FB86B"></span> <b>full marks</b></span>'+
@@ -192,7 +206,6 @@ function vTests(){
     if(!cols.length) return;
     var wk=weakTop(k.id, 12);
     s+='<div class="kidbox">'+
-       dailyBtn(k.id)+
        (wk.length?'<button class="fixbtn" data-t="weak" data-kid="'+k.id+'">'+
          '<span class="nm">Practise the '+wk.length+' he keeps missing</span>'+
          '<span class="mt">'+esc(wk.slice(0,4).map(weakLabel).join(", "))+
@@ -208,19 +221,17 @@ function vTests(){
   if(tKid()==="tc") s+=paperPanel();
   s+=weakPanel(tKid());
 
-  /* The voices the tests are read in. The picker was written and then never
-     given a home, so bestVoice() always took whatever came first and the
-     setting it reads was never written by anything. */
-  s+='<div class="panel"><h2><span class="em">\uD83D\uDD0A</span> Voices'+
-     '<span class="side">this device</span></h2>';
+  /* No voice picker. The ranking in bestVoice() already knows which is the good
+     one — a modern neural voice, a woman, the right accent, and never one of
+     the old SAPI ones — so choosing was a setting that only ever made things
+     worse. The one thing worth saying is when there is no Mandarin voice at
+     all, because then the Chinese tests are silent and that looks like a bug. */
   if(!bestVoice("zh-CN")){
-    s+='<p class="warn">This device has no Mandarin voice, so the Chinese tests stay '+
-       'silent rather than being read out in an English accent. On an iPad: Settings '+
-       '\u2192 Accessibility \u2192 Spoken Content \u2192 Voices \u2192 Chinese (Mandarin).</p>';
+    s+='<div class="panel"><p class="warn" style="margin:0">This device has no '+
+       'Mandarin voice, so the Chinese tests stay silent rather than being read out '+
+       'in an English accent. On an iPad: Settings \u2192 Accessibility \u2192 Spoken '+
+       'Content \u2192 Voices \u2192 Chinese (Mandarin).</p></div>';
   }
-  s+=voiceBox("en-GB")+voiceBox("zh-CN")+
-     '<div class="key">Pick one and it reads a line back so you can hear it. '+
-     '\u2728 marks the modern voices, which sound far more like a person.</div></div>';
   return s;
 }
 
@@ -256,7 +267,6 @@ function wKidBar(){
 function wTests(){
   wKidBar();
   wResults();          /* the sync buttons now live on this screen */
-  wireVoices();
   document.querySelectorAll("[data-weakgo]").forEach(function(b){
     b.onclick=function(e){
       e.stopPropagation();

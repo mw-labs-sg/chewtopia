@@ -960,12 +960,12 @@ function langVoices(lang){
     return ye-xe;
   });
 }
-function bestVoice(lang){
-  var saved=S("voice:"+lang,"");
-  var hit=voices.filter(function(v){ return v.name===saved; })[0];
-  if(hit) return hit;
-  return langVoices(lang)[0] || null;
-}
+/* The top of the ranking, always. There used to be a picker whose choice was
+   read here, but choosing by hand only ever landed on a worse voice than the
+   ranking would: it already puts a modern neural voice first, prefers a woman,
+   prefers the accent they hear at school, and pushes the old SAPI voices and
+   the Cantonese and Taiwan ones to the bottom. */
+function bestVoice(lang){ return langVoices(lang)[0] || null; }
 /* Chinese read too slowly turns to mush and loses its tones, so it never
    drops below this however slow the English is set. */
 function say(t,rate,lang){
@@ -988,27 +988,4 @@ function sayLater(fn, ms){ sayTimers.push(setTimeout(fn, ms)); }
 function hush(){
   sayTimers.forEach(clearTimeout); sayTimers=[];
   try{ speechSynthesis.cancel(); }catch(e){}
-}
-function voiceBox(lang){
-  var o=langVoices(lang);
-  var label = lang==="zh-CN" ? "Chinese voice" : "English voice";
-  if(!o.length) return '<div class="lbl">'+label+'</div>'+
-    '<p class="empty">No '+(lang==="zh-CN"?"Chinese":"English")+' voice installed on this device.</p>';
-  var cur=bestVoice(lang);
-  var h='<div class="lbl">'+label+'</div><select data-voice="'+lang+'">';
-  o.forEach(function(v){
-    var tag = NEURAL.test(v.name) ? "  ✨" : OLD.test(v.name) ? "  (old)" : "";
-    h+='<option value="'+esc(v.name)+'"'+((cur&&v.name===cur.name)?" selected":"")+'>'+
-       esc(v.name)+tag+'</option>';
-  });
-  return h+'</select>';
-}
-function wireVoices(){
-  document.querySelectorAll("[data-voice]").forEach(function(sel){
-    sel.onchange=function(){
-      var lg=sel.dataset.voice;
-      W("voice:"+lg, sel.value);
-      say(lg==="zh-CN" ? "你好，我是老师。" : "Hello. I am your teacher.", 0.85, lg);
-    };
-  });
 }

@@ -515,13 +515,20 @@
   .mxcol > .mxtag:first-child{margin-top:0}
   .mxcols.two{grid-template-columns:repeat(2,1fr)}
   /* one start button per boy, in his own colour and nothing else */
+  /* both boys side by side on a wide screen, stacked on a phone */
+  .todayrow{display:grid;grid-template-columns:1fr;gap:9px}
+  @media(min-width:620px){ .todayrow{grid-template-columns:1fr 1fr} }
   .daily{display:block;width:100%;border:none;font-family:inherit;text-align:left;
-    cursor:pointer;border-radius:14px;padding:12px 14px;margin-bottom:8px;color:#fff}
+    cursor:pointer;border-radius:14px;padding:12px 14px;color:#fff}
+  .todayrow .daily{margin-bottom:0;height:100%}
   .daily.k-tc{background:var(--blue)}
   .daily.k-sc{background:var(--tang)}
-  .daily .dl{display:block;font-size:16px;font-weight:800}
+  /* whose ten minutes this is, since both are on screen at once now */
+  .daily .dwho{display:block;font-size:11px;font-weight:800;letter-spacing:.09em;
+    text-transform:uppercase;opacity:.82;margin-bottom:2px}
+  .daily .dl{display:block;font-size:16px;font-weight:800;line-height:1.25}
   .daily .dl i{font-style:normal;font-size:12px;font-weight:700;opacity:.85}
-  .daily .dm{display:block;font-size:12px;font-weight:600;opacity:.88;margin-top:1px}
+  .daily .dm{display:block;font-size:12px;font-weight:600;opacity:.88;margin-top:2px}
   .daily:active{transform:translateY(1px)}
   /* the mistakes button: plain, quiet, no third colour in the column */
   .fixbtn{display:block;width:100%;border:none;font-family:inherit;text-align:left;
@@ -664,7 +671,7 @@ body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;-
   </header>
   <nav class="tabs" id="tabs" aria-label="Sections"></nav>
   <main id="view" tabindex="-1"></main>
-  <p class="foot">Saved on this device · build 95</p>
+  <p class="foot">Saved on this device · build 96</p>
 </div>
 <!-- load order matters: data, then core, then screens, app last -->
 <!-- Pinned to an exact version with a hash to match: "@2" floats, so a bad
@@ -675,9 +682,9 @@ body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;-
         integrity="sha384-l8ah+VgaWtk1mvOe9VC+OirC6qHFF4yH7l7mKRidV9MSti3E9F463bMp6ZVN4kuC"
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="data.js?v=31"></script>
-<script src="core.js?v=44"></script>
+<script src="core.js?v=45"></script>
 <script src="timetable.js?v=6"></script>
-<script src="training.js?v=45"></script>
+<script src="training.js?v=46"></script>
 <script src="app.js?v=78"></script>
 </body>
 </html>
