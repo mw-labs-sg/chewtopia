@@ -711,36 +711,45 @@ var SCHOOL_LINKS = [
    levels each CCA takes, and when any of them meet. The school sends that out
    itself. The four groups are the usual MOE headings and are our own tidying
    up - the listing itself is one flat list of twenty.
-   g: "b" boys only, "g" girls only, "" open to both.
+
+   g   : "b" boys only, "g" girls only, "" open to both.
+   dsa : which of MOE's seven DSA-Sec talent categories it sits in. Every one
+         of them sits in one - the CCA is never what opens the door, the
+         standard reached in it is. moe.gov.sg/secondary/dsa
+   ri  : the matching talent area at Raffles Institution, named exactly as RI
+         names it, or "" where RI has none. RI publishes its list only while
+         the exercise is open, so this is the last one it ran, off its own
+         AskGov answers: ask.gov.sg/ri
+   no  : 1 where RI says outright that it does NOT take DSA in this area.
    ========================================================================== */
 var NYPS_CCA = [
   {h:"Sports", em:"\uD83C\uDFC3", cca:[
-    {t:"Artistic Gymnastics", g:"g"},
-    {t:"Badminton",           g:""},
-    {t:"Basketball",          g:""},
-    {t:"Football",            g:"b"},
-    {t:"Table Tennis",        g:""},
-    {t:"Tennis",              g:""},
-    {t:"Track and Field",     g:""},
-    {t:"Wushu",               g:""}
+    {t:"Artistic Gymnastics", g:"g", dsa:"Sports and games", ri:""},
+    {t:"Badminton",           g:"",  dsa:"Sports and games", ri:"Badminton"},
+    {t:"Basketball",          g:"",  dsa:"Sports and games", ri:"Basketball"},
+    {t:"Football",            g:"b", dsa:"Sports and games", ri:"", no:1},
+    {t:"Table Tennis",        g:"",  dsa:"Sports and games", ri:"Table Tennis"},
+    {t:"Tennis",              g:"",  dsa:"Sports and games", ri:"Tennis"},
+    {t:"Track and Field",     g:"",  dsa:"Sports and games", ri:"Track and Field"},
+    {t:"Wushu",               g:"",  dsa:"Sports and games", ri:""}
   ]},
   {h:"Visual and performing arts", em:"\uD83C\uDFB5", cca:[
-    {t:"Art and Crafts",                         g:""},
-    {t:"Chinese Calligraphy and Brush Painting", g:""},
-    {t:"Chinese Dance",                          g:"g"},
-    {t:"Chinese Orchestra",                      g:""},
-    {t:"Choir",                                  g:"b"},
-    {t:"String Ensemble",                        g:""}
+    {t:"Art and Crafts",                         g:"",  dsa:"Visual, literary and performing arts", ri:"Visual Arts"},
+    {t:"Chinese Calligraphy and Brush Painting", g:"",  dsa:"Visual, literary and performing arts", ri:""},
+    {t:"Chinese Dance",                          g:"g", dsa:"Visual, literary and performing arts", ri:"", no:1},
+    {t:"Chinese Orchestra",                      g:"",  dsa:"Visual, literary and performing arts", ri:"Chinese Orchestra"},
+    {t:"Choir",                                  g:"b", dsa:"Visual, literary and performing arts", ri:"Choir"},
+    {t:"String Ensemble",                        g:"",  dsa:"Visual, literary and performing arts", ri:"String Ensemble"}
   ]},
   {h:"Clubs and societies", em:"\u265F\uFE0F", cca:[
-    {t:"International Chess", g:""},
-    {t:"Robotics",            g:""}
+    {t:"International Chess", g:"", dsa:"Sports and games",                   ri:"", no:1},
+    {t:"Robotics",            g:"", dsa:"Science, mathematics and engineering", ri:"", no:1}
   ]},
   {h:"Uniformed groups", em:"\uD83E\uDDE2", cca:[
-    {t:"Boys\u2019 Brigade",     g:"b"},
-    {t:"Girl Guides (Brownies)", g:"g"},
-    {t:"Girls\u2019 Brigade",    g:"g"},
-    {t:"Scouts",                 g:""}
+    {t:"Boys\u2019 Brigade",         g:"b", dsa:"Uniformed groups", ri:"Leadership & Character"},
+    {t:"Girl Guides (Brownies)", g:"g", dsa:"Uniformed groups", ri:"Leadership & Character"},
+    {t:"Girls\u2019 Brigade",        g:"g", dsa:"Uniformed groups", ri:"Leadership & Character"},
+    {t:"Scouts",                 g:"",  dsa:"Uniformed groups", ri:"Leadership & Character"}
   ]}
 ];
 
@@ -801,6 +810,118 @@ var PSLE_NOTES = [
   ["Same score, one seat",
    "Citizenship first (citizens, then PRs, then international students), then "+
    "who put the school higher on their list, and only then a ballot."]
+];
+
+/* ==========================================================================
+   SECONDARY SCHOOLS - a shortlist, with what it took to get in last round.
+
+   There is no ranking to show. MOE stopped ranking secondary schools in 2012
+   and has not published one since, so anything calling itself a league table
+   is somebody's guess dressed up. What MOE does publish is the indicative
+   PSLE score range each school actually took, and that is what is here, off
+   each school's own page on moe.gov.sg/schoolfinder. MOE says on those pages
+   that the ranges move year to year with the cohort and with who applied, so
+   read them as last year's weather, not next year's.
+
+   The shortlist is boys' and co-ed schools a Nanyang Primary boy with 高级华文
+   would look at - the SAP and Integrated Programme ones. It is not every
+   school, and a school missing from it is not a school ruled out.
+
+   (D) and (M) are the Higher Chinese grade that came with that score:
+   Distinction and Merit. Where a range carries one, the score alone was not
+   enough - the 华文 grade was part of the cut.
+
+   s   : what the school is - IP, SAP, both, or neither.
+   pg  : the ranges, most demanding posting group first.
+   aff : an affiliated primary, which lowers the bar for its own children.
+   ========================================================================== */
+var SEC_SCHOOLS = [
+  {t:"Raffles Institution", w:"Boys", s:"Integrated Programme",
+   pg:[["PG3","4 to 6"]], aff:""},
+  {t:"Hwa Chong Institution", w:"Boys", s:"IP \u00b7 SAP",
+   pg:[["PG3","4(D) to 6(M)"]], aff:""},
+  {t:"Catholic High School", w:"Boys", s:"IP \u00b7 SAP",
+   pg:[["PG3","4(D) to 7(M)"],["PG2","6(D) to 8(M)"]],
+   aff:"Catholic High School (Primary)"},
+  {t:"Dunman High School", w:"Co-ed", s:"IP \u00b7 SAP",
+   pg:[["PG3","4(D) to 8(M)"]], aff:""},
+  {t:"National Junior College", w:"Co-ed", s:"Integrated Programme",
+   pg:[["IP","5 to 8"]], aff:""},
+  {t:"Victoria School", w:"Boys", s:"Integrated Programme",
+   pg:[["IP","5 to 8"],["PG3","6 to 9"]], aff:""},
+  {t:"River Valley High School", w:"Co-ed", s:"IP \u00b7 SAP",
+   pg:[["PG3","4(M) to 9(M)"]], aff:""},
+  {t:"Maris Stella High School", w:"Boys", s:"SAP",
+   pg:[["PG3","4(M) to 16"],["PG3","7(M) to 12"]],
+   aff:"Maris Stella High School (Primary)"},
+  {t:"NUS High School of Math and Science", w:"Co-ed", s:"Through-train \u00b7 DSA only",
+   pg:[["\u2014","no S1 posting at all"]], aff:""}
+];
+
+/* The things that decide it, none of which is a ranking. Written out because
+   the first is the one that catches Nanyang parents of boys by surprise. */
+var SEC_NOTES = [
+  ["Nanyang gives our two no affiliation",
+   "Nanyang Primary's affiliated secondary is Nanyang Girls' High, and it takes "+
+   "girls. So neither boy inherits a place anywhere. The score and DSA are the "+
+   "only two doors, which is worth knowing six years early rather than one."],
+  ["高级华文 is doing work in that table",
+   "Every (D) and (M) above is a Higher Chinese grade that came with the score. "+
+   "At a SAP school a score of 14 or better plus a HCL grade is a posting "+
+   "advantage, and where two children tie for the last seat the better 华文 "+
+   "grade goes first - before citizenship, before order of choice, before the "+
+   "ballot."],
+  ["DSA is the other door, and it closes early",
+   "Applications go in around May of P6 and results come back in November, "+
+   "before the PSLE result. Take a DSA place and school choices at S1 posting "+
+   "are gone, and so is transferring after results. It is a commitment, not a "+
+   "safety net."],
+  ["Ranges are last year's, not a promise",
+   "MOE republishes them after each posting and says on every school page that "+
+   "they shift with the cohort. Two or three points either way is ordinary."]
+];
+
+/* ==========================================================================
+   PARENT FORUMS - KiasuParents, which is where Singapore parents actually
+   argue about all of the above.
+
+   These are links out, not a feed. Chewtopia has no server and the forum
+   sends no CORS headers, so the app cannot read threads and show them here;
+   pretending otherwise would mean a list that silently went stale. Instead
+   the first two links are the forum's own live views - Recent and Popular -
+   so "latest" is one tap away and always actually latest.
+
+   live:1 marks the two that are already a newest-first list.
+   ========================================================================== */
+var FORUM_LINKS = [
+  {id:"kp-recent", t:"Latest posts", s:"Everything on the forum, newest first.",
+   u:"https://forum.kiasuparents.com/recent", k:"hot", live:1},
+  {id:"kp-popular", t:"Most active", s:"What the forum is actually arguing about this week.",
+   u:"https://forum.kiasuparents.com/popular", k:"hot", live:1},
+  {id:"kp-sec", t:"Secondary schools — selection",
+   s:"Cut-off points, DSA, and what a PSLE score is worth where.",
+   u:"https://forum.kiasuparents.com/category/48/secondary-schools-selection", k:"sec"},
+  {id:"kp-pri-ac", t:"Primary schools — academic support",
+   s:"Schoolwork, exams, tuition and learning gaps, P1 to P6.",
+   u:"https://forum.kiasuparents.com/category/27/primary-schools-academic-support", k:"pri"},
+  {id:"kp-pri-net", t:"Primary schools — parent networking",
+   s:"Parents from the same school. Nanyang has its own long-running thread.",
+   u:"https://forum.kiasuparents.com/category/38/primary-schools-parent-networking-groups", k:"pri"},
+  {id:"kp-pri-reg", t:"Primary One — selection and registration",
+   s:"Phases, balloting and choosing. SC is through this; it still runs every year.",
+   u:"https://forum.kiasuparents.com/category/5/primary-schools-selection-registration", k:"pri"},
+  {id:"kp-sport", t:"Sports, fitness and athletics",
+   s:"Which clubs and coaches, and what a CCA standard actually looks like.",
+   u:"https://forum.kiasuparents.com/category/15/sports-fitness-athletics", k:"cca"},
+  {id:"kp-music", t:"Music, dance, speech and drama",
+   s:"The other half of the CCA and DSA conversation.",
+   u:"https://forum.kiasuparents.com/category/12/music-singing-dancing-speech-drama", k:"cca"},
+  {id:"kp-enrich", t:"Academic learning and enrichment",
+   s:"Home learning, enrichment and tutors, with the usual sales pitches mixed in.",
+   u:"https://forum.kiasuparents.com/category/70/academic-learning-enrichment", k:"cca"},
+  {id:"kp-nyps", t:"Search: Nanyang Primary",
+   s:"Every thread with Nanyang Primary in the title, newest first.",
+   u:"https://forum.kiasuparents.com/search?term=nanyang%20primary&in=titles", k:"sec"}
 ];
 
 var SEED_ACTS = [

@@ -38,8 +38,10 @@ function render(){
   var v=document.getElementById("view");
   if(quiz){ v.innerHTML=quizHTML(); wireQuiz(); return; }
   if(paper){ v.innerHTML=paperHTML(); wirePaper(); return; }
-  var V={home:vHome,schedule:vWeek,meals:vMeals,practice:vTests,reading:vRead,links:vLinks};
-  var Wr={home:wHome,schedule:wWeek,meals:wMeals,practice:wTests,reading:wRead,links:wLinks};
+  var V={home:vHome,schedule:vWeek,meals:vMeals,forums:vForums,
+         practice:vTests,reading:vRead,links:vLinks};
+  var Wr={home:wHome,schedule:wWeek,meals:wMeals,forums:wForums,
+          practice:wTests,reading:wRead,links:wLinks};
   /* the child switch belongs inside the first panel, under its heading */
   var html=V[tab]();
   if(tab==="home"||tab==="schedule") html=html.replace("</h2>", "</h2>"+whoBar());
@@ -167,15 +169,24 @@ function vCCA(){
     s+='<div class="ccag"><h3><span class="em">'+x.em+'</span>'+esc(x.h)+'</h3>';
     x.cca.forEach(function(c){
       var shut = c.g==="g";   /* girls only - neither of ours can join */
-      s+='<span class="cca'+(shut?" shut":"")+'">'+esc(c.t)+
-         (c.g?'<i>'+(c.g==="b"?"boys":"girls")+'</i>':'')+'</span>';
+      s+='<span class="cca'+(shut?" shut":"")+'">'+
+         '<b>'+esc(c.t)+(c.g?'<i>'+(c.g==="b"?"boys":"girls")+'</i>':'')+'</b>'+
+         '<u>'+esc(c.dsa||"")+
+           (c.ri ? '<em class="yes">RI: '+esc(c.ri)+'</em>'
+                 : c.no ? '<em class="nope">not at RI</em>'
+                        : '<em>no RI area</em>')+
+         '</u></span>';
     });
     s+='</div>';
   });
-  s+='</div><div class="key">From MOE\u2019s school listing. It names the CCAs and '+
-     'who each one takes, but not which levels they start at or when they meet '+
-     '\u2014 the school sends that out itself.</div></div>';
-  return s+vPSLE();
+  s+='</div><div class="key">Names and who each takes are from MOE\u2019s school '+
+     'listing \u2014 it does not say which levels they start at or when they meet. '+
+     'The grey line under each is its DSA-Sec talent category, then whether '+
+     'Raffles takes DSA in it: every CCA sits in some category, so what opens '+
+     'the door is the standard reached, never the membership. RI publishes its '+
+     'talent areas only while the exercise is open, so those are from the last '+
+     'one it ran.</div></div>';
+  return s+vSchools()+vPSLE();
 }
 
 /* Neither boy is anywhere near sitting it - TC is P2 - but the CCA choice, the
@@ -217,6 +228,67 @@ function vPSLE(){
      'secondary-one posting pages. Rules change \u2014 check them again nearer '+
      'the time rather than trusting this screen.</div></div>';
   return s;
+}
+
+function vSchools(){
+  var sc = (typeof SEC_SCHOOLS!=="undefined" ? SEC_SCHOOLS : []);
+  var nt = (typeof SEC_NOTES!=="undefined" ? SEC_NOTES : []);
+  if(!sc.length) return "";
+  var s='<div class="panel"><h2><span class="em">\uD83C\uDF93</span> Secondary schools'+
+        '<span class="side">what each took last round</span></h2>'+
+        '<p class="pnote" style="margin:0 0 12px">There is no ranking here because '+
+        'there is no ranking to show \u2014 MOE stopped publishing one in 2012. These '+
+        'are the indicative PSLE score ranges each school actually took, which is '+
+        'the nearest honest thing to it.</p><div class="schs">';
+  sc.forEach(function(c){
+    s+='<div class="sch"><span class="scht">'+esc(c.t)+'</span>'+
+       '<span class="schm">'+esc(c.w)+' \u00b7 '+esc(c.s)+'</span><span class="schr">';
+    c.pg.forEach(function(r){
+      s+='<span class="schb"><i>'+esc(r[0])+'</i><b>'+esc(r[1])+'</b></span>';
+    });
+    s+='</span>'+(c.aff?'<span class="schaf">Affiliated: '+esc(c.aff)+'</span>':'')+'</div>';
+  });
+  s+='</div><div class="pnotes">';
+  nt.forEach(function(n){
+    s+='<div class="pn"><b>'+esc(n[0])+'</b><span>'+esc(n[1])+'</span></div>';
+  });
+  s+='</div><div class="key">Every range is off that school\u2019s own page on MOE '+
+     'SchoolFinder, and MOE says on each of them that the ranges move with the '+
+     'cohort. (D) and (M) are the Higher Chinese grade that came with the score. '+
+     'The shortlist is ours, not MOE\u2019s \u2014 a school not on it is not a school '+
+     'ruled out.</div></div>';
+  return s;
+}
+
+/* The forum is somebody else\u2019s live site and Chewtopia has no server, so this
+   cannot be a feed: no CORS headers means the app cannot read a thread even if
+   it wanted to. Links out, then - and the first two are the forum\u2019s own
+   newest-first views, so "latest" stays honestly latest instead of being a
+   list here that quietly rots. */
+function vForums(){
+  var f = (typeof FORUM_LINKS!=="undefined" ? FORUM_LINKS : []);
+  var s='<div class="panel"><h2><span class="em">\uD83D\uDCAC</span> Parent forums'+
+        '<span class="side">opens in a new tab</span></h2><div class="lnks">';
+  f.forEach(function(l){
+    s+='<a class="lnk f-'+esc(l.k)+'" href="'+esc(l.u)+'" target="_blank" rel="noopener noreferrer">'+
+       '<span class="lnt">'+esc(l.t)+(l.live?' <em class="livep">live</em>':'')+'</span>'+
+       '<span class="lns">'+esc(l.s)+'</span>'+
+       '<span class="lnu">'+esc(String(l.u).replace(/^https:\u002f\u002f/,"").replace(/\u002f.*$/,"")) +'</span>'+
+       '<span class="lngo">\u2197</span></a>';
+  });
+  s+='</div><div class="key">KiasuParents is a public forum, not a source. What '+
+     'is on it is other parents talking \u2014 useful for what a school felt like '+
+     'and useless for what a cut-off was. Check anything that matters against '+
+     'MOE or the school itself. Chewtopia cannot pull the threads in: there is '+
+     'no server behind it and the forum sends no CORS headers, so the top two '+
+     'links go to the forum\u2019s own newest-first pages instead of a list here '+
+     'that would go stale.</div></div>';
+  return s;
+}
+function wForums(){
+  document.querySelectorAll(".lnk").forEach(function(a){
+    a.addEventListener("click", function(){ sfxTap(); });
+  });
 }
 
 function wLinks(){
