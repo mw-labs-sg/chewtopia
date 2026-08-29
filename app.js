@@ -183,13 +183,26 @@ function vHome(){
      '<span class="agh"></span>'+
      kids.map(function(k){ return '<span class="agh '+whoCls(k.id)+'">'+esc(pname(k.id))+'</span>'; }).join("");
 
-  function dayRows(list, d, dim){
+  /* The date chip only ever carried the number, so 31 Aug followed by 1 Sept
+     gave nothing to tell you the month had turned over, and the "After that"
+     rows — which are not consecutive days — had no month at all. Print it on
+     the first row and again whenever it changes, forced on for every later row. */
+  var lastMon="";
+  function monCap(d){
+    var y=new Date(d+"T00:00:00").getFullYear();
+    return dmon(d)+(y!==new Date().getFullYear() ? " "+String(y).slice(2) : "");
+  }
+  function dayRows(list, d, forceMon){
     var out="", has=!!(list&&list.length);
+    var mon=d.slice(0,7), turned=(forceMon || mon!==lastMon);
+    lastMon=mon;
     /* a day off colours its own date too, so no-school days can be counted
        down the left edge without reading a word */
     var off = has && list.some(function(e){ return e.hol; });
     out+='<span class="agd'+(d===today?" now":"")+(isWeekend(d)?" we":"")+
-         (off?" off":"")+(has?"":" bare")+'"><b>'+dnum(d)+'</b><i>'+
+         (off?" off":"")+(has?"":" bare")+(turned?" mo":"")+'">'+
+         (turned?'<u'+(monCap(d).length>4?' class="yr"':'')+'>'+esc(monCap(d))+'</u>':'')+
+         '<b>'+dnum(d)+'</b><i>'+
          dday(d).slice(0,3)+'</i></span>';
     kids.forEach(function(k){
       var mine=has ? list.filter(function(e){ return e.w===k.id; }) : [];
@@ -226,7 +239,7 @@ function vHome(){
     s+='<span class="agwk">After that<i>'+
        (restDays?"next 3 of "+laterDays.length:laterDays.length+
          (laterDays.length===1?" day":" days"))+'</i></span>';
-    show.forEach(function(d){ s+=dayRows(byDay[d], d); });
+    show.forEach(function(d){ s+=dayRows(byDay[d], d, true); });
     if(restEvs){
       s+='<span class="agd sp"></span><span class="agc both">'+
          '<p class="empty" style="padding:2px 0">and '+restEvs+' more further out, '+

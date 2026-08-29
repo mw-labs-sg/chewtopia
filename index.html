@@ -361,6 +361,16 @@
   .agd b{font-size:20px;font-weight:800}
   .agd i{font-style:normal;font-size:10.5px;font-weight:700;color:var(--soft);
     text-transform:uppercase;letter-spacing:.04em}
+  /* the month cap, printed only on the row where the month turns over */
+  .agd u{display:block;text-decoration:none;font-size:9.5px;font-weight:800;
+    color:var(--blue);text-transform:uppercase;letter-spacing:.05em;
+    margin-bottom:2px;white-space:nowrap}
+  /* "Sept 27" is two words wide; the 44px chip on a phone needs it smaller */
+  .agd u.yr{font-size:7.5px;letter-spacing:0}
+  .agd.mo{padding-top:5px}
+  .agd.bare.mo{padding-top:2px}
+  .agd.off u{color:#B03A22}
+  .agd.now u{color:rgba(255,255,255,.9)}
   .agd.now{background:var(--ink);color:#fff}
   .agd.now i{color:rgba(255,255,255,.8)}
   .agd.sp{background:transparent}
@@ -689,7 +699,7 @@ body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;-
   </header>
   <nav class="tabs" id="tabs" aria-label="Sections"></nav>
   <main id="view" tabindex="-1"></main>
-  <p class="foot">Saved on this device · build 105</p>
+  <p class="foot">Saved on this device · build 106</p>
 </div>
 <!-- load order matters: data, then core, then screens, app last -->
 <!-- Pinned to an exact version with a hash to match: "@2" floats, so a bad
@@ -703,6 +713,6 @@ body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;-
 <script src="core.js?v=48"></script>
 <script src="timetable.js?v=6"></script>
 <script src="training.js?v=51"></script>
-<script src="app.js?v=80"></script>
+<script src="app.js?v=81"></script>
 </body>
 </html>
