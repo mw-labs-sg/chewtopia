@@ -718,8 +718,6 @@ var SCHOOL_LINKS = [
    inri  : 1 if Raffles runs this as a CCA, so he could carry on doing it
            there. Off RI's own entry on MOE SchoolFinder.
    ridsa : 1 if Raffles takes DSA in an area of exactly this name.
-   via   : where RI's nearest DSA area is called something else. Read it as
-           "the same part of the school", not as a match.
 
    The two are genuinely different and the difference is the useful bit:
    Football and International Chess are both CCAs at RI, and RI says outright
@@ -741,8 +739,8 @@ var NYPS_CCA = [
     {t:"Wushu",               g:"",  dsa:"Sports and games", inri:0, ridsa:0}
   ]},
   {h:"Visual and performing arts", em:"\uD83C\uDFB5", cca:[
-    {t:"Art and Crafts",                         g:"",  dsa:"Visual, literary and performing arts", inri:0, via:"Visual Arts"},
-    {t:"Chinese Calligraphy and Brush Painting", g:"",  dsa:"Visual, literary and performing arts", inri:0, via:"Visual Arts"},
+    {t:"Art and Crafts",                         g:"",  dsa:"Visual, literary and performing arts", inri:0, ridsa:0},
+    {t:"Chinese Calligraphy and Brush Painting", g:"",  dsa:"Visual, literary and performing arts", inri:0, ridsa:0},
     {t:"Chinese Dance",                          g:"g", dsa:"Visual, literary and performing arts", inri:0, ridsa:0},
     {t:"Chinese Orchestra",                      g:"",  dsa:"Visual, literary and performing arts", inri:1, ridsa:1},
     {t:"Choir",                                  g:"b", dsa:"Visual, literary and performing arts", inri:1, ridsa:1},
@@ -753,10 +751,10 @@ var NYPS_CCA = [
     {t:"Robotics",            g:"", dsa:"Science, mathematics and engineering", inri:0, ridsa:0}
   ]},
   {h:"Uniformed groups", em:"\uD83E\uDDE2", cca:[
-    {t:"Boys\u2019 Brigade",         g:"b", dsa:"Uniformed groups", inri:1, via:"Leadership & Character"},
+    {t:"Boys\u2019 Brigade",         g:"b", dsa:"Uniformed groups", inri:1, ridsa:0},
     {t:"Girl Guides (Brownies)", g:"g", dsa:"Uniformed groups", inri:0, ridsa:0},
     {t:"Girls\u2019 Brigade",        g:"g", dsa:"Uniformed groups", inri:0, ridsa:0},
-    {t:"Scouts",                 g:"",  dsa:"Uniformed groups", inri:1, via:"Leadership & Character"}
+    {t:"Scouts",                 g:"",  dsa:"Uniformed groups", inri:1, ridsa:0}
   ]}
 ];
 
@@ -790,10 +788,13 @@ var CCA_NOTES = [
    "robotics are talent areas at plenty of them. RI's own advice for a "+
    "robotics child is to apply under Mathematics or Science with the robotics "+
    "achievements as supporting evidence."],
-  ["\u201cvia\u201d means the nearest thing, not a match",
-   "Art and Crafts, calligraphy and the uniformed groups are marked against "+
-   "Visual Arts and Leadership & Character, which is what RI runs instead. "+
-   "Same part of the school; not an area of the same name."],
+  ["RI DSA means RI runs an area of exactly that name",
+   "Nothing looser, so the button never has to be interpreted. RI also runs "+
+   "Visual Arts and Leadership & Character, which no CCA here is named after "+
+   "\u2014 an art child applies under the first, a child with a leadership record "+
+   "under the second, and being in Art and Crafts or the Scouts is neither "+
+   "required for that nor sufficient. That is a conversation for P6, not a "+
+   "tag on a list."],
   ["What is actually looked at",
    "The standard reached, evidenced: age-group or national selection, SYF, "+
    "National School Games, a graded music exam \u2014 plus RI's own trial, "+

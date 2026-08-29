@@ -177,8 +177,7 @@ function vCCA(){
            (c.inri ? '<em class="bub in">in RI</em>'
                    : '<em class="bub off">not in RI</em>')+
            (c.ridsa ? '<em class="bub yes">RI DSA</em>'
-                    : c.via ? '<em class="bub yes via">RI DSA <s>via '+esc(c.via)+'</s></em>'
-                            : '<em class="bub off">no RI DSA</em>')+
+                    : '<em class="bub off">no RI DSA</em>')+
          '</u></span>';
     });
     s+='</div>';
