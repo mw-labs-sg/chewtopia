@@ -173,20 +173,32 @@ function vCCA(){
       s+='<span class="cca'+(shut?" shut":"")+'">'+
          '<b>'+esc(c.t)+(c.g?'<i>'+(c.g==="b"?"boys":"girls")+'</i>':'')+'</b>'+
          '<u>'+esc(c.dsa||"")+
-           (c.ri ? '<em class="yes">RI: '+esc(c.ri)+'</em>'
-                 : c.no ? '<em class="nope">not at RI</em>'
-                        : '<em>no RI area</em>')+
+           (c.ri ? '<em class="yes" title="Raffles ran a talent area of this '+
+                   'name last round. It is not a route in.">RI runs this area</em>'
+                 : '<em title="Raffles does not run this area. Other schools '+
+                   'do.">not an RI area</em>')+
          '</u></span>';
     });
     s+='</div>';
   });
-  s+='</div><div class="key">Names and who each takes are from MOE\u2019s school '+
-     'listing \u2014 it does not say which levels they start at or when they meet. '+
-     'The grey line under each is its DSA-Sec talent category, then whether '+
-     'Raffles takes DSA in it: every CCA sits in some category, so what opens '+
-     'the door is the standard reached, never the membership. RI publishes its '+
-     'talent areas only while the exercise is open, so those are from the last '+
-     'one it ran.</div></div>';
+  s+='</div>';
+  /* The tags were read as "join this one, get in through it" the first time
+     this panel was shown. They do not say that, so the panel now says what
+     they do say, in words, right underneath them. */
+  var cn = (typeof CCA_NOTES!=="undefined" ? CCA_NOTES : []);
+  if(cn.length){
+    s+='<div class="pnotes">';
+    cn.forEach(function(n){
+      s+='<div class="pn"><b>'+esc(n[0])+'</b><span>'+esc(n[1])+'</span></div>';
+    });
+    s+='</div>';
+  }
+  s+='<div class="key">Names and who each takes are from MOE\u2019s school listing '+
+     '\u2014 it does not say which levels they start at or when they meet. The '+
+     'grey line under each CCA is the DSA-Sec talent category it counts in, '+
+     'then whether Raffles runs an area of that name. RI publishes its list '+
+     'only while the exercise is open, so it is from the last one it ran and '+
+     'RI reviews it every year.</div></div>';
   return s+vSchools()+vPSLE();
 }
 

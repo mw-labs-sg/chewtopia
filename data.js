@@ -753,6 +753,40 @@ var NYPS_CCA = [
   ]}
 ];
 
+/* What the RI tag on each CCA means, and — the part that matters — what it
+   does not. Written out because the panel on its own reads like a promise,
+   and the first time it was shown the tags were taken for "join this, get in
+   through it", which is not what any of them say.
+
+   Every quoted line below is RI's own, off ri.edu.sg and ask.gov.sg/ri.
+   ========================================================================== */
+var CCA_NOTES = [
+  ["A green tag is not a way in",
+   "It says one thing only: Raffles ran a DSA talent area of that name at its "+
+   "last exercise. It is not a route, and joining the CCA is not the "+
+   "qualification. RI's own page says meeting all the criteria does not "+
+   "guarantee being shortlisted or offered a place — and, the part that "+
+   "surprises everyone, that applicants who have never done the activity "+
+   "before may also apply, because it assesses potential too."],
+  ["Grey does not mean pointless",
+   "It means Raffles does not run that area. Raffles is one school out of "+
+   "dozens that take DSA, and football, chess and robotics are talent areas "+
+   "at plenty of them. RI's own advice for a robotics child is to apply under "+
+   "Mathematics or Science and put the robotics achievements in as supporting "+
+   "evidence — so even at RI the area is a door, not a wall."],
+  ["What is actually looked at",
+   "The standard reached, evidenced: age-group or national selection, SYF, "+
+   "National School Games, a graded music exam — plus RI's own trial, "+
+   "audition or interview. Almost none of that comes from the school CCA "+
+   "alone. Six years of turning up to Choir on a Wednesday is not evidence "+
+   "of anything."],
+  ["So pick it for the six years",
+   "This is four hours a week of his life until he is eighteen. Choosing it "+
+   "to game an application that mostly looks elsewhere is optimising the "+
+   "wrong thing — and a child who enjoys it is the one who reaches the "+
+   "standard that does count."]
+];
+
 /* ==========================================================================
    HOW THE PSLE IS SCORED - the thing every CCA and streaming conversation
    eventually circles back to, written down once so it does not have to be
