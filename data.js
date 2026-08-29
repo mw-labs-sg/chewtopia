@@ -1050,45 +1050,102 @@ var SEC_NOTES = [
 
 /* ==========================================================================
    PARENT FORUMS - KiasuParents, which is where Singapore parents actually
-   argue about all of the above.
+   argue about everything on the School tab.
 
-   These are links out, not a feed. Chewtopia has no server and the forum
-   sends no CORS headers, so the app cannot read threads and show them here;
-   pretending otherwise would mean a list that silently went stale. Instead
-   the first two links are the forum's own live views - Recent and Popular -
-   so "latest" is one tap away and always actually latest.
+   The three threads under each board are a SNAPSHOT, not a feed, and the
+   reason is worth writing down so nobody tries to "fix" it later: Chewtopia
+   has no server, and forum.kiasuparents.com sends no CORS headers on any of
+   /api/category, /api/recent or its RSS. All four were tried from the page
+   and all four fail at the browser before the request is even sent. A static
+   file physically cannot read that forum. So the titles below were fetched by
+   hand and pasted, and they will age.
 
-   live:1 marks the two that are already a newest-first list.
+   Two things keep that honest:
+   - FORUM_SNAP is on screen, so a stale list says how stale it is.
+   - Every board keeps its link, and the top two entries are the forum's own
+     Recent and Popular views, which are always current. A snapshot is never
+     more than one tap from the real thing.
+
+   To refresh: open each board, take the top three, update t/u/n/d below and
+   move FORUM_SNAP on.
+
+   live:1  the board is itself a newest-first list, so it gets no snapshot.
+   th:     title, url, reply count, last activity. n:0 means none shown.
    ========================================================================== */
+var FORUM_SNAP = "29 Aug 2026";
+
 var FORUM_LINKS = [
   {id:"kp-recent", t:"Latest posts", s:"Everything on the forum, newest first.",
    u:"https://forum.kiasuparents.com/recent", k:"hot", live:1},
-  {id:"kp-popular", t:"Most active", s:"What the forum is actually arguing about this week.",
+  {id:"kp-popular", t:"Most active", s:"What the forum is arguing about this week.",
    u:"https://forum.kiasuparents.com/popular", k:"hot", live:1},
-  {id:"kp-sec", t:"Secondary schools — selection",
+
+  {id:"kp-sec", t:"Secondary schools \u2014 selection",
    s:"Cut-off points, DSA, and what a PSLE score is worth where.",
-   u:"https://forum.kiasuparents.com/category/48/secondary-schools-selection", k:"sec"},
-  {id:"kp-pri-ac", t:"Primary schools — academic support",
+   u:"https://forum.kiasuparents.com/category/48/secondary-schools-selection", k:"sec",
+   th:[
+     {t:"DSA 2026", u:"https://forum.kiasuparents.com/topic/111777/dsa-2026", n:42, d:"20 Jul 2026", pin:1},
+     {t:"DSA 2025", u:"https://forum.kiasuparents.com/topic/110367/dsa-2025", n:163, d:"5 Sep 2025", pin:1},
+     {t:"Singapore Secondary Schools\u2019 Statistics", u:"https://forum.kiasuparents.com/topic/109869/singapore-secondary-schools-statistics", n:5, d:"22 Jul 2026"}
+   ]},
+
+  {id:"kp-pri-ac", t:"Primary schools \u2014 academic support",
    s:"Schoolwork, exams, tuition and learning gaps, P1 to P6.",
-   u:"https://forum.kiasuparents.com/category/27/primary-schools-academic-support", k:"pri"},
-  {id:"kp-pri-net", t:"Primary schools — parent networking",
-   s:"Parents from the same school. Nanyang has its own long-running thread.",
-   u:"https://forum.kiasuparents.com/category/38/primary-schools-parent-networking-groups", k:"pri"},
-  {id:"kp-pri-reg", t:"Primary One — selection and registration",
-   s:"Phases, balloting and choosing. SC is through this; it still runs every year.",
-   u:"https://forum.kiasuparents.com/category/5/primary-schools-selection-registration", k:"pri"},
+   u:"https://forum.kiasuparents.com/category/27/primary-schools-academic-support", k:"pri",
+   th:[
+     {t:"We\u2019re giving away free advanced math lessons!", u:"https://forum.kiasuparents.com/topic/112185/we-re-giving-away-free-advanced-math-lessons", n:0, d:""},
+     {t:"[Android] I built a Singapore P1\u2013P6 Chinese app", u:"https://forum.kiasuparents.com/topic/112171/android-i-built-a-singapore-p1-p6-chinese-app.-the-most-useful-feature-weekly-%E5%90%AC%E5%86%99-is-free", n:0, d:""},
+     {t:"Chen Lao Shi\u2019s thread on CL learning, group classes & workshops", u:"https://forum.kiasuparents.com/topic/102404/chen-lao-shi-s-thread-on-cl-learning-pri-amp-sec-grp-classes-amp-workshops", n:207, d:"24 Jul 2026"}
+   ]},
+
+  {id:"kp-pri-net", t:"Primary schools \u2014 parent networking",
+   s:"Parents from the same school, one thread each.",
+   u:"https://forum.kiasuparents.com/category/38/primary-schools-parent-networking-groups", k:"pri",
+   th:[
+     {t:"Fern Green Primary", u:"https://forum.kiasuparents.com/topic/110446/fern-green-primary", n:0, d:""},
+     {t:"Springdale vs FernGreen vs Anchorgreen", u:"https://forum.kiasuparents.com/topic/112089/springdale-vs-ferngreen-vs-anchorgreen", n:0, d:""},
+     {t:"Punggol Primary 2027", u:"https://forum.kiasuparents.com/topic/112199/punggol-primary-2027", n:0, d:""}
+   ]},
+
+  {id:"kp-pri-reg", t:"Primary One \u2014 selection and registration",
+   s:"Phases, balloting and parent volunteering.",
+   u:"https://forum.kiasuparents.com/category/5/primary-schools-selection-registration", k:"pri",
+   th:[
+     {t:"Choosing and evaluating primary schools", u:"https://forum.kiasuparents.com/topic/193/choosing-and-evaluating-primary-schools", n:0, d:""},
+     {t:"Four primary schools scrap parent volunteer scheme for P1 entry", u:"https://forum.kiasuparents.com/topic/112182/four-primary-schools-scrap-parent-volunteer-scheme-for-entry-into-primary-1", n:0, d:""},
+     {t:"PV application \u2014 distance to school", u:"https://forum.kiasuparents.com/topic/112176/pv-application-distance-to-school", n:0, d:""}
+   ]},
+
   {id:"kp-sport", t:"Sports, fitness and athletics",
-   s:"Which clubs and coaches, and what a CCA standard actually looks like.",
-   u:"https://forum.kiasuparents.com/category/15/sports-fitness-athletics", k:"cca"},
+   s:"Clubs, coaches, and what a CCA standard actually looks like.",
+   u:"https://forum.kiasuparents.com/category/15/sports-fitness-athletics", k:"cca",
+   th:[
+     {t:"Children\u2019s sports and activities \u2014 what do you value most?", u:"https://forum.kiasuparents.com/topic/112195/children-s-sports-and-activities-what-do-you-value-the-most", n:0, d:""},
+     {t:"Conveniently located swimming school for your kids", u:"https://forum.kiasuparents.com/topic/112101/conveniently-located-swimming-school-for-your-kids", n:1, d:"9 Jul 2026"},
+     {t:"Strike for Care charity futsal tournament 2026", u:"https://forum.kiasuparents.com/topic/112049/invitation-to-strike-for-care-charity-futsal-tournament-2026", n:1, d:"22 Jun 2026"}
+   ]},
+
   {id:"kp-music", t:"Music, dance, speech and drama",
    s:"The other half of the CCA and DSA conversation.",
-   u:"https://forum.kiasuparents.com/category/12/music-singing-dancing-speech-drama", k:"cca"},
+   u:"https://forum.kiasuparents.com/category/12/music-singing-dancing-speech-drama", k:"cca",
+   th:[
+     {t:"Dear parents, this one\u2019s for you \uD83C\uDFBB", u:"https://forum.kiasuparents.com/topic/112077/dear-parents-this-one-s-for-you", n:1, d:"30 Jun 2026"},
+     {t:"NUS psycholinguistics study", u:"https://forum.kiasuparents.com/topic/112034/nus-psycholinguistics-study-by-nus-psycholinguistics-lab", n:1, d:"19 Jun 2026"},
+     {t:"Music, drama and ukulele classes \u2014 Eunos, Ubi, Kembangan, Bedok", u:"https://forum.kiasuparents.com/topic/111911/looking-for-music-drama-ukelele-classes-in-eunos-ubi-kembangan-bedok-area", n:1, d:"17 Apr 2026"}
+   ]},
+
   {id:"kp-enrich", t:"Academic learning and enrichment",
-   s:"Home learning, enrichment and tutors, with the usual sales pitches mixed in.",
-   u:"https://forum.kiasuparents.com/category/70/academic-learning-enrichment", k:"cca"},
+   s:"Home learning, enrichment and tutors, sales pitches included.",
+   u:"https://forum.kiasuparents.com/category/70/academic-learning-enrichment", k:"cca",
+   th:[
+     {t:"All about finding & evaluating tutors", u:"https://forum.kiasuparents.com/topic/48050/all-about-finding-amp-evaluating-tutors", n:450, d:"5 Jun 2025"},
+     {t:"Educare Tutoring \u2014 affordable & quality education", u:"https://forum.kiasuparents.com/topic/109751/educare-tutoring-affordable-quality-education", n:0, d:""},
+     {t:"Are STEM DSA preparation programs really useful?", u:"https://forum.kiasuparents.com/topic/111563/are-stem-dsa-preparation-programs-really-useful", n:3, d:"14 Jul 2026"}
+   ]},
+
   {id:"kp-nyps", t:"Search: Nanyang Primary",
    s:"Every thread with Nanyang Primary in the title, newest first.",
-   u:"https://forum.kiasuparents.com/search?term=nanyang%20primary&in=titles", k:"sec"}
+   u:"https://forum.kiasuparents.com/search?term=nanyang%20primary&in=titles", k:"sec", live:1}
 ];
 
 var SEED_ACTS = [

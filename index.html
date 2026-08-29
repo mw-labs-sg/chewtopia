@@ -569,15 +569,38 @@
     .schr{grid-column:1;grid-row:auto;align-items:flex-start;margin-top:5px}
   }
 
-  /* ---- forums: same card as the school sites, its own four colours ---- */
-  .lnk.f-hot{border-color:#F5D2C6;background:var(--peach)}
-  .lnk.f-hot .lnt,.lnk.f-hot .lngo{color:var(--tang)}
-  .lnk.f-sec{border-color:#BBD7FA;background:var(--sky)}
-  .lnk.f-sec .lnt,.lnk.f-sec .lngo{color:var(--blue)}
-  .lnk.f-pri{border-color:#BFE3CB;background:#DFF3E4}
-  .lnk.f-pri .lnt,.lnk.f-pri .lngo{color:#2F7A45}
-  .lnk.f-cca{border-color:#D5C8F7;background:#F0EAFE}
-  .lnk.f-cca .lnt,.lnk.f-cca .lngo{color:var(--grape)}
+  /* ---- forums: a board card, with its three threads listed inside ---- */
+  .fbs{display:grid;grid-template-columns:1fr;gap:10px}
+  @media(min-width:720px){ .fbs{grid-template-columns:1fr 1fr} }
+  .fb{border:2px solid var(--line);border-radius:16px;background:var(--bg);
+    overflow:hidden}
+  .fbh{position:relative;display:block;text-decoration:none;color:var(--ink);
+    padding:13px 42px 12px 14px}
+  .fbt{display:block;font-family:'Baloo 2',cursive;font-size:17px;font-weight:700;
+    line-height:1.2}
+  .fbs2{display:block;font-size:12.5px;color:var(--soft);margin-top:2px;
+    line-height:1.4}
+  .fb .lngo{top:12px;right:12px}
+  /* the snapshot itself, sunk into the card so it reads as contents */
+  .fth{background:#fff;border-top:2px solid var(--line);padding:2px 6px}
+  .ft{display:block;text-decoration:none;padding:8px 8px;border-radius:9px;
+    border-bottom:1px solid var(--line)}
+  .ft:last-child{border-bottom:none}
+  .ft:active{background:var(--bg)}
+  .ftt{display:block;font-size:13.5px;font-weight:600;color:var(--ink);
+    line-height:1.35}
+  .ftt i{font-style:normal;font-size:9px;font-weight:800;text-transform:uppercase;
+    letter-spacing:.05em;border-radius:5px;padding:2px 5px;margin-right:6px;
+    background:var(--peach);color:var(--tang);vertical-align:1px}
+  .ftm{display:block;font-size:11px;font-weight:700;color:var(--soft);margin-top:3px}
+  .fb.f-hot{border-color:#F5D2C6;background:var(--peach)}
+  .fb.f-hot .fbt,.fb.f-hot .lngo{color:var(--tang)}
+  .fb.f-sec{border-color:#BBD7FA;background:var(--sky)}
+  .fb.f-sec .fbt,.fb.f-sec .lngo{color:var(--blue)}
+  .fb.f-pri{border-color:#BFE3CB;background:#DFF3E4}
+  .fb.f-pri .fbt,.fb.f-pri .lngo{color:#2F7A45}
+  .fb.f-cca{border-color:#D5C8F7;background:#F0EAFE}
+  .fb.f-cca .fbt,.fb.f-cca .lngo{color:var(--grape)}
   /* the two that are already a newest-first list say so */
   .livep{font-family:'Lexend',sans-serif;font-style:normal;font-size:10px;
     font-weight:800;text-transform:uppercase;letter-spacing:.06em;
@@ -896,7 +919,7 @@ body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;-
   </header>
   <nav class="tabs" id="tabs" aria-label="Sections"></nav>
   <main id="view" tabindex="-1"></main>
-  <p class="foot">Saved on this device · build 115</p>
+  <p class="foot">Saved on this device · build 116</p>
 </div>
 <!-- load order matters: data, then core, then screens, app last -->
 <!-- Pinned to an exact version with a hash to match: "@2" floats, so a bad
@@ -906,10 +929,10 @@ body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3"
         integrity="sha384-l8ah+VgaWtk1mvOe9VC+OirC6qHFF4yH7l7mKRidV9MSti3E9F463bMp6ZVN4kuC"
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script src="data.js?v=39"></script>
+<script src="data.js?v=40"></script>
 <script src="core.js?v=50"></script>
 <script src="timetable.js?v=6"></script>
 <script src="training.js?v=51"></script>
-<script src="app.js?v=90"></script>
+<script src="app.js?v=91"></script>
 </body>
 </html>
