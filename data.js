@@ -639,8 +639,6 @@ var SEED_EVENTS = [
 
   /* Nanyang Primary, P1 2027 welcome letter — SC starts P1 next January, so
      these are his, not TC's, even though the letter comes from TC's school. */
-  {id:"e30", t:"SEN form due — only if he needs support", d:"2026-09-25", w:"sc",
-   n:"Only if he would need extra help to settle in or learn — dyslexia, ADHD, mild autism, hearing loss, sight or physical needs. Submit the SEN Information Form by Friday 25 September and a SEN officer gets in touch late in the year if necessary. Nothing to do if it does not apply. Queries: nyps@moe.edu.sg."},
   {id:"e31", t:"Download Parents Gateway", d:"2026-10-01", w:"sc",
    n:"From October the school sends every announcement, letter and consent form through the Parents Gateway app, not by email. Get it onto the phone before then so nothing is missed.",
    url:"https://pg.moe.edu.sg"},
