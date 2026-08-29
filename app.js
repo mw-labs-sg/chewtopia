@@ -173,11 +173,12 @@ function vCCA(){
       s+='<span class="cca'+(shut?" shut":"")+'">'+
          '<b>'+esc(c.t)+(c.g?'<i>'+(c.g==="b"?"boys":"girls")+'</i>':'')+'</b>'+
          '<u>'+
-           '<em class="bub dsa"><i>DSA</i>'+esc(c.dsa||"")+'</em>'+
-           (c.ri
-             ? '<em class="bub ri'+(c.near?" near":"")+'"><i>RI</i>'+esc(c.ri)+
-               (c.near?' <s>nearest</s>':'')+'</em>'
-             : '<em class="bub ri off"><i>RI</i>none</em>')+
+           '<em class="bub dsa" title="Counts as: '+esc(c.dsa||"")+'">DSA</em>'+
+           (c.inri ? '<em class="bub in">in RI</em>'
+                   : '<em class="bub off">not in RI</em>')+
+           (c.ridsa ? '<em class="bub yes">RI DSA</em>'
+                    : c.via ? '<em class="bub yes via">RI DSA <s>via '+esc(c.via)+'</s></em>'
+                            : '<em class="bub off">no RI DSA</em>')+
          '</u></span>';
     });
     s+='</div>';

@@ -461,26 +461,23 @@
   /* the second line: which DSA category it counts in, and whether RI takes it */
   .cca u{display:flex;flex-wrap:wrap;align-items:center;gap:6px;text-decoration:none;
     font-size:11px;font-weight:700;color:var(--soft);margin-top:5px}
-  /* two bubbles, not one tag: the first says which DSA category it counts in,
-     the second whether Raffles runs an area of that name. They were one line
-     to begin with and got read as a single claim about getting in. */
-  .cca em.bub{display:inline-flex;align-items:center;gap:5px;font-style:normal;
-    font-size:11px;font-weight:700;border-radius:999px;padding:3px 9px 3px 4px;
-    background:#fff;color:var(--soft);border:1.5px solid var(--line)}
-  .cca em.bub i{font-style:normal;font-size:9px;font-weight:800;
-    text-transform:uppercase;letter-spacing:.06em;border-radius:999px;
-    padding:2px 6px;background:var(--line);color:var(--ink)}
+  /* Three short buttons, one per question: does it count for DSA at all, is
+     it a CCA at Raffles, does Raffles take DSA in it. They were one tag to
+     begin with and the whole panel got read as a single claim about entry. */
+  .cca em.bub{display:inline-flex;align-items:center;gap:4px;font-style:normal;
+    font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;
+    border-radius:999px;padding:3px 9px;border:1.5px solid var(--line);
+    background:#fff;color:var(--soft);white-space:nowrap}
   .cca em.dsa{border-color:#BBD7FA;background:var(--sky);color:#1E5BB8}
-  .cca em.dsa i{background:var(--blue);color:#fff}
-  .cca em.ri{border-color:#BFE3CB;background:#DFF3E4;color:#2F7A45}
-  .cca em.ri i{background:#2F7A45;color:#fff}
-  /* nearest-thing rather than a name match, and dashed so it cannot be read
-     as the same claim as an exact one */
-  .cca em.ri.near{border-style:dashed}
-  .cca em.ri.near s{text-decoration:none;font-size:9px;font-weight:800;
-    text-transform:uppercase;letter-spacing:.05em;opacity:.7}
-  .cca em.ri.off{border-color:var(--line);background:#fff;color:var(--soft)}
-  .cca em.ri.off i{background:var(--line);color:var(--soft)}
+  .cca em.in{border-color:#D5C8F7;background:#F0EAFE;color:var(--grape)}
+  .cca em.yes{border-color:#BFE3CB;background:#DFF3E4;color:#2F7A45}
+  /* dashed: RI's nearest area is called something else, so it must not read
+     the same as an exact match */
+  .cca em.yes.via{border-style:dashed}
+  .cca em.bub s{text-decoration:none;font-size:9px;font-weight:700;
+    text-transform:none;letter-spacing:0;opacity:.8}
+  .cca em.off{border-color:var(--line);background:#fff;color:var(--soft);
+    opacity:.75}
   .cca i{font-style:normal;font-size:10px;font-weight:800;text-transform:uppercase;
     letter-spacing:.05em;border-radius:6px;padding:2px 5px;
     background:#fff;color:var(--soft)}
@@ -899,7 +896,7 @@ body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;-
   </header>
   <nav class="tabs" id="tabs" aria-label="Sections"></nav>
   <main id="view" tabindex="-1"></main>
-  <p class="foot">Saved on this device · build 114</p>
+  <p class="foot">Saved on this device · build 115</p>
 </div>
 <!-- load order matters: data, then core, then screens, app last -->
 <!-- Pinned to an exact version with a hash to match: "@2" floats, so a bad
@@ -909,10 +906,10 @@ body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3"
         integrity="sha384-l8ah+VgaWtk1mvOe9VC+OirC6qHFF4yH7l7mKRidV9MSti3E9F463bMp6ZVN4kuC"
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script src="data.js?v=38"></script>
+<script src="data.js?v=39"></script>
 <script src="core.js?v=50"></script>
 <script src="timetable.js?v=6"></script>
 <script src="training.js?v=51"></script>
-<script src="app.js?v=89"></script>
+<script src="app.js?v=90"></script>
 </body>
 </html>

@@ -705,51 +705,58 @@ var SCHOOL_LINKS = [
 /* ==========================================================================
    CCAs AT NANYANG PRIMARY - what the school offers, so the choice is not a
    surprise the term it has to be made. The names, and who each one takes, are
-   off MOE's own school listing for Nanyang Primary:
-   moe.gov.sg/schoolfinder/schooldetail/nanyang-primary-school
-   Two things that listing does NOT say, so they are not claimed here: which
-   levels each CCA takes, and when any of them meet. The school sends that out
-   itself. The four groups are the usual MOE headings and are our own tidying
-   up - the listing itself is one flat list of twenty.
+   off MOE's own school listing for Nanyang Primary. That listing does NOT say
+   which levels each CCA takes or when they meet, so neither do we.
 
-   g   : "b" boys only, "g" girls only, "" open to both.
-   dsa : which of MOE's seven DSA-Sec talent categories it sits in. Every one
-         of them sits in one - the CCA is never what opens the door, the
-         standard reached in it is. moe.gov.sg/secondary/dsa
-   ri  : the matching talent area at Raffles Institution, named exactly as RI
-         names it, or "" where RI has none. RI publishes its list only while
-         the exercise is open, so this is the last one it ran, off its own
-         AskGov answers: ask.gov.sg/ri
-   no  : 1 where RI says outright that it does NOT take DSA in this area.
+   Three separate questions get three separate buttons, because rolling them
+   into one tag got the whole panel misread:
+
+   dsa   : which of MOE's seven DSA-Sec talent categories it counts in. Every
+           CCA counts in one, so the button is the same everywhere and only
+           the category behind it differs - it is on the screen to say "this
+           is a DSA category", nothing more. moe.gov.sg/secondary/dsa
+   inri  : 1 if Raffles runs this as a CCA, so he could carry on doing it
+           there. Off RI's own entry on MOE SchoolFinder.
+   ridsa : 1 if Raffles takes DSA in an area of exactly this name.
+   via   : where RI's nearest DSA area is called something else. Read it as
+           "the same part of the school", not as a match.
+
+   The two are genuinely different and the difference is the useful bit:
+   Football and International Chess are both CCAs at RI, and RI says outright
+   it takes no DSA in either. Being able to do it there is not being able to
+   get in through it.
+
+   RI publishes its DSA areas only while the exercise is open, so those come
+   from the last one it ran, off ask.gov.sg/ri. RI reviews the list yearly.
    ========================================================================== */
 var NYPS_CCA = [
   {h:"Sports", em:"\uD83C\uDFC3", cca:[
-    {t:"Artistic Gymnastics", g:"g", dsa:"Sports and games", ri:""},
-    {t:"Badminton",           g:"",  dsa:"Sports and games", ri:"Badminton"},
-    {t:"Basketball",          g:"",  dsa:"Sports and games", ri:"Basketball"},
-    {t:"Football",            g:"b", dsa:"Sports and games", ri:"", no:1},
-    {t:"Table Tennis",        g:"",  dsa:"Sports and games", ri:"Table Tennis"},
-    {t:"Tennis",              g:"",  dsa:"Sports and games", ri:"Tennis"},
-    {t:"Track and Field",     g:"",  dsa:"Sports and games", ri:"Track and Field"},
-    {t:"Wushu",               g:"",  dsa:"Sports and games", ri:""}
+    {t:"Artistic Gymnastics", g:"g", dsa:"Sports and games", inri:0, ridsa:0},
+    {t:"Badminton",           g:"",  dsa:"Sports and games", inri:1, ridsa:1},
+    {t:"Basketball",          g:"",  dsa:"Sports and games", inri:1, ridsa:1},
+    {t:"Football",            g:"b", dsa:"Sports and games", inri:1, ridsa:0},
+    {t:"Table Tennis",        g:"",  dsa:"Sports and games", inri:1, ridsa:1},
+    {t:"Tennis",              g:"",  dsa:"Sports and games", inri:1, ridsa:1},
+    {t:"Track and Field",     g:"",  dsa:"Sports and games", inri:1, ridsa:1},
+    {t:"Wushu",               g:"",  dsa:"Sports and games", inri:0, ridsa:0}
   ]},
   {h:"Visual and performing arts", em:"\uD83C\uDFB5", cca:[
-    {t:"Art and Crafts",                         g:"",  dsa:"Visual, literary and performing arts", ri:"Visual Arts", near:1},
-    {t:"Chinese Calligraphy and Brush Painting", g:"",  dsa:"Visual, literary and performing arts", ri:"Visual Arts", near:1},
-    {t:"Chinese Dance",                          g:"g", dsa:"Visual, literary and performing arts", ri:"", no:1},
-    {t:"Chinese Orchestra",                      g:"",  dsa:"Visual, literary and performing arts", ri:"Chinese Orchestra"},
-    {t:"Choir",                                  g:"b", dsa:"Visual, literary and performing arts", ri:"Choir"},
-    {t:"String Ensemble",                        g:"",  dsa:"Visual, literary and performing arts", ri:"String Ensemble"}
+    {t:"Art and Crafts",                         g:"",  dsa:"Visual, literary and performing arts", inri:0, via:"Visual Arts"},
+    {t:"Chinese Calligraphy and Brush Painting", g:"",  dsa:"Visual, literary and performing arts", inri:0, via:"Visual Arts"},
+    {t:"Chinese Dance",                          g:"g", dsa:"Visual, literary and performing arts", inri:0, ridsa:0},
+    {t:"Chinese Orchestra",                      g:"",  dsa:"Visual, literary and performing arts", inri:1, ridsa:1},
+    {t:"Choir",                                  g:"b", dsa:"Visual, literary and performing arts", inri:1, ridsa:1},
+    {t:"String Ensemble",                        g:"",  dsa:"Visual, literary and performing arts", inri:1, ridsa:1}
   ]},
   {h:"Clubs and societies", em:"\u265F\uFE0F", cca:[
-    {t:"International Chess", g:"", dsa:"Sports and games",                     ri:"", no:1},
-    {t:"Robotics",            g:"", dsa:"Science, mathematics and engineering", ri:"", no:1}
+    {t:"International Chess", g:"", dsa:"Sports and games",                     inri:1, ridsa:0},
+    {t:"Robotics",            g:"", dsa:"Science, mathematics and engineering", inri:0, ridsa:0}
   ]},
   {h:"Uniformed groups", em:"\uD83E\uDDE2", cca:[
-    {t:"Boys\u2019 Brigade",         g:"b", dsa:"Uniformed groups", ri:"Leadership & Character", near:1},
-    {t:"Girl Guides (Brownies)", g:"g", dsa:"Uniformed groups", ri:"Leadership & Character", near:1},
-    {t:"Girls\u2019 Brigade",        g:"g", dsa:"Uniformed groups", ri:"Leadership & Character", near:1},
-    {t:"Scouts",                 g:"",  dsa:"Uniformed groups", ri:"Leadership & Character", near:1}
+    {t:"Boys\u2019 Brigade",         g:"b", dsa:"Uniformed groups", inri:1, via:"Leadership & Character"},
+    {t:"Girl Guides (Brownies)", g:"g", dsa:"Uniformed groups", inri:0, ridsa:0},
+    {t:"Girls\u2019 Brigade",        g:"g", dsa:"Uniformed groups", inri:0, ridsa:0},
+    {t:"Scouts",                 g:"",  dsa:"Uniformed groups", inri:1, via:"Leadership & Character"}
   ]}
 ];
 
@@ -761,36 +768,43 @@ var NYPS_CCA = [
    Every quoted line below is RI's own, off ri.edu.sg and ask.gov.sg/ri.
    ========================================================================== */
 var CCA_NOTES = [
-  ["A green tag is not a way in",
-   "It says one thing only: Raffles ran a DSA talent area of that name at its "+
-   "last exercise. It is not a route, and joining the CCA is not the "+
-   "qualification. RI's own page says meeting all the criteria does not "+
-   "guarantee being shortlisted or offered a place — and, the part that "+
-   "surprises everyone, that applicants who have never done the activity "+
-   "before may also apply, because it assesses potential too."],
+  ["The three buttons, plainly",
+   "DSA says the CCA counts in one of MOE's seven talent categories \u2014 they "+
+   "all do, so that button never rules anything out. IN RI says Raffles runs "+
+   "it as a CCA, so he could keep doing it there. RI DSA says Raffles takes "+
+   "DSA applications in it. Those last two are different questions and the "+
+   "difference is the useful part."],
+  ["Football and Chess prove the point",
+   "Both are CCAs at Raffles \u2014 IN RI \u2014 and Raffles says outright it takes no "+
+   "DSA in either. Being able to do it at RI is not being able to get in "+
+   "through it, and the two buttons are there so that never has to be guessed "+
+   "at again."],
+  ["A green RI DSA button is still not a way in",
+   "It says Raffles ran an area of that name last round, and nothing more. "+
+   "RI's own page says meeting every criterion guarantees neither a shortlist "+
+   "nor an offer \u2014 and that applicants who have never done the activity may "+
+   "apply too, because potential is assessed. The CCA is not the "+
+   "qualification."],
   ["Grey does not mean pointless",
-   "It means Raffles does not run that area. Raffles is one school out of "+
-   "dozens that take DSA, and football, chess and robotics are talent areas "+
-   "at plenty of them. RI's own advice for a robotics child is to apply under "+
-   "Mathematics or Science and put the robotics achievements in as supporting "+
-   "evidence — so even at RI the area is a door, not a wall."],
+   "Raffles is one school out of dozens that take DSA, and football, chess and "+
+   "robotics are talent areas at plenty of them. RI's own advice for a "+
+   "robotics child is to apply under Mathematics or Science with the robotics "+
+   "achievements as supporting evidence."],
+  ["\u201cvia\u201d means the nearest thing, not a match",
+   "Art and Crafts, calligraphy and the uniformed groups are marked against "+
+   "Visual Arts and Leadership & Character, which is what RI runs instead. "+
+   "Same part of the school; not an area of the same name."],
   ["What is actually looked at",
    "The standard reached, evidenced: age-group or national selection, SYF, "+
-   "National School Games, a graded music exam — plus RI's own trial, "+
+   "National School Games, a graded music exam \u2014 plus RI's own trial, "+
    "audition or interview. Almost none of that comes from the school CCA "+
-   "alone. Six years of turning up to Choir on a Wednesday is not evidence "+
-   "of anything."],
-  ["A dotted RI tag is a near miss, not a match",
-   "Art and Crafts, calligraphy and the uniformed groups are marked against "+
-   "Visual Arts and Leadership & Character, which is the nearest thing RI runs "+
-   "\u2014 not an area of the same name. Read those as \"the same part of the "+
-   "school\", not as \"this counts\". The solid ones are exact: RI runs an area "+
-   "called exactly that."],
+   "alone. Six years of turning up on a Wednesday is not evidence of "+
+   "anything."],
   ["So pick it for the six years",
-   "This is four hours a week of his life until he is eighteen. Choosing it "+
-   "to game an application that mostly looks elsewhere is optimising the "+
-   "wrong thing — and a child who enjoys it is the one who reaches the "+
-   "standard that does count."]
+   "This is four hours a week of his life until he is eighteen. Choosing it to "+
+   "game an application that mostly looks elsewhere is optimising the wrong "+
+   "thing \u2014 and a child who enjoys it is the one who reaches the standard "+
+   "that does count."]
 ];
 
 /* ==========================================================================
