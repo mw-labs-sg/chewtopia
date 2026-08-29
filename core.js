@@ -135,7 +135,8 @@ var DAYS = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunda
    and Sync now sits at the foot of Training. Old #progress links land on
    Training rather than nowhere. */
 var TABS = [["home","Upcoming","t1"],["schedule","Timetable","t2"],
-            ["meals","Meals","t3"],["forums","Forums","t7"],
+            ["meals","Meals","t3"],["grow","Growth","t8"],
+            ["forums","Forums","t7"],
             ["practice","Training","t4"],
             ["reading","Reading","t6"],["links","School","t5"]];
 var tab="home", quiz=null, showAdd=false;
@@ -145,7 +146,8 @@ var paper=null;
 /* Each tab gets a readable address, e.g. .../chewtopia/#meals, so a link can
    be bookmarked or sent straight to one screen. */
 var SLUGS = {home:"upcoming", schedule:"timetable", meals:"meals",
-             forums:"forums", practice:"training", reading:"reading",
+             grow:"growth", forums:"forums", practice:"training",
+             reading:"reading",
              links:"school"};
 function tabFromHash(){
   var h=(location.hash||"").replace(/^#\/?/,"").toLowerCase();
@@ -460,7 +462,12 @@ function syncErr(){ return S("syncerr",""); }
 /* "seedgone" is the list of school-set events that were removed in the app.
    It used to be listed here as "gone", which is not a key anything writes, so
    an event deleted on the iPad came straight back on the phone. */
-var STATE_KEYS=["weak:tc","weak:sc","books:tc","books:sc","events","acts","seedgone"];
+/* grow:* rides the same machinery as everything else here: keyed by id, so
+   mergeList unions it and strike()/dropStruck() make a deletion stick. A year
+   of measurements is exactly the kind of thing that must not live on one
+   tablet, which is why it syncs and the meal plan does not. */
+var STATE_KEYS=["weak:tc","weak:sc","books:tc","books:sc","events","acts",
+                "seedgone","grow:tc","grow:sc"];
 function stateIdent(k){ return k.indexOf("weak:")===0 ? "k" : "id"; }
 
 /* ---------- tombstones ----------

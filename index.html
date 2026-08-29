@@ -72,6 +72,7 @@
   .t1{background:var(--c1)} .t2{background:var(--c2)} .t3{background:var(--c3)}
   .t4{background:var(--c4)} .t5{background:var(--c5)} .t6{background:var(--c6)}
   .t7{background:var(--c7)}
+  .t8{background:var(--c8)}
   .tabdiv{flex:0 0 auto;width:2px;background:rgba(255,255,255,.5);border-radius:2px;margin:7px 3px}
   .tabdiv{flex:0 0 auto;width:2px;background:rgba(255,255,255,.45);border-radius:2px;margin:7px 3px}
 
@@ -532,6 +533,60 @@
     vertical-align:middle;border-radius:6px;padding:2px 6px;
     background:#fff;color:var(--tang)}
 
+  /* ---- growth: the latest numbers big, then the two lines ---- */
+  .glat{display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:14px}
+  @media(min-width:560px){ .glat{grid-template-columns:1fr 1fr} }
+  .gcard{background:var(--bg);border:2px solid var(--line);border-radius:16px;
+    padding:11px 14px 12px}
+  .gcard.c-tc{border-color:#BBD7FA;background:var(--sky)}
+  .gcard.c-sc{border-color:#F5D2C6;background:var(--peach)}
+  .gwho{display:block;font-size:11px;font-weight:800;text-transform:uppercase;
+    letter-spacing:.07em;color:var(--soft)}
+  .gnow{display:flex;align-items:baseline;gap:14px;margin-top:3px}
+  .gnow b{font-family:'Baloo 2',cursive;font-size:26px;font-weight:700;
+    line-height:1.1;color:var(--ink)}
+  .gnow b i{font-style:normal;font-size:13px;font-weight:700;color:var(--soft);
+    margin-left:2px}
+  .gsub{display:block;font-size:12px;color:var(--soft);margin-top:4px;line-height:1.45}
+  .gnone{display:block;font-size:14px;color:var(--soft);margin-top:6px}
+
+  .gcharts{display:grid;grid-template-columns:1fr;gap:12px}
+  @media(min-width:620px){ .gcharts{grid-template-columns:1fr 1fr} }
+  .gwrap{background:var(--bg);border:2px solid var(--line);border-radius:16px;
+    padding:10px 12px 8px}
+  .gwrap h3{margin:0 0 6px;font-family:'Baloo 2',cursive;font-size:15px;
+    font-weight:700;color:var(--ink)}
+  .gwrap h3 em{font-style:normal;font-size:12px;font-weight:700;color:var(--soft)}
+  /* the box is a fixed height and the viewBox is stretched to it, so the two
+     charts line up side by side whatever the numbers happen to be */
+  .gch{display:block;width:100%;height:140px}
+  .ggl{stroke:var(--line);stroke-width:1}
+  .gyl{fill:var(--soft);font-size:9px;font-weight:700;text-anchor:end}
+  .gxl{fill:var(--soft);font-size:9px;font-weight:700}
+  .gxl.end{text-anchor:end}
+  .gln{fill:none;stroke-width:2.5;stroke-linejoin:round;stroke-linecap:round}
+  .gkey{display:flex;gap:14px;margin-top:10px;font-size:12px;font-weight:700;
+    color:var(--soft)}
+  .gk{display:flex;align-items:center;gap:6px}
+  .gk i{width:11px;height:11px;border-radius:50%;display:inline-block}
+
+  /* the form: one row on a wide screen, wraps on a phone */
+  .growrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  .growrow select,.growrow input{flex:1 1 90px;min-width:0;margin:0}
+  .growrow #gW{flex:0 0 92px}
+  .growrow .btn{flex:0 0 auto;margin:0}
+  .hint{font-size:12.5px;color:var(--tang);font-weight:700;margin-top:7px;
+    min-height:16px}
+
+  /* every reading, newest first */
+  .grows{display:grid;grid-template-columns:1fr}
+  .growr{display:grid;grid-template-columns:1fr auto auto 30px;column-gap:10px;
+    align-items:center;padding:8px 2px;border-bottom:1px solid var(--line)}
+  .growr:last-child{border-bottom:none}
+  .grd{font-size:13.5px;font-weight:600;color:var(--ink)}
+  .grv{font-size:13.5px;font-weight:800;color:var(--blue);white-space:nowrap;
+    font-variant-numeric:tabular-nums}
+
   /* ---- progress matrix: each boy gets three subject columns ---- */
   .mxkey{display:flex;gap:12px;flex-wrap:wrap;align-items:center;font-size:12.5px;
     color:var(--soft);font-weight:600;margin-bottom:12px}
@@ -714,26 +769,26 @@
     radial-gradient(700px 480px at 84% 26%,rgba(47,115,232,.42),transparent 60%),
     radial-gradient(680px 520px at 60% 88%,rgba(255,111,82,.20),transparent 62%),
     linear-gradient(170deg,#080B26 0%,#141543 48%,#251A4A 100%);}
-body[data-scene="galaxy"]{--c1:#4E7BE0;--c2:#7C5CE0;--c3:#D45C97;--c4:#2FA98F;--c5:#D99A12;--c6:#3FA6B8;--c7:#C2543F}
+body[data-scene="galaxy"]{--c1:#4E7BE0;--c2:#7C5CE0;--c3:#D45C97;--c4:#2FA98F;--c5:#D99A12;--c6:#3FA6B8;--c7:#C2543F;--c8:#3E8F8A}
   body[data-scene="aurora"]::before{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 900' preserveAspectRatio='xMidYMax slice'><g fill='%23FFFFFF'><circle cx='90' cy='90' r='2' opacity='.8'/><circle cx='340' cy='40' r='1.5' opacity='.6'/><circle cx='600' cy='120' r='2.2' opacity='.75'/><circle cx='900' cy='60' r='1.6' opacity='.6'/><circle cx='1150' cy='150' r='2' opacity='.7'/><circle cx='1380' cy='70' r='1.6' opacity='.6'/><circle cx='470' cy='240' r='1.6' opacity='.55'/><circle cx='1020' cy='300' r='1.8' opacity='.5'/></g><circle cx='1200' cy='150' r='46' fill='%23F2F6FF' opacity='.9'/><circle cx='1178' cy='138' r='44' fill='%230A1230' opacity='.95'/><g opacity='.5'><path d='M-40 430 q220 -190 430 -70 q210 118 430 -40 q210 -150 660 10 l0 130 q-430 -140 -650 20 q-230 168 -450 40 q-200 -116 -420 40z' fill='%2334E1B0'/><path d='M-40 520 q250 -160 470 -50 q230 114 450 -30 q200 -132 600 20 l0 120 q-400 -130 -600 10 q-240 168 -470 44 q-210 -112 -450 36z' fill='%236BE7F5' opacity='.65'/><path d='M-40 610 q260 -130 500 -30 q240 100 470 -20 q190 -100 550 20 l0 110 q-380 -110 -560 0 q-250 152 -490 40 q-220 -102 -470 30z' fill='%23A78BFA' opacity='.5'/></g><path d='M0 900 L0 720 L150 560 L280 690 L420 520 L560 700 L700 600 L860 740 L1000 620 L1160 760 L1300 660 L1440 780 V900z' fill='%23070C24' opacity='.92'/><path d='M150 560 l52 64 l-104 0z M420 520 l58 72 l-116 0z M1000 620 l46 58 l-92 0z' fill='%23DDE7FF' opacity='.5'/></svg>"),
     radial-gradient(820px 520px at 30% 44%,rgba(52,225,176,.26),transparent 62%),
     radial-gradient(760px 480px at 76% 30%,rgba(107,231,245,.20),transparent 60%),
     linear-gradient(175deg,#050A24 0%,#0A1740 52%,#132A55 100%);}
-body[data-scene="aurora"]{--c1:#2AA6CE;--c2:#22B48C;--c3:#7C5CE0;--c4:#4E7BE0;--c5:#D99A12;--c6:#D45C97;--c7:#8A6BD8}
+body[data-scene="aurora"]{--c1:#2AA6CE;--c2:#22B48C;--c3:#7C5CE0;--c4:#4E7BE0;--c5:#D99A12;--c6:#D45C97;--c7:#8A6BD8;--c8:#C4703F}
   body[data-scene="ocean"]::before{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 900' preserveAspectRatio='xMidYMax slice'><g opacity='.18' fill='%23BDF0FF'><path d='M120 -40 L300 -40 L120 620 L60 620z'/><path d='M420 -40 L540 -40 L360 660 L300 660z'/><path d='M760 -40 L900 -40 L720 640 L660 640z'/><path d='M1120 -40 L1260 -40 L1060 620 L1000 620z'/></g><g fill='none' stroke='%23BDF0FF' opacity='.35'><circle cx='220' cy='430' r='9' stroke-width='2'/><circle cx='260' cy='360' r='5' stroke-width='2'/><circle cx='1180' cy='330' r='11' stroke-width='2'/><circle cx='1130' cy='260' r='6' stroke-width='2'/><circle cx='700' cy='500' r='7' stroke-width='2'/><circle cx='740' cy='440' r='4' stroke-width='2'/></g><g fill='%230B3B57' opacity='.6'><path d='M980 300 q120 -66 250 -18 q60 22 96 -14 q-16 52 -60 66 q-140 56 -286 6 q-40 -14 0 -40z'/></g><circle cx='1046' cy='300' r='6' fill='%23DFF6FF' opacity='.8'/><path d='M0 900 L0 700 q120 -70 240 -10 q140 70 260 -10 q150 -100 320 -10 q170 90 320 -20 q140 -100 300 0 V900z' fill='%23062B41' opacity='.8'/><g fill='%230D5C6E' opacity='.7'><path d='M180 900 q-30 -140 20 -220 q-70 120 -60 220z'/><path d='M240 900 q10 -160 70 -240 q-20 150 -30 240z'/><path d='M1120 900 q-24 -150 26 -230 q-64 130 -56 230z'/><path d='M1180 900 q14 -170 76 -250 q-26 160 -36 250z'/></g></svg>"),
     radial-gradient(900px 560px at 46% -8%,rgba(189,240,255,.24),transparent 60%),
     radial-gradient(700px 520px at 84% 40%,rgba(31,143,163,.30),transparent 62%),
     linear-gradient(178deg,#04304A 0%,#063D5C 44%,#02202F 100%);}
-body[data-scene="ocean"]{--c1:#2695B4;--c2:#2FA98F;--c3:#4E7BE0;--c4:#3FB0A2;--c5:#D99A12;--c6:#7C5CE0;--c7:#C46A3C}
+body[data-scene="ocean"]{--c1:#2695B4;--c2:#2FA98F;--c3:#4E7BE0;--c4:#3FB0A2;--c5:#D99A12;--c6:#7C5CE0;--c7:#C46A3C;--c8:#8A6BD8}
   body[data-scene="forest"]::before{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 900' preserveAspectRatio='xMidYMax slice'><circle cx='1180' cy='150' r='52' fill='%23FFF4CF' opacity='.85'/><circle cx='1180' cy='150' r='110' fill='%23FFF0B8' opacity='.16'/><g opacity='.28' fill='%23BFE6CE'><path d='M60 900 L60 560 L20 560 L110 400 L60 400 L150 250 L240 400 L190 400 L280 560 L240 560 L240 900z'/><path d='M400 900 L400 600 L370 600 L450 470 L410 470 L490 350 L570 470 L530 470 L610 600 L580 600 L580 900z'/><path d='M900 900 L900 580 L865 580 L950 430 L910 430 L995 290 L1080 430 L1040 430 L1125 580 L1090 580 L1090 900z'/><path d='M1290 900 L1290 620 L1260 620 L1340 500 L1300 500 L1380 380 L1440 500 V900z'/></g><g opacity='.28' fill='%23E8FBF0'><path d='M0 640 q260 -30 520 4 q260 34 520 -6 q200 -30 400 6 v40 q-220 -34 -420 -4 q-260 40 -520 4 q-260 -34 -500 -8z'/></g><g opacity='.6' fill='%233F7A55'><path d='M180 900 L180 620 L140 620 L235 450 L185 450 L285 290 L385 450 L335 450 L430 620 L390 620 L390 900z'/><path d='M640 900 L640 650 L605 650 L695 500 L650 500 L740 360 L830 500 L785 500 L875 650 L840 650 L840 900z'/><path d='M1080 900 L1080 640 L1045 640 L1130 490 L1090 490 L1175 350 L1260 490 L1220 490 L1305 640 L1270 640 L1270 900z'/></g><g fill='%23FFE9A8'><circle cx='330' cy='330' r='5' opacity='.9'/><circle cx='700' cy='250' r='4' opacity='.75'/><circle cx='1010' cy='380' r='5' opacity='.8'/><circle cx='520' cy='430' r='3.5' opacity='.7'/><circle cx='1230' cy='260' r='4' opacity='.7'/><circle cx='150' cy='420' r='3.5' opacity='.65'/><circle cx='860' cy='700' r='4' opacity='.6'/><circle cx='420' cy='740' r='3.5' opacity='.55'/></g></svg>"),
     radial-gradient(900px 500px at 78% 8%,rgba(255,233,168,.20),transparent 60%),
     linear-gradient(180deg,#0B2A20 0%,#14402E 46%,#20583A 100%);}
-body[data-scene="forest"]{--c1:#3E9B57;--c2:#2FA98F;--c3:#C1791F;--c4:#61A845;--c5:#D99A12;--c6:#2695B4;--c7:#B8543F}
+body[data-scene="forest"]{--c1:#3E9B57;--c2:#2FA98F;--c3:#C1791F;--c4:#61A845;--c5:#D99A12;--c6:#2695B4;--c7:#B8543F;--c8:#2A8FA8}
   body[data-scene="volcano"]::before{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 900' preserveAspectRatio='xMidYMax slice'><g fill='%23FFB86B' opacity='.75'><circle cx='240' cy='430' r='3'/><circle cx='420' cy='300' r='2.2'/><circle cx='700' cy='380' r='2.6'/><circle cx='980' cy='260' r='2'/><circle cx='1180' cy='420' r='3'/><circle cx='560' cy='180' r='2'/><circle cx='1320' cy='200' r='2.4'/><circle cx='120' cy='260' r='2.2'/><circle cx='860' cy='520' r='2.6'/></g><path d='M0 900 L0 690 L180 560 L300 660 L470 470 L640 640 L820 500 L1010 650 L1180 540 L1320 640 L1440 570 V900z' fill='%23200C0C' opacity='.92'/><path d='M470 470 q-26 60 -40 120 q40 -30 82 -6 q-16 -66 -42 -114z' fill='%23FF6F52' opacity='.8'/><path d='M462 452 q-14 -50 8 -84 q22 36 10 84z' fill='%23FFC24D' opacity='.6'/><path d='M0 780 q120 -40 240 -6 q140 40 280 -10 q150 -52 300 6 q150 54 320 -14 q160 -64 300 8 V900 H0z' fill='%23C7371B' opacity='.6'/><path d='M0 840 q160 -34 320 0 q170 36 340 -6 q180 -44 360 8 q160 46 420 -8 V900 H0z' fill='%23FF8B3D' opacity='.55'/></svg>"),
     radial-gradient(900px 520px at 50% 104%,rgba(255,140,60,.50),transparent 62%),
     radial-gradient(620px 420px at 18% 22%,rgba(255,111,82,.22),transparent 60%),
     linear-gradient(180deg,#150A10 0%,#2C1116 52%,#5A1A12 100%);}
-body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;--c5:#D45C97;--c6:#7C5CE0;--c7:#3E8F8A}
+body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;--c5:#D45C97;--c6:#7C5CE0;--c7:#3E8F8A;--c8:#5E7FC4}
 
   /* every world is dark now, so the small print and the wordmark get some lift */
   .foot{color:rgba(255,255,255,.78)}
@@ -790,7 +845,7 @@ body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;-
   </header>
   <nav class="tabs" id="tabs" aria-label="Sections"></nav>
   <main id="view" tabindex="-1"></main>
-  <p class="foot">Saved on this device · build 111</p>
+  <p class="foot">Saved on this device · build 112</p>
 </div>
 <!-- load order matters: data, then core, then screens, app last -->
 <!-- Pinned to an exact version with a hash to match: "@2" floats, so a bad
@@ -801,9 +856,9 @@ body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;-
         integrity="sha384-l8ah+VgaWtk1mvOe9VC+OirC6qHFF4yH7l7mKRidV9MSti3E9F463bMp6ZVN4kuC"
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="data.js?v=36"></script>
-<script src="core.js?v=49"></script>
+<script src="core.js?v=50"></script>
 <script src="timetable.js?v=6"></script>
 <script src="training.js?v=51"></script>
-<script src="app.js?v=86"></script>
+<script src="app.js?v=87"></script>
 </body>
 </html>

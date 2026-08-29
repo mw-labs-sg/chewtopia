@@ -38,13 +38,14 @@ function render(){
   var v=document.getElementById("view");
   if(quiz){ v.innerHTML=quizHTML(); wireQuiz(); return; }
   if(paper){ v.innerHTML=paperHTML(); wirePaper(); return; }
-  var V={home:vHome,schedule:vWeek,meals:vMeals,forums:vForums,
+  var V={home:vHome,schedule:vWeek,meals:vMeals,grow:vGrow,forums:vForums,
          practice:vTests,reading:vRead,links:vLinks};
-  var Wr={home:wHome,schedule:wWeek,meals:wMeals,forums:wForums,
+  var Wr={home:wHome,schedule:wWeek,meals:wMeals,grow:wGrow,forums:wForums,
           practice:wTests,reading:wRead,links:wLinks};
   /* the child switch belongs inside the first panel, under its heading */
   var html=V[tab]();
-  if(tab==="home"||tab==="schedule") html=html.replace("</h2>", "</h2>"+whoBar());
+  if(tab==="home"||tab==="schedule"||tab==="grow")
+    html=html.replace("</h2>", "</h2>"+whoBar());
   v.innerHTML=html; Wr[tab]();
   document.querySelectorAll("[data-vw]").forEach(function(b){
     b.onclick=function(){ W("vwho", b.dataset.vw); sfxPop(); render(); };
@@ -228,6 +229,203 @@ function vPSLE(){
      'secondary-one posting pages. Rules change \u2014 check them again nearer '+
      'the time rather than trusting this screen.</div></div>';
   return s;
+}
+
+/* ==========================================================================
+   GROWTH - weight and height, typed in whenever they get weighed, and drawn.
+
+   Two numbers a week is not enough data for anything clever, and cleverness is
+   not the point: the point is watching the line go up over a year. So the
+   chart is plain SVG built as a string like every other view here - no library,
+   nothing to fetch, and it redraws inside render() with everything else.
+
+   Deliberately NOT here: any judgement about whether a number is a good one.
+   That needs the growth reference charts, which we do not have off any sheet,
+   and an invented band under a child's weight is worse than no band at all.
+   BMI is shown because it is arithmetic, not an opinion.
+   ========================================================================== */
+function growKey(who){ return "grow:"+who; }
+function growList(who){
+  return SJ(growKey(who),[]).slice().sort(function(a,b){
+    return a.d < b.d ? -1 : a.d > b.d ? 1 : 0; });
+}
+function growDays(iso){ return Math.round(new Date(iso+"T00:00:00")/86400000); }
+function isoFromDays(n){
+  var d=new Date(n*86400000);
+  return d.getUTCFullYear()+"-"+String(d.getUTCMonth()+1).padStart(2,"0")+
+         "-"+String(d.getUTCDate()).padStart(2,"0");
+}
+function kidCol(id){ return id==="tc" ? "var(--blue)" : "var(--tang)"; }
+
+/* One chart, one measurement, every shown child drawn on it. Returns "" when
+   there is nothing to draw, so the caller can say so in words instead. */
+function growChart(kids, field, unit){
+  var W=320, H=140, L=36, R=8, T=10, B=20;
+  var series=[], loX=null, hiX=null, loY=null, hiY=null;
+  kids.forEach(function(k){
+    var pts=[];
+    growList(k.id).forEach(function(r){
+      var v=parseFloat(r[field]); if(isNaN(v)) return;
+      var x=growDays(r.d);
+      pts.push({x:x, y:v});
+      if(loX===null||x<loX) loX=x;
+      if(hiX===null||x>hiX) hiX=x;
+      if(loY===null||v<loY) loY=v;
+      if(hiY===null||v>hiY) hiY=v;
+    });
+    if(pts.length) series.push({id:k.id, pts:pts});
+  });
+  if(!series.length) return "";
+
+  /* A single reading, or several all on one day, would give a box with no
+     width or no height and every point would land on top of the others. */
+  if(hiX===loX){ loX-=7; hiX+=7; }
+  var pad=(hiY-loY)*0.15 || Math.max(hiY*0.05, 1);
+  var y0=loY-pad, y1=hiY+pad;
+
+  function px(x){ return L + (x-loX)/(hiX-loX)*(W-L-R); }
+  function py(v){ return T + (1-(v-y0)/(y1-y0))*(H-T-B); }
+
+  var g='<svg class="gch" viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none" '+
+        'role="img" aria-label="'+esc(unit)+' over time">';
+  /* three gridlines with the value beside them, so the shape has a scale */
+  for(var i=0;i<3;i++){
+    var v=y0+(y1-y0)*i/2, yy=py(v);
+    g+='<line class="ggl" x1="'+L+'" y1="'+yy.toFixed(1)+'" x2="'+(W-R)+
+       '" y2="'+yy.toFixed(1)+'"/>'+
+       '<text class="gyl" x="'+(L-6)+'" y="'+(yy+3).toFixed(1)+'">'+v.toFixed(1)+'</text>';
+  }
+  g+='<text class="gxl" x="'+L+'" y="'+(H-5)+'">'+esc(dfull(isoFromDays(loX)))+'</text>'+
+     '<text class="gxl end" x="'+(W-R)+'" y="'+(H-5)+'">'+esc(dfull(isoFromDays(hiX)))+'</text>';
+
+  series.forEach(function(se){
+    var d=se.pts.map(function(p){
+      return px(p.x).toFixed(1)+","+py(p.y).toFixed(1); }).join(" ");
+    if(se.pts.length>1)
+      g+='<polyline class="gln" points="'+d+'" style="stroke:'+kidCol(se.id)+'"/>';
+    se.pts.forEach(function(p){
+      g+='<circle class="gdot" cx="'+px(p.x).toFixed(1)+'" cy="'+py(p.y).toFixed(1)+
+         '" r="3" style="fill:'+kidCol(se.id)+'"/>';
+    });
+  });
+  return g+'</svg>';
+}
+
+function vGrow(){
+  var kids=shownKids().filter(function(k){ return vwho()==="all" || k.id===vwho(); });
+  var s='<div class="panel"><h2><span class="em">\uD83D\uDCC8</span> Growth'+
+        '<span class="side">weight and height</span></h2>';
+
+  /* the newest reading for each child, and what moved since the one before */
+  s+='<div class="glat">';
+  kids.forEach(function(k){
+    var l=growList(k.id), last=l[l.length-1], prev=l[l.length-2];
+    s+='<div class="gcard '+whoCls(k.id)+'"><span class="gwho">'+esc(pname(k.id))+'</span>';
+    if(!last){ s+='<span class="gnone">Nothing weighed yet</span></div>'; return; }
+    s+='<span class="gnow">'+
+       (last.w!==""&&last.w!=null ? '<b>'+(+last.w).toFixed(1)+'<i>kg</i></b>' : '')+
+       (last.h!==""&&last.h!=null ? '<b>'+(+last.h).toFixed(1)+'<i>cm</i></b>' : '')+
+       '</span>';
+    var bits=[];
+    if(prev){
+      ["w","h"].forEach(function(f){
+        var a=parseFloat(prev[f]), b=parseFloat(last[f]);
+        if(isNaN(a)||isNaN(b)) return;
+        var dd=b-a;
+        bits.push((dd>=0?"+":"\u2212")+Math.abs(dd).toFixed(1)+(f==="w"?"kg":"cm"));
+      });
+    }
+    var bmi = (last.w && last.h) ? (+last.w)/Math.pow((+last.h)/100,2) : null;
+    s+='<span class="gsub">'+esc(dfull(last.d))+
+       (bits.length?' \u00b7 '+esc(bits.join(", "))+' since last time':'')+
+       (bmi?' \u00b7 BMI '+bmi.toFixed(1):'')+'</span></div>';
+  });
+  s+='</div>';
+
+  var wc=growChart(kids,"w","kilograms"), hc=growChart(kids,"h","centimetres");
+  if(wc||hc){
+    s+='<div class="gcharts">';
+    if(wc) s+='<div class="gwrap"><h3>Weight <em>kg</em></h3>'+wc+'</div>';
+    if(hc) s+='<div class="gwrap"><h3>Height <em>cm</em></h3>'+hc+'</div>';
+    s+='</div>';
+    if(kids.length>1)
+      s+='<div class="gkey">'+kids.map(function(k){
+           return '<span class="gk"><i style="background:'+kidCol(k.id)+'"></i>'+
+                  esc(pname(k.id))+'</span>'; }).join("")+'</div>';
+  } else {
+    s+='<p class="empty">Nothing plotted yet. Put the first weigh-in in below '+
+       'and the line starts from there.</p>';
+  }
+
+  /* The form. Weight or height on its own is fine - a morning where only one
+     of them happens still counts, and a missing number just skips that chart. */
+  var pick = vwho()==="all" ? who() : vwho();
+  var opts=KIDS.map(function(k){
+    return '<option value="'+k.id+'"'+(k.id===pick?" selected":"")+'>'+
+           esc(pname(k.id))+'</option>'; }).join("");
+  s+='<div class="lbl">Add a weigh-in</div>'+
+     '<div class="growrow">'+
+       '<select id="gW">'+opts+'</select>'+
+       '<input type="date" id="gD" value="'+esc(isoOf(new Date()))+'">'+
+       '<input type="number" id="gKg" step="0.1" min="0" max="200" placeholder="kg" inputmode="decimal">'+
+       '<input type="number" id="gCm" step="0.1" min="0" max="250" placeholder="cm" inputmode="decimal">'+
+       '<button class="btn go" id="gAdd">Add</button>'+
+     '</div><div class="hint" id="gMsg"></div>';
+  s+='</div>';
+
+  /* every reading, newest first, one panel per child */
+  kids.forEach(function(k){
+    var l=growList(k.id).slice().reverse();
+    if(!l.length) return;
+    s+='<div class="panel"><h2><span class="em">\uD83D\uDCCB</span> '+esc(pname(k.id))+
+       '<span class="side">'+l.length+(l.length===1?" reading":" readings")+'</span></h2>'+
+       '<div class="grows">';
+    l.forEach(function(r){
+      s+='<div class="growr"><span class="grd">'+esc(dfull(r.d))+'</span>'+
+         '<span class="grv">'+(r.w!==""&&r.w!=null ? (+r.w).toFixed(1)+' kg' : '\u2014')+'</span>'+
+         '<span class="grv">'+(r.h!==""&&r.h!=null ? (+r.h).toFixed(1)+' cm' : '\u2014')+'</span>'+
+         '<button class="x" data-gdel="'+esc(r.id)+'" data-gwho="'+esc(k.id)+'" '+
+         'aria-label="Delete this reading">\u00d7</button></div>';
+    });
+    s+='</div></div>';
+  });
+  return s;
+}
+
+function wGrow(){
+  var b=document.getElementById("gAdd");
+  if(b) b.onclick=function(){
+    var w=document.getElementById("gW").value,
+        d=document.getElementById("gD").value,
+        kg=document.getElementById("gKg").value.trim(),
+        cm=document.getElementById("gCm").value.trim(),
+        m=document.getElementById("gMsg");
+    /* Say what is wrong. Doing nothing silently just looks broken. */
+    if(!d){ m.textContent="Pick the date it was taken."; return; }
+    if(!kg && !cm){ m.textContent="Put in a weight, a height, or both."; return; }
+    var a=SJ(growKey(w),[]), hit=null;
+    /* One reading per child per day: standing him on the scale twice on a
+       Sunday should correct the morning number, not draw a second dot on it. */
+    a.forEach(function(x){ if(x.d===d) hit=x; });
+    if(hit){
+      if(kg) hit.w=+kg;
+      if(cm) hit.h=+cm;
+      hit.ts=Date.now();
+    } else {
+      a.push({id:"g"+Date.now()+Math.floor(Math.random()*1000),
+              d:d, w:kg?+kg:"", h:cm?+cm:"", ts:Date.now()});
+    }
+    WJ(growKey(w), a);
+    sfxPop(); render();
+  };
+  document.querySelectorAll("[data-gdel]").forEach(function(x){
+    x.onclick=function(){
+      var w=x.dataset.gwho, id=x.dataset.gdel, k=growKey(w);
+      WJ(k, SJ(k,[]).filter(function(r){ return r.id!==id; }));
+      strike(k, id);        /* without this the next sync hands it back */
+      sfxTap(); render();
+    };
+  });
 }
 
 function vSchools(){
