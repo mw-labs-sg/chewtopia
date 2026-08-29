@@ -190,8 +190,13 @@ function vHome(){
     var y=new Date(d+"T00:00:00").getFullYear();
     return dmon(d)+(y!==new Date().getFullYear() ? " "+String(y).slice(2) : "");
   }
+  /* and a soft rule where one month ends and the next begins — the small
+     caps say which month, the line is what you see without reading. */
+  var lastMon="";
   function dayRows(list, d){
-    var out="", has=!!(list&&list.length);
+    var out="", has=!!(list&&list.length), mon=d.slice(0,7);
+    if(lastMon && mon!==lastMon) out+='<span class="agmo"></span>';
+    lastMon=mon;
     /* a day off colours its own date too, so no-school days can be counted
        down the left edge without reading a word */
     var off = has && list.some(function(e){ return e.hol; });

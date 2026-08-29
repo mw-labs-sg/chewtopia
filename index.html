@@ -367,8 +367,12 @@
     margin-bottom:2px;white-space:nowrap}
   /* "Sept 27" is two words wide; the 44px chip on a phone needs it smaller */
   .agd u.yr{font-size:7.5px;letter-spacing:0}
-  .agd.mo{padding-top:5px}
-  .agd.bare.mo{padding-top:2px}
+  /* a soft rule where the month turns over, so the change is visible
+     without reading the small caps at all */
+  .agmo{grid-column:1/-1;height:0;border-top:1px solid var(--line);margin:9px 0 7px}
+  /* a week band draws its own rule, so a month starting on a Monday would
+     otherwise get two lines stacked */
+  .agwk + .agmo{display:none}
   .agd.off u{color:#B03A22}
   .agd.now u{color:rgba(255,255,255,.9)}
   .agd.now{background:var(--ink);color:#fff}
@@ -699,7 +703,7 @@ body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;-
   </header>
   <nav class="tabs" id="tabs" aria-label="Sections"></nav>
   <main id="view" tabindex="-1"></main>
-  <p class="foot">Saved on this device · build 107</p>
+  <p class="foot">Saved on this device · build 108</p>
 </div>
 <!-- load order matters: data, then core, then screens, app last -->
 <!-- Pinned to an exact version with a hash to match: "@2" floats, so a bad
@@ -713,6 +717,6 @@ body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;-
 <script src="core.js?v=48"></script>
 <script src="timetable.js?v=6"></script>
 <script src="training.js?v=51"></script>
-<script src="app.js?v=82"></script>
+<script src="app.js?v=83"></script>
 </body>
 </html>
