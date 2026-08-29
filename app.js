@@ -526,47 +526,35 @@ function vSchools(){
   return s;
 }
 
-/* Links plus a snapshot, and it cannot be anything else: Chewtopia has no
-   server, and the forum sends no CORS headers on its API or its RSS - all of
-   /api/category, /api/recent, /recent.rss and /category/N.rss were tried from
-   the page and every one fails in the browser before the request goes out. So
-   the three threads under each board were fetched by hand and will age. The
-   snapshot date is on screen and every board keeps its live link, so a stale
-   list says so and the real thing is one tap away. */
+/* Links out, and nothing read in. The forum blocks it - no CORS headers on
+   its API or its RSS - and a hand-pasted copy of "the latest three" is stale
+   within the week and has to be re-pasted forever. So every card opens the
+   real page instead. Same card as the school sites, two groups. */
 function vForums(){
   var f = (typeof FORUM_LINKS!=="undefined" ? FORUM_LINKS : []);
-  var when = (typeof FORUM_SNAP!=="undefined" ? FORUM_SNAP : "");
-  var s='<div class="panel"><h2><span class="em">\uD83D\uDCAC</span> Parent forums'+
-        '<span class="side">KiasuParents</span></h2><div class="fbs">';
-  f.forEach(function(l){
-    s+='<div class="fb f-'+esc(l.k)+'">'+
-       '<a class="fbh" href="'+esc(l.u)+'" target="_blank" rel="noopener noreferrer">'+
-         '<span class="fbt">'+esc(l.t)+
-           (l.live?' <em class="livep">live</em>':'')+'</span>'+
-         '<span class="fbs2">'+esc(l.s)+'</span>'+
+  function group(which, em, title, side){
+    var mine=f.filter(function(l){ return (l.sec||"forum")===which; });
+    if(!mine.length) return "";
+    var g='<div class="panel"><h2><span class="em">'+em+'</span> '+title+
+          '<span class="side">'+side+'</span></h2><div class="lnks">';
+    mine.forEach(function(l){
+      g+='<a class="lnk f-'+esc(l.k)+'" href="'+esc(l.u)+'" target="_blank" rel="noopener noreferrer">'+
+         '<span class="lnt">'+esc(l.t)+(l.live?' <em class="livep">live</em>':'')+'</span>'+
+         '<span class="lns">'+esc(l.s)+'</span>'+
          '<span class="lngo">\u2197</span></a>';
-    if(l.th && l.th.length){
-      s+='<div class="fth">';
-      l.th.forEach(function(t){
-        s+='<a class="ft" href="'+esc(t.u)+'" target="_blank" rel="noopener noreferrer">'+
-           '<span class="ftt">'+(t.pin?'<i>pinned</i>':'')+esc(t.t)+'</span>'+
-           '<span class="ftm">'+
-             (t.n ? esc(String(t.n))+(t.n===1?" reply":" replies") : "")+
-             (t.n && t.d ? " \u00b7 " : "")+esc(t.d||"")+
-           '</span></a>';
-      });
-      s+='</div>';
-    }
-    s+='</div>';
-  });
-  s+='</div><div class="key">The three threads under each board were copied '+
-     'down on <b>'+esc(when)+'</b> and do not update themselves \u2014 Chewtopia '+
-     'has no server, and the forum blocks a page like this one from reading it. '+
-     'Tap any board heading for what is actually on it now; the two marked '+
-     '<em>live</em> are the forum\u2019s own newest-first pages. And it is a public '+
-     'forum, not a source: useful for what a school felt like, useless for what '+
-     'a cut-off was. Check anything that matters against MOE or the school.'+
-     '</div></div>';
+    });
+    return g+'</div>';
+  }
+  var s = group("site","\uD83D\uDCF0","KiasuParents","the site")+
+     '<div class="key">The sections behind the menu across the top of their '+
+     'site. Every one opens in a new tab.</div></div>'+
+     group("forum","\uD83D\uDCAC","The forum","boards")+
+     '<div class="key">Chewtopia only links here, it does not read the forum: '+
+     'there is no server behind this app and the forum refuses to be read by a '+
+     'page like it. So nothing on this tab can go stale \u2014 every card opens '+
+     'whatever is actually there now. And it is a public forum, not a source: '+
+     'good for what a school felt like, useless for what a cut-off was. Check '+
+     'anything that matters against MOE or the school.</div></div>';
   return s;
 }
 function wForums(){
