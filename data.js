@@ -744,6 +744,65 @@ var NYPS_CCA = [
   ]}
 ];
 
+/* ==========================================================================
+   HOW THE PSLE IS SCORED - the thing every CCA and streaming conversation
+   eventually circles back to, written down once so it does not have to be
+   half-remembered off a WhatsApp group.
+
+   All of it is MOE's, from:
+     moe.gov.sg/psle-fsbb/psle/psle-scoring-system          (ALs, the score)
+     moe.gov.sg/secondary/s1-posting/how-to-choose/...      (posting groups,
+                                                             tie-breakers)
+   The mark ranges are MOE's own word "reference" ranges - the AL a child gets
+   is set against the cohort, so a printed range is a guide, not a promise.
+
+   TC sits it in 2030 and SC in 2032, counting forward from P2 and K2 in 2026.
+   ========================================================================== */
+var PSLE_AL = [
+  {al:"AL 1", m:"90 and above"},
+  {al:"AL 2", m:"85 to 89"},
+  {al:"AL 3", m:"80 to 84"},
+  {al:"AL 4", m:"75 to 79"},
+  {al:"AL 5", m:"65 to 74"},
+  {al:"AL 6", m:"45 to 64"},
+  {al:"AL 7", m:"20 to 44"},
+  {al:"AL 8", m:"below 20"}
+];
+
+/* What the total opens up. G3/G2/G1 are the subject levels that replaced
+   Express, Normal (Academic) and Normal (Technical). */
+var PSLE_PG = [
+  {s:"4 to 20",  g:"PG3",        n:"every subject at G3, the most demanding level"},
+  {s:"21 to 22", g:"PG3 or PG2", n:""},
+  {s:"23 to 24", g:"PG2",        n:"most subjects at G2"},
+  {s:"25",       g:"PG2 or PG1", n:""},
+  {s:"26 to 30", g:"PG1",        n:"needs AL 7 or better in both English and maths"}
+];
+
+/* The notes under the tables. Kept here so the wording is edited in one place
+   with everything else, and app.js stays the shape of the panel only. */
+var PSLE_NOTES = [
+  ["The four subjects",
+   "English, mother tongue, maths and science. Each is marked on its own and "+
+   "given an Achievement Level from 1 to 8 - no bell curve against the rest of "+
+   "the cohort, so a good year for everyone is a good result for everyone."],
+  ["The score",
+   "Add the four ALs together. 4 is the best possible and 32 the worst, and "+
+   "there are only 29 totals in between - far fewer rungs than the old "+
+   "aggregate, which is the whole point of it."],
+  ["Foundation subjects",
+   "Graded A, B or C, which count as AL 6, AL 7 and AL 8 when the four are "+
+   "added up."],
+  ["高级华文",
+   "Graded Distinction, Merit or Pass, and it does NOT go into the score. It "+
+   "buys a posting advantage at a SAP school on a score of 14 or better, and "+
+   "where two children with the same score want the same SAP place, the better "+
+   "华文 grade goes first - ahead of the ordinary tie-breakers."],
+  ["Same score, one seat",
+   "Citizenship first (citizens, then PRs, then international students), then "+
+   "who put the school higher on their list, and only then a ballot."]
+];
+
 var SEED_ACTS = [
   /* SC — from the printed weekly schedule */
   {id:"sa1", who:"sc", day:"Monday",    from:"16:00", to:"17:00", t:"Phonics"},

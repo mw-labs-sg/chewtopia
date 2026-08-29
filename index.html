@@ -462,6 +462,29 @@
      more than a list that quietly leaves things out */
   .cca.shut{color:var(--soft);opacity:.55}
 
+  /* ---- how the PSLE is scored: two tables and a short set of notes ---- */
+  .pgrid{display:grid;grid-template-columns:1fr;gap:12px}
+  @media(min-width:620px){ .pgrid{grid-template-columns:1fr 1fr} }
+  .pblk{background:var(--bg);border:2px solid var(--line);border-radius:16px;
+    padding:12px 14px 13px}
+  .pblk h3{margin:0 0 10px;font-family:'Baloo 2',cursive;font-size:16px;
+    font-weight:700;color:var(--ink)}
+  .ptab{display:grid;grid-template-columns:auto 1fr;column-gap:12px;row-gap:1px;
+    align-items:baseline}
+  .pk{font-size:13px;font-weight:800;color:var(--blue);white-space:nowrap;
+    padding:4px 0}
+  .pk.num{font-variant-numeric:tabular-nums}
+  .pv{font-size:13.5px;color:var(--ink);padding:4px 0;line-height:1.35}
+  .pv b{font-weight:800}
+  .pv i{display:block;font-style:normal;font-size:12px;color:var(--soft);
+    margin-top:1px;line-height:1.35}
+  .pnote{margin:10px 0 0;font-size:12px;color:var(--soft);line-height:1.5}
+  .pnotes{display:grid;grid-template-columns:1fr;gap:10px;margin-top:12px}
+  .pn{border-left:3px solid var(--line);padding:1px 0 1px 11px}
+  .pn b{display:block;font-size:13.5px;font-weight:800;color:var(--ink);
+    margin-bottom:2px}
+  .pn span{display:block;font-size:13px;color:var(--soft);line-height:1.55}
+
   /* ---- progress matrix: each boy gets three subject columns ---- */
   .mxkey{display:flex;gap:12px;flex-wrap:wrap;align-items:center;font-size:12.5px;
     color:var(--soft);font-weight:600;margin-bottom:12px}
@@ -720,7 +743,7 @@ body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;-
   </header>
   <nav class="tabs" id="tabs" aria-label="Sections"></nav>
   <main id="view" tabindex="-1"></main>
-  <p class="foot">Saved on this device · build 109</p>
+  <p class="foot">Saved on this device · build 110</p>
 </div>
 <!-- load order matters: data, then core, then screens, app last -->
 <!-- Pinned to an exact version with a hash to match: "@2" floats, so a bad
@@ -730,10 +753,10 @@ body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3"
         integrity="sha384-l8ah+VgaWtk1mvOe9VC+OirC6qHFF4yH7l7mKRidV9MSti3E9F463bMp6ZVN4kuC"
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script src="data.js?v=34"></script>
+<script src="data.js?v=35"></script>
 <script src="core.js?v=48"></script>
 <script src="timetable.js?v=6"></script>
 <script src="training.js?v=51"></script>
-<script src="app.js?v=84"></script>
+<script src="app.js?v=85"></script>
 </body>
 </html>

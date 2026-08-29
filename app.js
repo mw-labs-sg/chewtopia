@@ -175,6 +175,47 @@ function vCCA(){
   s+='</div><div class="key">From MOE\u2019s school listing. It names the CCAs and '+
      'who each one takes, but not which levels they start at or when they meet '+
      '\u2014 the school sends that out itself.</div></div>';
+  return s+vPSLE();
+}
+
+/* Neither boy is anywhere near sitting it - TC is P2 - but the CCA choice, the
+   高级华文 he is already doing and every streaming conversation all point at
+   this, and it is easier to read once here than to half-remember it off a
+   parents' group. Reference only: nothing on this panel is tappable. */
+function vPSLE(){
+  var al = (typeof PSLE_AL!=="undefined" ? PSLE_AL : []);
+  var pg = (typeof PSLE_PG!=="undefined" ? PSLE_PG : []);
+  var nt = (typeof PSLE_NOTES!=="undefined" ? PSLE_NOTES : []);
+  if(!al.length) return "";
+  var s='<div class="panel"><h2><span class="em">\uD83D\uDCCF</span> How the PSLE is scored'+
+        '<span class="side">TC 2030 \u00b7 SC 2032</span></h2>';
+
+  s+='<div class="pgrid">';
+  s+='<div class="pblk"><h3>Each subject, out of 8</h3><div class="ptab">';
+  al.forEach(function(a){
+    s+='<span class="pk">'+esc(a.al)+'</span><span class="pv">'+esc(a.m)+'</span>';
+  });
+  s+='</div><p class="pnote">MOE calls these reference ranges: the AL is set '+
+     'against the cohort, so the marks are a guide and not a promise.</p></div>';
+
+  s+='<div class="pblk"><h3>The four added up, 4 to 32</h3><div class="ptab">';
+  pg.forEach(function(g){
+    s+='<span class="pk num">'+esc(g.s)+'</span><span class="pv"><b>'+esc(g.g)+'</b>'+
+       (g.n?'<i>'+esc(g.n)+'</i>':'')+'</span>';
+  });
+  s+='</div><p class="pnote">Lower is better. The posting group sets which '+
+     'level the subjects start at in secondary one, not which school.</p></div>';
+  s+='</div>';
+
+  s+='<div class="pnotes">';
+  nt.forEach(function(n){
+    s+='<div class="pn"><b>'+esc(n[0])+'</b><span>'+esc(n[1])+'</span></div>';
+  });
+  s+='</div>';
+
+  s+='<div class="key">All of it is MOE\u2019s, off the PSLE scoring and '+
+     'secondary-one posting pages. Rules change \u2014 check them again nearer '+
+     'the time rather than trusting this screen.</div></div>';
   return s;
 }
 
