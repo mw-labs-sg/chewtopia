@@ -150,8 +150,34 @@ function vLinks(){
   s+='</div><div class="key">Chewtopia never asks for or keeps a password. '+
      'Each of these takes you to the school\u2019s own login page, where the '+
      'usual MIMS details go in.</div></div>';
+  return s+vCCA();
+}
+
+/* Both boys are boys, so the girls-only CCAs are shown but greyed: knowing
+   Chinese Dance exists and is not open to them is worth more than a list that
+   quietly leaves things out. Nothing here is tappable - it is a reference
+   column, not a chooser, and the school runs the actual sign-up. */
+function vCCA(){
+  var g = (typeof NYPS_CCA!=="undefined" ? NYPS_CCA : []);
+  if(!g.length) return "";
+  var n=0; g.forEach(function(x){ n+=x.cca.length; });
+  var s='<div class="panel"><h2><span class="em">\uD83C\uDFC5</span> CCAs at Nanyang'+
+        '<span class="side">'+n+' to pick from</span></h2><div class="ccas">';
+  g.forEach(function(x){
+    s+='<div class="ccag"><h3><span class="em">'+x.em+'</span>'+esc(x.h)+'</h3>';
+    x.cca.forEach(function(c){
+      var shut = c.g==="g";   /* girls only - neither of ours can join */
+      s+='<span class="cca'+(shut?" shut":"")+'">'+esc(c.t)+
+         (c.g?'<i>'+(c.g==="b"?"boys":"girls")+'</i>':'')+'</span>';
+    });
+    s+='</div>';
+  });
+  s+='</div><div class="key">From MOE\u2019s school listing. It names the CCAs and '+
+     'who each one takes, but not which levels they start at or when they meet '+
+     '\u2014 the school sends that out itself.</div></div>';
   return s;
 }
+
 function wLinks(){
   document.querySelectorAll(".lnk").forEach(function(a){
     a.addEventListener("click", function(){ sfxTap(); });

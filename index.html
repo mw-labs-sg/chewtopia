@@ -445,6 +445,23 @@
   .lnk.l-mims{border-color:#F5D2C6;background:var(--peach)}
   .lnk.l-mims .lnt,.lnk.l-mims .lngo{color:var(--tang)}
 
+  /* ---- CCAs at Nanyang: a reference column, one block per group ---- */
+  .ccas{display:grid;grid-template-columns:1fr;gap:12px}
+  @media(min-width:620px){ .ccas{grid-template-columns:1fr 1fr} }
+  .ccag{background:var(--bg);border:2px solid var(--line);border-radius:16px;
+    padding:12px 14px 13px}
+  .ccag h3{margin:0 0 9px;font-family:'Baloo 2',cursive;font-size:16px;
+    font-weight:700;color:var(--ink);display:flex;align-items:center;gap:7px}
+  .ccag h3 .em{font-size:16px}
+  .cca{display:flex;align-items:baseline;gap:7px;font-size:14px;font-weight:600;
+    color:var(--ink);padding:4px 0;line-height:1.3}
+  .cca i{font-style:normal;font-size:10px;font-weight:800;text-transform:uppercase;
+    letter-spacing:.05em;border-radius:6px;padding:2px 5px;
+    background:#fff;color:var(--soft)}
+  /* girls only: still listed, because knowing it is there and shut is worth
+     more than a list that quietly leaves things out */
+  .cca.shut{color:var(--soft);opacity:.55}
+
   /* ---- progress matrix: each boy gets three subject columns ---- */
   .mxkey{display:flex;gap:12px;flex-wrap:wrap;align-items:center;font-size:12.5px;
     color:var(--soft);font-weight:600;margin-bottom:12px}
@@ -703,7 +720,7 @@ body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;-
   </header>
   <nav class="tabs" id="tabs" aria-label="Sections"></nav>
   <main id="view" tabindex="-1"></main>
-  <p class="foot">Saved on this device · build 108</p>
+  <p class="foot">Saved on this device · build 109</p>
 </div>
 <!-- load order matters: data, then core, then screens, app last -->
 <!-- Pinned to an exact version with a hash to match: "@2" floats, so a bad
@@ -713,10 +730,10 @@ body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3"
         integrity="sha384-l8ah+VgaWtk1mvOe9VC+OirC6qHFF4yH7l7mKRidV9MSti3E9F463bMp6ZVN4kuC"
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script src="data.js?v=33"></script>
+<script src="data.js?v=34"></script>
 <script src="core.js?v=48"></script>
 <script src="timetable.js?v=6"></script>
 <script src="training.js?v=51"></script>
-<script src="app.js?v=83"></script>
+<script src="app.js?v=84"></script>
 </body>
 </html>

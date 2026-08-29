@@ -702,6 +702,48 @@ var SCHOOL_LINKS = [
    u:"https://idp.mims.moe.gov.sg/nidp/app/login?id=mims", k:"mims"}
 ];
 
+/* ==========================================================================
+   CCAs AT NANYANG PRIMARY - what the school offers, so the choice is not a
+   surprise the term it has to be made. The names, and who each one takes, are
+   off MOE's own school listing for Nanyang Primary:
+   moe.gov.sg/schoolfinder/schooldetail/nanyang-primary-school
+   Two things that listing does NOT say, so they are not claimed here: which
+   levels each CCA takes, and when any of them meet. The school sends that out
+   itself. The four groups are the usual MOE headings and are our own tidying
+   up - the listing itself is one flat list of twenty.
+   g: "b" boys only, "g" girls only, "" open to both.
+   ========================================================================== */
+var NYPS_CCA = [
+  {h:"Sports", em:"\uD83C\uDFC3", cca:[
+    {t:"Artistic Gymnastics", g:"g"},
+    {t:"Badminton",           g:""},
+    {t:"Basketball",          g:""},
+    {t:"Football",            g:"b"},
+    {t:"Table Tennis",        g:""},
+    {t:"Tennis",              g:""},
+    {t:"Track and Field",     g:""},
+    {t:"Wushu",               g:""}
+  ]},
+  {h:"Visual and performing arts", em:"\uD83C\uDFB5", cca:[
+    {t:"Art and Crafts",                         g:""},
+    {t:"Chinese Calligraphy and Brush Painting", g:""},
+    {t:"Chinese Dance",                          g:"g"},
+    {t:"Chinese Orchestra",                      g:""},
+    {t:"Choir",                                  g:"b"},
+    {t:"String Ensemble",                        g:""}
+  ]},
+  {h:"Clubs and societies", em:"\u265F\uFE0F", cca:[
+    {t:"International Chess", g:""},
+    {t:"Robotics",            g:""}
+  ]},
+  {h:"Uniformed groups", em:"\uD83E\uDDE2", cca:[
+    {t:"Boys\u2019 Brigade",     g:"b"},
+    {t:"Girl Guides (Brownies)", g:"g"},
+    {t:"Girls\u2019 Brigade",    g:"g"},
+    {t:"Scouts",                 g:""}
+  ]}
+];
+
 var SEED_ACTS = [
   /* SC — from the printed weekly schedule */
   {id:"sa1", who:"sc", day:"Monday",    from:"16:00", to:"17:00", t:"Phonics"},
