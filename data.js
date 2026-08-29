@@ -734,22 +734,22 @@ var NYPS_CCA = [
     {t:"Wushu",               g:"",  dsa:"Sports and games", ri:""}
   ]},
   {h:"Visual and performing arts", em:"\uD83C\uDFB5", cca:[
-    {t:"Art and Crafts",                         g:"",  dsa:"Visual, literary and performing arts", ri:"Visual Arts"},
-    {t:"Chinese Calligraphy and Brush Painting", g:"",  dsa:"Visual, literary and performing arts", ri:""},
+    {t:"Art and Crafts",                         g:"",  dsa:"Visual, literary and performing arts", ri:"Visual Arts", near:1},
+    {t:"Chinese Calligraphy and Brush Painting", g:"",  dsa:"Visual, literary and performing arts", ri:"Visual Arts", near:1},
     {t:"Chinese Dance",                          g:"g", dsa:"Visual, literary and performing arts", ri:"", no:1},
     {t:"Chinese Orchestra",                      g:"",  dsa:"Visual, literary and performing arts", ri:"Chinese Orchestra"},
     {t:"Choir",                                  g:"b", dsa:"Visual, literary and performing arts", ri:"Choir"},
     {t:"String Ensemble",                        g:"",  dsa:"Visual, literary and performing arts", ri:"String Ensemble"}
   ]},
   {h:"Clubs and societies", em:"\u265F\uFE0F", cca:[
-    {t:"International Chess", g:"", dsa:"Sports and games",                   ri:"", no:1},
+    {t:"International Chess", g:"", dsa:"Sports and games",                     ri:"", no:1},
     {t:"Robotics",            g:"", dsa:"Science, mathematics and engineering", ri:"", no:1}
   ]},
   {h:"Uniformed groups", em:"\uD83E\uDDE2", cca:[
-    {t:"Boys\u2019 Brigade",         g:"b", dsa:"Uniformed groups", ri:"Leadership & Character"},
-    {t:"Girl Guides (Brownies)", g:"g", dsa:"Uniformed groups", ri:"Leadership & Character"},
-    {t:"Girls\u2019 Brigade",        g:"g", dsa:"Uniformed groups", ri:"Leadership & Character"},
-    {t:"Scouts",                 g:"",  dsa:"Uniformed groups", ri:"Leadership & Character"}
+    {t:"Boys\u2019 Brigade",         g:"b", dsa:"Uniformed groups", ri:"Leadership & Character", near:1},
+    {t:"Girl Guides (Brownies)", g:"g", dsa:"Uniformed groups", ri:"Leadership & Character", near:1},
+    {t:"Girls\u2019 Brigade",        g:"g", dsa:"Uniformed groups", ri:"Leadership & Character", near:1},
+    {t:"Scouts",                 g:"",  dsa:"Uniformed groups", ri:"Leadership & Character", near:1}
   ]}
 ];
 
@@ -780,6 +780,12 @@ var CCA_NOTES = [
    "audition or interview. Almost none of that comes from the school CCA "+
    "alone. Six years of turning up to Choir on a Wednesday is not evidence "+
    "of anything."],
+  ["A dotted RI tag is a near miss, not a match",
+   "Art and Crafts, calligraphy and the uniformed groups are marked against "+
+   "Visual Arts and Leadership & Character, which is the nearest thing RI runs "+
+   "\u2014 not an area of the same name. Read those as \"the same part of the "+
+   "school\", not as \"this counts\". The solid ones are exact: RI runs an area "+
+   "called exactly that."],
   ["So pick it for the six years",
    "This is four hours a week of his life until he is eighteen. Choosing it "+
    "to game an application that mostly looks elsewhere is optimising the "+
@@ -810,6 +816,20 @@ var PSLE_AL = [
   {al:"AL 6", m:"45 to 64"},
   {al:"AL 7", m:"20 to 44"},
   {al:"AL 8", m:"below 20"}
+];
+
+/* Where the totals come from, because "4 to 6" means nothing until you have
+   seen it added up once. Four subjects, one AL each, so the smallest total
+   possible is four ones and the largest is four eights. It is not a mark out
+   of anything and it is not a percentage - it is four small numbers added. */
+var PSLE_MAKE = [
+  {n:"4",  sum:"1 + 1 + 1 + 1", w:"90 or more in all four subjects. Nothing better exists."},
+  {n:"5",  sum:"1 + 1 + 1 + 2", w:"Three at 90+, one at 85-89."},
+  {n:"6",  sum:"1 + 1 + 2 + 2", w:"Two at 90+, two at 85-89."},
+  {n:"8",  sum:"2 + 2 + 2 + 2", w:"85-89 across the board."},
+  {n:"12", sum:"3 + 3 + 3 + 3", w:"80-84 across the board."},
+  {n:"20", sum:"5 + 5 + 5 + 5", w:"65-74 across the board."},
+  {n:"32", sum:"8 + 8 + 8 + 8", w:"The largest total there is."}
 ];
 
 /* What the total opens up. G3/G2/G1 are the subject levels that replaced
@@ -844,6 +864,105 @@ var PSLE_NOTES = [
   ["Same score, one seat",
    "Citizenship first (citizens, then PRs, then international students), then "+
    "who put the school higher on their list, and only then a ballot."]
+];
+
+/* ==========================================================================
+   THE WORDS - every abbreviation on this tab, decoded once. Nothing here is
+   an opinion; it is what each term means, and where it bites for our two.
+   ========================================================================== */
+var JARGON = [
+  {k:"AL", t:"Achievement Level",
+   d:"One per subject, 1 to 8, and 1 is the best. It is the band his raw mark "+
+     "falls in - AL 1 is 90 and above, AL 8 is under 20. He gets four of them."},
+  {k:"PSLE Score", t:"The four ALs added together",
+   d:"That is all it is. Smallest possible 4, largest 32, and LOWER IS BETTER. "+
+     "It is not a percentage and not a mark out of anything."},
+  {k:"4 to 6", t:"What a school's range means",
+   d:"The band of totals that school actually took at the last posting. \"4 to "+
+     "6\" means everyone admitted had four ALs adding to between 4 and 6 - "+
+     "AL 1 in all four subjects, or one band worse in two of them. It is not a "+
+     "target the school sets; it is what the applicants happened to be."},
+  {k:"(D) (M)", t:"The Higher Chinese grade on a cut-off",
+   d:"Distinction and Merit. \"4(D) to 6(M)\" means the last child in got a 6 "+
+     "AND a Merit in Higher Chinese. Where a range carries one, the number on "+
+     "its own was not enough."},
+  {k:"HCL / 高级华文", t:"Higher Chinese Language",
+   d:"Graded Distinction, Merit or Pass, and it does NOT go into the score. It "+
+     "buys a SAP posting advantage at a score of 14 or better, and where two "+
+     "children tie for a SAP seat the better grade goes first. TC does it "+
+     "already; it is most of why the practice in this app is 高级华文."},
+  {k:"PG1 PG2 PG3", t:"Posting Group",
+   d:"Which band he is posted into, from his score. PG3 is 4-20 and is the "+
+     "most demanding; PG2 is 23-24; PG1 is 26-30. It decides the level his "+
+     "subjects start at, not which school he goes to."},
+  {k:"G1 G2 G3", t:"Subject levels",
+   d:"What replaced Normal (Technical), Normal (Academic) and Express. Set per "+
+     "subject rather than for the whole child, and moved up or down later on "+
+     "how he actually does."},
+  {k:"IP", t:"Integrated Programme",
+   d:"Six years in one school straight through to A levels, skipping O levels "+
+     "entirely. Entered at Secondary 1. RI, Hwa Chong, Dunman, NJC, Victoria "+
+     "and River Valley on our list all run one."},
+  {k:"SAP", t:"Special Assistance Plan",
+   d:"The Chinese-medium heritage schools. Everyone does Higher Chinese, and "+
+     "the culture is bilingual by design. Nanyang Primary is a SAP school, "+
+     "which is why the 华文 load is what it is."},
+  {k:"DSA", t:"Direct School Admission",
+   d:"Applying in P6 on a talent, before the PSLE is sat. Free, and binding: "+
+     "accept a place and there are no S1 posting choices and no transfer after "+
+     "results."},
+  {k:"S1 Posting", t:"The ordinary route",
+   d:"Score plus his ranked list of schools. Ties are broken by citizenship, "+
+     "then who ranked the school higher, then a ballot."},
+  {k:"Affiliation", t:"A lower bar at a linked secondary",
+   d:"Some primaries feed a secondary and their children get in on a gentler "+
+     "range. Nanyang Primary's is Nanyang Girls' High, which takes girls, so "+
+     "neither of ours has one. Worth knowing early."}
+];
+
+/* ==========================================================================
+   WHAT WE ACTUALLY HAVE TO DO - the whole thing above, turned into the few
+   things that are ours to act on, in the order they happen.
+
+   The month names are the shape of the year, taken from MOE's 2026 exercise;
+   they move by a week or two each year and MOE publishes the real ones each
+   January. TC sits the PSLE in 2030, SC in 2032.
+   ========================================================================== */
+var TODO = [
+  {w:"Now, and for years", t:"Nothing to submit. Two things to build.",
+   d:"There is no form and no application before P6. What compounds between "+
+     "now and then is only this: the four PSLE subjects, and 高级华文. Every "+
+     "SAP cut-off in the table above carries a (D) or an (M), so the 华文 is "+
+     "not extra credit - it is part of the price."},
+  {w:"Around P3", t:"Pick a CCA he will still want in Secondary 3.",
+   d:"Not the one with the best tag. The one he stays in long enough to get "+
+     "good at, because the standard is what is looked at and the membership is "+
+     "not. If he is going to be serious about a sport or an instrument, the "+
+     "level that counts is usually built outside school as well - a club, a "+
+     "coach, graded exams."},
+  {w:"P4 to P6", t:"Keep the evidence.",
+   d:"Certificates, competition results, graded music exams, any age-group or "+
+     "national selection. A DSA application is that pile plus a trial or an "+
+     "audition. Nobody reconstructs four years of it in May of P6."},
+  {w:"P6, January to May", t:"Look at schools, in person.",
+   d:"Open houses run through this window. This is also when each school "+
+     "publishes its own DSA talent areas for that year - RI takes its list "+
+     "down between exercises, so the one in this app is last round's."},
+  {w:"P6, early May to early June", t:"DSA applications, if we are doing one.",
+   d:"One window for every school, free, done online. Miss it and that is the "+
+     "year gone."},
+  {w:"P6, June to August", t:"Trials, auditions and interviews.",
+   d:"Each school runs its own and they clash. This is the part that actually "+
+     "decides a DSA place."},
+  {w:"P6, late October", t:"Rank the DSA schools that made an offer.",
+   d:"Only if there was an offer. Ranking one is a commitment, not a hedge."},
+  {w:"P6, late November", t:"DSA results - before the PSLE result.",
+   d:"Take a place and school choices at S1 posting are gone, and so is "+
+     "transferring after the results come out."},
+  {w:"P6, late November onward", t:"PSLE result, then choose six schools.",
+   d:"Only if there is no DSA place. Rank them honestly - the second "+
+     "tie-breaker is who put the school higher, so a wishful first choice "+
+     "costs nothing but a dishonest order does."}
 ];
 
 /* ==========================================================================

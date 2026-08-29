@@ -460,11 +460,27 @@
     color:var(--ink)}
   /* the second line: which DSA category it counts in, and whether RI takes it */
   .cca u{display:flex;flex-wrap:wrap;align-items:center;gap:6px;text-decoration:none;
-    font-size:11px;font-weight:700;color:var(--soft);margin-top:3px}
-  .cca em{font-style:normal;font-size:10px;font-weight:800;text-transform:uppercase;
-    letter-spacing:.04em;border-radius:6px;padding:2px 6px;
-    background:#fff;color:var(--soft)}
-  .cca em.yes{background:#DFF3E4;color:#2F7A45}
+    font-size:11px;font-weight:700;color:var(--soft);margin-top:5px}
+  /* two bubbles, not one tag: the first says which DSA category it counts in,
+     the second whether Raffles runs an area of that name. They were one line
+     to begin with and got read as a single claim about getting in. */
+  .cca em.bub{display:inline-flex;align-items:center;gap:5px;font-style:normal;
+    font-size:11px;font-weight:700;border-radius:999px;padding:3px 9px 3px 4px;
+    background:#fff;color:var(--soft);border:1.5px solid var(--line)}
+  .cca em.bub i{font-style:normal;font-size:9px;font-weight:800;
+    text-transform:uppercase;letter-spacing:.06em;border-radius:999px;
+    padding:2px 6px;background:var(--line);color:var(--ink)}
+  .cca em.dsa{border-color:#BBD7FA;background:var(--sky);color:#1E5BB8}
+  .cca em.dsa i{background:var(--blue);color:#fff}
+  .cca em.ri{border-color:#BFE3CB;background:#DFF3E4;color:#2F7A45}
+  .cca em.ri i{background:#2F7A45;color:#fff}
+  /* nearest-thing rather than a name match, and dashed so it cannot be read
+     as the same claim as an exact one */
+  .cca em.ri.near{border-style:dashed}
+  .cca em.ri.near s{text-decoration:none;font-size:9px;font-weight:800;
+    text-transform:uppercase;letter-spacing:.05em;opacity:.7}
+  .cca em.ri.off{border-color:var(--line);background:#fff;color:var(--soft)}
+  .cca em.ri.off i{background:var(--line);color:var(--soft)}
   .cca i{font-style:normal;font-size:10px;font-weight:800;text-transform:uppercase;
     letter-spacing:.05em;border-radius:6px;padding:2px 5px;
     background:#fff;color:var(--soft)}
@@ -494,6 +510,45 @@
   .pn b{display:block;font-size:13.5px;font-weight:800;color:var(--ink);
     margin-bottom:2px}
   .pn span{display:block;font-size:13px;color:var(--soft);line-height:1.55}
+
+  /* ---- where a PSLE total comes from: number, the sum, what it means ---- */
+  .mktab{display:grid;grid-template-columns:auto auto 1fr;column-gap:12px;row-gap:2px;
+    align-items:baseline}
+  .mkn{font-family:'Baloo 2',cursive;font-size:19px;font-weight:700;
+    color:var(--blue);text-align:right;font-variant-numeric:tabular-nums;
+    padding:3px 0}
+  .mks{font-size:12.5px;font-weight:800;color:var(--ink);white-space:nowrap;
+    font-variant-numeric:tabular-nums;padding:3px 0}
+  .mkw{font-size:12.5px;color:var(--soft);line-height:1.4;padding:3px 0}
+  @media(max-width:420px){
+    .mktab{grid-template-columns:auto 1fr}
+    .mkw{grid-column:2}
+  }
+
+  /* ---- the glossary: the short form, what it stands for, what it does ---- */
+  .jgs{display:grid;grid-template-columns:1fr;gap:10px}
+  @media(min-width:620px){ .jgs{grid-template-columns:1fr 1fr} }
+  .jg{background:var(--bg);border:2px solid var(--line);border-radius:14px;
+    padding:10px 13px 11px}
+  .jgk{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.05em;
+    color:#fff;background:var(--blue);border-radius:999px;padding:3px 9px}
+  .jgt{display:block;font-family:'Baloo 2',cursive;font-size:15px;font-weight:700;
+    color:var(--ink);margin-top:6px;line-height:1.2}
+  .jgd{display:block;font-size:12.5px;color:var(--soft);line-height:1.55;margin-top:4px}
+
+  /* ---- what to do: a numbered run down the page ---- */
+  .tds{display:grid;grid-template-columns:1fr;gap:2px}
+  .td{display:grid;grid-template-columns:26px 1fr;column-gap:11px;row-gap:2px;
+    padding:11px 0;border-bottom:1px solid var(--line)}
+  .td:last-child{border-bottom:none}
+  .tdn{grid-row:1/4;font-family:'Baloo 2',cursive;font-size:15px;font-weight:700;
+    color:#fff;background:var(--blue);border-radius:50%;width:26px;height:26px;
+    line-height:26px;text-align:center}
+  .tdw{font-size:10.5px;font-weight:800;text-transform:uppercase;
+    letter-spacing:.06em;color:var(--tang)}
+  .tdt{font-family:'Baloo 2',cursive;font-size:16px;font-weight:700;
+    color:var(--ink);line-height:1.25;margin-top:1px}
+  .tdd{font-size:13px;color:var(--soft);line-height:1.55;margin-top:3px}
 
   /* ---- secondary schools: one card each, the range it took on the right ---- */
   .schs{display:grid;grid-template-columns:1fr;gap:8px;margin-bottom:14px}
@@ -844,7 +899,7 @@ body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;-
   </header>
   <nav class="tabs" id="tabs" aria-label="Sections"></nav>
   <main id="view" tabindex="-1"></main>
-  <p class="foot">Saved on this device · build 113</p>
+  <p class="foot">Saved on this device · build 114</p>
 </div>
 <!-- load order matters: data, then core, then screens, app last -->
 <!-- Pinned to an exact version with a hash to match: "@2" floats, so a bad
@@ -854,10 +909,10 @@ body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3"
         integrity="sha384-l8ah+VgaWtk1mvOe9VC+OirC6qHFF4yH7l7mKRidV9MSti3E9F463bMp6ZVN4kuC"
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script src="data.js?v=37"></script>
+<script src="data.js?v=38"></script>
 <script src="core.js?v=50"></script>
 <script src="timetable.js?v=6"></script>
 <script src="training.js?v=51"></script>
-<script src="app.js?v=88"></script>
+<script src="app.js?v=89"></script>
 </body>
 </html>

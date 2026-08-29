@@ -172,11 +172,12 @@ function vCCA(){
       var shut = c.g==="g";   /* girls only - neither of ours can join */
       s+='<span class="cca'+(shut?" shut":"")+'">'+
          '<b>'+esc(c.t)+(c.g?'<i>'+(c.g==="b"?"boys":"girls")+'</i>':'')+'</b>'+
-         '<u>'+esc(c.dsa||"")+
-           (c.ri ? '<em class="yes" title="Raffles ran a talent area of this '+
-                   'name last round. It is not a route in.">RI runs this area</em>'
-                 : '<em title="Raffles does not run this area. Other schools '+
-                   'do.">not an RI area</em>')+
+         '<u>'+
+           '<em class="bub dsa"><i>DSA</i>'+esc(c.dsa||"")+'</em>'+
+           (c.ri
+             ? '<em class="bub ri'+(c.near?" near":"")+'"><i>RI</i>'+esc(c.ri)+
+               (c.near?' <s>nearest</s>':'')+'</em>'
+             : '<em class="bub ri off"><i>RI</i>none</em>')+
          '</u></span>';
     });
     s+='</div>';
@@ -199,7 +200,7 @@ function vCCA(){
      'then whether Raffles runs an area of that name. RI publishes its list '+
      'only while the exercise is open, so it is from the last one it ran and '+
      'RI reviews it every year.</div></div>';
-  return s+vSchools()+vPSLE();
+  return s+vPSLE()+vJargon()+vSchools()+vTodo();
 }
 
 /* Neither boy is anywhere near sitting it - TC is P2 - but the CCA choice, the
@@ -230,6 +231,25 @@ function vPSLE(){
   s+='</div><p class="pnote">Lower is better. The posting group sets which '+
      'level the subjects start at in secondary one, not which school.</p></div>';
   s+='</div>';
+
+  /* "4 to 6" is meaningless until it has been added up once in front of you,
+     which is exactly how it was misread the first time this panel went up. */
+  var mk = (typeof PSLE_MAKE!=="undefined" ? PSLE_MAKE : []);
+  if(mk.length){
+    s+='<div class="pblk" style="margin-top:12px"><h3>Where a total comes from</h3>'+
+       '<p class="pnote" style="margin:0 0 9px">Four subjects, one AL each, '+
+       'added. That is the whole calculation \u2014 it is not a percentage and '+
+       'not a mark out of anything.</p><div class="mktab">';
+    mk.forEach(function(m){
+      s+='<span class="mkn">'+esc(m.n)+'</span>'+
+         '<span class="mks">'+esc(m.sum)+'</span>'+
+         '<span class="mkw">'+esc(m.w)+'</span>';
+    });
+    s+='</div><p class="pnote">So a school that took <b>4 to 6</b> took '+
+       'children who were at AL 1 in every subject, or one band down in two of '+
+       'them. A school that took <b>4(D) to 8(M)</b> took up to four ones and '+
+       'four twos, and wanted a Higher Chinese grade with it.</p></div>';
+  }
 
   s+='<div class="pnotes">';
   nt.forEach(function(n){
@@ -438,6 +458,41 @@ function wGrow(){
       sfxTap(); render();
     };
   });
+}
+
+/* Every abbreviation on this tab in one place. It sits between the scoring
+   and the school table on purpose: the table is unreadable without it. */
+function vJargon(){
+  var j = (typeof JARGON!=="undefined" ? JARGON : []);
+  if(!j.length) return "";
+  var s='<div class="panel"><h2><span class="em">\uD83D\uDD24</span> What the words mean'+
+        '<span class="side">'+j.length+' of them</span></h2><div class="jgs">';
+  j.forEach(function(x){
+    s+='<div class="jg"><span class="jgk">'+esc(x.k)+'</span>'+
+       '<span class="jgt">'+esc(x.t)+'</span>'+
+       '<span class="jgd">'+esc(x.d)+'</span></div>';
+  });
+  return s+'</div></div>';
+}
+
+/* The whole tab turned into the handful of things that are actually ours to
+   do, in the order they happen. Everything above this is background; this is
+   the part with a date on it. */
+function vTodo(){
+  var t = (typeof TODO!=="undefined" ? TODO : []);
+  if(!t.length) return "";
+  var s='<div class="panel"><h2><span class="em">\u2705</span> What we actually have to do'+
+        '<span class="side">TC sits it 2030 \u00b7 SC 2032</span></h2><div class="tds">';
+  t.forEach(function(x,i){
+    s+='<div class="td"><span class="tdn">'+(i+1)+'</span>'+
+       '<span class="tdw">'+esc(x.w)+'</span>'+
+       '<span class="tdt">'+esc(x.t)+'</span>'+
+       '<span class="tdd">'+esc(x.d)+'</span></div>';
+  });
+  return s+'</div><div class="key">The months are the shape of the year, off '+
+    'MOE\u2019s 2026 exercise \u2014 they shift by a week or two and MOE publishes '+
+    'the real dates each January. Nothing on this list can be done early, and '+
+    'the only two that can be missed outright are the DSA windows.</div></div>';
 }
 
 function vSchools(){
