@@ -1168,7 +1168,14 @@ var SEED_GROW = [
      lens while the rule is back on the wall, and that parallax alone moves the
      apparent number by several centimetres. If the height line ever looks
      wrong, this is the reading to measure again. */
-  {id:"gsc-20260830", who:"sc", d:"2026-08-30", w:18.5, h:113}
+  {id:"gsc-20260830", who:"sc", d:"2026-08-30", w:18.5, h:113},
+
+  /* Same morning, TC against the same wall rule. Both numbers check out on
+     the photos: 23.7 is on the Xiaomi display, and the top of his head sits
+     just under the 130 mark, which is what 129 looks like. A better shot than
+     SC's - the rule and the boy are in the same plane and the whole scale is
+     in frame, so this one did not have to be taken on trust. */
+  {id:"gtc-20260830", who:"tc", d:"2026-08-30", w:23.7, h:129}
 ];
 
 var SEED_ACTS = [
