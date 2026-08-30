@@ -678,10 +678,14 @@ function vHome(){
 
 /* Meals and Growth were a tab each and are now one screen, stacked, with no
    inner tabs: what they eat and how they grow is one conversation, and two
-   half-empty tabs cost more to walk past than one honest one. Nothing about
-   either half changed - they are the same panels in the same order. */
-function vMealsGrow(){ return vMeals()+vGrow(); }
-function wMealsGrow(){ wMeals(); wGrow(); }
+   half-empty tabs cost more to walk past than one honest one.
+
+   Growth goes first. The charts are the reason to open this screen - two
+   numbers a month that only mean anything as a line - while the meal plan is
+   a rota that mostly runs itself and gets glanced at. Whatever is worth
+   looking at should not need scrolling past a week of dinners. */
+function vMealsGrow(){ return vGrow()+vMeals(); }
+function wMealsGrow(){ wGrow(); wMeals(); }
 
 function vMeals(){
   var m=SJ("meals:"+monKey(),null)||mealPlan();
