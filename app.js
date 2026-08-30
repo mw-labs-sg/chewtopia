@@ -288,61 +288,87 @@ function isoFromDays(n){
 }
 function kidCol(id){ return id==="tc" ? "var(--blue)" : "var(--tang)"; }
 
-/* One chart, one boy, one measurement.
+/* One chart per boy, carrying both his numbers.
 
-   Both boys used to share an axis and it was the wrong way round. TC is around
-   24kg and SC around 18.5, so a shared weight scale spans seven kilos and the
-   third of a kilo either of them puts on in a month is a flat line inside it.
-   Split per boy and each chart scales to his own range, which is the only way
-   his own progress is visible at all. It also means no legend and no name
-   riding the line: the panel around the chart already says whose it is.
+   Weight and height cannot share a scale - he is 18kg and 113cm, so on one
+   axis the weight line is flat against the floor - so each gets its own: kg
+   down the left in his colour, cm down the right in grey, both normalised to
+   their own range so each line uses the full height of the box. The two are
+   told apart by more than colour, since colour alone fails on a printout and
+   for anyone colour-blind: weight is solid, height is dashed, and each line
+   carries its unit at the end.
 
-   Returns "" when there is nothing to draw, so the caller says so in words. */
-function growChart(who, field, unit){
-  var W=320, H=140, L=36, R=8, T=10, B=20;
-  var pts=[], loY=null, hiY=null;
-  growList(who).forEach(function(r){
-    var v=parseFloat(r[field]); if(isNaN(v)) return;
-    pts.push({x:growDays(r.d), y:v});
-    if(loY===null||v<loY) loY=v;
-    if(hiY===null||v>hiY) hiY=v;
+   Sharing a chart is the point. Weight and height moving together is growth;
+   one moving without the other is the thing worth noticing, and that only
+   shows when they are drawn over each other.
+
+   Returns "" when there is nothing to draw. */
+function growChart(who){
+  var W=320, H=150, L=34, R=32, T=14, B=20;
+  var rows=growList(who);
+
+  function build(field){
+    var pts=[], lo=null, hi=null;
+    rows.forEach(function(r){
+      var v=parseFloat(r[field]); if(isNaN(v)) return;
+      pts.push({x:growDays(r.d), y:v});
+      if(lo===null||v<lo) lo=v;
+      if(hi===null||v>hi) hi=v;
+    });
+    if(!pts.length) return null;
+    var pad=(hi-lo)*0.15 || Math.max(hi*0.04, 0.5);
+    return {pts:pts, y0:lo-pad, y1:hi+pad};
+  }
+  var wS=build("w"), hS=build("h");
+  if(!wS && !hS) return "";
+
+  /* one x scale for both, so a weight and a height taken the same morning sit
+     in the same column even when only one of them was recorded */
+  var loX=null, hiX=null;
+  [wS,hS].forEach(function(se){
+    if(!se) return;
+    se.pts.forEach(function(p){
+      if(loX===null||p.x<loX) loX=p.x;
+      if(hiX===null||p.x>hiX) hiX=p.x;
+    });
   });
-  if(!pts.length) return "";
-
-  var loX=pts[0].x, hiX=pts[pts.length-1].x;
-  /* One reading, or several on one day, would give a box with no width and
-     put every point in the same place. */
-  if(hiX===loX){ loX-=7; hiX+=7; }
-  var pad=(hiY-loY)*0.15 || Math.max(hiY*0.05, 1);
-  var y0=loY-pad, y1=hiY+pad;
+  if(hiX===loX){ loX-=7; hiX+=7; }   /* one reading would give a box no wider than a dot */
 
   function px(x){ return L + (x-loX)/(hiX-loX)*(W-L-R); }
-  function py(v){ return T + (1-(v-y0)/(y1-y0))*(H-T-B); }
+  function py(se,v){ return T + (1-(v-se.y0)/(se.y1-se.y0))*(H-T-B); }
 
   var col=kidCol(who);
   var g='<svg class="gch" viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none" '+
-        'role="img" aria-label="'+esc(pname(who))+', '+esc(unit)+' over time">';
+        'role="img" aria-label="'+esc(pname(who))+', weight and height over time">';
+
+  /* three lines across, with kg on the left and cm on the right against the
+     same three heights - each column reading its own scale */
   for(var i=0;i<3;i++){
-    var v=y0+(y1-y0)*i/2, yy=py(v);
-    g+='<line class="ggl" x1="'+L+'" y1="'+yy.toFixed(1)+'" x2="'+(W-R)+
-       '" y2="'+yy.toFixed(1)+'"/>'+
-       '<text class="gyl" x="'+(L-6)+'" y="'+(yy+3).toFixed(1)+'">'+v.toFixed(1)+'</text>';
+    var f=i/2, yy=T+(1-f)*(H-T-B);
+    g+='<line class="ggl" x1="'+L+'" y1="'+yy.toFixed(1)+'" x2="'+(W-R)+'" y2="'+yy.toFixed(1)+'"/>';
+    if(wS) g+='<text class="gyl" style="fill:'+col+'" x="'+(L-5)+'" y="'+(yy+3).toFixed(1)+'">'+
+              (wS.y0+(wS.y1-wS.y0)*f).toFixed(1)+'</text>';
+    if(hS) g+='<text class="gyl r" x="'+(W-R+5)+'" y="'+(yy+3).toFixed(1)+'">'+
+              (hS.y0+(hS.y1-hS.y0)*f).toFixed(0)+'</text>';
   }
+  if(wS) g+='<text class="gun" style="fill:'+col+'" x="'+(L-5)+'" y="'+(T-4)+'">kg</text>';
+  if(hS) g+='<text class="gun r" x="'+(W-R+5)+'" y="'+(T-4)+'">cm</text>';
+
   g+='<text class="gxl" x="'+L+'" y="'+(H-5)+'">'+esc(dfull(isoFromDays(loX)))+'</text>'+
      '<text class="gxl end" x="'+(W-R)+'" y="'+(H-5)+'">'+esc(dfull(isoFromDays(hiX)))+'</text>';
 
-  if(pts.length>1){
-    /* a wash under the line: with one boy per chart there is nothing to
-       confuse it with, and it makes a shallow climb read as a climb */
-    var area=pts.map(function(p){ return px(p.x).toFixed(1)+","+py(p.y).toFixed(1); }).join(" ");
-    g+='<polygon class="gfil" style="fill:'+col+'" points="'+
-       px(pts[0].x).toFixed(1)+','+(H-B)+' '+area+' '+px(pts[pts.length-1].x).toFixed(1)+','+(H-B)+'"/>'+
-       '<polyline class="gln" points="'+area+'" style="stroke:'+col+'"/>';
+  function draw(se, cls, stroke){
+    if(!se) return;
+    var d=se.pts.map(function(p){ return px(p.x).toFixed(1)+","+py(se,p.y).toFixed(1); }).join(" ");
+    if(se.pts.length>1)
+      g+='<polyline class="gln '+cls+'" points="'+d+'" style="stroke:'+stroke+'"/>';
+    se.pts.forEach(function(p){
+      g+='<circle class="gdot" cx="'+px(p.x).toFixed(1)+'" cy="'+py(se,p.y).toFixed(1)+
+         '" r="3" style="fill:'+stroke+'"/>';
+    });
   }
-  pts.forEach(function(p){
-    g+='<circle class="gdot" cx="'+px(p.x).toFixed(1)+'" cy="'+py(p.y).toFixed(1)+
-       '" r="3" style="fill:'+col+'"/>';
-  });
+  draw(wS, "w", col);
+  draw(hS, "h", "var(--soft)");
   return g+'</svg>';
 }
 
@@ -380,12 +406,17 @@ function growPanel(k){
        (bmi?' \u00b7 BMI '+bmi.toFixed(1):'')+'</div>';
   }
 
-  var wc=growChart(k.id,"w","kilograms"), hc=growChart(k.id,"h","centimetres");
-  if(wc||hc){
-    s+='<div class="gcharts">';
-    if(wc) s+='<div class="gwrap"><h3>Weight <em>kg</em></h3>'+wc+'</div>';
-    if(hc) s+='<div class="gwrap"><h3>Height <em>cm</em></h3>'+hc+'</div>';
-    s+='</div>';
+  var ch=growChart(k.id);
+  if(ch){
+    /* the key names only what is actually on the chart: a morning where only
+       the scale came out leaves a weight line and no height one */
+    var anyW=l.some(function(r){ return r.w!==""&&r.w!=null; }),
+        anyH=l.some(function(r){ return r.h!==""&&r.h!=null; });
+    s+='<div class="gwrap"><h3>'+
+       (anyW&&anyH ? "Weight and height" : anyW ? "Weight" : "Height")+'<em>'+
+       (anyW?'<span class="lg w" style="border-top-color:'+kidCol(k.id)+'"></span>kg':'')+
+       (anyH?'<span class="lg h"></span>cm':'')+
+       '</em></h3>'+ch+'</div>';
   } else {
     s+='<p class="empty">Nothing weighed yet. Put the first one in below and '+
        'the line starts from there.</p>';
@@ -598,15 +629,26 @@ function vHome(){
   });
 
   /* Past the four weeks, only the next few — the holiday list runs to the end
-     of next year and nobody needs Christmas 2027 under this week's spelling. */
+     of next year and nobody needs Christmas 2027 under this week's spelling.
+
+     Which few, though, matters. Taking the next three days flat gave three
+     public holidays, because eighteen of them are gazetted between here and
+     the end of 2027, and the P1 orientation the school asked us to save the
+     date for sat invisible behind them inside "and 15 more further out". A
+     holiday needs no saving and arrives on its own; a school date is the
+     whole reason to look this far ahead. So days with something to do come
+     first, and the holidays fill in only if there are none. */
   if(laterDays.length){
     laterDays.sort();
-    var show=laterDays.slice(0,3);
-    var restDays=laterDays.length-show.length;
+    var doing=laterDays.filter(function(d){
+      return byDay[d].some(function(e){ return !e.hol; }); });
+    var show=(doing.length?doing:laterDays).slice(0,3);
+    var shown={}; show.forEach(function(d){ shown[d]=1; });
+    var rest=laterDays.filter(function(d){ return !shown[d]; });
     var restEvs=0;
-    laterDays.slice(3).forEach(function(d){ restEvs+=byDay[d].length; });
+    rest.forEach(function(d){ restEvs+=byDay[d].length; });
     s+='<span class="agwk">After that<i>'+
-       (restDays?"next 3 of "+laterDays.length:laterDays.length+
+       (rest.length?"next "+show.length+" of "+laterDays.length:laterDays.length+
          (laterDays.length===1?" day":" days"))+'</i></span>';
     show.forEach(function(d){ s+=dayRows(byDay[d], d); });
     if(restEvs){

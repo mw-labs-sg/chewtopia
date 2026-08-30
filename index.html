@@ -595,22 +595,31 @@
     margin-left:3px}
   .gsub{font-size:12.5px;color:var(--soft);margin:5px 0 13px;line-height:1.45}
 
-  .gcharts{display:grid;grid-template-columns:1fr;gap:12px}
-  @media(min-width:560px){ .gcharts{grid-template-columns:1fr 1fr} }
   .gwrap{background:var(--bg);border:2px solid var(--line);border-radius:16px;
     padding:10px 12px 8px}
-  .gwrap h3{margin:0 0 6px;font-family:'Baloo 2',cursive;font-size:15px;
-    font-weight:700;color:var(--ink)}
-  .gwrap h3 em{font-style:normal;font-size:12px;font-weight:700;color:var(--soft)}
-  /* fixed height with the viewBox stretched to it, so weight and height sit
-     level side by side whatever the numbers are */
-  .gch{display:block;width:100%;height:140px}
+  .gwrap h3{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:0 0 8px;
+    font-family:'Baloo 2',cursive;font-size:15px;font-weight:700;color:var(--ink)}
+  .gwrap h3 em{display:flex;align-items:center;gap:5px;margin-left:auto;
+    font-style:normal;font-family:'Lexend',sans-serif;font-size:11px;
+    font-weight:700;color:var(--soft)}
+  /* the key sits in the heading rather than under the chart: a solid rule for
+     weight, a dashed one for height, matching what is actually drawn */
+  .lg{display:inline-block;width:16px;height:0;border-top:2.5px solid var(--soft);
+    border-radius:2px}
+  .lg.h{border-top-style:dashed;margin-left:6px}
+  .gch{display:block;width:100%;height:150px}
   .ggl{stroke:var(--line);stroke-width:1}
   .gyl{fill:var(--soft);font-size:9px;font-weight:700;text-anchor:end}
+  .gyl.r{text-anchor:start}
+  .gun{font-size:8.5px;font-weight:800;text-anchor:end;fill:var(--soft);
+    text-transform:uppercase;letter-spacing:.04em}
+  .gun.r{text-anchor:start}
   .gxl{fill:var(--soft);font-size:9px;font-weight:700}
   .gxl.end{text-anchor:end}
   .gln{fill:none;stroke-width:2.5;stroke-linejoin:round;stroke-linecap:round}
-  .gfil{opacity:.13}
+  /* height is dashed as well as grey, so the two lines still separate on a
+     printout and for anyone who cannot rely on colour */
+  .gln.h{stroke-width:2;stroke-dasharray:5 4}
 
   /* the form, inside the boy it adds to */
   .growrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:14px}
@@ -889,7 +898,7 @@ body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;-
   </header>
   <nav class="tabs" id="tabs" aria-label="Sections"></nav>
   <main id="view" tabindex="-1"></main>
-  <p class="foot">Saved on this device · build 123</p>
+  <p class="foot">Saved on this device · build 124</p>
 </div>
 <!-- load order matters: data, then core, then screens, app last -->
 <!-- Pinned to an exact version with a hash to match: "@2" floats, so a bad
@@ -903,6 +912,6 @@ body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;-
 <script src="core.js?v=54"></script>
 <script src="timetable.js?v=6"></script>
 <script src="training.js?v=51"></script>
-<script src="app.js?v=97"></script>
+<script src="app.js?v=99"></script>
 </body>
 </html>
