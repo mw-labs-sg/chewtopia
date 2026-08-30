@@ -170,8 +170,7 @@ var DAYS = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunda
    and Sync now sits at the foot of Training. Old #progress links land on
    Training rather than nowhere. */
 var TABS = [["home","Upcoming","t1"],["schedule","Timetable","t2"],
-            ["meals","Meals","t3"],["grow","Growth","t8"],
-            ["forums","Forums","t7"],
+            ["meals","Meals & Growth","t3"],["forums","Forums","t7"],
             ["practice","Training","t4"],
             ["reading","Reading","t6"],["links","School","t5"]];
 var tab="home", quiz=null, showAdd=false;
@@ -181,13 +180,13 @@ var paper=null;
 /* Each tab gets a readable address, e.g. .../chewtopia/#meals, so a link can
    be bookmarked or sent straight to one screen. */
 var SLUGS = {home:"upcoming", schedule:"timetable", meals:"meals",
-             grow:"growth", forums:"forums", practice:"training",
-             reading:"reading",
+             forums:"forums", practice:"training", reading:"reading",
              links:"school"};
 function tabFromHash(){
   var h=(location.hash||"").replace(/^#\/?/,"").toLowerCase();
   for(var k in SLUGS){ if(SLUGS[k]===h) return k; }
   if(h==="progress") return "practice";      /* old bookmarks still work */
+  if(h==="growth")   return "meals";         /* Growth folded into Meals */
   return null;
 }
 function go(id, quiet){

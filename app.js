@@ -38,14 +38,13 @@ function render(){
   var v=document.getElementById("view");
   if(quiz){ v.innerHTML=quizHTML(); wireQuiz(); return; }
   if(paper){ v.innerHTML=paperHTML(); wirePaper(); return; }
-  var V={home:vHome,schedule:vWeek,meals:vMeals,grow:vGrow,forums:vForums,
+  var V={home:vHome,schedule:vWeek,meals:vMealsGrow,forums:vForums,
          practice:vTests,reading:vRead,links:vLinks};
-  var Wr={home:wHome,schedule:wWeek,meals:wMeals,grow:wGrow,forums:wForums,
+  var Wr={home:wHome,schedule:wWeek,meals:wMealsGrow,forums:wForums,
           practice:wTests,reading:wRead,links:wLinks};
   /* the child switch belongs inside the first panel, under its heading */
   var html=V[tab]();
-  if(tab==="home"||tab==="schedule"||tab==="grow")
-    html=html.replace("</h2>", "</h2>"+whoBar());
+  if(tab==="home"||tab==="schedule") html=html.replace("</h2>", "</h2>"+whoBar());
   v.innerHTML=html; Wr[tab]();
   document.querySelectorAll("[data-vw]").forEach(function(b){
     b.onclick=function(){ W("vwho", b.dataset.vw); sfxPop(); render(); };
@@ -344,7 +343,9 @@ function growChart(kids, field, unit){
 }
 
 function vGrow(){
-  var kids=shownKids().filter(function(k){ return vwho()==="all" || k.id===vwho(); });
+  /* Both boys, always. The child switch belonged to the Growth tab and went
+     with it, and two lines on one chart is what you want to look at anyway. */
+  var kids=shownKids();
   var s='<div class="panel"><h2><span class="em">\uD83D\uDCC8</span> Growth'+
         '<span class="side">weight and height</span></h2>';
 
@@ -391,7 +392,7 @@ function vGrow(){
 
   /* The form. Weight or height on its own is fine - a morning where only one
      of them happens still counts, and a missing number just skips that chart. */
-  var pick = vwho()==="all" ? who() : vwho();
+  var pick = who();
   var opts=KIDS.map(function(k){
     return '<option value="'+k.id+'"'+(k.id===pick?" selected":"")+'>'+
            esc(pname(k.id))+'</option>'; }).join("");
@@ -674,6 +675,13 @@ function vHome(){
 
   return s+'</div>'+todayFood();
 }
+
+/* Meals and Growth were a tab each and are now one screen, stacked, with no
+   inner tabs: what they eat and how they grow is one conversation, and two
+   half-empty tabs cost more to walk past than one honest one. Nothing about
+   either half changed - they are the same panels in the same order. */
+function vMealsGrow(){ return vMeals()+vGrow(); }
+function wMealsGrow(){ wMeals(); wGrow(); }
 
 function vMeals(){
   var m=SJ("meals:"+monKey(),null)||mealPlan();
