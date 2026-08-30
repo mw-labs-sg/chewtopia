@@ -304,7 +304,7 @@ function growChart(kids, field, unit){
       if(loY===null||v<loY) loY=v;
       if(hiY===null||v>hiY) hiY=v;
     });
-    if(pts.length) series.push({id:k.id, pts:pts});
+    if(pts.length) series.push({id:k.id, nm:pname(k.id), pts:pts});
   });
   if(!series.length) return "";
 
@@ -338,6 +338,14 @@ function growChart(kids, field, unit){
       g+='<circle class="gdot" cx="'+px(p.x).toFixed(1)+'" cy="'+py(p.y).toFixed(1)+
          '" r="3" style="fill:'+kidCol(se.id)+'"/>';
     });
+    /* His name, in his colour, at the end of his own line. A legend below the
+       chart makes you look away and match colours by memory; two boys whose
+       lines cross makes that worse. The label sits with the line instead. */
+    var last=se.pts[se.pts.length-1], ly=py(last.y);
+    /* nudged off the top or bottom edge rather than clipped by it */
+    ly = Math.max(T+8, Math.min(H-B-3, ly-7));
+    g+='<text class="gnm" x="'+(px(last.x)-5).toFixed(1)+'" y="'+ly.toFixed(1)+
+       '" style="fill:'+kidCol(se.id)+'">'+esc(se.nm)+'</text>';
   });
   return g+'</svg>';
 }
@@ -381,8 +389,11 @@ function vGrow(){
     if(wc) s+='<div class="gwrap"><h3>Weight <em>kg</em></h3>'+wc+'</div>';
     if(hc) s+='<div class="gwrap"><h3>Height <em>cm</em></h3>'+hc+'</div>';
     s+='</div>';
-    if(kids.length>1)
-      s+='<div class="gkey">'+kids.map(function(k){
+    /* only the boys with a reading: a swatch for a line nobody drew reads as
+       a bug in the chart rather than an empty log */
+    var plotted=kids.filter(function(k){ return growList(k.id).length; });
+    if(plotted.length>1)
+      s+='<div class="gkey">'+plotted.map(function(k){
            return '<span class="gk"><i style="background:'+kidCol(k.id)+'"></i>'+
                   esc(pname(k.id))+'</span>'; }).join("")+'</div>';
   } else {
