@@ -578,32 +578,25 @@
     vertical-align:middle;border-radius:6px;padding:2px 6px;
     background:#fff;color:var(--tang)}
 
-  /* ---- health: one panel per boy, in his colour ---- */
-  /* A tinted left edge rather than a tinted panel: whose numbers these are has
-     to be obvious at a glance, but the charts underneath need a plain ground
-     or the wash under each line fights the panel behind it. */
-  .gpan{border-left:6px solid var(--line)}
-  .gpan.c-tc{border-left-color:var(--blue)}
-  .gpan.c-sc{border-left-color:var(--tang)}
-  .gpan.c-tc h2 .em,.gpan.c-tc .gnow b{color:var(--blue)}
-  .gpan.c-sc h2 .em,.gpan.c-sc .gnow b{color:var(--tang)}
-
-  .gnow{display:flex;align-items:baseline;gap:18px;margin:2px 0 0}
-  .gnow b{font-family:'Baloo 2',cursive;font-size:34px;font-weight:700;
+  /* ---- health: the two boys side by side, one form above them ---- */
+  /* .duo and .kidbox are the Reading tab's, reused rather than reinvented:
+     two columns on a tablet, stacking on a phone at 300px each. */
+  .gnow{display:flex;align-items:baseline;gap:14px;margin:10px 0 0}
+  .gnow b{font-family:'Baloo 2',cursive;font-size:28px;font-weight:700;
     line-height:1.05;color:var(--ink)}
-  .gnow b i{font-style:normal;font-size:15px;font-weight:700;color:var(--soft);
-    margin-left:3px}
-  .gsub{font-size:12.5px;color:var(--soft);margin:5px 0 13px;line-height:1.45}
+  .gnow b i{font-style:normal;font-size:13px;font-weight:700;color:var(--soft);
+    margin-left:2px}
+  .gsub{font-size:12px;color:var(--soft);margin:4px 0 10px;line-height:1.45}
 
   .gwrap{background:var(--bg);border:2px solid var(--line);border-radius:16px;
     padding:10px 12px 8px}
-  .gwrap h3{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:0 0 8px;
-    font-family:'Baloo 2',cursive;font-size:15px;font-weight:700;color:var(--ink)}
+  .gwrap h3{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin:0 0 8px;
+    font-family:'Baloo 2',cursive;font-size:14px;font-weight:700;color:var(--ink)}
   .gwrap h3 em{display:flex;align-items:center;gap:5px;margin-left:auto;
     font-style:normal;font-family:'Lexend',sans-serif;font-size:11px;
     font-weight:700;color:var(--soft)}
-  /* the key sits in the heading rather than under the chart: a solid rule for
-     weight, a dashed one for height, matching what is actually drawn */
+  /* the key sits in the heading: a solid rule for weight, a dashed one for
+     height, matching what is actually drawn */
   .lg{display:inline-block;width:16px;height:0;border-top:2.5px solid var(--soft);
     border-radius:2px}
   .lg.h{border-top-style:dashed;margin-left:6px}
@@ -621,24 +614,23 @@
      printout and for anyone who cannot rely on colour */
   .gln.h{stroke-width:2;stroke-dasharray:5 4}
 
-  /* the form, inside the boy it adds to */
-  .growrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:14px}
+  /* the one form, above both boys */
+  .growrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  .growrow select{flex:0 0 92px;margin:0}
   .growrow input{flex:1 1 90px;min-width:0;margin:0}
   .growrow .btn{flex:0 0 auto;margin:0}
-  .hint{font-size:12.5px;color:var(--tang);font-weight:700;margin-top:7px;
+  .hint{font-size:12.5px;color:var(--tang);font-weight:700;margin:7px 0 14px;
     min-height:16px}
 
-  /* every reading he has ever had */
-  .grows{display:grid;grid-template-columns:1fr;margin-top:6px;
-    border-top:1px solid var(--line)}
+  /* every reading he has had, under his own chart */
+  .grows{display:grid;grid-template-columns:1fr;margin-top:10px;
+    border-top:1px solid var(--line);background:none!important}
   .growr{display:grid;grid-template-columns:1fr auto auto 30px;column-gap:10px;
-    align-items:center;padding:8px 2px;border-bottom:1px solid var(--line)}
+    align-items:center;padding:7px 2px;border-bottom:1px solid var(--line)}
   .growr:last-child{border-bottom:none}
-  .grd{font-size:13.5px;font-weight:600;color:var(--ink)}
-  .grv{font-size:13.5px;font-weight:800;white-space:nowrap;
-    font-variant-numeric:tabular-nums}
-  .gpan.c-tc .grv{color:var(--blue)}
-  .gpan.c-sc .grv{color:var(--tang)}
+  .grd{font-size:13px;font-weight:600;color:var(--ink)}
+  .grv{font-size:13px;font-weight:800;white-space:nowrap;
+    font-variant-numeric:tabular-nums;color:inherit}
 
   /* ---- progress matrix: each boy gets three subject columns ---- */
   .mxkey{display:flex;gap:12px;flex-wrap:wrap;align-items:center;font-size:12.5px;
@@ -898,7 +890,7 @@ body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;-
   </header>
   <nav class="tabs" id="tabs" aria-label="Sections"></nav>
   <main id="view" tabindex="-1"></main>
-  <p class="foot">Saved on this device · build 125</p>
+  <p class="foot">Saved on this device · build 128</p>
 </div>
 <!-- load order matters: data, then core, then screens, app last -->
 <!-- Pinned to an exact version with a hash to match: "@2" floats, so a bad
@@ -908,10 +900,10 @@ body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3"
         integrity="sha384-l8ah+VgaWtk1mvOe9VC+OirC6qHFF4yH7l7mKRidV9MSti3E9F463bMp6ZVN4kuC"
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script src="data.js?v=44"></script>
+<script src="data.js?v=45"></script>
 <script src="core.js?v=54"></script>
 <script src="timetable.js?v=6"></script>
 <script src="training.js?v=51"></script>
-<script src="app.js?v=99"></script>
+<script src="app.js?v=101"></script>
 </body>
 </html>

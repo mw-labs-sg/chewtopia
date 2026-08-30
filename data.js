@@ -643,7 +643,27 @@ var SEED_EVENTS = [
    n:"From October the school sends every announcement, letter and consent form through the Parents Gateway app, not by email. Get it onto the phone before then so nothing is missed.",
    url:"https://pg.moe.edu.sg"},
   {id:"e32", t:"P1 Orientation Day", d:"2026-11-20", w:"sc",
-   n:"Physical orientation at Nanyang Primary for him and a parent, Friday afternoon. Times and the rest come closer to the date, through Parents Gateway."}
+   n:"Physical orientation at Nanyang Primary for him and a parent, Friday afternoon. Times and the rest come closer to the date, through Parents Gateway."},
+
+
+  /* From the K2 parents' WhatsApp group, read off the thread rather than from
+     the school. Two birthdays and the graduation. Anything in that group that
+     was already over (the Twinkl free downloads, the 2C results) is not here,
+     and neither is the chat. */
+  {id:"e33", t:"Aurora\u2019s birthday party", d:"2026-09-26", w:"sc",
+   n:"Saturday, at Darius\u2019 condo clubhouse \u2014 the same place as last time. Half the class has said yes in the group. Nobody has said a time yet, so ask."},
+  {id:"e34", t:"RSVP for Arden\u2019s birthday", d:"2026-10-07", w:"sc",
+   n:"Headcount by Wednesday 7 October, adults and kids, so Jeremy and Candice can book the room and the food. Siblings are welcome, so TC counts too.",
+   url:"https://luma.com/5z0qfvda"},
+  {id:"e35", t:"Arden Au\u2019s birthday party", d:"2026-11-07", w:"sc",
+   n:"Saturday morning. Siblings welcome. RSVP was due a month before, on 7 October."},
+
+  /* The one date in that thread that is the school\u2019s, not a parent\u2019s. Two
+     parents asked how long it runs and nobody in the group knew; the 9am is
+     one parent saying they were told the morning session starts then, which
+     is why it is a note and not a time on the event. */
+  {id:"e36", t:"K2 graduation and concert", d:"2026-11-19", w:"sc",
+   n:"Thursday. A parent in the group was told the morning session starts at 9. How long it runs nobody in the group knew, and the school had not said \u2014 worth asking, because P1 orientation at Nanyang Primary is the very next afternoon."}
 ];
 
 /* ==========================================================================

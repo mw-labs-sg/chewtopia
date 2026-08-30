@@ -372,19 +372,18 @@ function growChart(who){
   return g+'</svg>';
 }
 
-/* Everything about one boy in one panel, in his own colour: what he weighs
-   now, the two lines, the form that adds to him, and every reading taken.
+/* One panel, the boys side by side inside it, and a single form above them.
 
-   The form lives inside his panel rather than once at the bottom with a child
-   picker, which is one fewer field and removes the mistake that picker made
-   possible - filing SC's weight against TC and only noticing months later
-   when the line has a step in it. */
-function growPanel(k){
-  var l=growList(k.id), last=l[l.length-1], prev=l[l.length-2], id=esc(k.id);
-  var s='<div class="panel gpan '+whoCls(k.id)+'">'+
-        '<h2><span class="em">\uD83D\uDCC8</span> '+esc(pname(k.id))+
-        '<span class="side">'+(l.length ? l.length+(l.length===1?" reading":" readings")
-                                        : "nothing yet")+'</span></h2>';
+   They were a panel each, stacked, which pushed SC below the fold on a tablet
+   and meant scrolling to compare two numbers taken the same morning. Side by
+   side is the whole point of having two of them. This reuses the .duo/.kidbox
+   pair the Reading tab already uses for exactly this, rather than inventing a
+   second way of putting the boys next to each other. */
+function growCard(k){
+  var l=growList(k.id), last=l[l.length-1], prev=l[l.length-2];
+  var s='<div class="kidbox"><div class="kidname '+whoCls(k.id)+'">'+esc(pname(k.id))+
+        '<small>'+(l.length ? l.length+(l.length===1?" reading":" readings")
+                            : "nothing yet")+'</small></div>';
 
   if(last){
     s+='<div class="gnow">'+
@@ -402,40 +401,32 @@ function growPanel(k){
     }
     var bmi = (last.w && last.h) ? (+last.w)/Math.pow((+last.h)/100,2) : null;
     s+='<div class="gsub">'+esc(dfull(last.d))+
-       (bits.length?' \u00b7 '+esc(bits.join(", "))+' since last time':'')+
+       (bits.length?' \u00b7 '+esc(bits.join(", ")):'')+
        (bmi?' \u00b7 BMI '+bmi.toFixed(1):'')+'</div>';
   }
 
   var ch=growChart(k.id);
   if(ch){
-    /* the key names only what is actually on the chart: a morning where only
-       the scale came out leaves a weight line and no height one */
     var anyW=l.some(function(r){ return r.w!==""&&r.w!=null; }),
         anyH=l.some(function(r){ return r.h!==""&&r.h!=null; });
+    /* the key names only what is drawn: a morning where only the scale came
+       out leaves a weight line and no height one */
     s+='<div class="gwrap"><h3>'+
        (anyW&&anyH ? "Weight and height" : anyW ? "Weight" : "Height")+'<em>'+
        (anyW?'<span class="lg w" style="border-top-color:'+kidCol(k.id)+'"></span>kg':'')+
        (anyH?'<span class="lg h"></span>cm':'')+
        '</em></h3>'+ch+'</div>';
   } else {
-    s+='<p class="empty">Nothing weighed yet. Put the first one in below and '+
-       'the line starts from there.</p>';
+    s+='<p class="empty">Nothing weighed yet.</p>';
   }
 
-  s+='<div class="growrow">'+
-       '<input type="date" id="gD-'+id+'" value="'+esc(isoOf(new Date()))+'">'+
-       '<input type="number" id="gKg-'+id+'" step="0.1" min="0" max="200" placeholder="kg" inputmode="decimal">'+
-       '<input type="number" id="gCm-'+id+'" step="0.1" min="0" max="250" placeholder="cm" inputmode="decimal">'+
-       '<button class="btn go" data-gadd="'+id+'">Add</button>'+
-     '</div><div class="hint" id="gMsg-'+id+'"></div>';
-
   if(l.length){
-    s+='<div class="grows">';
+    s+='<div class="grows '+whoCls(k.id)+'">';
     l.slice().reverse().forEach(function(r){
       s+='<div class="growr"><span class="grd">'+esc(dfull(r.d))+'</span>'+
          '<span class="grv">'+(r.w!==""&&r.w!=null ? (+r.w).toFixed(1)+' kg' : '\u2014')+'</span>'+
          '<span class="grv">'+(r.h!==""&&r.h!=null ? (+r.h).toFixed(1)+' cm' : '\u2014')+'</span>'+
-         '<button class="x" data-gdel="'+esc(r.id)+'" data-gwho="'+id+'" '+
+         '<button class="x" data-gdel="'+esc(r.id)+'" data-gwho="'+esc(k.id)+'" '+
          'aria-label="Delete this reading">\u00d7</button></div>';
     });
     s+='</div>';
@@ -444,36 +435,49 @@ function growPanel(k){
 }
 
 function vGrow(){
-  return shownKids().map(growPanel).join("");
+  var opts=KIDS.map(function(k){
+    return '<option value="'+k.id+'"'+(k.id===who()?" selected":"")+'>'+
+           esc(pname(k.id))+'</option>'; }).join("");
+  return '<div class="panel"><h2><span class="em">\uD83D\uDCC8</span> Growth'+
+         '<span class="side">weight and height</span></h2>'+
+         /* one form, above both, because two forms was two of everything for
+            the sake of saving one dropdown */
+         '<div class="growrow">'+
+           '<select id="gW">'+opts+'</select>'+
+           '<input type="date" id="gD" value="'+esc(isoOf(new Date()))+'">'+
+           '<input type="number" id="gKg" step="0.1" min="0" max="200" placeholder="kg" inputmode="decimal">'+
+           '<input type="number" id="gCm" step="0.1" min="0" max="250" placeholder="cm" inputmode="decimal">'+
+           '<button class="btn go" id="gAdd">Add</button>'+
+         '</div><div class="hint" id="gMsg"></div>'+
+         '<div class="duo">'+shownKids().map(growCard).join("")+'</div></div>';
 }
 
 function wGrow(){
-  document.querySelectorAll("[data-gadd]").forEach(function(b){
-    b.onclick=function(){
-      var w=b.dataset.gadd,
-          d=document.getElementById("gD-"+w).value,
-          kg=document.getElementById("gKg-"+w).value.trim(),
-          cm=document.getElementById("gCm-"+w).value.trim(),
-          m=document.getElementById("gMsg-"+w);
-      /* Say what is wrong. Doing nothing silently just looks broken. */
-      if(!d){ m.textContent="Pick the date it was taken."; return; }
-      if(!kg && !cm){ m.textContent="Put in a weight, a height, or both."; return; }
-      var a=SJ(growKey(w),[]), hit=null;
-      /* One reading per boy per day: standing him on the scale twice on a
-         Sunday should correct the morning number, not draw a second dot. */
-      a.forEach(function(x){ if(x.d===d) hit=x; });
-      if(hit){
-        if(kg) hit.w=+kg;
-        if(cm) hit.h=+cm;
-        hit.ts=Date.now();
-      } else {
-        a.push({id:"g"+Date.now()+Math.floor(Math.random()*1000),
-                d:d, w:kg?+kg:"", h:cm?+cm:"", ts:Date.now()});
-      }
-      WJ(growKey(w), a);
-      sfxPop(); render();
-    };
-  });
+  var b=document.getElementById("gAdd");
+  if(b) b.onclick=function(){
+    var w=document.getElementById("gW").value,
+        d=document.getElementById("gD").value,
+        kg=document.getElementById("gKg").value.trim(),
+        cm=document.getElementById("gCm").value.trim(),
+        m=document.getElementById("gMsg");
+    /* Say what is wrong. Doing nothing silently just looks broken. */
+    if(!d){ m.textContent="Pick the date it was taken."; return; }
+    if(!kg && !cm){ m.textContent="Put in a weight, a height, or both."; return; }
+    var a=SJ(growKey(w),[]), hit=null;
+    /* One reading per boy per day: standing him on the scale twice on a
+       Sunday should correct the morning number, not draw a second dot. */
+    a.forEach(function(x){ if(x.d===d) hit=x; });
+    if(hit){
+      if(kg) hit.w=+kg;
+      if(cm) hit.h=+cm;
+      hit.ts=Date.now();
+    } else {
+      a.push({id:"g"+Date.now()+Math.floor(Math.random()*1000),
+              d:d, w:kg?+kg:"", h:cm?+cm:"", ts:Date.now()});
+    }
+    WJ(growKey(w), a);
+    sfxPop(); render();
+  };
   document.querySelectorAll("[data-gdel]").forEach(function(x){
     x.onclick=function(){
       var w=x.dataset.gwho, id=x.dataset.gdel, k=growKey(w);
@@ -642,7 +646,14 @@ function vHome(){
     laterDays.sort();
     var doing=laterDays.filter(function(d){
       return byDay[d].some(function(e){ return !e.hol; }); });
-    var show=(doing.length?doing:laterDays).slice(0,3);
+    /* Eight, not three. Three was enough while the only things out here were
+       two school letters; a birthday, an RSVP, a second birthday, the K2
+       graduation and the P1 orientation arrived and pushed the last two of
+       those — the two that actually need a morning cleared — back off the
+       screen. There are rarely more than a handful of real dates this far
+       out, and the twenty-odd holidays behind them are what needed capping,
+       not these. */
+    var show=(doing.length?doing:laterDays).slice(0,8);
     var shown={}; show.forEach(function(d){ shown[d]=1; });
     var rest=laterDays.filter(function(d){ return !shown[d]; });
     var restEvs=0;
