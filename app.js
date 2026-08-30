@@ -286,7 +286,9 @@ function isoFromDays(n){
   return d.getUTCFullYear()+"-"+String(d.getUTCMonth()+1).padStart(2,"0")+
          "-"+String(d.getUTCDate()).padStart(2,"0");
 }
-function kidCol(id){ return id==="tc" ? "var(--blue)" : "var(--tang)"; }
+/* The chart lines read from the same two tokens as every tinted box, so a
+   boy cannot be one colour on his card and another on his line. */
+function kidCol(id){ return id==="tc" ? "var(--tc-ink)" : "var(--sc-ink)"; }
 
 /* One chart per boy, carrying both his numbers.
 
@@ -486,6 +488,41 @@ function wGrow(){
       sfxTap(); render();
     };
   });
+}
+
+/* Every abbreviation on this tab in one place. It sits between the scoring
+   and the school table on purpose: the table is unreadable without it. */
+function vJargon(){
+  var j = (typeof JARGON!=="undefined" ? JARGON : []);
+  if(!j.length) return "";
+  var s='<div class="panel"><h2><span class="em">\uD83D\uDD24</span> What the words mean'+
+        '<span class="side">'+j.length+' of them</span></h2><div class="jgs">';
+  j.forEach(function(x){
+    s+='<div class="jg"><span class="jgk">'+esc(x.k)+'</span>'+
+       '<span class="jgt">'+esc(x.t)+'</span>'+
+       '<span class="jgd">'+esc(x.d)+'</span></div>';
+  });
+  return s+'</div></div>';
+}
+
+/* The whole tab turned into the handful of things that are actually ours to
+   do, in the order they happen. Everything above this is background; this is
+   the part with a date on it. */
+function vTodo(){
+  var t = (typeof TODO!=="undefined" ? TODO : []);
+  if(!t.length) return "";
+  var s='<div class="panel"><h2><span class="em">\u2705</span> What we actually have to do'+
+        '<span class="side">TC sits it 2030 \u00b7 SC 2032</span></h2><div class="tds">';
+  t.forEach(function(x,i){
+    s+='<div class="td"><span class="tdn">'+(i+1)+'</span>'+
+       '<span class="tdw">'+esc(x.w)+'</span>'+
+       '<span class="tdt">'+esc(x.t)+'</span>'+
+       '<span class="tdd">'+esc(x.d)+'</span></div>';
+  });
+  return s+'</div><div class="key">The months are the shape of the year, off '+
+    'MOE\u2019s 2026 exercise \u2014 they shift by a week or two and MOE publishes '+
+    'the real dates each January. Nothing on this list can be done early, and '+
+    'the only two that can be missed outright are the DSA windows.</div></div>';
 }
 
 function vSchools(){

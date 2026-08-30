@@ -17,10 +17,21 @@
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Lexend:wght@400;500;600;700&family=Noto+Sans+SC:wght@500;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#F4F6FD; --card:#FFF; --ink:#16222E; --soft:#6A7E8F; --line:#E1EAF2;
+    --bg:#F4F6FD; --card:#FFF; --ink:#16222E; --soft:#5E7183; --line:#E1EAF2;
     --blue:#2F73E8; --lime:#4FB86B; --coral:#FF6F52; --grape:#7C5CE0; --sun:#FFB627;
+    --lime-ink:#2C7A46; --coral-ink:#B3401F; --grape-ink:#5B41B8;
+                                      /* the same hues, for words */
     --sky:#E8F2FE;
-    --tang:#C25A0C; --peach:#FFE9D2;   /* SC */
+    --tang:#C25A0C; --peach:#FFE9D2;   /* warnings and the odd amber chip */
+    --tang-deep:#9C4708;               /* the same amber, on a peach fill */
+    /* One boy, one colour, everywhere. TC is blue and SC is green; every
+       tinted box, chip, dot and chart line reads from these four and nothing
+       hard-codes a child's colour any more. "Everyone" was the green, which
+       is why it is now a neutral slate - a shared event should not look like
+       one of SC's. */
+    --tc-bg:#E8F2FE; --tc-ink:#1E5FC4; --tc-line:#BBD7FA;
+    --sc-bg:#E4F4E8; --sc-ink:#2F7A45; --sc-line:#BFE3CB;
+    --all-bg:#EFF1F7; --all-ink:#5C6B7A; --all-line:#DCE1EC;
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   html,body{overscroll-behavior-y:contain}          /* no pull-to-refresh mid-test */
@@ -110,14 +121,14 @@
 
   /* ---- reading ---- */
   .rdc{font-size:13px;font-weight:800;border-radius:9px;padding:5px 11px}
-  .rdc.en{background:var(--sky);color:var(--blue)}
-  .rdc.cn{background:#FFE9D2;color:var(--tang)}
+  .rdc.en{background:var(--tc-bg);color:var(--tc-ink)}
+  .rdc.cn{background:var(--peach);color:var(--tang-deep)}
   .rdc.mo{background:#DFF3E4;color:#2F7A45}
   .bk{display:flex;align-items:center;gap:11px;padding:10px 0;border-bottom:1px solid var(--line)}
   .bk:last-of-type{border-bottom:none}
   .bl{flex:0 0 auto;font-size:12px;font-weight:800;border-radius:8px;padding:5px 8px}
-  .bl.en{background:var(--sky);color:var(--blue)}
-  .bl.cn{background:#FFE9D2;color:var(--tang)}
+  .bl.en{background:var(--tc-bg);color:var(--tc-ink)}
+  .bl.cn{background:var(--peach);color:var(--tang-deep)}
   .btx{flex:1;font-weight:700;font-size:16px}
   .btx small{display:block;font-weight:400;font-size:13px;color:var(--soft);margin-top:1px}
 
@@ -146,14 +157,14 @@
   .fd:last-child{margin-bottom:0}
   .cell.brek{background:var(--sky);padding:9px 11px}
   .cell.dinr{background:#E7F4EA;padding:9px 11px}
-  .mcol.b .ml{color:var(--blue)}
+  .mcol.b .ml{color:var(--tc-ink)}
   .mcol.d .ml{color:#2F7A45}
   .mealday:last-of-type{border-bottom:0}
   .mealday .mh{font-family:'Baloo 2',cursive;font-size:18px;margin-bottom:2px}
   .mealday .mh em{font-style:normal;font-size:13px;font-weight:400;
     font-family:'Lexend',sans-serif;color:var(--soft);margin-left:5px}
   .mealday.now{background:#FFF8F6;margin:0 -10px;padding:12px 10px;border-radius:12px;border-bottom:0}
-  .mealday.now .mh{color:var(--coral)}
+  .mealday.now .mh{color:var(--coral-ink)}
   .mealday .cell{padding:4px 0}
 
   /* ---- buttons ---- */
@@ -161,9 +172,9 @@
     font-weight:700;font-size:17px;cursor:pointer}
   .btn:active{transform:translateY(2px)}
   .btn.wide{width:100%}
-  .btn.go{background:var(--lime);color:#fff}
+  .btn.go{background:var(--lime-ink);color:#fff}
   .btn.play{background:var(--coral);color:#fff}
-  .btn.soft{background:var(--sky);color:var(--blue)}
+  .btn.soft{background:var(--sky);color:var(--tc-ink)}
   .btn:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
   /* One ring for everything, so tabbing through on a keyboard is followable.
      :focus-visible keeps it off for taps and mouse clicks. */
@@ -184,7 +195,7 @@
   input:focus,textarea:focus,select:focus{outline:none;border-color:var(--blue)}
   .lbl{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);
     font-weight:700;margin:12px 0 5px}
-  .saved{font-size:13px;color:var(--lime);font-weight:700;height:16px;margin-top:8px}
+  .saved{font-size:13px;color:var(--lime-ink);font-weight:700;height:16px;margin-top:8px}
 
   /* ---- tests ---- */
   .test{display:flex;align-items:center;justify-content:space-between;gap:11px;width:100%;
@@ -199,9 +210,9 @@
   .sub:first-of-type{margin-top:0}
 
   /* ---- child colours ---- */
-  .c-tc{background:var(--sky)!important;color:var(--blue)!important}
-  .c-sc{background:var(--peach)!important;color:var(--tang)!important}
-  .c-all{background:#DFF3E4!important;color:#2F7A45!important}
+  .c-tc{background:var(--tc-bg)!important;color:var(--tc-ink)!important}
+  .c-sc{background:var(--sc-bg)!important;color:var(--sc-ink)!important}
+  .c-all{background:var(--all-bg)!important;color:var(--all-ink)!important}
   .c-tc b,.c-sc b,.c-all b{color:inherit!important}
   .tag{display:inline-block;font-size:14px;font-weight:800;border-radius:8px;
     padding:3px 10px;margin-right:8px;letter-spacing:.03em;vertical-align:1px}
@@ -219,7 +230,7 @@
   .wkh{font-size:12.5px;font-weight:700;color:var(--soft);text-align:center;
     align-self:center;letter-spacing:.03em}
   .wkh em{font-style:normal;font-weight:400;opacity:.75}
-  .wkh.now{color:var(--coral)}
+  .wkh.now{color:var(--coral-ink)}
   .corner{grid-column:1;grid-row:1}
   .wkt{grid-column:1;font-size:10px;color:var(--soft);text-align:right;
     padding-right:5px;align-self:start;line-height:1;padding-top:1px}
@@ -236,8 +247,8 @@
   .wkb.sch.hL{box-shadow:none}
   .wkb.sch.hR{box-shadow:none}
   /* school subjects */
-  .s-core{background:var(--sky);color:var(--blue)}
-  .s-cl{background:#FFE3DC;color:#B03A22}
+  .s-core{background:var(--sky);color:var(--tc-ink)}
+  .s-cl{background:#FFE3DC;color:#96301A}
   .s-rec{background:#FFF1D6;color:#8A6100}
   .s-fun{background:#DFF3E4;color:#2F7A45}
   .s-other{background:#F0EAFE;color:var(--grape)}
@@ -309,9 +320,9 @@
     border-radius:999px;padding:5px 16px;margin-bottom:6px}
   .rankbadge.rS{background:#FFF1D6;color:#8A6100}
   .rankbadge.rA{background:#DFF3E4;color:#2F7A45}
-  .rankbadge.rB{background:var(--sky);color:var(--blue)}
+  .rankbadge.rB{background:var(--sky);color:var(--tc-ink)}
   .rankbadge.rC{background:#F0EAFE;color:var(--grape)}
-  .rankbadge.rD{background:#FFE3DC;color:#B03A22}
+  .rankbadge.rD{background:#FFE3DC;color:#96301A}
   .streakline{font-size:14px;color:var(--soft);font-weight:600}
 
   /* ---- results ---- */
@@ -321,14 +332,14 @@
   .run i{font-style:normal;font-size:11px;opacity:.8}
   .run.good{background:#DFF3E4;color:#2F7A45}
   .run.mid{background:#FFF1D6;color:#8A6100}
-  .run.low{background:#FFE3DC;color:#B03A22}
+  .run.low{background:#FFE3DC;color:#96301A}
 
   /* ---- sync: two big buttons and a plain sentence ---- */
   .syncrow{display:flex;gap:10px;margin-bottom:10px}
   .syncrow .btn{flex:1;font-size:17px;padding:15px 10px}
   .synced{font-size:14px;font-weight:700;color:var(--ink);background:var(--bg);
     border-radius:11px;padding:10px 12px;margin:0 0 10px}
-  .synced.bad{background:#FFE3DC;color:#B03A22}
+  .synced.bad{background:#FFE3DC;color:#96301A}
   .synced b{font-weight:800}
   /* a table or a file named in a sentence, so it reads as a thing to type */
   .synced code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
@@ -364,7 +375,7 @@
     text-transform:uppercase;letter-spacing:.04em}
   /* the month cap, on every date so a chip read on its own still says when */
   .agd u{display:block;text-decoration:none;font-size:9.5px;font-weight:800;
-    color:var(--blue);text-transform:uppercase;letter-spacing:.05em;
+    color:var(--tc-ink);text-transform:uppercase;letter-spacing:.05em;
     margin-bottom:2px;white-space:nowrap}
   /* "Sept 27" is two words wide; the 44px chip on a phone needs it smaller */
   .agd u.yr{font-size:7.5px;letter-spacing:0}
@@ -374,7 +385,7 @@
   /* a week band draws its own rule, so a month starting on a Monday would
      otherwise get two lines stacked */
   .agwk + .agmo{display:none}
-  .agd.off u{color:#B03A22}
+  .agd.off u{color:#96301A}
   .agd.now u{color:rgba(255,255,255,.9)}
   .agd.now{background:var(--ink);color:#fff}
   .agd.now i{color:rgba(255,255,255,.8)}
@@ -383,26 +394,26 @@
   .agc.both{grid-column:2/-1}
   .evc{position:relative;background:var(--bg);border-radius:12px;padding:10px 30px 10px 12px;
     margin-bottom:6px}
-  .evc.e-tc{background:#F2F8FF}
-  .evc.e-sc{background:#FFF6EC}
+  .evc.e-tc{background:#F4F9FF}
+  .evc.e-sc{background:#F3FAF5}
   .evc.e-all{background:#F5F3FE}
   .evc.live{box-shadow:0 0 0 2px var(--sun) inset}
   /* a test he sits, outlined in his own colour so it is picked out of a column
      of trips, forms and reminders without reading a word. An outline rather
      than a border, so nothing shifts, and it does not fight .live's shadow. */
   .evc.tst{outline:2.5px solid var(--grape);outline-offset:-2.5px}
-  .evc.tst.e-tc{outline-color:var(--blue)}
-  .evc.tst.e-sc{outline-color:var(--tang)}
+  .evc.tst.e-tc{outline-color:var(--tc-ink)}
+  .evc.tst.e-sc{outline-color:var(--sc-ink)}
   .evc.tst .evt{font-weight:800}
   /* a day off — public holiday or school holiday. Red, so the days with no
      school jump out of the column before anything else does. */
   .evc.hol{background:#FFE3DC;box-shadow:inset 3px 0 0 #FF6F52}
-  .evc.hol .evt{color:#B03A22}
-  .evc.hol .evw{color:#C0563C}
-  .evc.hol .nt{color:#A8664F}
+  .evc.hol .evt{color:#96301A}
+  .evc.hol .evw{color:#9C4327}
+  .evc.hol .nt{color:#8A4B33}
   /* and the date itself, so a day off reads at a glance down the left edge */
-  .agd.off{background:#FFE3DC;color:#B03A22}
-  .agd.off i{color:#C0563C}
+  .agd.off{background:#FFE3DC;color:#96301A}
+  .agd.off i{color:#9C4327}
   .agd.off.now{background:var(--ink);color:#fff}
   .agd.off.now i{color:rgba(255,255,255,.8)}
   .evt{display:block;font-weight:700;font-size:14.5px;line-height:1.25;color:var(--ink)}
@@ -438,11 +449,11 @@
     background:#fff;color:var(--soft)}
   /* each site keeps its own colour so the eye learns the row */
   .lnk.l-sls {border-color:#BBD7FA;background:var(--sky)}
-  .lnk.l-sls  .lnt,.lnk.l-sls  .lngo{color:var(--blue)}
+  .lnk.l-sls  .lnt,.lnk.l-sls  .lngo{color:var(--tc-ink)}
   .lnk.l-icon{border-color:#BFE3CB;background:#DFF3E4}
   .lnk.l-icon .lnt,.lnk.l-icon .lngo{color:#2F7A45}
   .lnk.l-dojo{border-color:#D5C8F7;background:#F0EAFE}
-  .lnk.l-dojo .lnt,.lnk.l-dojo .lngo{color:var(--grape)}
+  .lnk.l-dojo .lnt,.lnk.l-dojo .lngo{color:var(--grape-ink)}
   .lnk.l-mims{border-color:#F5D2C6;background:var(--peach)}
   .lnk.l-mims .lnt,.lnk.l-mims .lngo{color:var(--tang)}
 
@@ -468,7 +479,7 @@
     border-radius:999px;padding:3px 9px;border:1.5px solid var(--line);
     background:#fff;color:var(--soft);white-space:nowrap}
   .cca em.dsa{border-color:#BBD7FA;background:var(--sky);color:#1E5BB8}
-  .cca em.in{border-color:#D5C8F7;background:#F0EAFE;color:var(--grape)}
+  .cca em.in{border-color:#D5C8F7;background:#F0EAFE;color:var(--grape-ink)}
   .cca em.yes{border-color:#BFE3CB;background:#DFF3E4;color:#2F7A45}
   .cca em.off{border-color:var(--line);background:#fff;color:var(--soft);
     opacity:.75}
@@ -488,7 +499,7 @@
     font-weight:700;color:var(--ink)}
   .ptab{display:grid;grid-template-columns:auto 1fr;column-gap:12px;row-gap:1px;
     align-items:baseline}
-  .pk{font-size:13px;font-weight:800;color:var(--blue);white-space:nowrap;
+  .pk{font-size:13px;font-weight:800;color:var(--tc-ink);white-space:nowrap;
     padding:4px 0}
   .pk.num{font-variant-numeric:tabular-nums}
   .pv{font-size:13.5px;color:var(--ink);padding:4px 0;line-height:1.35}
@@ -506,7 +517,7 @@
   .mktab{display:grid;grid-template-columns:auto auto 1fr;column-gap:12px;row-gap:2px;
     align-items:baseline}
   .mkn{font-family:'Baloo 2',cursive;font-size:19px;font-weight:700;
-    color:var(--blue);text-align:right;font-variant-numeric:tabular-nums;
+    color:var(--tc-ink);text-align:right;font-variant-numeric:tabular-nums;
     padding:3px 0}
   .mks{font-size:12.5px;font-weight:800;color:var(--ink);white-space:nowrap;
     font-variant-numeric:tabular-nums;padding:3px 0}
@@ -522,7 +533,7 @@
   .jg{background:var(--bg);border:2px solid var(--line);border-radius:14px;
     padding:10px 13px 11px}
   .jgk{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.05em;
-    color:#fff;background:var(--blue);border-radius:999px;padding:3px 9px}
+    color:#fff;background:var(--tc-ink);border-radius:999px;padding:3px 9px}
   .jgt{display:block;font-family:'Baloo 2',cursive;font-size:15px;font-weight:700;
     color:var(--ink);margin-top:6px;line-height:1.2}
   .jgd{display:block;font-size:12.5px;color:var(--soft);line-height:1.55;margin-top:4px}
@@ -533,7 +544,7 @@
     padding:11px 0;border-bottom:1px solid var(--line)}
   .td:last-child{border-bottom:none}
   .tdn{grid-row:1/4;font-family:'Baloo 2',cursive;font-size:15px;font-weight:700;
-    color:#fff;background:var(--blue);border-radius:50%;width:26px;height:26px;
+    color:#fff;background:var(--tc-ink);border-radius:50%;width:26px;height:26px;
     line-height:26px;text-align:center}
   .tdw{font-size:10.5px;font-weight:800;text-transform:uppercase;
     letter-spacing:.06em;color:var(--tang)}
@@ -554,7 +565,7 @@
   .schb{display:flex;align-items:baseline;gap:6px;white-space:nowrap}
   .schb i{font-style:normal;font-size:10px;font-weight:800;text-transform:uppercase;
     letter-spacing:.04em;color:var(--soft)}
-  .schb b{font-size:15px;font-weight:800;color:var(--blue);
+  .schb b{font-size:15px;font-weight:800;color:var(--tc-ink);
     font-variant-numeric:tabular-nums}
   .schaf{grid-column:1/-1;font-size:11.5px;font-weight:600;color:var(--soft);
     margin-top:3px}
@@ -567,11 +578,11 @@
   .lnk.f-hot{border-color:#F5D2C6;background:var(--peach)}
   .lnk.f-hot .lnt,.lnk.f-hot .lngo{color:var(--tang)}
   .lnk.f-sec{border-color:#BBD7FA;background:var(--sky)}
-  .lnk.f-sec .lnt,.lnk.f-sec .lngo{color:var(--blue)}
+  .lnk.f-sec .lnt,.lnk.f-sec .lngo{color:var(--tc-ink)}
   .lnk.f-pri{border-color:#BFE3CB;background:#DFF3E4}
   .lnk.f-pri .lnt,.lnk.f-pri .lngo{color:#2F7A45}
   .lnk.f-cca{border-color:#D5C8F7;background:#F0EAFE}
-  .lnk.f-cca .lnt,.lnk.f-cca .lngo{color:var(--grape)}
+  .lnk.f-cca .lnt,.lnk.f-cca .lngo{color:var(--grape-ink)}
   /* the two that are already a newest-first list say so */
   .livep{font-family:'Lexend',sans-serif;font-style:normal;font-size:10px;
     font-weight:800;text-transform:uppercase;letter-spacing:.06em;
@@ -661,9 +672,15 @@
   .mxkey b{font-weight:700;color:var(--ink)}
   .mx6,.duo{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-start}
   .kidbox{flex:1 1 300px;min-width:0}
-  .kidname{display:block;width:100%;font-family:inherit;border:none;cursor:default;
-    font-weight:800;font-size:15px;padding:7px 6px;border-radius:11px;
-    text-align:center;margin-bottom:8px}
+  /* A flat slab of colour was the loudest thing on the screen and the least
+     informative. Same tint, quieter, with a matching hairline to give it an
+     edge and the count sitting under the name rather than fighting it. */
+  .kidname{display:block;width:100%;font-family:inherit;cursor:default;
+    border:1.5px solid var(--all-line);font-weight:800;font-size:15px;
+    padding:9px 10px;border-radius:12px;text-align:center;margin-bottom:10px;
+    letter-spacing:.01em}
+  .kidname.c-tc{border-color:var(--tc-line)}
+  .kidname.c-sc{border-color:var(--sc-line)}
   button.kidname{cursor:pointer}
   .duo .test{margin-bottom:8px;padding:12px 13px}
   .duo .test .nm{font-size:15px}
@@ -671,7 +688,8 @@
   .duo .sub{margin:14px 0 8px}
   .duo .rdsum{margin-bottom:10px}
   .duo .btx{font-size:15px}
-  .kidname small{display:block;font-size:10.5px;font-weight:600;opacity:.85}
+  .kidname small{display:block;font-size:10.5px;font-weight:700;opacity:.7;
+    margin-top:2px;letter-spacing:.04em}
   .mxcols{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
   .mxsub{font-size:13px;letter-spacing:.06em;font-weight:800;
     color:var(--ink);text-align:center;padding-bottom:5px;border-bottom:1px solid var(--line)}
@@ -695,7 +713,7 @@
   .tbox .tavg.full{opacity:1}
   .tbox.good{background:#DFF3E4;color:#2F7A45}
   .tbox.mid{background:#FFF1D6;color:#8A6100}
-  .tbox.low{background:#FFE3DC;color:#B03A22}
+  .tbox.low{background:#FFE3DC;color:#96301A}
   .tbox.none{background:var(--bg);color:var(--soft);border:1.5px solid var(--line)}
   .tbox .tv.small{font-size:13px;font-weight:700}
   /* one wide pinyin box, typed as da4 ma3 */
@@ -739,8 +757,8 @@
   .daily{display:block;width:100%;border:none;font-family:inherit;text-align:left;
     cursor:pointer;border-radius:14px;padding:12px 14px;color:#fff}
   .todayrow .daily{margin-bottom:0;height:100%}
-  .daily.k-tc{background:var(--blue)}
-  .daily.k-sc{background:var(--tang)}
+  .daily.k-tc{background:var(--tc-ink)}
+  .daily.k-sc{background:var(--sc-ink)}
   /* whose ten minutes this is, since both are on screen at once now */
   .daily .dwho{display:block;font-size:11px;font-weight:800;letter-spacing:.09em;
     text-transform:uppercase;opacity:.82;margin-bottom:2px}
@@ -891,13 +909,13 @@ body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;-
   .wb:active{transform:translateY(1px)}
   /* resting: the same pale tint the child's own panels use */
   .wb.w-all{background:#F0EAFE;color:var(--grape)}
-  .wb.w-tc {background:var(--sky);color:var(--blue)}
-  .wb.w-sc {background:var(--peach);color:var(--tang)}
+  .wb.w-tc {background:var(--tc-bg);color:var(--tc-ink)}
+  .wb.w-sc {background:var(--sc-bg);color:var(--sc-ink)}
   /* chosen: the strong version of that very colour, plus a ring */
   .wb.on{color:#fff}
   .wb.w-all.on{background:var(--grape);box-shadow:0 0 0 3px #F0EAFE}
-  .wb.w-tc.on {background:var(--blue); box-shadow:0 0 0 3px var(--sky)}
-  .wb.w-sc.on {background:var(--tang); box-shadow:0 0 0 3px var(--peach)}
+  .wb.w-tc.on {background:var(--tc-ink); box-shadow:0 0 0 3px var(--tc-bg)}
+  .wb.w-sc.on {background:var(--sc-ink); box-shadow:0 0 0 3px var(--sc-bg)}
   .wb.on small{opacity:.9}
 
   @media(prefers-reduced-motion:reduce){*{transition:none!important}
@@ -913,7 +931,7 @@ body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;-
   </header>
   <nav class="tabs" id="tabs" aria-label="Sections"></nav>
   <main id="view" tabindex="-1"></main>
-  <p class="foot">Saved on this device · build 130</p>
+  <p class="foot">Saved on this device · build 134</p>
 </div>
 <!-- load order matters: data, then core, then screens, app last -->
 <!-- Pinned to an exact version with a hash to match: "@2" floats, so a bad
@@ -927,6 +945,6 @@ body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;-
 <script src="core.js?v=54"></script>
 <script src="timetable.js?v=6"></script>
 <script src="training.js?v=51"></script>
-<script src="app.js?v=102"></script>
+<script src="app.js?v=103"></script>
 </body>
 </html>
