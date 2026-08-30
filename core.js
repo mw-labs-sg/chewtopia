@@ -127,7 +127,42 @@ function dropGone(){
     if(keep.length!==a.length) WJ(k, keep);
   });
 }
-function seedOnce(){ mergeSeed("events", SEED_EVENTS); mergeSeed("acts", SEED_ACTS); dropGone(); }
+/* Growth readings can arrive from data.js too - a photo of the bathroom scale
+   gets read and typed in there rather than on the tablet.
+
+   This is NOT mergeSeed, on purpose. mergeSeed treats data.js as the truth and
+   rewrites the device copy whenever the two differ, which is right for a
+   school-set event and wrong for a measurement: correcting a number on the
+   iPad has to stick. So a seeded reading is only ever ADDED, never rewritten,
+   and it comes in with ts:0 so any later edit wins the merge outright.
+
+   Both tombstones are honoured. seedgone covers the seeded lists, and struck
+   is what the delete button on a reading writes - miss either and a reading
+   deleted on the tablet reappears on the next open. And a seed is skipped if
+   that child already has a reading on that date, which keeps the one-a-day
+   rule the form enforces. */
+function seedGrow(){
+  if(typeof SEED_GROW==="undefined" || !SEED_GROW.length) return;
+  var gone=seedGone(), t=tombs(), by={};
+  SEED_GROW.forEach(function(r){ (by[r.who]=by[r.who]||[]).push(r); });
+  Object.keys(by).forEach(function(who){
+    var key="grow:"+who, cur=SJ(key,[]), struck=t[key]||{},
+        have={}, onDay={}, changed=false;
+    cur.forEach(function(x){ have[x.id]=1; onDay[x.d]=1; });
+    by[who].forEach(function(r){
+      if(have[r.id] || onDay[r.d]) return;
+      if(gone.indexOf(r.id)>=0 || struck[r.id]) return;
+      cur.push({id:r.id, d:r.d,
+                w:(r.w===undefined?"":r.w), h:(r.h===undefined?"":r.h), ts:0});
+      onDay[r.d]=1; changed=true;
+    });
+    if(changed) WJ(key, cur);
+  });
+}
+function seedOnce(){
+  mergeSeed("events", SEED_EVENTS); mergeSeed("acts", SEED_ACTS);
+  seedGrow(); dropGone();
+}
 
 var DAYS = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
 /* Each tab keeps its own colour, so the eye learns where things live. */

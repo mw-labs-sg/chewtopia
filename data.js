@@ -1150,6 +1150,27 @@ var FORUM_LINKS = [
    u:"https://forum.kiasuparents.com/search?term=nanyang%20primary&in=titles"}
 ];
 
+/* ==========================================================================
+   WEIGH-INS FROM HERE - readings taken off a photo of the scale and the rule
+   rather than typed on the tablet. They land in the Growth tab on next open.
+
+   Same rules as everything else seeded: give each a fresh id, and one deleted
+   in the app stays deleted. Unlike the events, a reading here is never written
+   back over an edit made on the tablet - if a number is corrected there, the
+   correction wins.
+
+   w in kg, h in cm, either may be left out.
+   ========================================================================== */
+var SEED_GROW = [
+  /* Photo of the scale and the wall rule, morning of 30 Aug 2026. The 18.5 is
+     off the display and is not in doubt. The 113 is Dad's reading of the rule
+     and could not be checked from the photo: the boy's face is close to the
+     lens while the rule is back on the wall, and that parallax alone moves the
+     apparent number by several centimetres. If the height line ever looks
+     wrong, this is the reading to measure again. */
+  {id:"gsc-20260830", who:"sc", d:"2026-08-30", w:18.5, h:113}
+];
+
 var SEED_ACTS = [
   /* SC — from the printed weekly schedule */
   {id:"sa1", who:"sc", day:"Monday",    from:"16:00", to:"17:00", t:"Phonics"},
