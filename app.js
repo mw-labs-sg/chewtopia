@@ -288,28 +288,30 @@ function isoFromDays(n){
 }
 function kidCol(id){ return id==="tc" ? "var(--blue)" : "var(--tang)"; }
 
-/* One chart, one measurement, every shown child drawn on it. Returns "" when
-   there is nothing to draw, so the caller can say so in words instead. */
-function growChart(kids, field, unit){
-  var W=320, H=140, L=36, R=8, T=10, B=20;
-  var series=[], loX=null, hiX=null, loY=null, hiY=null;
-  kids.forEach(function(k){
-    var pts=[];
-    growList(k.id).forEach(function(r){
-      var v=parseFloat(r[field]); if(isNaN(v)) return;
-      var x=growDays(r.d);
-      pts.push({x:x, y:v});
-      if(loX===null||x<loX) loX=x;
-      if(hiX===null||x>hiX) hiX=x;
-      if(loY===null||v<loY) loY=v;
-      if(hiY===null||v>hiY) hiY=v;
-    });
-    if(pts.length) series.push({id:k.id, nm:pname(k.id), pts:pts});
-  });
-  if(!series.length) return "";
+/* One chart, one boy, one measurement.
 
-  /* A single reading, or several all on one day, would give a box with no
-     width or no height and every point would land on top of the others. */
+   Both boys used to share an axis and it was the wrong way round. TC is around
+   24kg and SC around 18.5, so a shared weight scale spans seven kilos and the
+   third of a kilo either of them puts on in a month is a flat line inside it.
+   Split per boy and each chart scales to his own range, which is the only way
+   his own progress is visible at all. It also means no legend and no name
+   riding the line: the panel around the chart already says whose it is.
+
+   Returns "" when there is nothing to draw, so the caller says so in words. */
+function growChart(who, field, unit){
+  var W=320, H=140, L=36, R=8, T=10, B=20;
+  var pts=[], loY=null, hiY=null;
+  growList(who).forEach(function(r){
+    var v=parseFloat(r[field]); if(isNaN(v)) return;
+    pts.push({x:growDays(r.d), y:v});
+    if(loY===null||v<loY) loY=v;
+    if(hiY===null||v>hiY) hiY=v;
+  });
+  if(!pts.length) return "";
+
+  var loX=pts[0].x, hiX=pts[pts.length-1].x;
+  /* One reading, or several on one day, would give a box with no width and
+     put every point in the same place. */
   if(hiX===loX){ loX-=7; hiX+=7; }
   var pad=(hiY-loY)*0.15 || Math.max(hiY*0.05, 1);
   var y0=loY-pad, y1=hiY+pad;
@@ -317,9 +319,9 @@ function growChart(kids, field, unit){
   function px(x){ return L + (x-loX)/(hiX-loX)*(W-L-R); }
   function py(v){ return T + (1-(v-y0)/(y1-y0))*(H-T-B); }
 
+  var col=kidCol(who);
   var g='<svg class="gch" viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none" '+
-        'role="img" aria-label="'+esc(unit)+' over time">';
-  /* three gridlines with the value beside them, so the shape has a scale */
+        'role="img" aria-label="'+esc(pname(who))+', '+esc(unit)+' over time">';
   for(var i=0;i<3;i++){
     var v=y0+(y1-y0)*i/2, yy=py(v);
     g+='<line class="ggl" x1="'+L+'" y1="'+yy.toFixed(1)+'" x2="'+(W-R)+
@@ -329,44 +331,40 @@ function growChart(kids, field, unit){
   g+='<text class="gxl" x="'+L+'" y="'+(H-5)+'">'+esc(dfull(isoFromDays(loX)))+'</text>'+
      '<text class="gxl end" x="'+(W-R)+'" y="'+(H-5)+'">'+esc(dfull(isoFromDays(hiX)))+'</text>';
 
-  series.forEach(function(se){
-    var d=se.pts.map(function(p){
-      return px(p.x).toFixed(1)+","+py(p.y).toFixed(1); }).join(" ");
-    if(se.pts.length>1)
-      g+='<polyline class="gln" points="'+d+'" style="stroke:'+kidCol(se.id)+'"/>';
-    se.pts.forEach(function(p){
-      g+='<circle class="gdot" cx="'+px(p.x).toFixed(1)+'" cy="'+py(p.y).toFixed(1)+
-         '" r="3" style="fill:'+kidCol(se.id)+'"/>';
-    });
-    /* His name, in his colour, at the end of his own line. A legend below the
-       chart makes you look away and match colours by memory; two boys whose
-       lines cross makes that worse. The label sits with the line instead. */
-    var last=se.pts[se.pts.length-1], ly=py(last.y);
-    /* nudged off the top or bottom edge rather than clipped by it */
-    ly = Math.max(T+8, Math.min(H-B-3, ly-7));
-    g+='<text class="gnm" x="'+(px(last.x)-5).toFixed(1)+'" y="'+ly.toFixed(1)+
-       '" style="fill:'+kidCol(se.id)+'">'+esc(se.nm)+'</text>';
+  if(pts.length>1){
+    /* a wash under the line: with one boy per chart there is nothing to
+       confuse it with, and it makes a shallow climb read as a climb */
+    var area=pts.map(function(p){ return px(p.x).toFixed(1)+","+py(p.y).toFixed(1); }).join(" ");
+    g+='<polygon class="gfil" style="fill:'+col+'" points="'+
+       px(pts[0].x).toFixed(1)+','+(H-B)+' '+area+' '+px(pts[pts.length-1].x).toFixed(1)+','+(H-B)+'"/>'+
+       '<polyline class="gln" points="'+area+'" style="stroke:'+col+'"/>';
+  }
+  pts.forEach(function(p){
+    g+='<circle class="gdot" cx="'+px(p.x).toFixed(1)+'" cy="'+py(p.y).toFixed(1)+
+       '" r="3" style="fill:'+col+'"/>';
   });
   return g+'</svg>';
 }
 
-function vGrow(){
-  /* Both boys, always. The child switch belonged to the Growth tab and went
-     with it, and two lines on one chart is what you want to look at anyway. */
-  var kids=shownKids();
-  var s='<div class="panel"><h2><span class="em">\uD83D\uDCC8</span> Growth'+
-        '<span class="side">weight and height</span></h2>';
+/* Everything about one boy in one panel, in his own colour: what he weighs
+   now, the two lines, the form that adds to him, and every reading taken.
 
-  /* the newest reading for each child, and what moved since the one before */
-  s+='<div class="glat">';
-  kids.forEach(function(k){
-    var l=growList(k.id), last=l[l.length-1], prev=l[l.length-2];
-    s+='<div class="gcard '+whoCls(k.id)+'"><span class="gwho">'+esc(pname(k.id))+'</span>';
-    if(!last){ s+='<span class="gnone">Nothing weighed yet</span></div>'; return; }
-    s+='<span class="gnow">'+
+   The form lives inside his panel rather than once at the bottom with a child
+   picker, which is one fewer field and removes the mistake that picker made
+   possible - filing SC's weight against TC and only noticing months later
+   when the line has a step in it. */
+function growPanel(k){
+  var l=growList(k.id), last=l[l.length-1], prev=l[l.length-2], id=esc(k.id);
+  var s='<div class="panel gpan '+whoCls(k.id)+'">'+
+        '<h2><span class="em">\uD83D\uDCC8</span> '+esc(pname(k.id))+
+        '<span class="side">'+(l.length ? l.length+(l.length===1?" reading":" readings")
+                                        : "nothing yet")+'</span></h2>';
+
+  if(last){
+    s+='<div class="gnow">'+
        (last.w!==""&&last.w!=null ? '<b>'+(+last.w).toFixed(1)+'<i>kg</i></b>' : '')+
        (last.h!==""&&last.h!=null ? '<b>'+(+last.h).toFixed(1)+'<i>cm</i></b>' : '')+
-       '</span>';
+       '</div>';
     var bits=[];
     if(prev){
       ["w","h"].forEach(function(f){
@@ -377,91 +375,74 @@ function vGrow(){
       });
     }
     var bmi = (last.w && last.h) ? (+last.w)/Math.pow((+last.h)/100,2) : null;
-    s+='<span class="gsub">'+esc(dfull(last.d))+
+    s+='<div class="gsub">'+esc(dfull(last.d))+
        (bits.length?' \u00b7 '+esc(bits.join(", "))+' since last time':'')+
-       (bmi?' \u00b7 BMI '+bmi.toFixed(1):'')+'</span></div>';
-  });
-  s+='</div>';
+       (bmi?' \u00b7 BMI '+bmi.toFixed(1):'')+'</div>';
+  }
 
-  var wc=growChart(kids,"w","kilograms"), hc=growChart(kids,"h","centimetres");
+  var wc=growChart(k.id,"w","kilograms"), hc=growChart(k.id,"h","centimetres");
   if(wc||hc){
     s+='<div class="gcharts">';
     if(wc) s+='<div class="gwrap"><h3>Weight <em>kg</em></h3>'+wc+'</div>';
     if(hc) s+='<div class="gwrap"><h3>Height <em>cm</em></h3>'+hc+'</div>';
     s+='</div>';
-    /* only the boys with a reading: a swatch for a line nobody drew reads as
-       a bug in the chart rather than an empty log */
-    var plotted=kids.filter(function(k){ return growList(k.id).length; });
-    if(plotted.length>1)
-      s+='<div class="gkey">'+plotted.map(function(k){
-           return '<span class="gk"><i style="background:'+kidCol(k.id)+'"></i>'+
-                  esc(pname(k.id))+'</span>'; }).join("")+'</div>';
   } else {
-    s+='<p class="empty">Nothing plotted yet. Put the first weigh-in in below '+
-       'and the line starts from there.</p>';
+    s+='<p class="empty">Nothing weighed yet. Put the first one in below and '+
+       'the line starts from there.</p>';
   }
 
-  /* The form. Weight or height on its own is fine - a morning where only one
-     of them happens still counts, and a missing number just skips that chart. */
-  var pick = who();
-  var opts=KIDS.map(function(k){
-    return '<option value="'+k.id+'"'+(k.id===pick?" selected":"")+'>'+
-           esc(pname(k.id))+'</option>'; }).join("");
-  s+='<div class="lbl">Add a weigh-in</div>'+
-     '<div class="growrow">'+
-       '<select id="gW">'+opts+'</select>'+
-       '<input type="date" id="gD" value="'+esc(isoOf(new Date()))+'">'+
-       '<input type="number" id="gKg" step="0.1" min="0" max="200" placeholder="kg" inputmode="decimal">'+
-       '<input type="number" id="gCm" step="0.1" min="0" max="250" placeholder="cm" inputmode="decimal">'+
-       '<button class="btn go" id="gAdd">Add</button>'+
-     '</div><div class="hint" id="gMsg"></div>';
-  s+='</div>';
+  s+='<div class="growrow">'+
+       '<input type="date" id="gD-'+id+'" value="'+esc(isoOf(new Date()))+'">'+
+       '<input type="number" id="gKg-'+id+'" step="0.1" min="0" max="200" placeholder="kg" inputmode="decimal">'+
+       '<input type="number" id="gCm-'+id+'" step="0.1" min="0" max="250" placeholder="cm" inputmode="decimal">'+
+       '<button class="btn go" data-gadd="'+id+'">Add</button>'+
+     '</div><div class="hint" id="gMsg-'+id+'"></div>';
 
-  /* every reading, newest first, one panel per child */
-  kids.forEach(function(k){
-    var l=growList(k.id).slice().reverse();
-    if(!l.length) return;
-    s+='<div class="panel"><h2><span class="em">\uD83D\uDCCB</span> '+esc(pname(k.id))+
-       '<span class="side">'+l.length+(l.length===1?" reading":" readings")+'</span></h2>'+
-       '<div class="grows">';
-    l.forEach(function(r){
+  if(l.length){
+    s+='<div class="grows">';
+    l.slice().reverse().forEach(function(r){
       s+='<div class="growr"><span class="grd">'+esc(dfull(r.d))+'</span>'+
          '<span class="grv">'+(r.w!==""&&r.w!=null ? (+r.w).toFixed(1)+' kg' : '\u2014')+'</span>'+
          '<span class="grv">'+(r.h!==""&&r.h!=null ? (+r.h).toFixed(1)+' cm' : '\u2014')+'</span>'+
-         '<button class="x" data-gdel="'+esc(r.id)+'" data-gwho="'+esc(k.id)+'" '+
+         '<button class="x" data-gdel="'+esc(r.id)+'" data-gwho="'+id+'" '+
          'aria-label="Delete this reading">\u00d7</button></div>';
     });
-    s+='</div></div>';
-  });
-  return s;
+    s+='</div>';
+  }
+  return s+'</div>';
+}
+
+function vGrow(){
+  return shownKids().map(growPanel).join("");
 }
 
 function wGrow(){
-  var b=document.getElementById("gAdd");
-  if(b) b.onclick=function(){
-    var w=document.getElementById("gW").value,
-        d=document.getElementById("gD").value,
-        kg=document.getElementById("gKg").value.trim(),
-        cm=document.getElementById("gCm").value.trim(),
-        m=document.getElementById("gMsg");
-    /* Say what is wrong. Doing nothing silently just looks broken. */
-    if(!d){ m.textContent="Pick the date it was taken."; return; }
-    if(!kg && !cm){ m.textContent="Put in a weight, a height, or both."; return; }
-    var a=SJ(growKey(w),[]), hit=null;
-    /* One reading per child per day: standing him on the scale twice on a
-       Sunday should correct the morning number, not draw a second dot on it. */
-    a.forEach(function(x){ if(x.d===d) hit=x; });
-    if(hit){
-      if(kg) hit.w=+kg;
-      if(cm) hit.h=+cm;
-      hit.ts=Date.now();
-    } else {
-      a.push({id:"g"+Date.now()+Math.floor(Math.random()*1000),
-              d:d, w:kg?+kg:"", h:cm?+cm:"", ts:Date.now()});
-    }
-    WJ(growKey(w), a);
-    sfxPop(); render();
-  };
+  document.querySelectorAll("[data-gadd]").forEach(function(b){
+    b.onclick=function(){
+      var w=b.dataset.gadd,
+          d=document.getElementById("gD-"+w).value,
+          kg=document.getElementById("gKg-"+w).value.trim(),
+          cm=document.getElementById("gCm-"+w).value.trim(),
+          m=document.getElementById("gMsg-"+w);
+      /* Say what is wrong. Doing nothing silently just looks broken. */
+      if(!d){ m.textContent="Pick the date it was taken."; return; }
+      if(!kg && !cm){ m.textContent="Put in a weight, a height, or both."; return; }
+      var a=SJ(growKey(w),[]), hit=null;
+      /* One reading per boy per day: standing him on the scale twice on a
+         Sunday should correct the morning number, not draw a second dot. */
+      a.forEach(function(x){ if(x.d===d) hit=x; });
+      if(hit){
+        if(kg) hit.w=+kg;
+        if(cm) hit.h=+cm;
+        hit.ts=Date.now();
+      } else {
+        a.push({id:"g"+Date.now()+Math.floor(Math.random()*1000),
+                d:d, w:kg?+kg:"", h:cm?+cm:"", ts:Date.now()});
+      }
+      WJ(growKey(w), a);
+      sfxPop(); render();
+    };
+  });
   document.querySelectorAll("[data-gdel]").forEach(function(x){
     x.onclick=function(){
       var w=x.dataset.gwho, id=x.dataset.gdel, k=growKey(w);
@@ -470,41 +451,6 @@ function wGrow(){
       sfxTap(); render();
     };
   });
-}
-
-/* Every abbreviation on this tab in one place. It sits between the scoring
-   and the school table on purpose: the table is unreadable without it. */
-function vJargon(){
-  var j = (typeof JARGON!=="undefined" ? JARGON : []);
-  if(!j.length) return "";
-  var s='<div class="panel"><h2><span class="em">\uD83D\uDD24</span> What the words mean'+
-        '<span class="side">'+j.length+' of them</span></h2><div class="jgs">';
-  j.forEach(function(x){
-    s+='<div class="jg"><span class="jgk">'+esc(x.k)+'</span>'+
-       '<span class="jgt">'+esc(x.t)+'</span>'+
-       '<span class="jgd">'+esc(x.d)+'</span></div>';
-  });
-  return s+'</div></div>';
-}
-
-/* The whole tab turned into the handful of things that are actually ours to
-   do, in the order they happen. Everything above this is background; this is
-   the part with a date on it. */
-function vTodo(){
-  var t = (typeof TODO!=="undefined" ? TODO : []);
-  if(!t.length) return "";
-  var s='<div class="panel"><h2><span class="em">\u2705</span> What we actually have to do'+
-        '<span class="side">TC sits it 2030 \u00b7 SC 2032</span></h2><div class="tds">';
-  t.forEach(function(x,i){
-    s+='<div class="td"><span class="tdn">'+(i+1)+'</span>'+
-       '<span class="tdw">'+esc(x.w)+'</span>'+
-       '<span class="tdt">'+esc(x.t)+'</span>'+
-       '<span class="tdd">'+esc(x.d)+'</span></div>';
-  });
-  return s+'</div><div class="key">The months are the shape of the year, off '+
-    'MOE\u2019s 2026 exercise \u2014 they shift by a week or two and MOE publishes '+
-    'the real dates each January. Nothing on this list can be done early, and '+
-    'the only two that can be missed outright are the DSA windows.</div></div>';
 }
 
 function vSchools(){
