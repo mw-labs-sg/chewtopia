@@ -394,20 +394,18 @@
   .agc.both{grid-column:2/-1}
   .evc{position:relative;background:var(--bg);border-radius:12px;padding:10px 30px 10px 12px;
     margin-bottom:6px}
-  .evc.e-tc{background:#F4F9FF}
-  .evc.e-sc{background:#F3FAF5}
-  .evc.e-all{background:#F5F3FE}
-  .evc.live{box-shadow:0 0 0 2px var(--sun) inset}
+  .evc.e-tc{background:var(--tc-bg)}
+  .evc.e-sc{background:var(--sc-bg)}
+  .evc.e-all{background:var(--all-bg)}
   /* a test he sits, outlined in his own colour so it is picked out of a column
      of trips, forms and reminders without reading a word. An outline rather
      than a border, so nothing shifts, and it does not fight .live's shadow. */
-  .evc.tst{outline:2.5px solid var(--grape);outline-offset:-2.5px}
-  .evc.tst.e-tc{outline-color:var(--tc-ink)}
-  .evc.tst.e-sc{outline-color:var(--sc-ink)}
   .evc.tst .evt{font-weight:800}
   /* a day off — public holiday or school holiday. Red, so the days with no
      school jump out of the column before anything else does. */
-  .evc.hol{background:#FFE3DC;box-shadow:inset 3px 0 0 #FF6F52}
+  /* a day off is the one card that is not a boy's colour, and the tint
+     carries that on its own - it needed no bar down the side */
+  .evc.hol{background:#FFE3DC}
   .evc.hol .evt{color:#96301A}
   .evc.hol .evw{color:#9C4327}
   .evc.hol .nt{color:#8A4B33}
@@ -931,7 +929,7 @@ body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;-
   </header>
   <nav class="tabs" id="tabs" aria-label="Sections"></nav>
   <main id="view" tabindex="-1"></main>
-  <p class="foot">Saved on this device · build 134</p>
+  <p class="foot">Saved on this device · build 135</p>
 </div>
 <!-- load order matters: data, then core, then screens, app last -->
 <!-- Pinned to an exact version with a hash to match: "@2" floats, so a bad
