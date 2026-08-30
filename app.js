@@ -449,7 +449,7 @@ function vGrow(){
            '<input type="number" id="gCm" step="0.1" min="0" max="250" placeholder="cm" inputmode="decimal">'+
            '<button class="btn go" id="gAdd">Add</button>'+
          '</div><div class="hint" id="gMsg"></div>'+
-         '<div class="duo">'+shownKids().map(growCard).join("")+'</div></div>';
+         '<div class="gduo">'+shownKids().map(growCard).join("")+'</div></div>';
 }
 
 function wGrow(){
