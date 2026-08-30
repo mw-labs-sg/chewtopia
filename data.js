@@ -650,8 +650,18 @@ var SEED_EVENTS = [
      the school. Two birthdays and the graduation. Anything in that group that
      was already over (the Twinkl free downloads, the 2C results) is not here,
      and neither is the chat. */
-  {id:"e33", t:"Aurora\u2019s birthday party", d:"2026-09-26", w:"sc",
-   n:"Saturday, at Darius\u2019 condo clubhouse \u2014 the same place as last time. Half the class has said yes in the group. Nobody has said a time yet, so ask."},
+  /* Off the printed invitation, which had a good deal more on it than the
+     group chat did - it is a joint party for both children, and it has a
+     time, an address and two numbers to call. */
+  {id:"e33", t:"Aurora & Albus\u2019 birthday party", d:"2026-09-26", time:"12:00", w:"sc",
+   n:"Saturday, 12noon to 4pm, cake cutting at 2.15pm. Clementi Park Condo clubhouse, 120 Sunset Way S(597152). A joint party for the two of them. RSVP to Darius on 9831 8353 or Yee Jing on 8112 4148."},
+
+  /* Our own reminder, not the hosts\u2019: the invitation gives two numbers to
+     RSVP to and no date to do it by, and a party with a room and a caterer
+     behind it wants an answer well before the week of. A Saturday, so there
+     is time to call. */
+  {id:"e37", t:"RSVP for Aurora & Albus\u2019 party", d:"2026-09-19", w:"sc",
+   n:"Darius on 9831 8353 or Yee Jing on 8112 4148. The invitation sets no deadline \u2014 this is a week before, to give them a headcount in time for the room and the food."},
   {id:"e34", t:"RSVP for Arden\u2019s birthday", d:"2026-10-07", w:"sc",
    n:"Headcount by Wednesday 7 October, adults and kids, so Jeremy and Candice can book the room and the food. Siblings are welcome, so TC counts too.",
    url:"https://luma.com/5z0qfvda"},
