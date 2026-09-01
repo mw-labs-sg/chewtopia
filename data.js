@@ -673,7 +673,15 @@ var SEED_EVENTS = [
      one parent saying they were told the morning session starts then, which
      is why it is a note and not a time on the event. */
   {id:"e36", t:"K2 graduation and concert", d:"2026-11-19", w:"sc",
-   n:"Thursday. A parent in the group was told the morning session starts at 9. How long it runs nobody in the group knew, and the school had not said \u2014 worth asking, because P1 orientation at Nanyang Primary is the very next afternoon."}
+   n:"Thursday. A parent in the group was told the morning session starts at 9. How long it runs nobody in the group knew, and the school had not said \u2014 worth asking, because P1 orientation at Nanyang Primary is the very next afternoon."},
+
+  /* Nanyang Kindergarten, letter from the principal 31 Aug 2026. A drill, not
+     an incident — said so in the title, so that nobody reads the word
+     "intruder" off a phone screen and thinks something has happened. Nothing
+     to bring and nothing to sign; the only thing asked of us is the
+     conversation the night before. */
+  {id:"e38", t:"Security drill — practice only", d:"2026-09-03", w:"sc",
+   n:"Thursday. An ECDA intruder-alert drill at the kindergarten: the children practise moving quickly to a secure area and staying quiet with their teachers. Nothing to bring and nothing to sign. Worth telling him the night before that it is a practice, like a fire drill — listening to the teacher and keeping quiet is the whole of it."}
 ];
 
 /* ==========================================================================
