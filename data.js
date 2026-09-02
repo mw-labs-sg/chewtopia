@@ -614,7 +614,8 @@ var SEED_EVENTS = [
    n:"Also the last day of Term 3."},
   {id:"e23", t:"Term 3 holidays", d:"2026-09-05", d2:"2026-09-13", w:"tc", hol:1,
    n:"Term 4 starts Monday 14 September."},
-  {id:"e24", t:"Children's Day — no school", d:"2026-10-02", w:"tc", hol:1},
+  {id:"e24", t:"Children’s Day — no school", d:"2026-10-02", hol:1,
+   n:"Both schools. The kindergarten’s Term 4 pledge schedule has the Friday down as a holiday too, which is why this is no longer TC’s alone."},
   {id:"e25", t:"End of school year", d:"2026-11-21", d2:"2026-12-31", w:"tc", hol:1,
    n:"Term 4 ends Friday 20 November."},
 
@@ -681,7 +682,22 @@ var SEED_EVENTS = [
      to bring and nothing to sign; the only thing asked of us is the
      conversation the night before. */
   {id:"e38", t:"Security drill — practice only", d:"2026-09-03", w:"sc",
-   n:"Thursday. An ECDA intruder-alert drill at the kindergarten: the children practise moving quickly to a secure area and staying quiet with their teachers. Nothing to bring and nothing to sign. Worth telling him the night before that it is a practice, like a fire drill — listening to the teacher and keeping quiet is the whole of it."}
+   n:"Thursday. An ECDA intruder-alert drill at the kindergarten: the children practise moving quickly to a secure area and staying quiet with their teachers. Nothing to bring and nothing to sign. Worth telling him the night before that it is a practice, like a fire drill — listening to the teacher and keeping quiet is the whole of it."},
+
+  /* Nanyang Kindergarten, Term 4 pledge schedule from the principal.
+     Every K2 child takes a turn leading the National Pledge at assembly,
+     and the whole class list is on the letter — only his day is here.
+     The week decides the language, not the child: weeks 1, 3 and 5 are
+     宣读信约 and weeks 2 and 4 are English, and his week is a Chinese one.
+     Time on the event is the 8.05am the letter asks parents to be in by,
+     not the start of the school day. */
+  {id:"e39", t:"宣读信约 — his turn to lead the pledge", d:"2026-09-17", time:"08:05", w:"sc",
+   n:"Thursday of week 1, in Mandarin. Family may come and watch — be in school by 8.05am sharp, and leave promptly once assembly is over. Neatly dressed, covered shoes. There is no second slot if he is late or away: the only way to move it is to swap directly with another parent in the class and tell the school."},
+
+  /* Also off that schedule: the kindergarten marks Children’s Day on the
+     Thursday and closes on the Friday. */
+  {id:"e40", t:"Children’s Day celebration", d:"2026-10-01", w:"sc",
+   n:"Thursday, in school. The holiday itself is the next day."}
 ];
 
 /* ==========================================================================
