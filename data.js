@@ -556,6 +556,248 @@ var MEALS_ROTATION = [
 }
 ];
 
+/* ==========================================================================
+   THE SPELLING CLIMB — a word ladder, three letters up to fifteen.
+
+   NOT curriculum. Nothing here is off a school sheet: it is a general
+   English word list written for this game, graded by how many letters a
+   word has and by nothing else. Falling over at level 9 says which length
+   he stops coping with, not that he is behind on anything the school has
+   set — STELLAR is TC_SPELL and SC_SPELL above, and those are the lists
+   that count.
+
+   Keyed by word length, and the key is checked against the word when the
+   game builds a level: a nine-letter word filed under ten would quietly
+   break the one thing the ladder measures. Lower-case letters only — no
+   names, no apostrophes, no hyphens — so "how many letters" has one
+   honest answer.
+
+   Every word carries a sentence it appears in, read out after the word the
+   way the spelling tests do. Not decoration: heard on its own "sun" could
+   be "son", "web" could be "webb", and a boy would be marked wrong for
+   spelling a word nobody told him.
+   ========================================================================== */
+var CLIMB_WORDS = {
+  3: [
+    ["cat","The cat sat on my bed."],
+    ["dog","Our dog barks at the postman."],
+    ["sun","The sun is very hot today."],
+    ["bus","We take the bus to school."],
+    ["red","His water bottle is red."],
+    ["box","The toys are in a big box."],
+    ["cup","She drank a cup of milk."],
+    ["hat","Wear a hat in the sun."],
+    ["leg","He hurt his leg playing football."],
+    ["pen","Write your name with a pen."],
+    ["six","There are six eggs left."],
+    ["van","The delivery van stopped outside."],
+    ["web","A spider made a web in the corner."],
+    ["jam","I like jam on my toast."],
+    ["key","Dad lost the key to the door."],
+    ["ice","There is ice in my drink."],
+    ["egg","He ate a boiled egg for breakfast."],
+    ["fox","A fox has a bushy tail."]
+  ],
+  4: [
+    ["fish","We saw a fish in the pond."],
+    ["jump","Watch me jump over the puddle."],
+    ["milk","He drinks milk before bed."],
+    ["book","This book is about dinosaurs."],
+    ["tree","A bird is sitting in the tree."],
+    ["rain","The rain fell all afternoon."],
+    ["blue","The sky is blue this morning."],
+    ["hand","Put up your hand to answer."],
+    ["cake","We cut the cake at the party."],
+    ["frog","A frog hopped into the grass."],
+    ["ship","The ship sailed out of the harbour."],
+    ["nest","Two eggs are in the nest."],
+    ["sock","One sock is missing again."],
+    ["drum","He banged the drum loudly."],
+    ["moon","The moon is bright tonight."],
+    ["star","I can see one star already."],
+    ["bird","That bird has a red beak."],
+    ["door","Please close the door quietly."]
+  ],
+  5: [
+    ["apple","She packed an apple in her bag."],
+    ["house","Their house is near the park."],
+    ["water","Drink some water after running."],
+    ["green","The leaves are green after the rain."],
+    ["happy","He was happy with his score."],
+    ["sleep","I sleep for ten hours."],
+    ["table","Put the plates on the table."],
+    ["chair","He pushed his chair under the desk."],
+    ["cloud","One grey cloud covered the sun."],
+    ["beach","We built a castle at the beach."],
+    ["mango","This mango is sweet and juicy."],
+    ["tiger","A tiger has orange and black stripes."],
+    ["brush","Brush your teeth before bed."],
+    ["sweet","That drink is too sweet."],
+    ["month","There are four birthdays this month."],
+    ["plant","Water the plant every morning."],
+    ["smile","Her smile is very wide."],
+    ["watch","My watch tells me the time."]
+  ],
+  6: [
+    ["yellow","The school bus is bright yellow."],
+    ["school","We walk to school together."],
+    ["family","My family eats dinner at seven."],
+    ["orange","He peeled an orange for me."],
+    ["dinner","Dinner is ready in ten minutes."],
+    ["garden","Grandma grows chillies in her garden."],
+    ["pencil","My pencil needs sharpening."],
+    ["rabbit","The rabbit ate a whole carrot."],
+    ["monkey","A monkey took the fruit."],
+    ["market","We buy fish at the wet market."],
+    ["jungle","Tigers live deep in the jungle."],
+    ["letter","She posted a letter to her cousin."],
+    ["minute","Wait one minute please."],
+    ["bottle","Fill your bottle before the trip."],
+    ["summer","It rains a lot in summer."],
+    ["winter","They wore coats all winter."],
+    ["basket","Put the apples in the basket."],
+    ["circle","Draw a circle around the answer."]
+  ],
+  7: [
+    ["kitchen","Mum is cooking in the kitchen."],
+    ["teacher","Our teacher read us a story."],
+    ["morning","I brush my teeth every morning."],
+    ["holiday","The holiday starts on Friday."],
+    ["library","He borrowed two books from the library."],
+    ["bicycle","She rode her bicycle to the park."],
+    ["picture","He drew a picture of our house."],
+    ["weather","The weather is hot and wet."],
+    ["evening","We go swimming in the evening."],
+    ["chicken","We had rice and chicken for lunch."],
+    ["station","The train left the station on time."],
+    ["brother","My brother is younger than me."],
+    ["journey","The journey took two hours."],
+    ["uniform","Wear your uniform on Monday."],
+    ["biscuit","He ate one biscuit with his milk."],
+    ["sandals","Wear sandals to the beach."],
+    ["blanket","Pull the blanket over your feet."],
+    ["whisper","Please whisper in the library."]
+  ],
+  8: [
+    ["birthday","His birthday is in October."],
+    ["elephant","An elephant drinks with its trunk."],
+    ["computer","The computer will not start."],
+    ["hospital","The nurse works at the hospital."],
+    ["sandwich","She made a cheese sandwich."],
+    ["mountain","They climbed the mountain slowly."],
+    ["umbrella","Take an umbrella, it looks like rain."],
+    ["dinosaur","This dinosaur had tiny arms."],
+    ["homework","Finish your homework before dinner."],
+    ["football","We played football in the field."],
+    ["midnight","The party ended at midnight."],
+    ["painting","Her painting won a prize."],
+    ["together","They walked home together."],
+    ["shoulder","He carried the bag on one shoulder."],
+    ["question","Put up your hand if you have a question."],
+    ["exercise","A little exercise every day helps."]
+  ],
+  9: [
+    ["butterfly","A butterfly landed on the flower."],
+    ["breakfast","We eat breakfast at seven."],
+    ["chocolate","He shared his chocolate with me."],
+    ["favourite","Blue is my favourite colour."],
+    ["beautiful","The garden looks beautiful today."],
+    ["different","These two socks are different."],
+    ["telephone","The telephone rang twice."],
+    ["adventure","The book is about a great adventure."],
+    ["crocodile","A crocodile slept beside the river."],
+    ["pineapple","This pineapple is very sweet."],
+    ["yesterday","It rained hard yesterday."],
+    ["dangerous","Crossing without looking is dangerous."],
+    ["orchestra","The orchestra played for an hour."],
+    ["furniture","The new furniture arrived today."],
+    ["apartment","They live in a small apartment."],
+    ["wonderful","We had a wonderful time."]
+  ],
+  10: [
+    ["playground","The playground is next to the hall."],
+    ["everything","He packed everything into one bag."],
+    ["understand","I do not understand this question."],
+    ["helicopter","A helicopter flew over the school."],
+    ["motorcycle","The motorcycle was very noisy."],
+    ["restaurant","We ate at a Japanese restaurant."],
+    ["television","Turn the television off now."],
+    ["vegetables","Eat your vegetables first."],
+    ["basketball","They play basketball on Tuesdays."],
+    ["strawberry","She chose strawberry ice cream."],
+    ["difference","Can you spot the difference?"],
+    ["calculator","Use a calculator to check it."],
+    ["instrument","The violin is a difficult instrument."],
+    ["friendship","Their friendship began in Primary One."]
+  ],
+  11: [
+    ["comfortable","This chair is very comfortable."],
+    ["information","The letter had all the information."],
+    ["immediately","Come inside immediately, it is raining."],
+    ["interesting","That was an interesting story."],
+    ["temperature","The nurse took his temperature."],
+    ["examination","The examination lasts one hour."],
+    ["grandmother","My grandmother makes the best soup."],
+    ["grandfather","Grandfather walks in the park each morning."],
+    ["celebration","There was a celebration after the match."],
+    ["imagination","She has a wonderful imagination."],
+    ["thermometer","The thermometer showed thirty degrees."],
+    ["caterpillar","A caterpillar ate the whole leaf."],
+    ["supermarket","We buy milk at the supermarket."],
+    ["countryside","The countryside is quiet and green."]
+  ],
+  12: [
+    ["refrigerator","Put the milk back in the refrigerator."],
+    ["kindergarten","His little brother is still in kindergarten."],
+    ["occasionally","We occasionally eat out on Sundays."],
+    ["successfully","She successfully finished the whole race."],
+    ["unbelievable","The end of that film was unbelievable."],
+    ["conversation","They had a long conversation after class."],
+    ["championship","Our school won the championship."],
+    ["disappointed","He was disappointed by his score."],
+    ["thunderstorm","A thunderstorm woke us at night."],
+    ["particularly","It was particularly hot yesterday."],
+    ["introduction","Read the introduction before you start."],
+    ["neighbouring","The neighbouring school joined the competition."]
+  ],
+  13: [
+    ["understanding","Thank you for your understanding."],
+    ["extraordinary","The magician did something extraordinary."],
+    ["unfortunately","The trip was cancelled, unfortunately."],
+    ["international","The airport is full of international flights."],
+    ["concentration","Chess needs a lot of concentration."],
+    ["neighbourhood","Our neighbourhood has three playgrounds."],
+    ["disappearance","Nobody could explain the disappearance of the keys."],
+    ["entertainment","The clown was the entertainment at the party."],
+    ["grandchildren","She has six grandchildren."],
+    ["mathematician","A mathematician studies numbers all day."]
+  ],
+  14: [
+    ["multiplication","We learn multiplication in Primary Two."],
+    ["transportation","The bus is our transportation to school."],
+    ["disappointment","Losing the final was a real disappointment."],
+    ["classification","The classification of animals is on page ten."],
+    ["recommendation","The teacher wrote a recommendation for him."],
+    ["responsibility","Feeding the fish is his responsibility."],
+    ["understandable","His handwriting is barely understandable."],
+    ["characteristic","A long neck is the characteristic of a giraffe."],
+    ["identification","Bring some identification to the office."],
+    ["congratulation","He sent a congratulation card to his cousin."]
+  ],
+  15: [
+    ["congratulations","He shouted congratulations across the field."],
+    ["extraordinarily","The cake was extraordinarily good."],
+    ["straightforward","The instructions were straightforward."],
+    ["internationally","The singer is known internationally."],
+    ["environmentally","Cycling is environmentally friendly."],
+    ["characteristics","List three characteristics of a mammal."],
+    ["recommendations","The report ended with five recommendations."],
+    ["accomplishments","She listed her accomplishments proudly."],
+    ["extracurricular","Chess club is an extracurricular activity."],
+    ["multiplications","He finished all the multiplications quickly."]
+  ]
+};
+
 /* Test dates and family events, loaded on first open only.
    Delete any of them in the app and they stay deleted. */
 var SEED_EVENTS = [

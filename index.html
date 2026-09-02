@@ -325,6 +325,25 @@
   .rankbadge.rD{background:#FFE3DC;color:#96301A}
   .streakline{font-size:14px;color:var(--soft);font-weight:600}
 
+  /* ---- the spelling climb: a ladder of thirteen rungs ---- */
+  /* All thirteen are always drawn, cleared or not, so the top of the ladder
+     is visible from the bottom rung — that is most of the pull of the game. */
+  .clad{display:flex;gap:4px;justify-content:center;flex-wrap:wrap;margin:2px 0 12px}
+  .crung{width:26px;height:26px;border-radius:8px;background:var(--line);
+    color:var(--soft);font-size:12px;font-weight:800;font-family:'Baloo 2',cursive;
+    display:flex;align-items:center;justify-content:center}
+  .crung.done{background:var(--lime);color:#fff}
+  .crung.now{background:var(--sun);color:#5A3B00;transform:scale(1.14);
+    box-shadow:0 0 0 3px #FFF1D6}
+  /* his best ever, so this climb always has something on screen to beat */
+  .crung.best{outline:2px dashed var(--grape);outline-offset:2px}
+  .cpips{display:flex;gap:8px;justify-content:center;margin:0 0 12px}
+  .cpip{width:15px;height:15px;border-radius:50%;background:var(--line)}
+  .cpip.on{background:var(--lime);box-shadow:0 0 0 3px #DFF3E4}
+  .clevel{margin-top:14px;padding:13px;border-radius:14px;text-align:center;
+    background:#FFF1D6;color:#8A6100;font-family:'Baloo 2',cursive;font-size:21px}
+  .csent{margin-top:8px;font-weight:600}
+
   /* ---- results ---- */
   .run{display:inline-flex;flex-direction:column;align-items:center;border-radius:11px;
     padding:8px 12px;min-width:62px}
@@ -929,7 +948,7 @@ body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;-
   </header>
   <nav class="tabs" id="tabs" aria-label="Sections"></nav>
   <main id="view" tabindex="-1"></main>
-  <p class="foot">Saved on this device · build 137</p>
+  <p class="foot">Saved on this device · build 138</p>
 </div>
 <!-- load order matters: data, then core, then screens, app last -->
 <!-- Pinned to an exact version with a hash to match: "@2" floats, so a bad
@@ -939,10 +958,10 @@ body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3"
         integrity="sha384-l8ah+VgaWtk1mvOe9VC+OirC6qHFF4yH7l7mKRidV9MSti3E9F463bMp6ZVN4kuC"
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script src="data.js?v=48"></script>
-<script src="core.js?v=54"></script>
+<script src="data.js?v=49"></script>
+<script src="core.js?v=55"></script>
 <script src="timetable.js?v=6"></script>
-<script src="training.js?v=51"></script>
-<script src="app.js?v=103"></script>
+<script src="training.js?v=52"></script>
+<script src="app.js?v=104"></script>
 </body>
 </html>

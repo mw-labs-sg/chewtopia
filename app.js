@@ -38,6 +38,7 @@ function render(){
   var v=document.getElementById("view");
   if(quiz){ v.innerHTML=quizHTML(); wireQuiz(); return; }
   if(paper){ v.innerHTML=paperHTML(); wirePaper(); return; }
+  if(climb){ v.innerHTML=climbHTML(); wireClimb(); return; }
   var V={home:vHome,schedule:vWeek,meals:vMealsGrow,forums:vForums,
          practice:vTests,reading:vRead,links:vLinks};
   var Wr={home:wHome,schedule:wWeek,meals:wMealsGrow,forums:wForums,
@@ -988,7 +989,7 @@ window.addEventListener("hashchange", function(){
   /* Never navigate out of a test in progress. Tapping a score in Progress sets
      the address bar and then starts the test; the hash change lands a moment
      later and used to wipe the quiz that had just opened. */
-  if(quiz) return;
+  if(quiz||climb) return;
   var t=tabFromHash();
   if(t && t!==tab) go(t, true);
 });

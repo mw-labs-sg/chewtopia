@@ -177,6 +177,9 @@ var tab="home", quiz=null, showAdd=false;
 /* The paper dictation sheet: not a quiz, because nothing on it is answered on
    the screen. Dad reads, he writes on paper, and there is no score to keep. */
 var paper=null;
+/* The spelling climb: a ladder rather than a test, so it keeps its own
+   state — there is no fixed list of items and no mark out of ten. */
+var climb=null;
 /* Each tab gets a readable address, e.g. .../chewtopia/#meals, so a link can
    be bookmarked or sent straight to one screen. */
 var SLUGS = {home:"upcoming", schedule:"timetable", meals:"health",
@@ -198,7 +201,7 @@ function go(id, quiet){
   /* Everything a screen was left in the middle of. wkOff was missed, so
      browsing four weeks ahead on the Timetable, going to Meals and coming
      back landed you four weeks ahead again with no way to tell why. */
-  tab=id; quiz=null; paper=null; showAdd=false; showBook=false; wkOff=0; hush();
+  tab=id; quiz=null; paper=null; climb=null; showAdd=false; showBook=false; wkOff=0; hush();
   if(!quiet){ try{ location.hash="#"+SLUGS[id]; }catch(e){} }
   render(); scrollTo(0,0);
 }

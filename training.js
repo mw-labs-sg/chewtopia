@@ -253,6 +253,7 @@ function vTests(){
   });
   s+='</div></div>';
 
+  s+=climbPanel(tKid());
   if(tKid()==="tc") s+=paperPanel();
   s+=weakPanel(tKid());
   if(tKid()==="tc") s+=charTable();
@@ -313,6 +314,10 @@ function wTests(){
       strike("weak:"+kid, key);      /* and it stays gone on the other device too */
       sfxTap(); render();
     };
+  });
+  /* Its own attribute, not data-t: the climb is not a code start() knows. */
+  document.querySelectorAll("[data-climb]").forEach(function(b){
+    b.onclick=function(){ sfxTap(); startClimb(b.dataset.climb); };
   });
   document.querySelectorAll("[data-t]").forEach(function(b){
     b.onclick=function(){
@@ -1436,4 +1441,284 @@ function doneHTML(){
     '</div><div class="btnrow">'+
     '<button class="btn soft" id="dAgain">Try again</button>'+
     '<button class="btn soft" id="dBack">More practice</button></div></div>';
+}
+
+/* ==========================================================================
+   THE SPELLING CLIMB — how long a word can he actually spell?
+
+   Every other test in here asks a fixed list and hands back a mark out of ten.
+   This one asks the opposite question: not "did he learn this week's words"
+   but "where does he fall over". So it is a ladder, not a test. Level 3 is
+   three-letter words, level 15 is fifteen, and the only way up is three right
+   in a row — one lucky guess must never promote him.
+
+   Three misses on a rung ends the climb, and the misses are counted per rung,
+   not per run: the lives refill on the way up. A boy who trips once on level 4
+   and once on level 7 has not shown a ceiling, and stopping him there would
+   report one he does not have. Three misses on the SAME rung is a ceiling, and
+   that is the number the run is really for.
+
+   Nothing missed here goes into the tricky-ones bank. A P2 boy handed
+   "extracurricular" has not got a weak word, he has run out of ladder, and
+   filling his daily practice with fifteen-letter words would be a punishment
+   for climbing well.
+   ========================================================================== */
+var CLIMB_LO=3, CLIMB_HI=15, CLIMB_ROW=3, CLIMB_LIVES=3;
+var CLIMB_TEST="Spelling climb";
+
+/* A name on every rung. "Level 8" is a school report; "you got to Cliff" is
+   the bit a seven-year-old repeats at dinner, and the names climb into the
+   sky the way the scene backdrops do. */
+var CLIMB_TIERS={3:"Sprout",4:"Pebble",5:"Rock",6:"Hill",7:"Ridge",8:"Cliff",
+                 9:"Peak",10:"Summit",11:"Cloud",12:"Sky",13:"Star",
+                 14:"Comet",15:"Galaxy"};
+function climbTier(n){ return CLIMB_TIERS[n]||("Level "+n); }
+/* "eight-letter words" — spelt out, because it is a thing that gets said. */
+function climbLen(n){ return (MA_ONES[n]||n)+"-letter words"; }
+function climbBest(kid){ var b=bestFor(CLIMB_TEST, kid); return b?b.score:0; }
+
+/* Only words that really are this long. The key in CLIMB_WORDS is the whole
+   promise of the game, so anything filed under the wrong length is dropped
+   rather than asked — one nine-letter word on the ten rung and the ladder is
+   measuring nothing. */
+function climbBank(n){
+  var a=(typeof CLIMB_WORDS!=="undefined" && CLIMB_WORDS[n]) ? CLIMB_WORDS[n] : [];
+  return a.filter(function(x){ return String(x[0]).length===n; });
+}
+function climbWordCount(){
+  var n=0;
+  for(var i=CLIMB_LO;i<=CLIMB_HI;i++) n+=climbBank(i).length;
+  return n;
+}
+/* Never the same word twice in one climb — until a rung runs out of fresh
+   ones, and then that rung starts over. Ending a run for lack of words would
+   look on the screen exactly like ending it for spelling them wrong. */
+function climbPick(){
+  var q=climb, a=climbBank(q.lvl);
+  if(!a.length) return null;
+  var fresh=a.filter(function(x){ return !q.seen[x[0]]; });
+  if(!fresh.length){
+    a.forEach(function(x){ delete q.seen[x[0]]; });
+    fresh=a;
+  }
+  var x=fresh[Math.floor(Math.random()*fresh.length)];
+  q.seen[x[0]]=1;
+  return {k:"spell", a:x[0], s:x[1]};
+}
+
+function startClimb(kid){
+  kid=kid||who(); W("who", kid);
+  climb={kid:kid, lvl:CLIMB_LO, row:0, lives:CLIMB_LIVES, cleared:0,
+         seen:{}, asked:0, right:0, missed:[], up:0, spoke:-1, msg:"",
+         wasBest:climbBest(kid),
+         it:null, graded:false, ok:false, given:"", done:false, saved:false};
+  climb.it=climbPick();
+  if(!climb.it){ climb=null; alert("The climbing word list is missing."); return; }
+  render(); scrollTo(0,0);
+}
+
+/* The whole ladder, always all thirteen rungs, so the top is visible from the
+   bottom. Used mid-climb and on the Training panel, where "now" is nothing. */
+function climbLadder(cleared, now, best){
+  var s='<div class="clad" aria-hidden="true">';
+  for(var n=CLIMB_LO;n<=CLIMB_HI;n++){
+    var cls = n<=cleared ? " done" : (n===now ? " now" : "");
+    if(best && n===best) cls+=" best";
+    s+='<span class="crung'+cls+'" title="'+esc(climbTier(n))+'">'+n+'</span>';
+  }
+  return s+'</div>';
+}
+function climbPips(row){
+  var s='<div class="cpips" role="img" aria-label="'+row+' of '+CLIMB_ROW+' in a row">';
+  for(var i=0;i<CLIMB_ROW;i++) s+='<span class="cpip'+(i<row?" on":"")+'"></span>';
+  return s+'</div>';
+}
+function climbHearts(n){
+  var s="";
+  for(var i=0;i<CLIMB_LIVES;i++) s+= (i<n ? "❤️" : "🤍");
+  return s;
+}
+
+function climbHTML(){
+  var q=climb;
+  if(q.done) return climbDoneHTML();
+  var it=q.it, left=CLIMB_ROW-q.row;
+  var s='<div class="panel quizcard"><div class="qtop">'+
+    '<button class="btn soft" id="cB">&larr; Back</button>'+
+    '<span class="hudchips">'+
+      '<span class="hud">⬆️ '+q.lvl+'</span>'+
+      '<span class="hud'+(q.lives<=1?" fire hot":"")+'" aria-label="'+q.lives+
+        ' tries left">'+climbHearts(q.lives)+'</span>'+
+    '</span></div>'+
+    botSVG()+
+    climbLadder(q.cleared, q.lvl, q.wasBest)+
+    '<div class="kind">'+esc(climbTier(q.lvl))+' · level '+q.lvl+'</div>'+
+    '<div class="qq">'+esc(climbLen(q.lvl))+'</div>'+
+    climbPips(q.row)+
+    '<div class="tip">Word, then the sentence, then the word again. '+
+      (left<=0 ? "Up you go." : (left===1?"One more":left+" more")+" in a row to go up.")+
+      '</div>'+
+    '<button class="btn play wide" id="cP">🔊 Play</button>'+
+    '<input type="text" id="ca" autocomplete="off" autocapitalize="none" '+
+      'autocorrect="off" spellcheck="false" placeholder="Type the word" '+
+      'style="margin-top:12px"'+
+      (q.graded?' disabled value="'+esc(q.given)+'"':'')+'>'+
+    '<div class="btnrow"><button class="btn go" id="cG">'+
+      (q.graded ? ((q.lives<=0||q.up===2) ? "See how high →" : "Next") : "Check")+
+      '</button></div>';
+  if(q.graded){
+    if(q.up===1) s+='<div class="clevel">⬆️ Level '+(q.lvl+1)+' · '+
+                    esc(climbTier(q.lvl+1))+' · '+esc(climbLen(q.lvl+1))+'</div>';
+    if(q.up===2) s+='<div class="clevel">🏆 Top of the ladder!</div>';
+    s+='<div class="fb '+(q.ok?"ok":"no")+'" role="status" aria-live="polite">'+
+       '<span class="big">'+esc(q.msg)+'</span>'+
+       '<b style="font-size:23px">'+esc(it.a)+'</b>'+
+       ltRow(it.a, q.given)+
+       '<div class="csent">'+esc(it.s)+'</div></div>';
+  }
+  return s+'</div>';
+}
+
+function climbGrade(){
+  var q=climb, el=document.getElementById("ca");
+  q.given = el ? el.value : "";
+  q.ok = clean(q.given)===clean(q.it.a);
+  q.graded=true; q.asked++; q.up=0;
+  if(q.ok){
+    q.right++; q.row++;
+    if(q.row>=CLIMB_ROW){
+      q.cleared=q.lvl;                       /* three in a row is what clears it */
+      q.up = (q.lvl>=CLIMB_HI) ? 2 : 1;
+    }
+    q.msg = q.up===2 ? "You cleared the whole ladder!"
+          : q.up===1 ? "Three in a row!"
+          : praise(false, q.row).t;
+  } else {
+    q.lives--; q.row=0;
+    q.missed.push(q.it.a);
+    /* Say how many tries are left rather than only "not quite" — on a rung he
+       is going to fall off, knowing it is coming is the difference between a
+       game and a surprise. */
+    q.msg = q.lives>0
+      ? oops(false).t+" "+q.lives+(q.lives===1?" try left on this rung.":" tries left on this rung.")
+      : "That is the climb over.";
+  }
+  render();
+  if(q.ok){
+    if(q.up){ sfxStreak(); burst(44); } else { sfxWin(); burst(18); }
+    botReact("cheer");
+  } else { sfxLose(); botReact("oops"); }
+  hush();
+  say(q.msg, 0.95);
+  if(!q.ok) say(q.it.a, 0.6);       /* the last thing he hears is the right word */
+}
+
+function climbNext(){
+  var q=climb;
+  if(q.lives<=0 || q.up===2) return climbFinish();
+  if(q.up===1){ q.lvl++; q.row=0; q.lives=CLIMB_LIVES; }
+  q.up=0; q.graded=false; q.ok=false; q.given=""; q.msg="";
+  q.it=climbPick();
+  if(!q.it) return climbFinish();   /* a rung with no words is the end of it */
+  render(); scrollTo(0,0);
+}
+function climbFinish(){
+  var q=climb;
+  q.done=true;
+  if(!q.saved){
+    q.saved=true;
+    /* One row per climb, like every other test, so it syncs with the rest and
+       the other device sees how high he got. The score is the rung he cleared
+       out of fifteen — which is exactly why the climb has its own panel and
+       not a coloured box: 8 out of 15 is a good climb, and scoreCls() would
+       have painted it red. */
+    addResult({who:q.kid, subject:"English", code:"climb", test:CLIMB_TEST,
+               score:q.cleared, total:CLIMB_HI, missed:q.missed, ts:Date.now()});
+    bumpStreak();
+  }
+  render(); scrollTo(0,0);
+}
+
+function climbDoneHTML(){
+  var q=climb, beat=q.cleared>q.wasBest;
+  if(!q.cheered){
+    q.cheered=true;
+    sfxDone(); burst(q.cleared>=8?46:18);
+    say(q.cleared ? "You cleared level "+q.cleared+"." : "Good try. Have another go.", 0.95);
+  }
+  return '<div class="panel done">'+botSVG()+
+    '<div class="kind">Spelling climb · '+esc(pname(q.kid))+'</div>'+
+    '<div class="big">'+(q.cleared||"—")+'</div>'+
+    '<div class="rk">'+(q.cleared
+      ? "Level "+q.cleared+" · "+esc(climbTier(q.cleared))
+      : "No rung cleared this time")+'</div>'+
+    '<div class="streakline">'+(q.cleared
+      ? esc(climbLen(q.cleared))+", three in a row"
+      : "Three three-letter words in a row starts the climb")+'</div>'+
+    climbLadder(q.cleared, 0, q.wasBest)+
+    /* "A new best — it was level 0" is what a first climb used to say. */
+    '<div class="streakline">'+(!q.wasBest ? "His first climb"
+      : beat ? "🎉 A new best — it was level "+q.wasBest
+      : "Best so far: level "+q.wasBest)+'</div>'+
+    '<div class="streakline">'+q.right+' of '+q.asked+' spelt right</div>'+
+    (q.missed.length?'<div class="again">Tripped on: <b>'+esc(q.missed.join(", "))+'</b></div>':'')+
+    '<div class="btnrow">'+
+      '<button class="btn go" id="cAgain">Climb again</button>'+
+      '<button class="btn soft" id="cBack">More practice</button>'+
+    '</div></div>';
+}
+
+function climbSay(it){
+  hush();
+  say("Spell",0.92); say(it.a+".",0.72);
+  say(it.s,0.86);
+  say("Again.",0.92); say(it.a+".",0.66);
+}
+function wireClimb(){
+  var q=climb;
+  if(q.done){
+    document.getElementById("cAgain").onclick=function(){ hush(); newBuddy(); startClimb(q.kid); };
+    document.getElementById("cBack").onclick=function(){ newBuddy(); go("practice"); };
+    return;
+  }
+  document.getElementById("cB").onclick=function(){ go("practice"); };
+  var p=document.getElementById("cP");
+  if(p) p.onclick=function(){ sfxTap(); climbSay(q.it); };
+  var g=document.getElementById("cG");
+  if(g) g.onclick=function(){ q.graded?climbNext():climbGrade(); };
+  var a=document.getElementById("ca");
+  if(a && !q.graded){
+    a.addEventListener("keydown",function(e){
+      if(e.key==="Enter"){ e.preventDefault(); g.click(); }
+    });
+    a.focus();
+  }
+  /* Once per word, not once per draw — render() rebuilds this card whenever
+     anything is tapped, and re-arming here restarted the word mid-sentence. */
+  if(!q.graded && q.spoke!==q.asked){
+    q.spoke=q.asked;
+    setTimeout(function(){ climbSay(q.it); }, 250);
+  }
+}
+
+/* The way in, on Training. Deliberately its own panel rather than a box in the
+   grid: the grid is "what did he score on the school's list", and this is the
+   one thing on the screen that is not the school's. */
+function climbPanel(kid){
+  var best=climbBest(kid), l=lastFor(CLIMB_TEST, kid);
+  return '<div class="panel"><h2><span class="em">🧗</span> Spelling climb'+
+    '<span class="side '+whoCls(kid)+'">'+esc(pname(kid))+'</span></h2>'+
+    '<p class="empty" style="padding:0 0 12px">Three-letter words up to fifteen. '+
+      'Spell <b>three in a row</b> and every word gets a letter longer. Three '+
+      'misses on the same rung and the climb is over — how high he got is the '+
+      'whole answer.</p>'+
+    climbLadder(best, 0, best)+
+    '<button class="btn go wide" data-climb="'+kid+'">'+
+      (best?"Climb again →":"Start climbing →")+'</button>'+
+    '<div class="key">'+(best
+      ? "Best so far: level "+best+" · "+esc(climbTier(best))+" · "+
+        esc(climbLen(best))+(l?" · last go "+esc(dshort(l.ts)):"")
+      : "Not climbed yet. "+climbWordCount()+" words on the ladder, and none of "+
+        "them are off a school list — this one is just for the fun of it.")+
+    '</div></div>';
 }

@@ -29,7 +29,7 @@ Load order matters and is fixed in `index.html`:
 | `data.js` | **The only file you normally edit.** Kids, word banks, timetables, meals, seed events, Supabase keys. |
 | `core.js` | Storage helpers (`S/W/SJ/WJ`), dates, scores, streaks, all Supabase sync, sound, speech, the weak-items bank, mascot SVGs. |
 | `timetable.js` | The Timetable tab: the weekly grid, school hours, after-school activities. |
-| `training.js` | The Training tab: test list, maths generators, and the quiz engine (`start` → `quizHTML` → `grade` → `next`). |
+| `training.js` | The Training tab: test list, maths generators, the quiz engine (`start` → `quizHTML` → `grade` → `next`), and the Spelling Climb (`startClimb` → `climbGrade` → `climbNext`). |
 | `app.js` | `render()`, the tab router, and Upcoming / Meals / Reading / School. Loads last and boots the app. |
 
 `render()` redraws the whole `#view` from scratch on every state change. There
@@ -92,6 +92,17 @@ Everything is Singapore MOE, and the PDFs it came from are in `References/`.
 Practice codes are `type|key`: `en` `es` `zh` `hz` `rn` `tx` `ma`. A seed event
 carrying `p:"en|3.5"` gets a practice button and feeds the daily set.
 
+- **The Spelling Climb is not curriculum**, and `CLIMB_WORDS` says so at the
+  top. It is a ladder of ordinary English words keyed by length, 3 letters to
+  15, for finding out where a boy falls over rather than testing a set list.
+  Three right in a row goes up a rung; three misses on one rung ends the run,
+  and the lives refill on the way up so a slip low down is not a ceiling.
+  Nothing missed there joins the weak-items bank — a P2 boy handed
+  "extracurricular" has run out of ladder, not found a word he needs to drill.
+  It has no practice code and is not in `allCodes()`, so it never feeds the
+  daily set; it is its own panel on Training and its own state (`climb`),
+  because a mark out of ten is exactly what it is not.
+
 ## Local dev
 
 No install, no test suite. Serve the folder over http (`file://` breaks
@@ -108,7 +119,9 @@ There is no test runner, but the app will run headless: stub `document`,
 `window` and `localStorage`, concatenate `data.js` `core.js` `timetable.js`
 `training.js`, and drive `start()` → `grade()` → `next()` over `allCodes()`.
 Answering everything correctly must score full marks on every code; that one
-check catches most marking regressions in under a second.
+check catches most marking regressions in under a second. Worth driving the
+climb the same way: a perfect climber must clear level 15 in 39 words and
+every word must be exactly as long as the rung it was asked on.
 
 ## Conventions
 
