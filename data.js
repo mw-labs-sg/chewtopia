@@ -858,8 +858,8 @@ var SEED_EVENTS = [
    n:"Term 4 starts Monday 14 September."},
   {id:"e24", t:"Children’s Day — no school", d:"2026-10-02", hol:1,
    n:"Both schools. The kindergarten’s Term 4 pledge schedule has the Friday down as a holiday too, which is why this is no longer TC’s alone."},
-  {id:"e25", t:"End of school year", d:"2026-11-21", d2:"2026-12-31", w:"tc", hol:1,
-   n:"Term 4 ends Friday 20 November."},
+  {id:"e25", t:"End of school year", d:"2026-11-21", d2:"2026-12-31", hol:1,
+   n:"Both schools. Term 4 ends Friday 20 November at Nanyang Primary, and the kindergarten newsletter has the very same run — 21 November to 31 December — so this is no longer TC’s alone. SC’s two camps fall inside it."},
 
   /* From ClassDojo, class 2J. Only the ones still open — the filing reminders
      and the worksheets already handed back have all been and gone. */
@@ -886,7 +886,7 @@ var SEED_EVENTS = [
    n:"From October the school sends every announcement, letter and consent form through the Parents Gateway app, not by email. Get it onto the phone before then so nothing is missed.",
    url:"https://pg.moe.edu.sg"},
   {id:"e32", t:"P1 Orientation Day", d:"2026-11-20", w:"sc",
-   n:"Physical orientation at Nanyang Primary for him and a parent, Friday afternoon. Times and the rest come closer to the date, through Parents Gateway."},
+   n:"Physical orientation at Nanyang Primary for him and a parent, Friday afternoon. Times and the rest come closer to the date, through Parents Gateway. The kindergarten has its graduation closure the same day — read that one before committing to a time."},
 
 
   /* From the K2 parents' WhatsApp group, read off the thread rather than from
@@ -915,8 +915,8 @@ var SEED_EVENTS = [
      parents asked how long it runs and nobody in the group knew; the 9am is
      one parent saying they were told the morning session starts then, which
      is why it is a note and not a time on the event. */
-  {id:"e36", t:"K2 graduation and concert", d:"2026-11-19", w:"sc",
-   n:"Thursday. A parent in the group was told the morning session starts at 9. How long it runs nobody in the group knew, and the school had not said \u2014 worth asking, because P1 orientation at Nanyang Primary is the very next afternoon."},
+  {id:"e36", t:"K2 Graduation Ceremony cum Concert", d:"2026-11-19", w:"sc",
+   n:"Thursday, at Nanyang Girls’ High. The date came off the parents’ group first, and the Term 4 newsletter has now confirmed it under the school’s own name for it. Still no times: a parent in the group was told the morning session starts at 9, and how long it runs nobody knew. Four rehearsals lead up to it — 16 October at the kindergarten, 11 and 12 November at NYGH, and the full dress rehearsal on the 18th."},
 
   /* Nanyang Kindergarten, letter from the principal 31 Aug 2026. A drill, not
      an incident — said so in the title, so that nobody reads the word
@@ -939,7 +939,49 @@ var SEED_EVENTS = [
   /* Also off that schedule: the kindergarten marks Children’s Day on the
      Thursday and closes on the Friday. */
   {id:"e40", t:"Children’s Day celebration", d:"2026-10-01", w:"sc",
-   n:"Thursday, in school. The holiday itself is the next day."}
+   n:"Thursday, in school. The holiday itself is the next day."},
+
+  /* Nanyang Kindergarten K2, Term 4 newsletter, 11 September 2026. The term’s
+     calendar of events, and only the rows that are his. The theme (Save My
+     Earth), the word lists, the sight words and the digraphs are learning
+     content with no date on them — not events, so not here.
+
+     Rows already covered: Children’s Day on 1 and 2 October, which came off
+     the pledge schedule, and Deepavali and Christmas, which are in SG_HOLIDAYS.
+     The 14 October learning journey is K2/1 and K2/2 and is not his — the
+     Term 4 pledge schedule he is on is headed K2/4, which puts him in the 15
+     October group. */
+  {id:"e42", t:"Kindergarten reopens — Term 4", d:"2026-09-14", w:"sc",
+   n:"Monday. His last term of K2. The theme is Save My Earth — land, air and water pollution, the 4Rs, and saving water and energy — with money and early multiplication and division in numeracy."},
+  {id:"e43", t:"Mid-Autumn Festival celebration", d:"2026-09-25", w:"sc",
+   n:"Friday, in school. The newsletter lists it and says nothing else — no costume, nothing to bring."},
+  {id:"e44", t:"Term 4 learning journey", d:"2026-10-15", w:"sc",
+   n:"Thursday, his group. K2/1 and K2/2 go on the Wednesday instead; he is K2/4, which is the class heading on his pledge schedule. Where they are going is not in the newsletter."},
+  {id:"e45", t:"K2 rehearsal at the kindergarten", d:"2026-10-16", w:"sc",
+   n:"Friday, at NYK itself. The first of the graduation rehearsals; the November ones are all at Nanyang Girls’ High."},
+  {id:"e46", t:"Nanyang Primary P5 engagement and school tour", d:"2026-11-10", w:"sc",
+   n:"Tuesday. The newsletter also lists a Primary School Visit among the term’s exploratory activities, so this is the K2 children going across to Nanyang Primary — the school he starts P1 at in January, and TC’s school already."},
+  {id:"e47", t:"Graduation concert rehearsals at NYGH", d:"2026-11-11", d2:"2026-11-12", w:"sc",
+   n:"Wednesday and Thursday, both at Nanyang Girls’ High. No times given."},
+  {id:"e48", t:"Parent-teacher meeting", d:"2026-11-16", d2:"2026-11-17", w:"sc",
+   n:"Monday and Tuesday. The newsletter gives no slots and no times, so one of the two days becomes ours once the teachers say which."},
+  {id:"e49", t:"No lesson — but K2 are at the dress rehearsal", d:"2026-11-18", w:"sc",
+   n:"Wednesday. “No lesson for all levels” reads like a day off and is not one for him: the full dress rehearsal at Nanyang Girls’ High is all staff and all K2 children. Times not given."},
+  {id:"e50", t:"K2 graduation — closure day", d:"2026-11-20", w:"sc",
+   n:"Friday. The term calendar says “K2 Graduation Ceremony cum Concert Closure” and no more. Whether that is the school closing after the concert or a second part of the ceremony is worth asking now rather than that week, because P1 orientation at Nanyang Primary is the same afternoon."},
+  {id:"e51", t:"Year-end holiday camp", d:"2026-11-23", d2:"2026-11-25", w:"sc",
+   n:"Monday to Wednesday, inside the school holidays. The newsletter does not say whether it has to be signed up for, or what it costs."},
+  {id:"e52", t:"K2 overnight camp", d:"2026-11-26", d2:"2026-11-27", w:"sc",
+   n:"Thursday and Friday, straight after the holiday camp, and his last thing as a kindergarten child. Nothing yet on what to pack."},
+
+  /* A Google Calendar invitation off our own family calendar: Sunday 11 October,
+     10 to 11am, organised by Chew. The forwarded mail began at “When”,
+     so it carried no event title at all — and a name is the one thing an
+     entry cannot be given by guessing. The hour is blocked out and the title says
+     plainly that the name is missing, rather than the app inventing a class nobody
+     named. Rename it and this comment goes with it. */
+  {id:"e41", t:"Sunday 10am — invitation with no name on it", d:"2026-10-11", time:"10:00", w:"tc",
+   n:"One hour, 10 to 11am. A Google Calendar invite organised by Chew to minwei.chew.sgp@gmail.com, and that is the whole of what came through — the forwarded copy started at “When” and had no title on it."}
 ];
 
 /* ==========================================================================
