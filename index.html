@@ -377,6 +377,17 @@
   /* the ones he did not pick stay legible but stop competing for his eye */
   .lopt.dim{opacity:.4}
   .lopt:disabled{cursor:default}
+  /* the answer and its speaker: one row, and the speaker is the narrow one */
+  .loptrow{display:flex;gap:8px;align-items:stretch}
+  .loptrow .lopt{flex:1;min-width:0}
+  .lsay{flex:0 0 54px;font-size:19px;border-radius:16px;cursor:pointer;
+    border:2px solid var(--line);background:var(--bg);color:var(--ink);
+    -webkit-appearance:none;appearance:none;-webkit-tap-highlight-color:transparent}
+  .lsay:active{transform:translateY(1px)}
+  /* characters need the whole width, so their speaker sits underneath */
+  .lopts.big .loptrow{flex-direction:column;gap:0}
+  .lopts.big .lsay{flex:none;width:100%;height:36px;font-size:16px;
+    border:0;background:none;border-radius:0 0 16px 16px;margin-top:-6px}
 
   /* ---- the quiz tab: one card per ladder ---- */
   /* Eight of them, so a card and not a panel each — a panel apiece was a
@@ -1007,7 +1018,7 @@ body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;-
   </header>
   <nav class="tabs" id="tabs" aria-label="Sections"></nav>
   <main id="view" tabindex="-1"></main>
-  <p class="foot">Saved on this device · build 143</p>
+  <p class="foot">Saved on this device · build 144</p>
 </div>
 <!-- load order matters: data, then core, then screens, app last -->
 <!-- Pinned to an exact version with a hash to match: "@2" floats, so a bad
@@ -1017,10 +1028,10 @@ body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3"
         integrity="sha384-l8ah+VgaWtk1mvOe9VC+OirC6qHFF4yH7l7mKRidV9MSti3E9F463bMp6ZVN4kuC"
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script src="data.js?v=53"></script>
+<script src="data.js?v=54"></script>
 <script src="core.js?v=57"></script>
 <script src="timetable.js?v=6"></script>
-<script src="training.js?v=56"></script>
+<script src="training.js?v=57"></script>
 <script src="app.js?v=107"></script>
 </body>
 </html>

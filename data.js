@@ -2038,3 +2038,51 @@ var KO_LADDER = {
     ["재미있다","jaemiitda","fun"], ["어렵다","eoryeopda","difficult"]
   ]]
 };
+
+/* Tagalog, the fifth language and the one the boys hear most often outside the
+   house. Same shape and the same ten rungs as the other three, and like Bahasa
+   it is read as it is spelt, so the middle column is empty. */
+var TL_LADDER = {
+  1: ["Pagbati", [
+    ["kumusta","","hello"], ["salamat","","thank you"],
+    ["magandang umaga","","good morning"], ["paalam","","goodbye"],
+    ["oo","","yes"], ["hindi","","no"]
+  ]],
+  2: ["Mga numero", [
+    ["isa","","one"], ["dalawa","","two"], ["tatlo","","three"],
+    ["apat","","four"], ["lima","","five"], ["sampu","","ten"]
+  ]],
+  3: ["Pamilya", [
+    ["nanay","","mother"], ["tatay","","father"],
+    ["kuya","","older brother"], ["ate","","older sister"],
+    ["kapatid","","a brother or sister"], ["pamilya","","family"]
+  ]],
+  4: ["Mga hayop", [
+    ["pusa","","a cat"], ["aso","","a dog"], ["ibon","","a bird"],
+    ["isda","","a fish"], ["kabayo","","a horse"], ["baka","","a cow"]
+  ]],
+  5: ["Pagkain", [
+    ["kanin","","rice"], ["tinapay","","bread"], ["itlog","","an egg"],
+    ["gatas","","milk"], ["tubig","","water"], ["gulay","","vegetables"]
+  ]],
+  6: ["Paaralan", [
+    ["guro","","a teacher"], ["mag-aaral","","a pupil"], ["libro","","a book"],
+    ["paaralan","","a school"], ["kaibigan","","a friend"], ["lapis","","a pencil"]
+  ]],
+  7: ["Mga lugar", [
+    ["bahay","","a house"], ["parke","","a park"], ["ospital","","a hospital"],
+    ["tindahan","","a shop"], ["palengke","","a market"], ["aklatan","","a library"]
+  ]],
+  8: ["Oras", [
+    ["ngayon","","today"], ["bukas","","tomorrow"], ["kahapon","","yesterday"],
+    ["umaga","","morning"], ["gabi","","night"], ["araw-araw","","every day"]
+  ]],
+  9: ["Mga pandiwa", [
+    ["kumain","","to eat"], ["uminom","","to drink"], ["matulog","","to sleep"],
+    ["pumunta","","to go"], ["magbasa","","to read"], ["magsulat","","to write"]
+  ]],
+  10: ["Mga pang-uri", [
+    ["malaki","","big"], ["maliit","","small"], ["mataas","","tall"],
+    ["bago","","new"], ["masaya","","happy"], ["mahirap","","difficult"]
+  ]]
+};

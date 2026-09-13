@@ -1597,7 +1597,7 @@ function maOpts(a){
 function qzLad(o){
   var B=o.bank;
   return { id:o.id, em:o.em, name:o.name, test:o.name, subject:o.subject,
-    lo:1, hi:10, mode:"pick", ask:"Tap the right answer",
+    lo:1, hi:10, mode:"pick", ask:"Tap the answer, or 🔊 to hear one",
     blurb:o.blurb, note:o.note,
     tier:function(n){ return (B[n]&&B[n][0])||("Level "+n); },
     rung:function(n){ return String((B[n]&&B[n][0])||("level "+n)).toLowerCase(); },
@@ -1620,7 +1620,7 @@ function langLad(o){
   var B=o.bank;
   return { id:o.id, em:o.em, name:o.name, test:o.name, subject:o.subject||o.name,
     lo:1, hi:10, mode:"pick", big:o.big, optLang:o.lang, voice:o.lang, vname:o.vname,
-    ask:"Listen, then tap the word", blurb:o.blurb, note:o.note,
+    ask:"Tap 🔊 to hear one, then tap the answer", blurb:o.blurb, note:o.note,
     tier:function(n){ return (B[n]&&B[n][0])||("Level "+n); },
     rung:function(n){ return (B[n]&&B[n][0])||("level "+n); },
     bank:function(n){
@@ -1630,14 +1630,20 @@ function langLad(o){
       var others=[], all=(B[n]&&B[n][1])||[];
       all.forEach(function(y){ if(y[0]!==x.a) others.push(y[0]); });
       return {a:x.a, py:x.py, m:x.m,
-              q:"Which one means “"+x.m+"”?",
+              q:"What is “"+x.m+"” in "+o.vname+"?",
               c:ladShuffleIn(x.a, shuffled(others).slice(0,3))};
     },
-    /* Twice, the second time slower. And in the language's own voice or not at
-       all: an English voice reading ねこ teaches the wrong sounds, which is why
-       say() refuses rather than guessing — the meaning is on screen anyway, so
-       a tablet with no Japanese voice still has a working game. */
-    speak:function(it){ return [[it.a,0.72,o.lang],[it.a,0.6,o.lang]]; },
+    /* The question, in English, and not the answer. Reading the answer out was
+       the game given away to anyone who already knew the sound of it, and it
+       left the other three words on screen unsaid — which is the half of a
+       language quiz where the learning is. Now he hears "what is thank you in
+       Tagalog", plays any of the four to hear how it sounds, and picks.
+
+       Each word is spoken in its own language or not at all: an English voice
+       reading ねこ teaches the wrong sounds, which is why say() refuses rather
+       than guessing — and the question is English, so a tablet with no Japanese
+       voice still asks out loud and still has a working game. */
+    speak:function(it){ return [[it.q,0.95]]; },
     tell:function(it){ return [[it.a,0.6,o.lang]]; },
     after:function(it){ return '<div class="csent">'+(it.py
       ? '<span lang="'+o.lang+'">'+esc(it.py)+'</span> · ' : '')+esc(it.m)+'</div>'; } };
@@ -1661,7 +1667,7 @@ var LADDERS=[
 
   { id:"ma", em:"➗", name:"Maths climb", test:"Maths climb",
     subject:"Maths", lo:1, hi:15, mode:"pick",
-    ask:"Tap the answer",
+    ask:"Tap the answer, or 🔊 to hear one",
     blurb:"Adding up to ten at the bottom, two steps at once at the top. Every "+
       "sum is read out as well as written, and no two in a run are the same.",
     note:"Rungs 1 to 9 are P2 ground. From 10 up it is P3 and beyond, so a "+
@@ -1705,6 +1711,13 @@ var LADDERS=[
       "the bottom, むずかしい at the top. The romaji is shown after each answer.",
     note:"Nobody teaches this at either school. If the tablet has no Japanese "+
       "voice the words stay silent rather than being read in an English one." }),
+
+  langLad({ id:"tl", em:"🇵🇭", name:"Tagalog quiz", subject:"Tagalog",
+    bank:TL_LADDER, lang:"fil-PH", vname:"Tagalog",
+    blurb:"Tagalog, six words a rung: kumusta and salamat at the bottom, verbs "+
+      "and adjectives at the top.",
+    note:"Nobody teaches this at either school either. Read as it is spelt, and "+
+      "the one language on here the boys hear outside the house." }),
 
   langLad({ id:"ko", em:"한", name:"한국어 quiz", subject:"한국어",
     bank:KO_LADDER, lang:"ko-KR", vname:"Korean", big:true,
@@ -1815,16 +1828,29 @@ function climbHearts(n){
   for(var i=0;i<CLIMB_LIVES;i++) s+= (i<n ? "❤️" : "🤍");
   return s;
 }
-/* The answers to tap. Shuffled once when the question is drawn, not here, so
-   they keep their order while the card is redrawn. */
+/* The answers to tap, each with a speaker of its own.
+
+   Hearing all four is the point: a boy choosing between 안녕하세요 and 감사합니다
+   by shape alone is doing a spot-the-difference puzzle, and hearing them is the
+   only part of it that is learning Korean. The speaker is a button beside the
+   answer rather than the answer itself, so playing one is never mistaken for
+   choosing it — and it keeps working after the answer is in, because the moment
+   he most wants to hear the right one is the moment he has just got it wrong.
+
+   Shuffled once when the question is drawn, not here, so they keep their order
+   while the card is redrawn. */
 function climbOpts(q){
   var it=q.it, s='<div class="lopts'+(q.L.big?" big":"")+'" role="group">';
   for(var i=0;i<it.c.length;i++){
     var o=it.c[i], cls="";
     if(q.graded) cls = (o===it.a) ? " right" : (o===q.given ? " wrong" : " dim");
-    s+='<button type="button" class="lopt'+cls+'" data-opt="'+esc(o)+'"'+
+    s+='<div class="loptrow">'+
+       '<button type="button" class="lopt'+cls+'" data-opt="'+esc(o)+'"'+
        (q.L.optLang?' lang="'+q.L.optLang+'"':'')+
-       (q.graded?' disabled':'')+'>'+esc(o)+'</button>';
+       (q.graded?' disabled':'')+'>'+esc(o)+'</button>'+
+       '<button type="button" class="lsay" data-say="'+esc(o)+'" '+
+       'title="Hear this one" aria-label="Hear this one">🔊</button>'+
+       '</div>';
   }
   return s+'</div>';
 }
@@ -1999,6 +2025,11 @@ function wireClimb(){
   if(g) g.onclick=function(){ q.graded?climbNext():climbGrade(); };
   document.querySelectorAll("[data-opt]").forEach(function(b){
     b.onclick=function(){ if(!q.graded) climbGrade(b.dataset.opt); };
+  });
+  /* Hearing an answer is not choosing it, and it goes on working once the
+     answer is in — see climbOpts(). */
+  document.querySelectorAll("[data-say]").forEach(function(b){
+    b.onclick=function(){ hush(); say(b.dataset.say, 0.7, L.optLang||"en-GB"); };
   });
   var a=document.getElementById("ca");
   if(a && !q.graded){

@@ -120,6 +120,14 @@ carrying `p:"en|3.5"` gets a practice button and feeds the daily set.
   began. A rung's wrong answers always come from that same rung, so nothing on
   screen is a giveaway; two words on one rung must never share a meaning, or the
   question has two right answers.
+  A language question is asked **in English and out loud** — "what is thank you
+  in Tagalog?" — and never reads its own answer, which used to hand the game to
+  anyone who knew the sound of it and left the other three words on screen
+  unsaid. Instead every answer on a tapped ladder carries its own speaker, in
+  the language it is written in, and they go on working after the answer is in:
+  the moment he most wants to hear the right one is the moment he has just got
+  it wrong. The English quizzes have them too, because SC is in K2 and cannot
+  read the answers yet.
   Nothing missed on a ladder joins the weak-items bank, none of them have a
   practice code or appear in `allCodes()`, and none of them feed the daily set
   — a P2 boy handed "extracurricular" has run out of ladder, not found a word
