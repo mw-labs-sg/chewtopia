@@ -2086,3 +2086,26 @@ var TL_LADDER = {
     ["bago","","new"], ["masaya","","happy"], ["mahirap","","difficult"]
   ]]
 };
+
+/* ==========================================================================
+   FUN — the songs the boys want the words to.
+
+   The words are NOT in here and will not be. "Soda Pop" and "Revolting
+   Children" are somebody's copyright — Tim Minchin's in one case and the
+   film's in the other — and a home-school app is not a lyrics site. What is
+   here is the title, who it is by, and a link that opens a search for the
+   official video. The words go in on the device, typed or pasted by whoever
+   has a copy of them, and they are kept in `lyr:<id>` rather than in the song
+   record: mergeSeed() replaces a seeded record whenever data.js changes it,
+   so anything the family typed into one would be wiped by the next release.
+
+   Nothing here syncs, the same way meals and the scene do not. A song pasted
+   on TC's iPad stays on TC's iPad, and the panel says so on screen.
+
+   Give any song added here a fresh id. Deleting a seeded one records it in
+   `seedgone` like every other seeded list, so it stays deleted.
+   ========================================================================== */
+var SEED_SONGS = [
+  {id:"sg1", t:"Soda Pop",           w:"Saja Boys · KPop Demon Hunters"},
+  {id:"sg2", t:"Revolting Children", w:"Matilda the Musical · Tim Minchin"}
+];

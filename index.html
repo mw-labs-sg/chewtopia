@@ -82,7 +82,7 @@
     box-shadow:inset 0 0 0 2.5px rgba(255,255,255,.95), 0 6px 18px rgba(0,0,0,.35)}
   .t1{background:var(--c1)} .t2{background:var(--c2)} .t3{background:var(--c3)}
   .t4{background:var(--c4)} .t5{background:var(--c5)} .t6{background:var(--c6)}
-  .t7{background:var(--c7)}
+  .t7{background:var(--c7)} .t8{background:var(--c3)}
   .tabdiv{flex:0 0 auto;width:2px;background:rgba(255,255,255,.5);border-radius:2px;margin:7px 3px}
   .tabdiv{flex:0 0 auto;width:2px;background:rgba(255,255,255,.45);border-radius:2px;margin:7px 3px}
 
@@ -351,6 +351,24 @@
   .clad.pick .crung{width:36px;height:36px;font-size:15px;border:0;padding:0;
     -webkit-appearance:none;appearance:none;cursor:pointer;
     -webkit-tap-highlight-color:transparent}
+  /* ---- Fun: the song words ---- */
+  .song{border:2px solid var(--line);border-radius:18px;padding:10px 12px;
+    margin-bottom:10px}
+  .song.open{border-color:var(--blue)}
+  .songtop{display:flex;align-items:center;gap:10px}
+  .songnm{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;
+    text-align:left;border:0;background:none;font:inherit;color:var(--ink);
+    cursor:pointer;padding:6px 0;-webkit-appearance:none;appearance:none}
+  .st{font-family:'Baloo 2',cursive;font-size:21px;font-weight:700}
+  .sw{font-size:13px;font-weight:700;color:var(--soft)}
+  .songyt{flex:0 0 44px;height:44px;border-radius:14px;background:var(--bg);
+    color:var(--coral);font-size:19px;text-decoration:none;display:flex;
+    align-items:center;justify-content:center}
+  /* Big, and every line break kept: the words are read at arm's length off a
+     tablet propped against the fruit bowl, by two boys at once. */
+  .lyr{white-space:pre-wrap;font-size:19px;line-height:1.85;font-weight:600;
+    padding:10px 2px 4px}
+  .lyred{width:100%;min-height:220px;font:inherit;font-size:15px;line-height:1.6}
   .cpips{display:flex;gap:8px;justify-content:center;margin:0 0 12px}
   .cpip{width:15px;height:15px;border-radius:50%;background:var(--line)}
   .cpip.on{background:var(--lime);box-shadow:0 0 0 3px #DFF3E4}
@@ -1018,7 +1036,7 @@ body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;-
   </header>
   <nav class="tabs" id="tabs" aria-label="Sections"></nav>
   <main id="view" tabindex="-1"></main>
-  <p class="foot">Saved on this device · build 144</p>
+  <p class="foot">Saved on this device · build 145</p>
 </div>
 <!-- load order matters: data, then core, then screens, app last -->
 <!-- Pinned to an exact version with a hash to match: "@2" floats, so a bad
@@ -1028,10 +1046,10 @@ body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3"
         integrity="sha384-l8ah+VgaWtk1mvOe9VC+OirC6qHFF4yH7l7mKRidV9MSti3E9F463bMp6ZVN4kuC"
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script src="data.js?v=54"></script>
-<script src="core.js?v=57"></script>
+<script src="data.js?v=55"></script>
+<script src="core.js?v=58"></script>
 <script src="timetable.js?v=6"></script>
 <script src="training.js?v=57"></script>
-<script src="app.js?v=107"></script>
+<script src="app.js?v=108"></script>
 </body>
 </html>

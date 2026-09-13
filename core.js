@@ -161,6 +161,7 @@ function seedGrow(){
 }
 function seedOnce(){
   mergeSeed("events", SEED_EVENTS); mergeSeed("acts", SEED_ACTS);
+  mergeSeed("songs", SEED_SONGS);
   seedGrow(); dropGone();
 }
 
@@ -172,7 +173,7 @@ var DAYS = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunda
 var TABS = [["home","Upcoming","t1"],["schedule","Timetable","t2"],
             ["meals","Health","t3"],["forums","Forums","t7"],
             ["practice","Training","t4"],
-            ["quiz","Quiz","t6"],["links","School","t5"]];
+            ["quiz","Quiz","t6"],["fun","Fun","t8"],["links","School","t5"]];
 var tab="home", quiz=null, showAdd=false;
 /* The paper dictation sheet: not a quiz, because nothing on it is answered on
    the screen. Dad reads, he writes on paper, and there is no score to keep. */
@@ -185,7 +186,7 @@ var climb=null;
 /* Each tab gets a readable address, e.g. .../chewtopia/#meals, so a link can
    be bookmarked or sent straight to one screen. */
 var SLUGS = {home:"upcoming", schedule:"timetable", meals:"health",
-             forums:"forums", practice:"training", quiz:"quiz",
+             forums:"forums", practice:"training", quiz:"quiz", fun:"fun",
              links:"school"};
 function tabFromHash(){
   var h=(location.hash||"").replace(/^#\/?/,"").toLowerCase();
@@ -207,6 +208,7 @@ function go(id, quiet){
      browsing four weeks ahead on the Timetable, going to Meals and coming
      back landed you four weeks ahead again with no way to tell why. */
   tab=id; quiz=null; paper=null; climb=null; showAdd=false; showBook=false; wkOff=0; hush();
+  songOpen=""; songEdit=""; showSong=false;
   if(!quiet){ try{ location.hash="#"+SLUGS[id]; }catch(e){} }
   render(); scrollTo(0,0);
 }

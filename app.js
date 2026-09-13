@@ -40,9 +40,9 @@ function render(){
   if(paper){ v.innerHTML=paperHTML(); wirePaper(); return; }
   if(climb){ v.innerHTML=climbHTML(); wireClimb(); return; }
   var V={home:vHome,schedule:vWeek,meals:vMealsGrow,forums:vForums,
-         practice:vTests,quiz:vQuiz,links:vLinks};
+         practice:vTests,quiz:vQuiz,fun:vFun,links:vLinks};
   var Wr={home:wHome,schedule:wWeek,meals:wMealsGrow,forums:wForums,
-          practice:wTests,quiz:wQuiz,links:wLinks};
+          practice:wTests,quiz:wQuiz,fun:wFun,links:wLinks};
   /* the child switch belongs inside the first panel, under its heading */
   var html=V[tab]();
   if(tab==="home"||tab==="schedule") html=html.replace("</h2>", "</h2>"+whoBar());
@@ -904,6 +904,137 @@ function vQuiz(){
     quizCards()+'</div>';
 }
 function wQuiz(){ wireClimbPanel(); }
+
+/* ==========================================================================
+   FUN — song words, for singing along to.
+
+   Not a lyrics site and not trying to be: the app ships the title, who it is
+   by, and a link to search for the official video. The words are pasted in
+   here by whoever has a copy of them, and they live on this device only — see
+   the note above SEED_SONGS in data.js.
+
+   Big type, because the point of the screen is two boys reading it at arm's
+   length on a tablet propped against the fruit bowl.
+   ========================================================================== */
+var songOpen="", songEdit="", showSong=false;
+
+function songs(){ return SJ("songs", []); }
+function songWords(id){ return S("lyr:"+id, ""); }
+function saveWords(id, t){ W("lyr:"+id, String(t||"").slice(0, 8000)); }
+/* A search, not a guess at a video id: an id rots and lands a seven-year-old
+   on somebody else's upload, while a search for the title plus "official"
+   puts the real one at the top and keeps working. */
+function songLink(s){
+  var by=String(s.w||"").split("·")[0].trim();
+  return "https://www.youtube.com/results?search_query="+
+         encodeURIComponent((s.t+" "+by+" official song").replace(/\s+/g," ").trim());
+}
+
+function vFun(){
+  var list=songs();
+  var s='<div class="panel"><h2><span class="em">🎵</span> Songs'+
+    '<span class="side">the words, for singing along</span></h2>';
+  if(!list.length) s+='<p class="empty">No songs yet.</p>';
+  list.forEach(function(x){
+    var open=(songOpen===x.id), edit=(songEdit===x.id), w=songWords(x.id);
+    s+='<div class="song'+(open?" open":"")+'">'+
+       '<div class="songtop">'+
+         '<button class="songnm" data-song="'+esc(x.id)+'" aria-expanded="'+(open?"true":"false")+'">'+
+           '<span class="st">'+esc(x.t)+'</span>'+
+           '<span class="sw">'+esc(x.w||"")+'</span>'+
+         '</button>'+
+         '<a class="songyt" href="'+esc(songLink(x))+'" target="_blank" '+
+           'rel="noopener" title="Find the official video">▶</a>'+
+       '</div>';
+    if(open){
+      if(edit){
+        s+='<textarea class="lyred" id="ly_'+esc(x.id)+'" spellcheck="false" '+
+           'placeholder="Paste or type the words here">'+esc(w)+'</textarea>'+
+           '<div class="btnrow">'+
+             '<button class="btn go" data-lysave="'+esc(x.id)+'">Save the words</button>'+
+             '<button class="btn soft" data-lycancel="1">Cancel</button>'+
+           '</div>';
+      } else if(w){
+        s+='<div class="lyr">'+esc(w)+'</div>'+
+           '<div class="btnrow">'+
+             '<button class="btn soft" data-lyedit="'+esc(x.id)+'">Edit the words</button>'+
+             '<button class="btn soft" data-songdel="'+esc(x.id)+'">Remove this song</button>'+
+           '</div>';
+      } else {
+        s+='<p class="empty" style="padding:10px 0">No words on this device yet. '+
+           'Tap ▶ to find the song, then paste the words in.</p>'+
+           '<div class="btnrow">'+
+             '<button class="btn go" data-lyedit="'+esc(x.id)+'">Add the words</button>'+
+             '<button class="btn soft" data-songdel="'+esc(x.id)+'">Remove this song</button>'+
+           '</div>';
+      }
+    }
+    s+='</div>';
+  });
+  s+='<div class="key">The words are kept on this device only — like the meal '+
+     'plan, they are not synced, so each iPad has its own copy. Nothing is '+
+     'shipped with the app: somebody has to paste them in.</div></div>';
+
+  if(showSong){
+    s+='<div class="panel"><h2>Add a song</h2>'+
+       '<div class="lbl">Title</div>'+
+       '<input type="text" id="sgT" maxlength="70" placeholder="Naughty">'+
+       '<div class="lbl">Who it is by, or what it is from</div>'+
+       '<input type="text" id="sgW" maxlength="70" placeholder="Matilda the Musical">'+
+       '<div class="btnrow"><button class="btn go" id="sgAdd">Add</button>'+
+       '<button class="btn soft" id="sgCancel">Cancel</button></div></div>';
+  } else {
+    s+='<div class="panel"><button class="addlink" id="sgShow">+ Add a song</button></div>';
+  }
+  return s;
+}
+
+function wFun(){
+  document.querySelectorAll("[data-song]").forEach(function(b){
+    b.onclick=function(){
+      songOpen = (songOpen===b.dataset.song) ? "" : b.dataset.song;
+      songEdit=""; sfxTap(); render();
+    };
+  });
+  document.querySelectorAll("[data-lyedit]").forEach(function(b){
+    b.onclick=function(){ songEdit=b.dataset.lyedit; render(); };
+  });
+  document.querySelectorAll("[data-lycancel]").forEach(function(b){
+    b.onclick=function(){ songEdit=""; render(); };
+  });
+  document.querySelectorAll("[data-lysave]").forEach(function(b){
+    b.onclick=function(){
+      var el=document.getElementById("ly_"+b.dataset.lysave);
+      saveWords(b.dataset.lysave, el?el.value:"");
+      songEdit=""; sfxPop(); render();
+    };
+  });
+  document.querySelectorAll("[data-songdel]").forEach(function(b){
+    b.onclick=function(){
+      if(!confirm("Remove this song? The words on this device go with it.")) return;
+      var id=b.dataset.songdel;
+      markGone(id);                 /* or the next open puts the seed straight back */
+      WJ("songs", songs().filter(function(x){ return x.id!==id; }));
+      try{ localStorage.removeItem("chew:lyr:"+id); }catch(e){}
+      songOpen=""; songEdit=""; render();
+    };
+  });
+  var sh=document.getElementById("sgShow");
+  if(sh) sh.onclick=function(){ showSong=true; render(); };
+  var cx=document.getElementById("sgCancel");
+  if(cx) cx.onclick=function(){ showSong=false; render(); };
+  var ad=document.getElementById("sgAdd");
+  if(ad) ad.onclick=function(){
+    var t=document.getElementById("sgT").value.trim();
+    if(!t){ alert("Needs a title."); return; }
+    var a=songs();
+    a.push({id:"sg"+Date.now(), t:t.slice(0,70),
+            w:document.getElementById("sgW").value.trim().slice(0,70)});
+    WJ("songs", a);
+    showSong=false; render();
+  };
+  document.querySelectorAll("textarea.lyred").forEach(grow);
+}
 
 /* ==========================================================================
    PROGRESS — one matrix: the two boys across, the subjects down.
