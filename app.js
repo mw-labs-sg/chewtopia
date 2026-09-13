@@ -916,7 +916,7 @@ function wQuiz(){ wireClimbPanel(); }
    Big type, because the point of the screen is two boys reading it at arm's
    length on a tablet propped against the fruit bowl.
    ========================================================================== */
-var songOpen="", songEdit="", showSong=false, songLine=-1;
+var songOpen="", songEdit="", showSong=false;
 
 function songs(){ return SJ("songs", []); }
 function songWords(id){ return S("lyr:"+id, ""); }
@@ -932,22 +932,19 @@ function songLink(s){
   return "https://www.youtube.com/results?search_query="+
          encodeURIComponent((s.t+" "+by+" official song").replace(/\s+/g," ").trim());
 }
-/* One line, one button.
+/* Just the words, one line to a line, big enough to read off the table.
 
-   This is the reading part, and it is why the words are on a screen rather than
-   on the fridge: SC is five, he knows these songs by heart, and what he is
-   doing when he reads one is checking that the words he can already sing are
-   the shapes in front of him. When a line stops him he taps it and hears it,
-   without having to ask anybody, and the line he is on stays marked while he
-   works along it. */
+   They were buttons for a build: tap a line, hear it read out. Taken out again
+   because SC is reading them, not operating them — a line that asks to be
+   pressed is a toy first and a sentence second, and what a boy learning to read
+   needs from a screen is that it holds still. */
 function lyricLines(x){
   var t=songText(x);
   if(!t) return "";
   var s='<div class="lyr">';
-  t.split("\n").forEach(function(ln, i){
+  t.split(String.fromCharCode(10)).forEach(function(ln){
     if(!ln.trim()){ s+='<div class="lygap"></div>'; return; }
-    s+='<button class="lyl'+(songLine===i?" on":"")+'" data-lysay="'+i+'">'+
-       '<span class="lyt">'+esc(ln)+'</span><span class="lyk">🔊</span></button>';
+    s+='<div class="lyl">'+esc(ln)+'</div>';
   });
   return s+'</div>';
 }
@@ -978,11 +975,8 @@ function vFun(){
              '<button class="btn soft" data-lycancel="1">Cancel</button>'+
            '</div>';
       } else if(w){
-        s+='<div class="tip" style="margin-top:8px">Tap a line to hear it.</div>'+
-           lyricLines(x)+
+        s+=lyricLines(x)+
            '<div class="btnrow">'+
-             '<button class="btn go" data-lyread="'+esc(x.id)+'">'+
-               (songLine<0?"🔊 Read it to me":"🔊 Next line")+'</button>'+
              '<button class="btn soft" data-lyedit="'+esc(x.id)+'">Edit the words</button>'+
              '<button class="btn soft" data-songdel="'+esc(x.id)+'">Remove this song</button>'+
            '</div>';
@@ -1021,34 +1015,7 @@ function wFun(){
   document.querySelectorAll("[data-song]").forEach(function(b){
     b.onclick=function(){
       songOpen = (songOpen===b.dataset.song) ? "" : b.dataset.song;
-      songEdit=""; songLine=-1; hush(); sfxTap(); render();
-    };
-  });
-  /* Tap a line, hear that line. Slower than talking, because he is following
-     it with his finger, and the line he tapped stays marked so he can look up
-     from the screen and find his place again. */
-  document.querySelectorAll("[data-lysay]").forEach(function(b){
-    b.onclick=function(){
-      var i=+b.dataset.lysay, x=null;
-      songs().forEach(function(y){ if(y.id===songOpen) x=y; });
-      if(!x) return;
-      songLine=i; render();
-      hush(); say(songText(x).split("\n")[i], 0.72);
-    };
-  });
-  /* The same thing without the hunting: it reads the next line down and moves
-     the mark, so a boy who cannot yet find his place can still keep going. */
-  document.querySelectorAll("[data-lyread]").forEach(function(b){
-    b.onclick=function(){
-      var x=null;
-      songs().forEach(function(y){ if(y.id===b.dataset.lyread) x=y; });
-      if(!x) return;
-      var lines=songText(x).split("\n"), i=songLine;
-      do { i++; } while(i<lines.length && !lines[i].trim());   /* skip the gaps */
-      if(i>=lines.length) i=0;                                 /* round to the top */
-      while(i<lines.length && !lines[i].trim()) i++;
-      songLine=i; render();
-      hush(); say(lines[i], 0.72);
+      songEdit=""; hush(); sfxTap(); render();
     };
   });
   document.querySelectorAll("[data-lyedit]").forEach(function(b){
@@ -1061,7 +1028,7 @@ function wFun(){
     b.onclick=function(){
       var el=document.getElementById("ly_"+b.dataset.lysave);
       saveWords(b.dataset.lysave, el?el.value:"");
-      songEdit=""; songLine=-1; sfxPop(); render();
+      songEdit=""; sfxPop(); render();
     };
   });
   document.querySelectorAll("[data-songdel]").forEach(function(b){

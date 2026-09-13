@@ -75,7 +75,14 @@
     font-size:15px;font-weight:800;cursor:pointer;white-space:nowrap;min-height:44px;
     color:rgba(255,255,255,.94);transition:transform .1s,box-shadow .12s,filter .12s;
     filter:saturate(.6) brightness(.62)}
-  @media(min-width:620px){ .tab{flex:1 1 0;padding:11px 6px} }
+  /* Nine tabs. Stretching them to fill one row squeezed School and Forums down
+     to a few letters and pushed the last of them off the edge, so from 620px up
+     they keep their own width and wrap onto a second row instead. Below that
+     the row still scrolls sideways, which is what a phone wants. */
+  @media(min-width:620px){
+    .tabs{flex-wrap:wrap;justify-content:center;overflow:visible}
+    .tab{flex:0 0 auto;padding:11px 15px}
+  }
   .tab:active{transform:translateY(2px)}
   .tab:hover{filter:saturate(.85) brightness(.82)}
   .tab.on{filter:none;color:#fff;
@@ -392,22 +399,13 @@
   .songyt{flex:0 0 44px;height:44px;border-radius:14px;background:var(--bg);
     color:var(--coral);font-size:19px;text-decoration:none;display:flex;
     align-items:center;justify-content:center}
-  /* One line, one button, because the line is the unit a five-year-old reads.
-     Big, well spaced, and wide enough that a finger tracking along it does not
-     land on the line below. */
-  .lyr{display:grid;gap:4px;padding:8px 0 4px}
-  .lyl{display:flex;align-items:center;gap:10px;width:100%;text-align:left;
-    border:0;border-radius:12px;padding:9px 11px;background:none;font:inherit;
-    font-size:19px;line-height:1.55;font-weight:600;color:var(--ink);
-    cursor:pointer;-webkit-appearance:none;appearance:none;
-    -webkit-tap-highlight-color:transparent}
-  .lyt{flex:1;min-width:0}
-  .lyk{flex:0 0 auto;font-size:13px;opacity:.32}
-  /* where he is. It stays put when he looks up from the screen. */
-  .lyl.on{background:#FFF1D6}
-  .lyl.on .lyk{opacity:.85}
-  .lyl:active{background:var(--bg)}
-  .lygap{height:10px}
+  /* One line to a line, the way it is sung, and big enough to read off the
+     table. Nothing here is tappable on purpose: he is reading it, not working
+     it, and a word that lights up when you touch it is a word being played
+     with rather than read. */
+  .lyr{display:grid;gap:2px;padding:10px 0 4px}
+  .lyl{font-size:20px;line-height:1.6;font-weight:600;padding:3px 2px}
+  .lygap{height:12px}
   .lyred{width:100%;min-height:220px;font:inherit;font-size:15px;line-height:1.6}
   .cpips{display:flex;gap:8px;justify-content:center;margin:0 0 12px}
   .cpip{width:15px;height:15px;border-radius:50%;background:var(--line)}
@@ -1076,7 +1074,7 @@ body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;-
   </header>
   <nav class="tabs" id="tabs" aria-label="Sections"></nav>
   <main id="view" tabindex="-1"></main>
-  <p class="foot">Saved on this device · build 147</p>
+  <p class="foot">Saved on this device · build 148</p>
 </div>
 <!-- load order matters: data, then core, then screens, app last -->
 <!-- Pinned to an exact version with a hash to match: "@2" floats, so a bad
@@ -1090,6 +1088,6 @@ body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;-
 <script src="core.js?v=59"></script>
 <script src="timetable.js?v=6"></script>
 <script src="training.js?v=58"></script>
-<script src="app.js?v=110"></script>
+<script src="app.js?v=111"></script>
 </body>
 </html>

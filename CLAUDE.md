@@ -158,12 +158,13 @@ carrying `p:"en|3.5"` gets a practice button and feeds the daily set.
   so the card warns when a voice is missing and the game runs silent off the
   meaning on screen.
 
-- **Fun is the song words, and it is where SC practises reading.** Every line is
-  its own button: tap it and it is read out slowly, and it stays marked so he can
-  look up from the screen and find his place again. "Read it to me" walks down a
-  line at a time and wraps back to the top. A boy of five decodes what he already
-  knows by heart — which is why the five traditional rhymes are on there, all of
-  them singable from memory and short enough to hold in one line.
+- **Fun is the song words, and it is where SC practises reading.** Nothing on
+  that screen is tappable and that is deliberate: the lines were buttons that
+  read themselves out for one build, and they came out again because he is
+  reading them, not working them — a line that lights up when you touch it is a
+  line being played with rather than read. Just the words, one line to a line,
+  20px. A boy of five decodes what he already knows by heart, which is why the
+  five traditional rhymes are there: singable from memory, one idea a line.
 - **The words to anything still in copyright are not in the repo.** `SEED_SONGS`
   in `data.js` carries a title and who it is by; only the out-of-copyright ones
   carry words, in `lx` — five traditional nursery rhymes, old enough that there
