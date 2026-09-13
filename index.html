@@ -368,13 +368,40 @@
   .lopt:active{transform:translateY(1px)}
   /* characters get the size they need to be read, and two to a row */
   .lopts.big{grid-template-columns:1fr 1fr}
-  .lopts.big .lopt{font-family:'Noto Sans SC',serif;font-size:34px;
-    text-align:center;padding:16px 8px;letter-spacing:.05em}
+  /* Sized to the screen, not to a number: むずかしい at a flat 34px broke across
+     two lines on a phone and split the word down the middle. */
+  .lopts.big .lopt{font-family:'Noto Sans SC',serif;font-size:clamp(21px,6.4vw,32px);
+    text-align:center;padding:16px 8px;letter-spacing:.04em}
   .lopt.right{background:var(--lime);border-color:var(--lime);color:#fff}
   .lopt.wrong{background:var(--coral);border-color:var(--coral);color:#fff}
   /* the ones he did not pick stay legible but stop competing for his eye */
   .lopt.dim{opacity:.4}
   .lopt:disabled{cursor:default}
+
+  /* ---- the quiz tab: one card per ladder ---- */
+  /* Eight of them, so a card and not a panel each — a panel apiece was a
+     minute of scrolling before the 华文 one came into view. */
+  /* 130px, not 158: on a phone the wider card fell to one per row and eight of
+     them became a screen and a half of scrolling. */
+  .qgrid{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(130px,1fr))}
+  .qcard{border:2px solid var(--line);border-radius:20px;padding:12px;
+    background:var(--card);display:flex;flex-direction:column}
+  /* the open one takes the whole row, because the rung picker needs the width */
+  .qcard.open{grid-column:1/-1;border-color:var(--blue)}
+  .qgo{display:flex;flex-direction:column;align-items:center;gap:2px;width:100%;
+    border:0;background:none;font:inherit;color:var(--ink);cursor:pointer;
+    padding:6px 0 2px;-webkit-appearance:none;appearance:none}
+  .qgo:active{transform:translateY(1px)}
+  .qem{font-size:34px;line-height:1.1}
+  .qnm{font-family:'Baloo 2',cursive;font-size:19px;font-weight:700;text-align:center}
+  .qsub{font-size:12px;font-weight:700;color:var(--soft);text-align:center}
+  .qfoot{display:flex;align-items:center;justify-content:space-between;gap:8px;
+    margin-top:10px}
+  .qbest{font-size:11px;font-weight:800;color:var(--soft);text-transform:uppercase;
+    letter-spacing:.04em}
+  .qlv{font-size:12px;font-weight:800;border:0;border-radius:999px;cursor:pointer;
+    padding:6px 11px;background:var(--bg);color:var(--blue);font-family:inherit;
+    -webkit-appearance:none;appearance:none}
 
   /* ---- results ---- */
   .run{display:inline-flex;flex-direction:column;align-items:center;border-radius:11px;
@@ -980,7 +1007,7 @@ body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;-
   </header>
   <nav class="tabs" id="tabs" aria-label="Sections"></nav>
   <main id="view" tabindex="-1"></main>
-  <p class="foot">Saved on this device · build 142</p>
+  <p class="foot">Saved on this device · build 143</p>
 </div>
 <!-- load order matters: data, then core, then screens, app last -->
 <!-- Pinned to an exact version with a hash to match: "@2" floats, so a bad
@@ -990,10 +1017,10 @@ body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3"
         integrity="sha384-l8ah+VgaWtk1mvOe9VC+OirC6qHFF4yH7l7mKRidV9MSti3E9F463bMp6ZVN4kuC"
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script src="data.js?v=52"></script>
-<script src="core.js?v=56"></script>
+<script src="data.js?v=53"></script>
+<script src="core.js?v=57"></script>
 <script src="timetable.js?v=6"></script>
-<script src="training.js?v=55"></script>
-<script src="app.js?v=106"></script>
+<script src="training.js?v=56"></script>
+<script src="app.js?v=107"></script>
 </body>
 </html>

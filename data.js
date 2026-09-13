@@ -1767,3 +1767,274 @@ var ZH_LADDER = {
     ["\u5408\u4f5c","h\u00e9zu\u00f2","to work together"], ["\u7ecf\u9a8c","j\u012bngy\u00e0n","experience"]
   ]]
 };
+
+/* ==========================================================================
+   THE HUMAN BODY LADDER — ten rungs, outside in.
+
+   NOT curriculum, for the same reason the science ladder is not: MOE starts
+   science in P3 and neither boy has a syllabus yet. What it is instead is a
+   proper progression — what you can see and touch first, then the senses,
+   then bones and muscles, then the organs that keep you going, then the
+   systems all at once. A boy who gets to rung 8 has learnt something real
+   about himself; he has not passed anything.
+
+   Same shape as SCI_LADDER: [question, the right answer, the wrong ones].
+   ========================================================================== */
+var BODY_LADDER = {
+  1: ["Outside", [
+    ["Which part of your body do you see with?","your eyes",["your ears","your knees"]],
+    ["How many fingers are there on two hands?","ten",["eight","twelve"]],
+    ["Which part of your body do you smell with?","your nose",["your tongue","your elbow"]],
+    ["What covers the outside of your whole body?","skin",["bone","hair"]],
+    ["Which joint is in the middle of your arm?","the elbow",["the knee","the ankle"]],
+    ["Which part of you do you hear with?","your ears",["your eyes","your nose"]]
+  ]],
+  2: ["The senses", [
+    ["Which part of you tastes food?","your tongue",["your liver","your lungs"]],
+    ["How many senses do we usually count?","five",["three","ten"]],
+    ["Which sense do you use to read a book?","sight",["taste","smell"]],
+    ["Touch is felt through your what?","skin",["hair","nails"]],
+    ["Which sense warns you that milk has gone off?","smell",["hearing","sight"]],
+    ["Which part of you helps you keep your balance?","your inner ear",["your thumb","your tongue"]]
+  ]],
+  3: ["Bones", [
+    ["What is your skeleton made of?","bones",["muscles","blood"]],
+    ["Which bones make a cage around your heart and lungs?","the ribs",["the knees","the fingers"]],
+    ["What is the bone that protects your brain called?","the skull",["the spine","the jaw"]],
+    ["Roughly how many bones does a grown-up have?","about 206",["about 50","about 1000"]],
+    ["What are the bones running down your back called?","the spine",["the ribs","the hips"]],
+    ["What do we call the place where two bones meet?","a joint",["a nerve","a muscle"]]
+  ]],
+  4: ["Muscles", [
+    ["What pulls on your bones so that you can move?","muscles",["skin","hair"]],
+    ["Which muscle never stops working, day or night?","the heart",["the biceps","the jaw"]],
+    ["What joins a muscle to a bone?","a tendon",["a vein","a nerve"]],
+    ["What happens to a muscle you use a lot?","it gets stronger",["it turns to bone","it disappears"]],
+    ["Which muscles do the work when you chew?","the jaw muscles",["the calf muscles","the neck muscles"]],
+    ["Shivering when you are cold is your muscles doing what?","making heat",["going to sleep","growing"]]
+  ]],
+  5: ["Heart and blood", [
+    ["What does your heart do?","pumps blood",["makes food","holds air"]],
+    ["Where in your body is your heart?","in your chest",["in your head","in your knee"]],
+    ["What does blood carry to every part of you?","oxygen and food",["only water","only air"]],
+    ["What are the tubes that carry blood around you called?","blood vessels",["nerves","tendons"]],
+    ["Roughly how many times a minute does a child's heart beat?","about 90",["about 10","about 300"]],
+    ["What is the beat you can feel in your wrist called?","your pulse",["your reflex","your breath"]]
+  ]],
+  6: ["Breathing", [
+    ["Which organs take in the air you breathe?","your lungs",["your kidneys","your liver"]],
+    ["Which gas does your body need out of the air?","oxygen",["helium","neon"]],
+    ["Which gas does your body get rid of when you breathe out?","carbon dioxide",["oxygen","hydrogen"]],
+    ["What is the big muscle underneath your lungs called?","the diaphragm",["the biceps","the pelvis"]],
+    ["Why do you breathe faster when you run?","your muscles need more oxygen",
+      ["your lungs get smaller","your heart stops"]],
+    ["Which of these keeps your lungs healthy?","exercise and clean air",
+      ["breathing smoke","sitting all day"]]
+  ]],
+  7: ["Eating and digesting", [
+    ["Where does digesting your food begin?","in your mouth",["in your stomach","in your toes"]],
+    ["What breaks your food into small pieces first?","your teeth",["your ribs","your lungs"]],
+    ["Which tube carries food from your mouth down to your stomach?","the oesophagus",
+      ["the windpipe","the spine"]],
+    ["Where does most of your food pass into the blood?","the small intestine",
+      ["the large intestine","the stomach"]],
+    ["What does your liver help your body to do?","clean the blood and digest food",
+      ["pump blood","hold air"]],
+    ["Why does your body need you to drink water?","every part of it needs water",
+      ["it makes bones harder","it makes hair grow"]]
+  ]],
+  8: ["Brain and nerves", [
+    ["Which part of you is in charge of all the rest?","your brain",["your heart","your stomach"]],
+    ["What carries messages between your body and your brain?","nerves",["veins","tendons"]],
+    ["What protects your brain?","your skull",["your ribs","your hips"]],
+    ["Snatching your hand off something hot is called what?","a reflex",["a habit","a dream"]],
+    ["Which part of the brain helps with balance and movement?","the cerebellum",
+      ["the skull","the lungs"]],
+    ["Why does your body need sleep?","the brain and body rest and repair",
+      ["so you stop breathing","so your hair grows"]]
+  ]],
+  9: ["Teeth, skin and hair", [
+    ["How many baby teeth does a child have?","twenty",["thirty-two","ten"]],
+    ["What is the hard white outside of a tooth called?","enamel",["the root","the gum"]],
+    ["Which is the largest organ of the body?","the skin",["the heart","the liver"]],
+    ["Why does your body sweat?","to cool itself down",["to grow","to see better"]],
+    ["Which of these keeps teeth healthy?","brushing twice a day",
+      ["sweets at bedtime","never seeing a dentist"]],
+    ["What are your hair and nails mostly made of?","keratin",["bone","muscle"]]
+  ]],
+  10: ["All of it at once", [
+    ["Which system carries blood around your body?","the circulatory system",
+      ["the digestive system","the skeletal system"]],
+    ["Which system is made of all your bones?","the skeletal system",
+      ["the muscular system","the respiratory system"]],
+    ["Which system takes in oxygen and gets rid of carbon dioxide?","the respiratory system",
+      ["the digestive system","the nervous system"]],
+    ["What does your immune system do?","fights germs",["digests food","makes bones"]],
+    ["Which organs clean your blood and make urine?","the kidneys",["the lungs","the ears"]],
+    ["What are all living things, including you, built from?","cells",["bricks","plastic"]]
+  ]]
+};
+
+/* ==========================================================================
+   THREE MORE LANGUAGES — Bahasa Indonesia, 日本語, 한국어.
+
+   NOT curriculum, and nobody at either school teaches these. They are here
+   because the boys asked, and because a language ladder is the one kind of
+   quiz where knowing nothing at the start is the normal way to begin: rung 1
+   is hello and thank you, and every rung after it is six more words.
+
+   Same shape as ZH_LADDER, so all four run off one ladder in training.js:
+   each rung is [what the rung is called, [[the word, how it sounds, what it
+   means], ...]]. The middle column is a reading, not a translation — romaji
+   for Japanese, revised romanisation for Korean — and Indonesian has none
+   worth printing, since it is read exactly as it is spelt.
+
+   Every word is ordinary, everyday vocabulary. Where a word is one a child
+   would only use to or about particular people, the meaning says so: Korean
+   형 is what a boy calls his older brother, and a girl would say 오빠.
+   ========================================================================== */
+var ID_LADDER = {
+  1: ["Halo", [
+    ["halo","","hello"], ["terima kasih","","thank you"],
+    ["selamat pagi","","good morning"], ["selamat tinggal","","goodbye"],
+    ["ya","","yes"], ["tidak","","no"]
+  ]],
+  2: ["Angka", [
+    ["satu","","one"], ["dua","","two"], ["tiga","","three"],
+    ["empat","","four"], ["lima","","five"], ["sepuluh","","ten"]
+  ]],
+  3: ["Keluarga", [
+    ["ibu","","mother"], ["ayah","","father"], ["kakak","","older brother or sister"],
+    ["adik","","younger brother or sister"], ["nenek","","grandmother"],
+    ["keluarga","","family"]
+  ]],
+  4: ["Binatang", [
+    ["kucing","","a cat"], ["anjing","","a dog"], ["burung","","a bird"],
+    ["ikan","","a fish"], ["kuda","","a horse"], ["sapi","","a cow"]
+  ]],
+  5: ["Makanan", [
+    ["nasi","","rice"], ["roti","","bread"], ["telur","","an egg"],
+    ["susu","","milk"], ["air","","water"], ["sayur","","vegetables"]
+  ]],
+  6: ["Sekolah", [
+    ["guru","","a teacher"], ["murid","","a pupil"], ["buku","","a book"],
+    ["sekolah","","a school"], ["teman","","a friend"], ["pensil","","a pencil"]
+  ]],
+  7: ["Tempat", [
+    ["rumah","","a house"], ["taman","","a park"], ["rumah sakit","","a hospital"],
+    ["toko","","a shop"], ["pasar","","a market"], ["perpustakaan","","a library"]
+  ]],
+  8: ["Waktu", [
+    ["hari ini","","today"], ["besok","","tomorrow"], ["kemarin","","yesterday"],
+    ["pagi","","morning"], ["malam","","night"], ["setiap hari","","every day"]
+  ]],
+  9: ["Kata kerja", [
+    ["makan","","to eat"], ["minum","","to drink"], ["melihat","","to see"],
+    ["pergi","","to go"], ["membaca","","to read"], ["menulis","","to write"]
+  ]],
+  10: ["Kata sifat", [
+    ["besar","","big"], ["kecil","","small"], ["tinggi","","tall"],
+    ["baru","","new"], ["senang","","happy"], ["sulit","","difficult"]
+  ]]
+};
+
+var JA_LADDER = {
+  1: ["あいさつ", [
+    ["こんにちは","konnichiwa","hello"], ["ありがとう","arigatou","thank you"],
+    ["おはよう","ohayou","good morning"], ["さようなら","sayounara","goodbye"],
+    ["はい","hai","yes"], ["いいえ","iie","no"]
+  ]],
+  2: ["かず", [
+    ["いち","ichi","one"], ["に","ni","two"], ["さん","san","three"],
+    ["よん","yon","four"], ["ご","go","five"], ["じゅう","juu","ten"]
+  ]],
+  3: ["かぞく", [
+    ["おかあさん","okaasan","mother"], ["おとうさん","otousan","father"],
+    ["あに","ani","my older brother"], ["あね","ane","my older sister"],
+    ["おとうと","otouto","my younger brother"], ["かぞく","kazoku","family"]
+  ]],
+  4: ["どうぶつ", [
+    ["ねこ","neko","a cat"], ["いぬ","inu","a dog"], ["とり","tori","a bird"],
+    ["さかな","sakana","a fish"], ["うま","uma","a horse"], ["うし","ushi","a cow"]
+  ]],
+  5: ["たべもの", [
+    ["ごはん","gohan","rice, a meal"], ["パン","pan","bread"],
+    ["たまご","tamago","an egg"], ["ぎゅうにゅう","gyuunyuu","milk"],
+    ["みず","mizu","water"], ["やさい","yasai","vegetables"]
+  ]],
+  6: ["がっこう", [
+    ["せんせい","sensei","a teacher"], ["がくせい","gakusei","a student"],
+    ["ほん","hon","a book"], ["がっこう","gakkou","a school"],
+    ["ともだち","tomodachi","a friend"], ["えんぴつ","enpitsu","a pencil"]
+  ]],
+  7: ["ばしょ", [
+    ["いえ","ie","a house"], ["こうえん","kouen","a park"],
+    ["びょういん","byouin","a hospital"], ["みせ","mise","a shop"],
+    ["えき","eki","a station"], ["としょかん","toshokan","a library"]
+  ]],
+  8: ["じかん", [
+    ["きょう","kyou","today"], ["あした","ashita","tomorrow"],
+    ["きのう","kinou","yesterday"], ["あさ","asa","morning"],
+    ["よる","yoru","night"], ["まいにち","mainichi","every day"]
+  ]],
+  9: ["どうし", [
+    ["たべる","taberu","to eat"], ["のむ","nomu","to drink"],
+    ["みる","miru","to see"], ["いく","iku","to go"],
+    ["よむ","yomu","to read"], ["かく","kaku","to write"]
+  ]],
+  10: ["けいようし", [
+    ["おおきい","ookii","big"], ["ちいさい","chiisai","small"],
+    ["たかい","takai","tall, expensive"], ["あたらしい","atarashii","new"],
+    ["たのしい","tanoshii","fun"], ["むずかしい","muzukashii","difficult"]
+  ]]
+};
+
+var KO_LADDER = {
+  1: ["인사", [
+    ["안녕하세요","annyeonghaseyo","hello"], ["감사합니다","gamsahamnida","thank you"],
+    ["안녕히 가세요","annyeonghi gaseyo","goodbye"], ["네","ne","yes"],
+    ["아니요","aniyo","no"], ["미안해요","mianhaeyo","sorry"]
+  ]],
+  2: ["숫자", [
+    ["하나","hana","one"], ["둘","dul","two"], ["셋","set","three"],
+    ["넷","net","four"], ["다섯","daseot","five"], ["열","yeol","ten"]
+  ]],
+  3: ["가족", [
+    ["어머니","eomeoni","mother"], ["아버지","abeoji","father"],
+    ["형","hyeong","a boy's older brother"], ["누나","nuna","a boy's older sister"],
+    ["동생","dongsaeng","younger brother or sister"], ["가족","gajok","family"]
+  ]],
+  4: ["동물", [
+    ["고양이","goyangi","a cat"], ["개","gae","a dog"], ["새","sae","a bird"],
+    ["물고기","mulgogi","a fish"], ["말","mal","a horse"], ["소","so","a cow"]
+  ]],
+  5: ["음식", [
+    ["밥","bap","rice, a meal"], ["빵","ppang","bread"], ["계란","gyeran","an egg"],
+    ["우유","uyu","milk"], ["물","mul","water"], ["김치","gimchi","kimchi"]
+  ]],
+  6: ["학교", [
+    ["선생님","seonsaengnim","a teacher"], ["학생","haksaeng","a student"],
+    ["책","chaek","a book"], ["학교","hakgyo","a school"],
+    ["친구","chingu","a friend"], ["연필","yeonpil","a pencil"]
+  ]],
+  7: ["장소", [
+    ["집","jip","a house"], ["공원","gongwon","a park"],
+    ["병원","byeongwon","a hospital"], ["가게","gage","a shop"],
+    ["역","yeok","a station"], ["도서관","doseogwan","a library"]
+  ]],
+  8: ["시간", [
+    ["오늘","oneul","today"], ["내일","naeil","tomorrow"],
+    ["어제","eoje","yesterday"], ["아침","achim","morning"],
+    ["밤","bam","night"], ["매일","maeil","every day"]
+  ]],
+  9: ["동사", [
+    ["먹다","meokda","to eat"], ["마시다","masida","to drink"],
+    ["보다","boda","to see"], ["가다","gada","to go"],
+    ["읽다","ikda","to read"], ["쓰다","sseuda","to write"]
+  ]],
+  10: ["형용사", [
+    ["크다","keuda","big"], ["작다","jakda","small"],
+    ["높다","nopda","high"], ["새롭다","saeropda","new"],
+    ["재미있다","jaemiitda","fun"], ["어렵다","eoryeopda","difficult"]
+  ]]
+};

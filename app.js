@@ -883,17 +883,25 @@ function wireRead(){
 }
 
 /* ==========================================================================
-   QUIZ — the four ladders, and nothing else on the screen.
+   QUIZ — eight ladders in a grid, and nothing else on the screen.
 
-   Spelling, maths, science and 华文. No TC/SC switch: both boys play these on
-   the same iPad and the best rung is whoever got there, so a "whose turn is it"
-   tap before a game would have bought nothing. Every panel is built by
-   climbPanel() in training.js, which loads before this file.
+   Spelling, maths, science, the human body, and four languages. No TC/SC
+   switch: both boys play these on the same iPad and the best rung is whoever
+   got there, so a "whose turn is it" tap before a game would have bought
+   nothing. The rules are said once here rather than eight times on the cards —
+   they are the same game underneath, and that is the point of it.
+
+   quizCards() and its handlers live in training.js, which loads before this.
    ========================================================================== */
 function vQuiz(){
-  var s="";
-  LADDERS.forEach(function(L){ s+=climbPanel(L.id); });
-  return s;
+  return '<div class="panel"><h2><span class="em">🎮</span> Quizzes'+
+    '<span class="side">tap one to play</span></h2>'+
+    '<p class="empty" style="padding:0 0 14px">Every one of these is the same '+
+      'game. Three right <b>in a row</b> and the next rung is harder; three '+
+      'misses on the same rung ends the run, and how high you got is the whole '+
+      'answer. Tap <b>Levels</b> on a card to start somewhere other than where '+
+      'it left off.</p>'+
+    quizCards()+'</div>';
 }
 function wQuiz(){ wireClimbPanel(); }
 

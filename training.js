@@ -1547,7 +1547,7 @@ function maRungGen(n){
    Read out at all because both boys are quicker at hearing a sum than reading
    one, and this ladder is not a reading test. */
 function maQ(q, a){
-  return {a:String(a), q:q, sy:q
+  return {a:String(a), q:q, c:ladShuffleIn(String(a), maOpts(a)), sy:q
     .replace(/1\/(\d+) of/g, function(_,d){
       return (d==="2"?"one half":d==="3"?"one third":d==="4"?"one quarter":"one fifth")+" of";
     })
@@ -1555,11 +1555,93 @@ function maQ(q, a){
     .replace(/×/g," times ").replace(/÷/g," divided by ")};
 }
 
-/* ---------- 3 and 4: science and 华文, both off a bank, both tapped ---------- */
-/* The right answer shuffled in with the wrong ones, fresh every time it is
-   asked — a boy who remembers "it was the second one" has remembered nothing
-   worth having. */
+/* ---------- everything else is tapped, not typed ----------
+
+   Typing is the test on the spelling ladder and nowhere else. On the others a
+   keyboard was only ever in the way: a boy who knows 56 loses the question to
+   his own thumbs, and on an iPad the keyboard covers half the card. So the
+   maths ladder offers four answers and the rest of them offer three or four,
+   and the right one is shuffled in fresh every single time — a boy who
+   remembers "it was the second one" has remembered nothing worth having. */
 function ladShuffleIn(right, wrongs){ return shuffled([right].concat(wrongs)); }
+
+/* Three wrong answers for a sum, and they have to be near misses. 56, 3 and
+   900 is not a question, it is a reading exercise: the only plausible wrong
+   answers to 7 × 8 are the ones a boy would actually arrive at — one out,
+   two out, ten out, or the digits the wrong way round. */
+function maOpts(a){
+  var n=Number(a), pool=[n+1, n-1, n+2, n-2, n+10, n-10, n+3, n-3, n+20, n-20];
+  /* Two digits the wrong way round is a slip a child actually makes: 14 for 41.
+     Three digits reversed is not a slip, it is a different number, and 851 next
+     to 158 only tells him which one looks wrong. */
+  var rev=String(n).split("").reverse().join("");
+  if(String(n).length===2 && rev.charAt(0)!=="0") pool.push(Number(rev));
+  var seen={}, out=[];
+  seen[String(n)]=1;
+  shuffled(pool).forEach(function(x){
+    if(x<0 || out.length>=3) return;
+    var k=String(x);
+    if(seen[k]) return;
+    seen[k]=1; out.push(k);
+  });
+  /* a sum whose near misses collided — 1 + 1 has fewer neighbours than most */
+  for(var d=4; out.length<3; d++){ if(!seen[String(n+d)]){ seen[String(n+d)]=1; out.push(String(n+d)); } }
+  return out;
+}
+
+/* ---------- the ladders themselves ---------- */
+/* Two shapes cover six of the eight. A quiz bank is a question with its answers
+   written out; a language bank is a word, how it sounds, and what it means. Both
+   arrive as {rung name, rows}, keyed by rung, so one factory each is enough and
+   a new subject or a new language is a bank in data.js and one line here. */
+function qzLad(o){
+  var B=o.bank;
+  return { id:o.id, em:o.em, name:o.name, test:o.name, subject:o.subject,
+    lo:1, hi:10, mode:"pick", ask:"Tap the right answer",
+    blurb:o.blurb, note:o.note,
+    tier:function(n){ return (B[n]&&B[n][0])||("Level "+n); },
+    rung:function(n){ return String((B[n]&&B[n][0])||("level "+n)).toLowerCase(); },
+    bank:function(n){
+      return ((B[n]&&B[n][1])||[]).map(function(x){ return {a:x[1], q:x[0], w:x[2]}; });
+    },
+    dress:function(x){ return {a:x.a, q:x.q, c:ladShuffleIn(x.a, x.w)}; },
+    speak:function(it){ return [[it.q,0.95]]; },
+    tell:function(it){ return [[it.a,0.9]]; } };
+}
+/* Hear the word, read what it means, tap the one that says it. The wrong
+   answers are the other words from the same rung, so every tile on screen is
+   one he has just as much business knowing — distractors off an easier rung
+   would make a hard word look easy.
+
+   Nothing here is written in the Latin alphabet except Bahasa Indonesia, which
+   is why `big` is a flag and not the rule: 재미있다 needs the size, "membaca"
+   needs the width. */
+function langLad(o){
+  var B=o.bank;
+  return { id:o.id, em:o.em, name:o.name, test:o.name, subject:o.subject||o.name,
+    lo:1, hi:10, mode:"pick", big:o.big, optLang:o.lang, voice:o.lang, vname:o.vname,
+    ask:"Listen, then tap the word", blurb:o.blurb, note:o.note,
+    tier:function(n){ return (B[n]&&B[n][0])||("Level "+n); },
+    rung:function(n){ return (B[n]&&B[n][0])||("level "+n); },
+    bank:function(n){
+      return ((B[n]&&B[n][1])||[]).map(function(x){ return {a:x[0], py:x[1], m:x[2]}; });
+    },
+    dress:function(x, n){
+      var others=[], all=(B[n]&&B[n][1])||[];
+      all.forEach(function(y){ if(y[0]!==x.a) others.push(y[0]); });
+      return {a:x.a, py:x.py, m:x.m,
+              q:"Which one means “"+x.m+"”?",
+              c:ladShuffleIn(x.a, shuffled(others).slice(0,3))};
+    },
+    /* Twice, the second time slower. And in the language's own voice or not at
+       all: an English voice reading ねこ teaches the wrong sounds, which is why
+       say() refuses rather than guessing — the meaning is on screen anyway, so
+       a tablet with no Japanese voice still has a working game. */
+    speak:function(it){ return [[it.a,0.72,o.lang],[it.a,0.6,o.lang]]; },
+    tell:function(it){ return [[it.a,0.6,o.lang]]; },
+    after:function(it){ return '<div class="csent">'+(it.py
+      ? '<span lang="'+o.lang+'">'+esc(it.py)+'</span> · ' : '')+esc(it.m)+'</div>'; } };
+}
 
 var LADDERS=[
   { id:"spell", em:"🧗", name:"Spelling climb", test:CLIMB_TEST,
@@ -1569,7 +1651,8 @@ var LADDERS=[
     blurb:"Three-letter words up to twenty. Each word is read out, then a "+
       "sentence with the word in it, then the word again.",
     note:"Ordinary English words, none of them off a school list — this one is "+
-      "just for the fun of it.",
+      "just for the fun of it. Typed, because tapping a word somebody else has "+
+      "spelt is not spelling it.",
     tier:climbTier, rung:climbLen, bank:climbBank,
     speak:function(it){ return [["Spell",0.92],[it.a+".",0.72],[it.s,0.86],
                                 ["Again.",0.92],[it.a+".",0.66]]; },
@@ -1577,8 +1660,8 @@ var LADDERS=[
     after:function(it){ return '<div class="csent">'+esc(it.s)+'</div>'; } },
 
   { id:"ma", em:"➗", name:"Maths climb", test:"Maths climb",
-    subject:"Maths", lo:1, hi:15, mode:"type", ph:"Answer", im:"numeric",
-    ask:"Work it out",
+    subject:"Maths", lo:1, hi:15, mode:"pick",
+    ask:"Tap the answer",
     blurb:"Adding up to ten at the bottom, two steps at once at the top. Every "+
       "sum is read out as well as written, and no two in a run are the same.",
     note:"Rungs 1 to 9 are P2 ground. From 10 up it is P3 and beyond, so a "+
@@ -1590,50 +1673,45 @@ var LADDERS=[
     speak:function(it){ return [["What is "+it.sy+"?",0.95]]; },
     tell:function(it){ return [["The answer is "+it.a+".",0.9]]; } },
 
-  { id:"sci", em:"🔬", name:"Science quiz", test:"Science quiz",
-    subject:"Science", lo:1, hi:10, mode:"pick",
-    ask:"Tap the right answer",
+  qzLad({ id:"sci", em:"🔬", name:"Science quiz", subject:"Science", bank:SCI_LADDER,
     blurb:"Animals at the bottom, food chains and condensation at the top — ten "+
       "rungs, one topic each, and every question is read out.",
     note:"Not school science: MOE starts science in P3, so neither boy has a "+
-      "syllabus for this yet. It is here because they like it.",
-    tier:function(n){ return (SCI_LADDER[n]&&SCI_LADDER[n][0])||("Level "+n); },
-    rung:function(n){ return String((SCI_LADDER[n]&&SCI_LADDER[n][0])||("level "+n)).toLowerCase(); },
-    bank:function(n){
-      var a=(typeof SCI_LADDER!=="undefined" && SCI_LADDER[n]) ? SCI_LADDER[n][1] : [];
-      return a.map(function(x){ return {a:x[1], q:x[0], w:x[2]}; });
-    },
-    dress:function(x){ return {a:x.a, q:x.q, c:ladShuffleIn(x.a, x.w)}; },
-    speak:function(it){ return [[it.q,0.95]]; },
-    tell:function(it){ return [[it.a,0.9]]; } },
+      "syllabus for this yet. It is here because they like it." }),
 
-  { id:"zh", em:"汉", name:"华文 quiz", test:"华文 quiz",
-    subject:"华文", lo:1, hi:10, mode:"pick", big:true, optLang:"zh-CN",
-    ask:"Listen, then tap the word",
+  qzLad({ id:"body", em:"🫀", name:"Human body", subject:"Science", bank:BODY_LADDER,
+    blurb:"Ten rungs from the outside in: what you can see, then the senses, "+
+      "bones, muscles, heart, lungs, food, brain, skin, and all of it at once.",
+    note:"Not school science either, but it does go in order — a boy who gets "+
+      "to rung 8 has learnt something real about himself." }),
+
+  langLad({ id:"zh", em:"汉", name:"华文 quiz", subject:"华文", bank:ZH_LADDER,
+    lang:"zh-CN", vname:"Mandarin", big:true,
     blurb:"The word is read out in Mandarin with its meaning on screen — tap the "+
       "characters that say it. 一二三 at the bottom, 保护环境 at the top.",
     note:"Not off a school sheet: his 听写 lists are on Training and those are "+
-      "the ones that count. The rungs here are my own idea of what is hard.",
-    tier:function(n){ return (ZH_LADDER[n]&&ZH_LADDER[n][0])||("Level "+n); },
-    rung:function(n){ return (ZH_LADDER[n]&&ZH_LADDER[n][0])||("level "+n); },
-    bank:function(n){
-      var a=(typeof ZH_LADDER!=="undefined" && ZH_LADDER[n]) ? ZH_LADDER[n][1] : [];
-      return a.map(function(x){ return {a:x[0], py:x[1], m:x[2]}; });
-    },
-    /* The wrong answers are the other words from the same rung, so every tile
-       on screen is one he has just as much business knowing. Distractors off an
-       easier rung would make a hard word look easy. */
-    dress:function(x, n){
-      var others=[], all=(ZH_LADDER[n]&&ZH_LADDER[n][1])||[];
-      all.forEach(function(y){ if(y[0]!==x.a) others.push(y[0]); });
-      return {a:x.a, py:x.py, m:x.m,
-              q:"Which one means “"+x.m+"”?",
-              c:ladShuffleIn(x.a, shuffled(others).slice(0,3))};
-    },
-    speak:function(it){ return [[it.a,0.72,"zh-CN"],[it.a,0.6,"zh-CN"]]; },
-    tell:function(it){ return [[it.a,0.6,"zh-CN"]]; },
-    after:function(it){ return '<div class="csent"><span lang="zh-CN">'+esc(it.py)+
-      '</span> · '+esc(it.m)+'</div>'; } }
+      "the ones that count. The rungs here are my own idea of what is hard." }),
+
+  langLad({ id:"id", em:"🇮🇩", name:"Bahasa quiz", subject:"Bahasa Indonesia",
+    bank:ID_LADDER, lang:"id-ID", vname:"Indonesian",
+    blurb:"Bahasa Indonesia, six words a rung: halo and terima kasih at the "+
+      "bottom, verbs and adjectives at the top.",
+    note:"Nobody teaches this at either school. It is read exactly as it is "+
+      "spelt, which makes it the gentlest of the four languages to start on." }),
+
+  langLad({ id:"ja", em:"あ", name:"日本語 quiz", subject:"日本語",
+    bank:JA_LADDER, lang:"ja-JP", vname:"Japanese", big:true,
+    blurb:"Hiragana and a little katakana, read out in Japanese — こんにちは at "+
+      "the bottom, むずかしい at the top. The romaji is shown after each answer.",
+    note:"Nobody teaches this at either school. If the tablet has no Japanese "+
+      "voice the words stay silent rather than being read in an English one." }),
+
+  langLad({ id:"ko", em:"한", name:"한국어 quiz", subject:"한국어",
+    bank:KO_LADDER, lang:"ko-KR", vname:"Korean", big:true,
+    blurb:"Hangul read out in Korean — 안녕하세요 at the bottom, 어렵다 at the "+
+      "top — with how it sounds shown after each answer.",
+    note:"Nobody teaches this at either school. If the tablet has no Korean "+
+      "voice the words stay silent rather than being read in an English one." })
 ];
 
 function ladBy(id){
@@ -1938,29 +2016,55 @@ function wireClimb(){
 }
 
 /* ==========================================================================
-   THE QUIZ SCREEN — the four panels, drawn by app.js's vQuiz().
+   THE QUIZ SCREEN — eight cards in a grid, drawn by app.js's vQuiz().
 
-   They have a tab of their own rather than a corner of Training because
-   Training is a wall of coloured boxes for the school's lists, and at the foot
-   of it the one thing in the app that is nobody's homework could not be found.
+   It has a tab of its own rather than a corner of Training because Training is
+   a wall of coloured boxes for the school's lists, and at the foot of it the
+   one thing in the app that is nobody's homework could not be found.
+
+   Cards rather than a panel each: one panel per quiz was fine at four and would
+   be a minute of scrolling at eight. A card is one tap to play at the rung it
+   remembers, and the rung picker is behind "Levels" for the once in a while
+   anybody wants to move it.
    ========================================================================== */
-function climbPanel(id){
-  var L=ladBy(id), best=ladBest(L), l=ladLast(L), from=ladFrom(L);
-  return '<div class="panel"><h2><span class="em">'+L.em+'</span> '+esc(L.name)+
-    (best?'<span class="side">best level '+best+'</span>':'')+'</h2>'+
-    '<p class="empty" style="padding:0 0 12px">'+esc(L.blurb)+' Get <b>three in '+
-      'a row</b> and every rung gets harder. Three misses on the same rung ends '+
-      'the run — how high you got is the whole answer.</p>'+
-    '<div class="key" style="margin:0 0 8px">Start on this rung — tap to change '+
-      'it, and it stays put for next time.</div>'+
-    climbPicker(L)+
-    '<button class="btn go wide" data-climb="'+L.id+'">'+
-      (best?"Go again from level ":"Start at level ")+from+' →</button>'+
-    '<div class="key">'+(best
-      ? "Best so far: level "+best+" · "+esc(L.tier(best))+" · "+
-        esc(L.rung(best))+(l?" · last go "+esc(dshort(l.ts)):"")
-      : esc(L.note))+
-    '</div></div>';
+var qopen="";                     /* which card has its levels showing */
+
+function quizCards(){
+  var s='<div class="qgrid">';
+  LADDERS.forEach(function(L){ s+=quizCard(L); });
+  return s+'</div>';
+}
+function quizCard(L){
+  var best=ladBest(L), from=ladFrom(L), l=ladLast(L), open=(qopen===L.id);
+  var s='<div class="qcard'+(open?" open":"")+'">'+
+    '<button class="qgo" data-climb="'+L.id+'">'+
+      '<span class="qem">'+L.em+'</span>'+
+      '<span class="qnm">'+esc(L.name)+'</span>'+
+      '<span class="qsub">Level '+from+' · '+esc(L.tier(from))+'</span>'+
+    '</button>'+
+    '<div class="qfoot">'+
+      '<span class="qbest">'+(best?"best "+best:"new")+'</span>'+
+      '<button class="qlv" data-qopen="'+L.id+'" aria-expanded="'+(open?"true":"false")+'">'+
+        (open?"Hide levels":"Levels")+'</button>'+
+    '</div>';
+  if(open){
+    s+='<p class="empty" style="padding:10px 0">'+esc(L.blurb)+'</p>'+
+       climbPicker(L)+
+       '<div class="key">'+(best
+         ? "Best so far: level "+best+" · "+esc(L.tier(best))+" · "+esc(L.rung(best))+
+           (l?" · last go "+esc(dshort(l.ts)):"")
+         : esc(L.note))+'</div>';
+    /* Said on the card rather than discovered mid-question: with no voice for
+       the language the game still works off the meaning on screen, but nothing
+       will be read out, and a silent Play button looks like a broken one. */
+    if(L.voice && !bestVoice(L.voice)){
+      s+='<p class="warn" style="margin:10px 0 0">This device has no '+
+         esc(L.vname||L.name)+' voice, so the words stay silent rather than being '+
+         'read out in an English accent. On an iPad: Settings → Accessibility → '+
+         'Spoken Content → Voices.</p>';
+    }
+  }
+  return s+'</div>';
 }
 
 /* The same ladder, tappable: pick the rung the run starts on. The same boxes in
@@ -1984,11 +2088,17 @@ function climbPicker(L){
   return s+'</div>';
 }
 
-/* Both of a panel's controls, wired by whichever screen drew it. */
+/* Everything on a card, wired by whichever screen drew it. */
 function wireClimbPanel(){
   /* Its own attribute, not data-t: a ladder is not a code start() knows. */
   document.querySelectorAll("[data-climb]").forEach(function(b){
     b.onclick=function(){ sfxTap(); startClimb(b.dataset.climb); };
+  });
+  document.querySelectorAll("[data-qopen]").forEach(function(b){
+    b.onclick=function(){
+      qopen = (qopen===b.dataset.qopen) ? "" : b.dataset.qopen;
+      sfxTap(); render();
+    };
   });
   /* Picking a rung only saves the setting and redraws — it does not start the
      run. Tapping along a ladder to see what the rungs are called should not

@@ -1058,10 +1058,14 @@ function say(t,rate,lang){
   if(!window.speechSynthesis || !snd()) return;
   lang=lang||"en-GB";
   var cn = lang.indexOf("zh")===0;
+  /* Any language that is not English, now that there are four of them. */
+  var foreign = lang.indexOf("en")!==0;
   var u=new SpeechSynthesisUtterance(t), v=bestVoice(lang);
   /* An English voice reading Chinese is worse than silence: it teaches the
-     wrong sounds. Say nothing and let the screen carry it. */
-  if(cn && !v) return;
+     wrong sounds. Say nothing and let the screen carry it. The same goes for
+     ねこ and 안녕하세요 — a tablet with no Japanese voice used to read the kana
+     out in an English accent, which is a lesson in how not to say it. */
+  if(foreign && !v) return;
   if(v){ u.voice=v; u.lang=v.lang; } else u.lang=lang;
   var base=0.85;   /* the one speed that suits both boys */
   if(isNaN(base)) base=0.85;
