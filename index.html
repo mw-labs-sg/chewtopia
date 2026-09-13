@@ -325,8 +325,8 @@
   .rankbadge.rD{background:#FFE3DC;color:#96301A}
   .streakline{font-size:14px;color:var(--soft);font-weight:600}
 
-  /* ---- the spelling climb: a ladder of thirteen rungs ---- */
-  /* All thirteen are always drawn, cleared or not, so the top of the ladder
+  /* ---- the spelling climb: a ladder of eighteen rungs, 3 letters to 20 ---- */
+  /* All of them are always drawn, cleared or not, so the top of the ladder
      is visible from the bottom rung — that is most of the pull of the game. */
   .clad{display:flex;gap:4px;justify-content:center;flex-wrap:wrap;margin:2px 0 12px}
   .crung{width:26px;height:26px;border-radius:8px;background:var(--line);
@@ -337,6 +337,15 @@
     box-shadow:0 0 0 3px #FFF1D6}
   /* his best ever, so this climb always has something on screen to beat */
   .crung.best{outline:2px dashed var(--grape);outline-offset:2px}
+  /* below where this climb started: never asked, so never green. Faded rather
+     than hidden, because the rungs he skipped are part of reading the run. */
+  .crung.skip{opacity:.4}
+  /* the tappable copy on Training, where a rung is a finger target and not a
+     read-out — 26px is fine to look at and too small to hit on an iPad. */
+  .clad.pick{gap:6px;margin-bottom:10px}
+  .clad.pick .crung{width:36px;height:36px;font-size:15px;border:0;padding:0;
+    -webkit-appearance:none;appearance:none;cursor:pointer;
+    -webkit-tap-highlight-color:transparent}
   .cpips{display:flex;gap:8px;justify-content:center;margin:0 0 12px}
   .cpip{width:15px;height:15px;border-radius:50%;background:var(--line)}
   .cpip.on{background:var(--lime);box-shadow:0 0 0 3px #DFF3E4}
@@ -948,7 +957,7 @@ body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;-
   </header>
   <nav class="tabs" id="tabs" aria-label="Sections"></nav>
   <main id="view" tabindex="-1"></main>
-  <p class="foot">Saved on this device · build 139</p>
+  <p class="foot">Saved on this device · build 140</p>
 </div>
 <!-- load order matters: data, then core, then screens, app last -->
 <!-- Pinned to an exact version with a hash to match: "@2" floats, so a bad
@@ -958,10 +967,10 @@ body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3"
         integrity="sha384-l8ah+VgaWtk1mvOe9VC+OirC6qHFF4yH7l7mKRidV9MSti3E9F463bMp6ZVN4kuC"
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script src="data.js?v=50"></script>
+<script src="data.js?v=51"></script>
 <script src="core.js?v=55"></script>
 <script src="timetable.js?v=6"></script>
-<script src="training.js?v=52"></script>
+<script src="training.js?v=53"></script>
 <script src="app.js?v=104"></script>
 </body>
 </html>

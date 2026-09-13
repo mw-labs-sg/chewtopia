@@ -319,6 +319,15 @@ function wTests(){
   document.querySelectorAll("[data-climb]").forEach(function(b){
     b.onclick=function(){ sfxTap(); startClimb(b.dataset.climb); };
   });
+  /* Picking a rung only saves the setting and redraws — it does not start the
+     climb. Tapping along the ladder to see the tier names should not drop a boy
+     straight into twenty-letter words. */
+  document.querySelectorAll("[data-cfrom]").forEach(function(b){
+    b.onclick=function(){
+      var p=b.dataset.cfrom.split(":");
+      setClimbFrom(p[0], p[1]); sfxTap(); render();
+    };
+  });
   document.querySelectorAll("[data-t]").forEach(function(b){
     b.onclick=function(){
       if(b.dataset.kid) W("who", b.dataset.kid);
@@ -1449,8 +1458,16 @@ function doneHTML(){
    Every other test in here asks a fixed list and hands back a mark out of ten.
    This one asks the opposite question: not "did he learn this week's words"
    but "where does he fall over". So it is a ladder, not a test. Level 3 is
-   three-letter words, level 15 is fifteen, and the only way up is three right
+   three-letter words, level 20 is twenty, and the only way up is three right
    in a row — one lucky guess must never promote him.
+
+   The rung he starts on is his to pick, and the pick sticks per boy. Starting
+   every run at three was right once and wrong from the second run on: TC can
+   spell every three-letter word in the bank, so the first nine words of every
+   climb were typing practice, and the game was over before it reached anything
+   he might actually get wrong. Starting high costs him the rungs below — they
+   are never asked, so they never count as cleared, and the ladder draws them
+   faded rather than green.
 
    Three misses on a rung ends the climb, and the misses are counted per rung,
    not per run: the lives refill on the way up. A boy who trips once on level 4
@@ -1460,10 +1477,10 @@ function doneHTML(){
 
    Nothing missed here goes into the tricky-ones bank. A P2 boy handed
    "extracurricular" has not got a weak word, he has run out of ladder, and
-   filling his daily practice with fifteen-letter words would be a punishment
+   filling his daily practice with twenty-letter words would be a punishment
    for climbing well.
    ========================================================================== */
-var CLIMB_LO=3, CLIMB_HI=15, CLIMB_ROW=3, CLIMB_LIVES=3;
+var CLIMB_LO=3, CLIMB_HI=20, CLIMB_ROW=3, CLIMB_LIVES=3;
 var CLIMB_TEST="Spelling climb";
 
 /* A name on every rung. "Level 8" is a school report; "you got to Cliff" is
@@ -1471,11 +1488,31 @@ var CLIMB_TEST="Spelling climb";
    sky the way the scene backdrops do. */
 var CLIMB_TIERS={3:"Sprout",4:"Pebble",5:"Rock",6:"Hill",7:"Ridge",8:"Cliff",
                  9:"Peak",10:"Summit",11:"Cloud",12:"Sky",13:"Star",
-                 14:"Comet",15:"Galaxy"};
+                 14:"Comet",15:"Galaxy",16:"Nebula",17:"Quasar",18:"Cosmos",
+                 19:"Infinity",20:"Legend"};
 function climbTier(n){ return CLIMB_TIERS[n]||("Level "+n); }
-/* "eight-letter words" — spelt out, because it is a thing that gets said. */
-function climbLen(n){ return (MA_ONES[n]||n)+"-letter words"; }
+/* "eight-letter words" — spelt out, because it is a thing that gets said.
+   numWords(), not MA_ONES[n]: that array stops at nineteen, so the top rung
+   was announcing itself as "20-letter words". */
+function climbLen(n){ return numWords(n)+"-letter words"; }
 function climbBest(kid){ var b=bestFor(CLIMB_TEST, kid); return b?b.score:0; }
+
+/* The rung this boy starts on, one setting per boy and kept on the device.
+   Deliberately not synced: which rung SC wants to start on today is a comfort
+   setting on the tablet in front of him, not a family record, and a stale value
+   arriving from the other device mid-week would move the bottom of his ladder
+   with nobody asking. Clamped on the way out as well as on the way in, because
+   a level saved before the ladder grew must not land off the end of it. */
+function climbFrom(kid){
+  var n=parseInt(S("climbfrom:"+kid, CLIMB_LO), 10);
+  if(!n || n<CLIMB_LO || n>CLIMB_HI) n=CLIMB_LO;
+  return n;
+}
+function setClimbFrom(kid, n){
+  n=Number(n);
+  if(!n || n<CLIMB_LO || n>CLIMB_HI) n=CLIMB_LO;
+  W("climbfrom:"+kid, String(n));
+}
 
 /* Only words that really are this long. The key in CLIMB_WORDS is the whole
    promise of the game, so anything filed under the wrong length is dropped
@@ -1506,9 +1543,12 @@ function climbPick(){
   return {k:"spell", a:x[0], s:x[1]};
 }
 
-function startClimb(kid){
+function startClimb(kid, lvl){
   kid=kid||who(); W("who", kid);
-  climb={kid:kid, lvl:CLIMB_LO, row:0, lives:CLIMB_LIVES, cleared:0,
+  var from = lvl ? Number(lvl) : climbFrom(kid);
+  if(!from || from<CLIMB_LO || from>CLIMB_HI) from=CLIMB_LO;
+  setClimbFrom(kid, from);        /* tapping a rung and climbing sets it for next time */
+  climb={kid:kid, from:from, lvl:from, row:0, lives:CLIMB_LIVES, cleared:0,
          seen:{}, asked:0, right:0, missed:[], up:0, spoke:-1, msg:"",
          wasBest:climbBest(kid),
          it:null, graded:false, ok:false, given:"", done:false, saved:false};
@@ -1517,12 +1557,19 @@ function startClimb(kid){
   render(); scrollTo(0,0);
 }
 
-/* The whole ladder, always all thirteen rungs, so the top is visible from the
-   bottom. Used mid-climb and on the Training panel, where "now" is nothing. */
-function climbLadder(cleared, now, best){
+/* The whole ladder, always every rung, so the top is visible from the bottom.
+   Used mid-climb and on the done screen, where "now" is nothing.
+
+   `from` is the rung the run began on. Rungs below it were never asked, so they
+   are drawn faded and not green — a boy who started at eight and cleared nine
+   has not climbed from three, and a row of green boxes underneath him would say
+   he had. */
+function climbLadder(cleared, now, best, from){
+  from = from || CLIMB_LO;
   var s='<div class="clad" aria-hidden="true">';
   for(var n=CLIMB_LO;n<=CLIMB_HI;n++){
-    var cls = n<=cleared ? " done" : (n===now ? " now" : "");
+    var cls = (n>=from && n<=cleared) ? " done" : (n===now ? " now" : "");
+    if(n<from) cls+=" skip";
     if(best && n===best) cls+=" best";
     s+='<span class="crung'+cls+'" title="'+esc(climbTier(n))+'">'+n+'</span>';
   }
@@ -1551,7 +1598,7 @@ function climbHTML(){
         ' tries left">'+climbHearts(q.lives)+'</span>'+
     '</span></div>'+
     botSVG()+
-    climbLadder(q.cleared, q.lvl, q.wasBest)+
+    climbLadder(q.cleared, q.lvl, q.wasBest, q.from)+
     '<div class="kind">'+esc(climbTier(q.lvl))+' · level '+q.lvl+'</div>'+
     '<div class="qq">'+esc(climbLen(q.lvl))+'</div>'+
     climbPips(q.row)+
@@ -1629,11 +1676,17 @@ function climbFinish(){
     q.saved=true;
     /* One row per climb, like every other test, so it syncs with the rest and
        the other device sees how high he got. The score is the rung he cleared
-       out of fifteen — which is exactly why the climb has its own panel and
-       not a coloured box: 8 out of 15 is a good climb, and scoreCls() would
-       have painted it red. */
+       out of twenty — which is exactly why the climb has its own panel and
+       not a coloured box: 8 out of 20 is a good climb, and scoreCls() would
+       have painted it red.
+
+       `from` rides along, local only — the results table in Supabase has no
+       column for it — because it is what makes a saved row readable here:
+       level 9 off a start at 8 and level 9 off a start at 3 are not the same
+       climb. */
     addResult({who:q.kid, subject:"English", code:"climb", test:CLIMB_TEST,
-               score:q.cleared, total:CLIMB_HI, missed:q.missed, ts:Date.now()});
+               score:q.cleared, total:CLIMB_HI, from:q.from,
+               missed:q.missed, ts:Date.now()});
     bumpStreak();
   }
   render(); scrollTo(0,0);
@@ -1654,8 +1707,13 @@ function climbDoneHTML(){
       : "No rung cleared this time")+'</div>'+
     '<div class="streakline">'+(q.cleared
       ? esc(climbLen(q.cleared))+", three in a row"
-      : "Three three-letter words in a row starts the climb")+'</div>'+
-    climbLadder(q.cleared, 0, q.wasBest)+
+      : "Three "+esc(climbLen(q.from))+" in a row starts the climb")+'</div>'+
+    climbLadder(q.cleared, 0, q.wasBest, q.from)+
+    /* Never silently — a big number off a high start is not a long climb, and
+       the screen has to say which it was before anyone reads it as a best. */
+    (q.from>CLIMB_LO
+      ? '<div class="streakline">Started at level '+q.from+' · '+
+        esc(climbTier(q.from))+'</div>' : '')+
     /* "A new best — it was level 0" is what a first climb used to say. */
     '<div class="streakline">'+(!q.wasBest ? "His first climb"
       : beat ? "🎉 A new best — it was level "+q.wasBest
@@ -1703,22 +1761,51 @@ function wireClimb(){
 
 /* The way in, on Training. Deliberately its own panel rather than a box in the
    grid: the grid is "what did he score on the school's list", and this is the
-   one thing on the screen that is not the school's. */
+   one thing on the screen that is not the school's.
+
+   Drawn for whichever boy the TC/SC switch is on, so both of them have their own
+   climb out of the same word bank: their own best rung, their own starting rung,
+   and — because every word is drawn at random — not the same words in the same
+   order as each other, even sitting side by side on two tablets. */
 function climbPanel(kid){
-  var best=climbBest(kid), l=lastFor(CLIMB_TEST, kid);
+  var best=climbBest(kid), l=lastFor(CLIMB_TEST, kid), from=climbFrom(kid);
   return '<div class="panel"><h2><span class="em">🧗</span> Spelling climb'+
     '<span class="side '+whoCls(kid)+'">'+esc(pname(kid))+'</span></h2>'+
-    '<p class="empty" style="padding:0 0 12px">Three-letter words up to fifteen. '+
-      'Spell <b>three in a row</b> and every word gets a letter longer. Three '+
-      'misses on the same rung and the climb is over — how high he got is the '+
-      'whole answer.</p>'+
-    climbLadder(best, 0, best)+
+    '<p class="empty" style="padding:0 0 12px">Three-letter words up to twenty. '+
+      'Each word is read out, then a sentence with the word in it, then the word '+
+      'again. Spell <b>three in a row</b> and every word gets a letter longer. '+
+      'Three misses on the same rung and the climb is over — how high he got is '+
+      'the whole answer.</p>'+
+    '<div class="key" style="margin:0 0 8px">Start on this rung — tap to change '+
+      'it, and it stays put for next time.</div>'+
+    climbPicker(kid)+
     '<button class="btn go wide" data-climb="'+kid+'">'+
-      (best?"Climb again →":"Start climbing →")+'</button>'+
+      (best?"Climb again from level ":"Start climbing at level ")+from+' →</button>'+
     '<div class="key">'+(best
       ? "Best so far: level "+best+" · "+esc(climbTier(best))+" · "+
         esc(climbLen(best))+(l?" · last go "+esc(dshort(l.ts)):"")
       : "Not climbed yet. "+climbWordCount()+" words on the ladder, and none of "+
         "them are off a school list — this one is just for the fun of it.")+
     '</div></div>';
+}
+
+/* The same ladder, tappable: pick the rung the climb starts on. The same boxes
+   in the same order as the climb itself draws them, so "I got to twelve" and
+   "start me at twelve" are the same row on the screen — and bigger than the
+   ladder proper, because these ones get hit with a finger on an iPad. */
+function climbPicker(kid){
+  var sel=climbFrom(kid), best=climbBest(kid);
+  var s='<div class="clad pick" role="group" aria-label="Starting level">';
+  for(var n=CLIMB_LO;n<=CLIMB_HI;n++){
+    var cls = (best && n<=best) ? " done" : "";
+    if(best && n===best) cls+=" best";
+    /* .crung.now is declared after .crung.done in the stylesheet, so the rung
+       he is about to start on stays yellow even inside his cleared range. */
+    if(n===sel) cls+=" now";
+    s+='<button type="button" class="crung'+cls+'" data-cfrom="'+kid+':'+n+'" '+
+       'aria-pressed="'+(n===sel?"true":"false")+'" '+
+       'title="Level '+n+' · '+esc(climbTier(n))+' · '+esc(climbLen(n))+'">'+
+       n+'</button>';
+  }
+  return s+'</div>';
 }

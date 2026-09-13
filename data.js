@@ -557,7 +557,7 @@ var MEALS_ROTATION = [
 ];
 
 /* ==========================================================================
-   THE SPELLING CLIMB — a word ladder, three letters up to fifteen.
+   THE SPELLING CLIMB — a word ladder, three letters up to twenty.
 
    NOT curriculum. Nothing here is off a school sheet: it is a general
    English word list written for this game, graded by how many letters a
@@ -565,6 +565,11 @@ var MEALS_ROTATION = [
    he stops coping with, not that he is behind on anything the school has
    set — STELLAR is TC_SPELL and SC_SPELL above, and those are the lists
    that count.
+
+   Anything past about thirteen letters is there to be the top of the ladder
+   rather than to be spelt. A P2 boy who reaches it has run out of game, not
+   run into a weakness, which is the whole reason none of this feeds his
+   practice.
 
    Keyed by word length, and the key is checked against the word when the
    game builds a level: a nine-letter word filed under ten would quietly
@@ -795,6 +800,56 @@ var CLIMB_WORDS = {
     ["accomplishments","She listed her accomplishments proudly."],
     ["extracurricular","Chess club is an extracurricular activity."],
     ["multiplications","He finished all the multiplications quickly."]
+  ],
+  /* Sixteen letters and up is the joke end of the ladder, and it is meant to
+     be. No seven-year-old is expected to spell "electroencephalogram"; the
+     rungs are here so the top of the ladder is a real place he can see from
+     level twelve, and so a boy who has cleared everything the school could
+     ever set him still has somewhere to go. Every sentence still says what
+     the word means, because a word he has never heard read out is a word he
+     is only guessing at. */
+  16: [
+    ["responsibilities","He has three responsibilities at home."],
+    ["misunderstanding","The whole quarrel was a misunderstanding."],
+    ["extraterrestrial","He drew an extraterrestrial with three eyes."],
+    ["acknowledgements","The book has a page of acknowledgements."],
+    ["incomprehensible","His scribbled note was incomprehensible."],
+    ["disqualification","A false start means disqualification."],
+    ["electromagnetism","A compass works because of electromagnetism."],
+    ["transcontinental","They took a transcontinental train."]
+  ],
+  17: [
+    ["misunderstandings","A few misunderstandings spoiled the game."],
+    ["indistinguishable","The twins are indistinguishable in that photo."],
+    ["counterproductive","Shouting at the dog is counterproductive."],
+    ["environmentalists","The environmentalists cleaned up the beach."],
+    ["conscientiousness","His teacher praised his conscientiousness."],
+    ["electrocardiogram","The doctor read his electrocardiogram."],
+    ["disqualifications","Two disqualifications ended the race early."]
+  ],
+  18: [
+    ["characteristically","He was characteristically late again."],
+    ["disproportionately","The schoolbag was disproportionately heavy."],
+    ["oversimplification","Saying all snakes bite is an oversimplification."],
+    ["misinterpretations","The map led to several misinterpretations."],
+    ["electrocardiograms","The nurse filed both electrocardiograms."],
+    ["interchangeability","The parts have complete interchangeability."]
+  ],
+  19: [
+    ["incomprehensibility","The code was famous for its incomprehensibility."],
+    ["counterproductively","He revised counterproductively until midnight."],
+    ["electrocardiography","The ward has a room for electrocardiography."],
+    ["oversimplifications","The answer was full of oversimplifications."],
+    ["overgeneralisations","Avoid overgeneralisations in your essay."],
+    ["unconstitutionality","The judge ruled on its unconstitutionality."]
+  ],
+  20: [
+    ["uncharacteristically","He was uncharacteristically quiet at dinner."],
+    ["electroencephalogram","The machine records an electroencephalogram."],
+    ["indistinguishability","Their voices have complete indistinguishability."],
+    ["compartmentalisation","The ship survived through compartmentalisation."],
+    ["internationalisation","The company planned its internationalisation."],
+    ["counterrevolutionary","The old general led a counterrevolutionary plot."]
   ]
 };
 
@@ -1506,14 +1561,17 @@ var SEED_GROW = [
      lens while the rule is back on the wall, and that parallax alone moves the
      apparent number by several centimetres. If the height line ever looks
      wrong, this is the reading to measure again. */
-  {id:"gsc-20260830", who:"sc", d:"2026-08-30", w:18.5, h:113},
-
+  {id:"gsc-20260830", who:"sc", d:"2026-08-30", w:18.5, h:113},
+
+
+
   /* Same morning, TC against the same wall rule. Both numbers check out on
      the photos: 23.7 is on the Xiaomi display, and the top of his head sits
      just under the 130 mark, which is what 129 looks like. A better shot than
      SC's - the rule and the boy are in the same plane and the whole scale is
      in frame, so this one did not have to be taken on trust. */
-  {id:"gtc-20260830", who:"tc", d:"2026-08-30", w:23.7, h:129}
+  {id:"gtc-20260830", who:"tc", d:"2026-08-30", w:23.7, h:129}
+
 ];
 
 var SEED_ACTS = [

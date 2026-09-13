@@ -94,9 +94,16 @@ carrying `p:"en|3.5"` gets a practice button and feeds the daily set.
 
 - **The Spelling Climb is not curriculum**, and `CLIMB_WORDS` says so at the
   top. It is a ladder of ordinary English words keyed by length, 3 letters to
-  15, for finding out where a boy falls over rather than testing a set list.
+  20, for finding out where a boy falls over rather than testing a set list.
+  Every word carries a sentence it appears in, read out after the word the way
+  a real spelling test does — heard alone, "sun" could be "son".
   Three right in a row goes up a rung; three misses on one rung ends the run,
   and the lives refill on the way up so a slip low down is not a ceiling.
+  The rung a boy starts on is his to pick and sticks per boy on the device
+  (`climbfrom:<kid>`, not synced): making TC type nine three-letter words
+  before the ladder reaches anything hard is how the game turned into a chore.
+  Rungs below the start are never asked, so they never count as cleared — the
+  ladder draws them faded, and the run records where it began.
   Nothing missed there joins the weak-items bank — a P2 boy handed
   "extracurricular" has run out of ladder, not found a word he needs to drill.
   It has no practice code and is not in `allCodes()`, so it never feeds the
@@ -120,8 +127,9 @@ There is no test runner, but the app will run headless: stub `document`,
 `training.js`, and drive `start()` → `grade()` → `next()` over `allCodes()`.
 Answering everything correctly must score full marks on every code; that one
 check catches most marking regressions in under a second. Worth driving the
-climb the same way: a perfect climber must clear level 15 in 39 words and
-every word must be exactly as long as the rung it was asked on.
+climb the same way, from every legal start rung: a perfect climber must clear
+level 20 in 3 words a rung — 54 from the bottom — and every word must be
+exactly as long as the rung it was asked on and appear in its own sentence.
 
 ## Conventions
 
