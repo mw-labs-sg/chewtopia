@@ -29,7 +29,7 @@ Load order matters and is fixed in `index.html`:
 | `data.js` | **The only file you normally edit.** Kids, word banks, timetables, meals, seed events, Supabase keys. |
 | `core.js` | Storage helpers (`S/W/SJ/WJ`), dates, scores, streaks, all Supabase sync, sound, speech, the weak-items bank, mascot SVGs. |
 | `timetable.js` | The Timetable tab: the weekly grid, school hours, after-school activities. |
-| `training.js` | The Training tab: test list, maths generators, the quiz engine (`start` → `quizHTML` → `grade` → `next`), and the Spelling Climb (`startClimb` → `climbGrade` → `climbNext`). |
+| `training.js` | The Training tab: test list, maths generators, the quiz engine (`start` → `quizHTML` → `grade` → `next`), and the Spelling Climb (`startClimb` → `climbGrade` → `climbNext`) — whose panel is drawn on Reading, by `app.js`. |
 | `app.js` | `render()`, the tab router, and Upcoming / Meals / Reading / School. Loads last and boots the app. |
 
 `render()` redraws the whole `#view` from scratch on every state change. There
@@ -107,7 +107,8 @@ carrying `p:"en|3.5"` gets a practice button and feeds the daily set.
   Nothing missed there joins the weak-items bank — a P2 boy handed
   "extracurricular" has run out of ladder, not found a word he needs to drill.
   It has no practice code and is not in `allCodes()`, so it never feeds the
-  daily set; it is its own panel on Training and its own state (`climb`),
+  daily set; it is its own panel on Reading — one per boy, wired by
+  `wireClimbPanel()` — and its own state (`climb`),
   because a mark out of ten is exactly what it is not.
 
 ## Local dev

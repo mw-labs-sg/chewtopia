@@ -810,7 +810,11 @@ function wHome(){
 }
 
 /* ==========================================================================
-   READING — books finished, in either language
+   READING — books finished, in either language, and the Spelling Climb
+
+   The climb lives here rather than on Training because Training is the school's
+   lists and the climb is not one of them — and because at the bottom of that
+   screen nobody could find it. Both boys get a panel, same as the book log.
    ========================================================================== */
 var showBook=false;
 function vRead(){
@@ -853,6 +857,8 @@ function vRead(){
   } else {
     s+='<div class="panel"><button class="addlink" id="bShow">+ Finished a book</button></div>';
   }
+  /* One per boy. climbPanel() comes from training.js, which loads before this. */
+  shownKids().forEach(function(k){ s+=climbPanel(k.id); });
   return s;
 }
 function wRead(){
@@ -875,6 +881,7 @@ function wRead(){
       var p=b.dataset.bk.split(":"); delBook(p[0],p[1]); render();
     };
   });
+  wireClimbPanel();
 }
 
 /* ==========================================================================

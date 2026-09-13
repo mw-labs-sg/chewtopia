@@ -253,7 +253,6 @@ function vTests(){
   });
   s+='</div></div>';
 
-  s+=climbPanel(tKid());
   if(tKid()==="tc") s+=paperPanel();
   s+=weakPanel(tKid());
   if(tKid()==="tc") s+=charTable();
@@ -313,19 +312,6 @@ function wTests(){
       WJ("weak:"+kid, weakAll(kid).filter(function(x){ return x.k!==key; }));
       strike("weak:"+kid, key);      /* and it stays gone on the other device too */
       sfxTap(); render();
-    };
-  });
-  /* Its own attribute, not data-t: the climb is not a code start() knows. */
-  document.querySelectorAll("[data-climb]").forEach(function(b){
-    b.onclick=function(){ sfxTap(); startClimb(b.dataset.climb); };
-  });
-  /* Picking a rung only saves the setting and redraws — it does not start the
-     climb. Tapping along the ladder to see the tier names should not drop a boy
-     straight into twenty-letter words. */
-  document.querySelectorAll("[data-cfrom]").forEach(function(b){
-    b.onclick=function(){
-      var p=b.dataset.cfrom.split(":");
-      setClimbFrom(p[0], p[1]); sfxTap(); render();
     };
   });
   document.querySelectorAll("[data-t]").forEach(function(b){
@@ -1722,7 +1708,7 @@ function climbDoneHTML(){
     (q.missed.length?'<div class="again">Tripped on: <b>'+esc(q.missed.join(", "))+'</b></div>':'')+
     '<div class="btnrow">'+
       '<button class="btn go" id="cAgain">Climb again</button>'+
-      '<button class="btn soft" id="cBack">More practice</button>'+
+      '<button class="btn soft" id="cBack">Back to reading</button>'+
     '</div></div>';
 }
 
@@ -1736,10 +1722,10 @@ function wireClimb(){
   var q=climb;
   if(q.done){
     document.getElementById("cAgain").onclick=function(){ hush(); newBuddy(); startClimb(q.kid); };
-    document.getElementById("cBack").onclick=function(){ newBuddy(); go("practice"); };
+    document.getElementById("cBack").onclick=function(){ newBuddy(); go("reading"); };
     return;
   }
-  document.getElementById("cB").onclick=function(){ go("practice"); };
+  document.getElementById("cB").onclick=function(){ go("reading"); };
   var p=document.getElementById("cP");
   if(p) p.onclick=function(){ sfxTap(); climbSay(q.it); };
   var g=document.getElementById("cG");
@@ -1759,14 +1745,17 @@ function wireClimb(){
   }
 }
 
-/* The way in, on Training. Deliberately its own panel rather than a box in the
-   grid: the grid is "what did he score on the school's list", and this is the
-   one thing on the screen that is not the school's.
+/* The way in, on Reading — not Training, where it spent two builds being looked
+   for and not found. Training is a wall of coloured boxes for the school's lists,
+   and the climb is the one thing in the app that is not off a school list, so it
+   sat at the bottom of the longest screen looking like one more test. Reading is
+   the other English screen, it is short, and a game about how long a word he can
+   spell belongs next to what he has been reading.
 
-   Drawn for whichever boy the TC/SC switch is on, so both of them have their own
-   climb out of the same word bank: their own best rung, their own starting rung,
-   and — because every word is drawn at random — not the same words in the same
-   order as each other, even sitting side by side on two tablets. */
+   Drawn once per boy, both of them, the way the book log above it is: each has
+   his own best rung, his own starting rung, and — because every word is drawn at
+   random — not the same words in the same order as the other, even on two
+   tablets side by side. */
 function climbPanel(kid){
   var best=climbBest(kid), l=lastFor(CLIMB_TEST, kid), from=climbFrom(kid);
   return '<div class="panel"><h2><span class="em">🧗</span> Spelling climb'+
@@ -1808,4 +1797,21 @@ function climbPicker(kid){
        n+'</button>';
   }
   return s+'</div>';
+}
+
+/* Both of the panel's controls, wired by whichever screen drew it. */
+function wireClimbPanel(){
+  /* Its own attribute, not data-t: the climb is not a code start() knows. */
+  document.querySelectorAll("[data-climb]").forEach(function(b){
+    b.onclick=function(){ sfxTap(); startClimb(b.dataset.climb); };
+  });
+  /* Picking a rung only saves the setting and redraws — it does not start the
+     climb. Tapping along the ladder to see the tier names should not drop a boy
+     straight into twenty-letter words. */
+  document.querySelectorAll("[data-cfrom]").forEach(function(b){
+    b.onclick=function(){
+      var p=b.dataset.cfrom.split(":");
+      setClimbFrom(p[0], p[1]); sfxTap(); render();
+    };
+  });
 }
