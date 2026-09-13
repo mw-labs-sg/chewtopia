@@ -173,7 +173,8 @@ var DAYS = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunda
 var TABS = [["home","Upcoming","t1"],["schedule","Timetable","t2"],
             ["meals","Health","t3"],["forums","Forums","t7"],
             ["practice","Training","t4"],
-            ["quiz","Quiz","t6"],["fun","Fun","t8"],["links","School","t5"]];
+            ["berries","Berries","t9"],["quiz","Quiz","t6"],
+            ["fun","Fun","t8"],["links","School","t5"]];
 var tab="home", quiz=null, showAdd=false;
 /* The paper dictation sheet: not a quiz, because nothing on it is answered on
    the screen. Dad reads, he writes on paper, and there is no score to keep. */
@@ -186,8 +187,8 @@ var climb=null;
 /* Each tab gets a readable address, e.g. .../chewtopia/#meals, so a link can
    be bookmarked or sent straight to one screen. */
 var SLUGS = {home:"upcoming", schedule:"timetable", meals:"health",
-             forums:"forums", practice:"training", quiz:"quiz", fun:"fun",
-             links:"school"};
+             forums:"forums", practice:"training", berries:"berries",
+             quiz:"quiz", fun:"fun", links:"school"};
 function tabFromHash(){
   var h=(location.hash||"").replace(/^#\/?/,"").toLowerCase();
   for(var k in SLUGS){ if(SLUGS[k]===h) return k; }

@@ -2109,3 +2109,92 @@ var SEED_SONGS = [
   {id:"sg1", t:"Soda Pop",           w:"Saja Boys · KPop Demon Hunters"},
   {id:"sg2", t:"Revolting Children", w:"Matilda the Musical · Tim Minchin"}
 ];
+
+/* ==========================================================================
+   BERRIES 高华 — 看图作文, the composition sheets TC brings home.
+
+   What is here and what is not. The 参考词语 are his sheet's own list, the way
+   TC_TINGXIE holds the school's 听写 lists: eight words off P2-L34-高华-PG1,
+   and a word list is the thing a boy has to know by Friday.
+
+   The 好句 pairs are NOT off the sheet. Berries' own "哪一句比较生动" pairs are
+   their copyright and they stay on the paper he ticked them on; these are
+   written for this app about the same four pictures, using the same 好词 the
+   model answers use — 眼前一亮, 狼吞虎咽, 兴高采烈, 皱起眉头, 红着脸. The skill
+   is the same one: plain sentence on one side, the same thing said properly on
+   the other, and he picks. Nothing is gained by copying their sentences in,
+   and he has already ticked those.
+
+   The 结构 questions are the shape of the sheet — 开头法: 人物, 结尾法: 做了错事,
+   and which picture belongs in which paragraph. That is a method, not a text.
+
+   A part is passed at BE_PASS or better, and the screen says 通过 or 再做一次.
+   That number is mine, not the school's: nobody marks these out of ten, but
+   "have another go" needs a line somewhere and 80% is where a P2 boy has shown
+   he knows the words rather than half of them.
+   ========================================================================== */
+var BE_PASS = 0.8;
+var BERRIES = [
+{
+  id:"L34", who:"tc", sheet:"P2-L34-高华",
+  t:"第三十四课：看图作文", theme:"知错能改",
+  open:"人物", end:"做了错事",
+  /* The four pictures, said plainly, so the screen can put the story in order
+     without reprinting the sheet. */
+  steps:[
+    "文华和朋友在操场上踢球。",
+    "回到家后，他看到桌子上的蛋糕，手也不洗就吃了起来。",
+    "晚上，他肚子很痛，捂着肚子哭着告诉妈妈。",
+    "妈妈带他到诊所，医生检查后告诉他为什么会肚子痛。"
+  ],
+  /* 参考词语, off the sheet. [word, pinyin, what it means, the sentence it is
+     practised in with the word left out] */
+  words:[
+    ["操场","cāochǎng","the school field","一天下午，文华和朋友在□□上踢球。"],
+    ["踢球","tī qiú","to play football","他们在操场上□□，玩得兴高采烈。"],
+    ["蛋糕","dàngāo","cake","回到家后，他看到桌子上放着几块□□。"],
+    ["口水直流","kǒushuǐ zhí liú","mouth watering","他眼前一亮，顿时□□□□。"],
+    ["肚子痛","dùzi tòng","stomach ache","晚上，文华觉得□□□得厉害。"],
+    ["捂着肚子","wǔzhe dùzi","holding his tummy","他弯下腰，□□□□，哭着叫妈妈。"],
+    ["诊所","zhěnsuǒ","the clinic","妈妈连忙带他到□□去。"],
+    ["检查","jiǎnchá","to examine","医生给他□□后说，他的手太脏了。"]
+  ],
+  /* 好句: the flat one and the lively one. Written for this app — see above. */
+  good:[
+    ["文华和朋友在操场上踢球。",
+     "文华和朋友在操场上踢球，玩得兴高采烈。",
+     "兴高采烈 说出他们有多开心。"],
+    ["文华看到桌子上的蛋糕，很想吃。",
+     "文华看到桌子上的蛋糕，眼前一亮，口水直流。",
+     "眼前一亮、口水直流 让人看见他的样子。"],
+    ["他拿起蛋糕就吃了起来。",
+     "他手也不洗，拿起蛋糕就狼吞虎咽地吃了起来。",
+     "狼吞虎咽 写出他吃得多急，也点出他没洗手。"],
+    ["晚上，文华的肚子很痛。",
+     "晚上，文华痛得皱起眉头，弯下腰，捂着肚子。",
+     "皱起眉头、弯下腰、捂着肚子 是三个动作，比“很痛”清楚。"],
+    ["妈妈很担心，带他去诊所。",
+     "妈妈听了，连忙放下手里的东西，带他到诊所去。",
+     "连忙 写出妈妈有多急。"],
+    ["文华知道错了，对妈妈说对不起。",
+     "文华红着脸，低下头，羞愧地对妈妈说：“对不起，让您担心了。”",
+     "红着脸、低下头 让人看得出他真的知道错了。"]
+  ],
+  /* 结构: the shape of the sheet, and where each picture goes. */
+  frame:[
+    ["这篇看图作文的主题是什么？", "知错能改", ["助人为乐","勤劳节俭"],
+     "他做错了事，后来知道错，还改了。"],
+    ["开头用的是哪一种开头法？", "人物开头法", ["天气开头法","对话开头法"],
+     "开头先介绍文华这个人：XX今年八岁……"],
+    ["结尾用的是哪一种结尾法？", "做了错事", ["快乐的一天","一次比赛"],
+     "结尾写他以后再也不这样做了：从此以后，XX……"],
+    ["第一段应该写哪一幅图？", "文华和朋友在操场上踢球。",
+     ["晚上，他肚子很痛。","妈妈带他到诊所。"], "一天下午……"],
+    ["第二段应该写哪一幅图？", "回到家后，他看到蛋糕，手也不洗就吃了起来。",
+     ["医生给他检查。","他和朋友在踢球。"], "回到家后……"],
+    ["最后一段最适合怎么写？", "从此以后，文华再也不敢不洗手就吃东西了。",
+     ["从此以后，文华每天都去操场踢球。","从此以后，文华最喜欢吃蛋糕。"],
+     "结尾要写他改了什么。"]
+  ]
+}
+];

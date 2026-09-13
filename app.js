@@ -40,9 +40,9 @@ function render(){
   if(paper){ v.innerHTML=paperHTML(); wirePaper(); return; }
   if(climb){ v.innerHTML=climbHTML(); wireClimb(); return; }
   var V={home:vHome,schedule:vWeek,meals:vMealsGrow,forums:vForums,
-         practice:vTests,quiz:vQuiz,fun:vFun,links:vLinks};
+         practice:vTests,berries:vBerries,quiz:vQuiz,fun:vFun,links:vLinks};
   var Wr={home:wHome,schedule:wWeek,meals:wMealsGrow,forums:wForums,
-          practice:wTests,quiz:wQuiz,fun:wFun,links:wLinks};
+          practice:wTests,berries:wBerries,quiz:wQuiz,fun:wFun,links:wLinks};
   /* the child switch belongs inside the first panel, under its heading */
   var html=V[tab]();
   if(tab==="home"||tab==="schedule") html=html.replace("</h2>", "</h2>"+whoBar());
@@ -1034,6 +1034,74 @@ function wFun(){
     showSong=false; render();
   };
   document.querySelectorAll("textarea.lyred").forEach(grow);
+}
+
+/* ==========================================================================
+   BERRIES — one screen per composition sheet, for TC.
+
+   The sheet comes home, gets ticked in class, and then sits in a folder. What
+   it is worth revising is on here: the eight 参考词语, the 好句 choice, the
+   shape of the composition, and the picture order — with a pass mark on each
+   part so "done it" is a thing the screen can say rather than a thing he says.
+
+   The writing itself stays on paper. This screen holds the plan he writes it
+   from; it does not mark the composition, because nobody here can.
+   ========================================================================== */
+function beCls(p){ return !p ? "" : (p.ok ? " pass" : " redo"); }
+function beMark(p){
+  if(!p) return "not tried";
+  return p.score+" / "+p.total+" · "+(p.ok ? "通过 ✓" : "再做一次");
+}
+function vBerries(){
+  var s='<div class="panel"><h2><span class="em">🍓</span> Berries 高华'+
+    '<span class="side k-tc">'+esc(pname("tc"))+'</span></h2>'+
+    '<p class="empty" style="padding:0 0 12px">The 看图作文 sheets, the parts of '+
+      'them worth doing again. Each part is passed at '+Math.round(BE_PASS*100)+
+      '% or better — under that it says 再做一次, and the words he missed go into '+
+      'his tricky ones like any other test. The composition itself is written on '+
+      'paper; this is the plan he writes it from.</p></div>';
+
+  BERRIES.forEach(function(L){
+    s+='<div class="panel"><h2><span class="em">📝</span> '+esc(L.t)+
+       '<span class="side">'+esc(L.sheet)+'</span></h2>'+
+       '<div class="betheme">主题：<b>'+esc(L.theme)+'</b> · 开头法：<b>'+
+         esc(L.open)+'</b> · 结尾法：<b>'+esc(L.end)+'</b></div>'+
+       '<div class="besteps">';
+    L.steps.forEach(function(x,i){
+      s+='<div class="bestep"><span class="ben">'+(i+1)+'</span>'+
+         '<span lang="zh-CN">'+esc(x)+'</span></div>';
+    });
+    s+='</div>'+
+       '<div class="bewords" lang="zh-CN">'+
+       L.words.map(function(w){
+         return '<span class="bew"><b>'+esc(w[0])+'</b><i>'+esc(w[1])+'</i>'+
+                '<small>'+esc(w[2])+'</small></span>';
+       }).join("")+'</div>';
+
+    [["ci","词语","Tap the word back into the sentence"],
+     ["ju","好句","Which sentence is livelier?"],
+     ["st","结构","Where does each picture go?"]].forEach(function(p){
+      var got=bePass(L, p[0]);
+      s+='<button class="bebtn'+beCls(got)+'" data-be="'+esc(L.id+":"+p[0])+'">'+
+         '<span class="bt" lang="zh-CN">'+esc(p[1])+'</span>'+
+         '<span class="bd2">'+esc(p[2])+'</span>'+
+         '<span class="bs">'+esc(beMark(got))+
+           (got?' · '+esc(dshort(got.ts)):"")+'</span></button>';
+    });
+    s+='<div class="key">The 参考词语 are off his sheet. The 好句 pairs are not: '+
+       'the ones Berries printed stay on the paper he ticked them on, and '+
+       'these are written about the same four pictures using the same 好词.'+
+       '</div></div>';
+  });
+  return s;
+}
+function wBerries(){
+  document.querySelectorAll("[data-be]").forEach(function(b){
+    b.onclick=function(){
+      var p=b.dataset.be.split(":");
+      sfxTap(); startBerries(p[0], p[1]);
+    };
+  });
 }
 
 /* ==========================================================================

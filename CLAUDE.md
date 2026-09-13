@@ -32,7 +32,7 @@ Load order matters and is fixed in `index.html`:
 | `core.js` | Storage helpers (`S/W/SJ/WJ`), dates, scores, streaks, all Supabase sync, sound, speech, the weak-items bank, mascot SVGs. |
 | `timetable.js` | The Timetable tab: the weekly grid, school hours, after-school activities. |
 | `training.js` | The Training tab: test list, maths generators, the quiz engine (`start` → `quizHTML` → `grade` → `next`), and the four quiz ladders — `LADDERS`, then `startClimb` → `climbGrade` → `climbNext`, whose panels are drawn on the Quiz tab by `app.js`. |
-| `app.js` | `render()`, the tab router, and Upcoming / Meals / Quiz / Fun / School, plus the reading log that Training draws. Loads last and boots the app. |
+| `app.js` | `render()`, the tab router, and Upcoming / Meals / Berries / Quiz / Fun / School, plus the reading log that Training draws. Loads last and boots the app. |
 
 `render()` redraws the whole `#view` from scratch on every state change. There
 is no diffing and no component model — a `v*()` function returns an HTML string
@@ -93,6 +93,24 @@ Everything is Singapore MOE, and the PDFs it came from are in `References/`.
 
 Practice codes are `type|key`: `en` `es` `zh` `hz` `rn` `tx` `ma`. A seed event
 carrying `p:"en|3.5"` gets a practice button and feeds the daily set.
+
+- **Berries is TC's 看图作文 sheets**, one panel each, out of `BERRIES` in
+  `data.js`. Three parts, each marked and each with a pass line at `BE_PASS`
+  (80%): 词语 taps the sheet's own 参考词语 back into a sentence (the `bd`
+  mechanic, one mark a character), 好句 is the plain sentence beside the lively
+  one, and 结构 is which picture goes in which paragraph and which 开头法 and
+  结尾法 the sheet uses. Under the line the button says 再做一次.
+  The 参考词语 are off his sheet, the way `TC_TINGXIE` holds the school's own
+  lists. **The 好句 pairs are not** — Berries' own stay on the paper he ticked
+  them on, and these are written for the app about the same four pictures using
+  the same 好词. Keep it that way for any sheet added.
+  The composition itself is not marked and must not be: he writes it on paper
+  and his teacher marks it, the same reason the 默写 sheet is a reading list.
+  A missed 词语 joins the tricky-ones bank like any other test; a 好句 does not,
+  because a sentence he chose wrongly is not a word he keeps missing.
+  `k:"pick"` is the quiz engine's tapped-answer kind, added for these — the tap
+  is the answer, so there is no Check button until it is marked, and `it.kind`
+  is what the card calls the question.
 
 - **The nine quiz ladders are not curriculum**, and each says so at the top of
   its own bank. They are the Quiz tab, a card each, built by `quizCards()` out

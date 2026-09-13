@@ -1104,6 +1104,10 @@ function bdAnswer(it){
    k:"bd" — the build-it mechanic — so the kind has to come from the shape of
    the item and the test it came from, or a 听写 ends up labelled "Spelling". */
 function quizKind(it){
+  /* A sheet that knows what it is asking says so: the Berries parts are 词语,
+     好句 and 结构, and guessing from the shape of the item labelled the first
+     of them 听写 and the other two Spelling. */
+  if(it.kind) return it.kind;
   if(it.k==="rn")   return "\u6211\u4f1a\u8ba4";          /* 我会认 */
   if(it.k==="dict") return "Dictation";
   if(it.k==="math") return "Question";
@@ -1171,6 +1175,25 @@ function quizHTML(){
           })()+'</div>')+
        '<input type="hidden" id="qa" value="'+esc(bdAnswer(it))+'">';
   }
+  else if(it.k==="pick"){
+    /* One question, two or three answers, and the tap is the answer — there is
+       no Check button to press. Answered by tapping rather than writing because
+       what it tests is which sentence is the better one; making him copy it out
+       would test his typing instead. */
+    s+='<div class="qq qw"'+(it.lang?' lang="'+it.lang+'"':'')+'>'+esc(it.q)+'</div>'+
+       (it.tip?'<div class="tip">'+esc(it.tip)+'</div>':'')+
+       '<div class="lopts sent" role="group">'+
+       it.c.map(function(o){
+         var cls="";
+         if(q.graded) cls = (o===it.a) ? " right" : (o===q.pick ? " wrong" : " dim");
+         return '<div class="loptrow">'+
+           '<button type="button" class="lopt'+cls+'" data-qopt="'+esc(o)+'"'+
+           (it.lang?' lang="'+it.lang+'"':'')+(q.graded?' disabled':'')+'>'+esc(o)+'</button>'+
+           '<button type="button" class="lsay" data-qsay="'+esc(o)+'" '+
+           'title="Hear this one" aria-label="Hear this one">🔊</button></div>';
+       }).join("")+'</div>'+
+       '<input type="hidden" id="qa" value="'+esc(q.pick||"")+'">';
+  }
   else if(it.k==="math"){
     /* A sum gets " = ?" after it; a question already asks for itself. */
     s+='<div class="qq'+(it.w?" qw":"")+'">'+esc(it.q)+(it.w?"":" = ?")+'</div>'+
@@ -1185,7 +1208,8 @@ function quizHTML(){
         ? '<textarea id="qa" spellcheck="false" placeholder="Type the whole sentence" style="margin-top:12px"></textarea>'
         : '<input type="text" id="qa" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Type here" style="margin-top:12px">');
   }
-  return s+'<div class="btnrow"><button class="btn go" id="qG">Check</button></div>'+
+  return s+(it.k==="pick" && !q.graded ? ""
+      : '<div class="btnrow"><button class="btn go" id="qG">Check</button></div>')+
     '<div id="qf" role="status" aria-live="polite"></div></div>';
 }
 function wireQuiz(){
@@ -1212,6 +1236,17 @@ function wireQuiz(){
 
   /* Build it: a tile drops into the first empty gap; tapping a filled gap
      clears that gap alone, so a wrong tap costs nothing but a second tap. */
+  document.querySelectorAll("[data-qopt]").forEach(function(b){
+    b.onclick=function(){
+      if(q.graded) return;
+      /* set it, redraw so the hidden input carries it, then mark it: grade()
+         reads the answer off the DOM and not off this handler */
+      q.pick=b.dataset.qopt; render(); grade();
+    };
+  });
+  document.querySelectorAll("[data-qsay]").forEach(function(b){
+    b.onclick=function(){ hush(); say(b.dataset.qsay, 0.75, it.lang||undefined); };
+  });
   document.querySelectorAll("[data-tile]").forEach(function(b){
     b.onclick=function(){
       if(q.graded) return;
@@ -1273,6 +1308,9 @@ function speakIt(it){
     say(heard,0.9,"zh-CN");
     sayLater(function(){ say(cue===heard ? heard : cue, 0.78, "zh-CN"); }, gap);
   }
+  else if(it.k==="pick"){
+    say(it.q, 0.9, it.lang||undefined);
+  }
   else if(it.k==="dict"){
     say("Write the whole sentence.",0.92); say(it.s,0.78);
     say("Again.",0.92); say(it.s,0.68);
@@ -1324,6 +1362,11 @@ function grade(forced){
         ' \u00b7 '+esc(pinyinBoth(it.a,it.tone))+(it.m?'<br>'+esc(it.m):"")+
         (right?"":'<br>You put: '+(esc(got.join(""))||"nothing"));
   }
+  else if(it.k==="pick"){
+    right = given===it.a;
+    detail = '<b'+(it.lang?' lang="'+it.lang+'"':'')+'>'+esc(it.a)+'</b>'+
+             (it.why?'<br>'+esc(it.why):"");
+  }
   else if(it.k==="math"){
     right=mathOK(given, it);
     if(!right) detail=esc(it.q)+(it.w?'<br>':' = ')+'<b>'+esc(it.a)+'</b>';
@@ -1366,7 +1409,10 @@ function grade(forced){
         ? it.h+(it.a?" ("+it.a+(it.tone||"")+")":"")
         : it.a);
     q.wrong.push(it);
-    weakAdd(it, q.code);
+    /* A sentence he chose wrongly is not a word he keeps missing, and dropping
+       one into the tricky-ones bank would put a 好句 question into tomorrow's
+       ten minutes of 生字 practice. */
+    if(it.k!=="pick") weakAdd(it, q.code);
   }
   q.graded=true;
   render();
@@ -1402,7 +1448,7 @@ function grade(forced){
   else if(it.k!=="math") say(it.a,0.6);
 }
 function next(){
-  var q=quiz; q.i++; q.graded=false; q.bd=null;
+  var q=quiz; q.i++; q.graded=false; q.bd=null; q.pick=null;
   if(q.i>=q.items.length){ q.done=true;
     addResult({who:who(),subject:q.subject,code:q.code,test:q.test,score:q.score,
                total:q.total||q.items.length,missed:q.missed,ts:Date.now(),
@@ -2140,4 +2186,78 @@ function wireClimbPanel(){
       setLadFrom(ladBy(p[0]), p[1]); sfxTap(); render();
     };
   });
+}
+
+/* ==========================================================================
+   BERRIES — the three things a 看图作文 sheet can actually be tested on.
+
+   词语: the eight words off the sheet, each one tapped back into the sentence
+   it belongs in. Same mechanic as 听写 — he hears the word, sees the sentence
+   with a gap in it, and taps the characters — because that is the mechanic
+   that works on an iPad and it is the one he already knows.
+
+   好句: the plain sentence beside the lively one. This is the whole point of
+   the sheet: he can already say what happened, and what Berries is teaching is
+   how to say it so somebody wants to read it.
+
+   结构: where each picture goes, which 开头法, which 结尾法. Knowing the shape
+   is what stops a boy writing four sentences and stopping.
+
+   Writing it is not tested and will not be. He writes the composition on paper
+   in his own hand, his teacher marks it, and an app that gave that a number
+   would be inventing one — same reason the 默写 sheet is a reading list and
+   not a quiz.
+   ========================================================================== */
+function beBy(id){
+  for(var i=0;i<BERRIES.length;i++) if(BERRIES[i].id===id) return BERRIES[i];
+  return null;
+}
+function beTest(L, part){
+  return "Berries "+L.id+" "+(part==="ci" ? "词语" : part==="ju" ? "好句" : "结构");
+}
+/* Everything he could be asked to tap, so a four-character word is chosen from
+   more than four tiles and the answer is not the only thing on screen. */
+function beTiles(L, need){
+  var seen={}, pool=[];
+  need.split("").forEach(function(c){ seen[c]=1; });
+  L.words.forEach(function(w){
+    w[0].split("").forEach(function(c){ if(!seen[c]){ seen[c]=1; pool.push(c); } });
+  });
+  return shuffled(need.split("").concat(shuffled(pool).slice(0, Math.min(5, pool.length))));
+}
+function beItems(L, part){
+  var out=[];
+  if(part==="ci"){
+    L.words.forEach(function(w){
+      out.push({k:"bd", kind:"词语", h:w[0], word:w[0], a:w[0], m:w[2], s:w[3],
+                tiles:beTiles(L, w[0]), lesson:L.id});
+    });
+  } else if(part==="ju"){
+    L.good.forEach(function(g){
+      out.push({k:"pick", kind:"好句", lang:"zh-CN",
+                q:"哪一句比较生动？", tip:"Tap the livelier one.",
+                a:g[1], c:shuffled([g[0], g[1]]), why:g[2]});
+    });
+  } else {
+    L.frame.forEach(function(f){
+      out.push({k:"pick", kind:"结构", lang:"zh-CN", q:f[0], a:f[1],
+                c:shuffled([f[1]].concat(f[2])), why:f[3]});
+    });
+  }
+  return out;
+}
+function startBerries(id, part){
+  var L=beBy(id);
+  if(!L) return;
+  W("who", L.who);                 /* these sheets are TC's */
+  startItems(beItems(L, part), beTest(L, part), "华文", "zh-CN", "be|"+L.id+"|"+part);
+}
+/* Passed, or have another go. The mark is out of the marks available, which on
+   the 词语 part is one per character — a boy who puts 口水直流 with one
+   character wrong has not failed the word, and 7 of 8 words is not the same
+   as 7 of 8 tries. */
+function bePass(L, part){
+  var r=lastFor(beTest(L, part), L.who);
+  if(!r) return null;
+  return {score:r.score, total:r.total, ts:r.ts, ok:(r.score/r.total)>=BE_PASS};
 }
