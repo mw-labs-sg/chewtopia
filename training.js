@@ -543,7 +543,7 @@ function maAddSub(){
     case 1: {  /* renaming in at least one column, which is the whole point */
       var a=rnd(115,650), b=rnd(115,340);
       if((a%10)+(b%10)<10) b+=10-((a%10)+(b%10));
-      return maQ(a+" + "+b, a+b);
+      return maLadQ(a+" + "+b, a+b);
     }
     case 2: {
       var a=rnd(200,999), b=rnd(105,a-20);
@@ -1570,29 +1570,36 @@ var MA_TIERS=["", "Start", "Take away", "Twenty", "Back from twenty", "Tables",
 function maRungGen(n){
   var a,b,c;
   switch(n){
-    case 1:  a=rnd(1,9);   b=rnd(1,10-a);  return maQ(a+" + "+b, a+b);
-    case 2:  a=rnd(2,10);  b=rnd(1,a);     return maQ(a+" − "+b, a-b);
-    case 3:  a=rnd(3,18);  b=rnd(1,20-a);  return maQ(a+" + "+b, a+b);
-    case 4:  a=rnd(6,20);  b=rnd(1,a);     return maQ(a+" − "+b, a-b);
-    case 5:  a=maPick([2,5,10]); b=rnd(2,10); return maQ(a+" × "+b, a*b);
-    case 6:  a=maPick([3,4]);    b=rnd(2,10); return maQ(a+" × "+b, a*b);
-    case 7:  a=rnd(11,89); b=rnd(5,99-a);  return maQ(a+" + "+b, a+b);
-    case 8:  a=rnd(25,99); b=rnd(6,a-1);   return maQ(a+" − "+b, a-b);
-    case 9:  b=maPick([2,3,4,5,10]); c=rnd(2,10); return maQ((b*c)+" ÷ "+b, c);
-    case 10: a=rnd(120,880); b=rnd(30,999-a); return maQ(a+" + "+b, a+b);
-    case 11: a=rnd(220,999); b=rnd(40,a-10);  return maQ(a+" − "+b, a-b);
-    case 12: a=rnd(12,39);  b=rnd(3,9);    return maQ(a+" × "+b, a*b);
-    case 13: b=rnd(3,9); c=rnd(11,20);     return maQ((b*c)+" ÷ "+b, c);
-    case 14: b=maPick([2,3,4,5]); c=rnd(2,9); return maQ("1/"+b+" of "+(b*c), c);
+    case 1:  a=rnd(1,9);   b=rnd(1,10-a);  return maLadQ(a+" + "+b, a+b);
+    case 2:  a=rnd(2,10);  b=rnd(1,a);     return maLadQ(a+" − "+b, a-b);
+    case 3:  a=rnd(3,18);  b=rnd(1,20-a);  return maLadQ(a+" + "+b, a+b);
+    case 4:  a=rnd(6,20);  b=rnd(1,a);     return maLadQ(a+" − "+b, a-b);
+    case 5:  a=maPick([2,5,10]); b=rnd(2,10); return maLadQ(a+" × "+b, a*b);
+    case 6:  a=maPick([3,4]);    b=rnd(2,10); return maLadQ(a+" × "+b, a*b);
+    case 7:  a=rnd(11,89); b=rnd(5,99-a);  return maLadQ(a+" + "+b, a+b);
+    case 8:  a=rnd(25,99); b=rnd(6,a-1);   return maLadQ(a+" − "+b, a-b);
+    case 9:  b=maPick([2,3,4,5,10]); c=rnd(2,10); return maLadQ((b*c)+" ÷ "+b, c);
+    case 10: a=rnd(120,880); b=rnd(30,999-a); return maLadQ(a+" + "+b, a+b);
+    case 11: a=rnd(220,999); b=rnd(40,a-10);  return maLadQ(a+" − "+b, a-b);
+    case 12: a=rnd(12,39);  b=rnd(3,9);    return maLadQ(a+" × "+b, a*b);
+    case 13: b=rnd(3,9); c=rnd(11,20);     return maLadQ((b*c)+" ÷ "+b, c);
+    case 14: b=maPick([2,3,4,5]); c=rnd(2,9); return maLadQ("1/"+b+" of "+(b*c), c);
     default: a=rnd(4,9); b=rnd(4,9); c=rnd(6,40);
-             return maQ(a+" × "+b+" + "+c, a*b+c);
+             return maLadQ(a+" × "+b+" + "+c, a*b+c);
   }
 }
 /* The sum twice: once as it is written and once as it is read out, because a
    voice handed "7 × 8" says "seven ex eight" on half the tablets in the house.
    Read out at all because both boys are quicker at hearing a sum than reading
-   one, and this ladder is not a reading test. */
-function maQ(q, a){
+   one, and this ladder is not a reading test.
+
+   maLadQ, not maQ: this was called maQ for five builds and there has been a
+   maQ since the maths quiz was written, three hundred lines up. The later
+   declaration won, so every maths question in the daily set quietly lost its
+   keyboard and its accepted spellings — and the fractions generator handed
+   this one "3/8", which is not a number, so the answers-to-tap loop below span
+   for ever and took the Training tab with it. */
+function maLadQ(q, a){
   return {a:String(a), q:q, c:ladShuffleIn(String(a), maOpts(a)), sy:q
     .replace(/1\/(\d+) of/g, function(_,d){
       return (d==="2"?"one half":d==="3"?"one third":d==="4"?"one quarter":"one fifth")+" of";
@@ -1616,7 +1623,12 @@ function ladShuffleIn(right, wrongs){ return shuffled([right].concat(wrongs)); }
    answers to 7 × 8 are the ones a boy would actually arrive at — one out,
    two out, ten out, or the digits the wrong way round. */
 function maOpts(a){
-  var n=Number(a), pool=[n+1, n-1, n+2, n-2, n+10, n-10, n+3, n-3, n+20, n-20];
+  var n=Number(a);
+  /* Anything that is not a whole number has no near misses worth offering, and
+     the top-up loop at the bottom would never finish looking for three of them:
+     String(NaN+4) is "NaN" every time round. */
+  if(!isFinite(n)) return [];
+  var pool=[n+1, n-1, n+2, n-2, n+10, n-10, n+3, n-3, n+20, n-20];
   /* Two digits the wrong way round is a slip a child actually makes: 14 for 41.
      Three digits reversed is not a slip, it is a different number, and 851 next
      to 158 only tells him which one looks wrong. */

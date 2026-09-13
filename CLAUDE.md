@@ -198,7 +198,11 @@ There is no test runner, but the app will run headless: stub `document`,
 `window` and `localStorage`, concatenate `data.js` `core.js` `timetable.js`
 `training.js`, and drive `start()` → `grade()` → `next()` over `allCodes()`.
 Answering everything correctly must score full marks on every code; that one
-check catches most marking regressions in under a second.
+check catches most marking regressions in under a second, and it is the check
+that catches a name collision in a generator — run it, not just the ladders.
+Drive `buildDaily()` for both boys in the same pass: it is what the Today
+button on Training calls, and a generator that cannot finish hangs that screen
+rather than failing on it.
 
 Drive the ladders the same way, every one of them from every legal start rung:
 a perfect run must reach the top rung in exactly three questions a rung, the
@@ -209,6 +213,13 @@ must end a run wherever it started and save one row with the rung it cleared.
 
 ## Conventions
 
+- **Five script tags, one namespace.** There are no modules: every top-level
+  `function` and `var` in the five files shares one global scope, and the last
+  declaration of a name silently wins. `maQ` was declared twice for five builds
+  — the maths ladder's builder took the maths quiz's name — and the daily set
+  lost every keyboard and accepted spelling it had, then hung the Training tab
+  outright. Before adding a top-level name, check nothing else has it:
+  `grep -n "^function name(" *.js`.
 - ES5 only: `var`, `function`, string concatenation. No arrow functions, no
   template literals, no `let`/`const`, no optional chaining. Matches every
   existing line and keeps old iPads working.
