@@ -2106,8 +2106,43 @@ var TL_LADDER = {
    `seedgone` like every other seeded list, so it stays deleted.
    ========================================================================== */
 var SEED_SONGS = [
+  /* The two the boys are singing this month. No words, and there will be none:
+     both are in copyright, and a home-school app is not a lyrics site. The ▶
+     finds the song and the family types in what it wants to read along with. */
   {id:"sg1", t:"Soda Pop",           w:"Saja Boys · KPop Demon Hunters"},
-  {id:"sg2", t:"Revolting Children", w:"Matilda the Musical · Tim Minchin"}
+  {id:"sg2", t:"Revolting Children", w:"Matilda the Musical · Tim Minchin"},
+
+  /* These five carry their words because they are old enough to be nobody's:
+     traditional nursery rhymes, out of copyright everywhere, with no author to
+     have taken them from. That is the only reason they are here in full.
+
+     They are also the right thing for SC to read. A boy of five decodes what he
+     already knows by heart — he is not reading "twinkle", he is checking that
+     the word he can already sing is the shape in front of him, and that is how
+     reading starts. Short lines, one idea a line, and a 🔊 on every one of them
+     so he can hear the line he is stuck on without asking. */
+  {id:"sg3", t:"Twinkle, Twinkle, Little Star", w:"Traditional · Jane Taylor, 1806",
+   pd:1, lx:"Twinkle, twinkle, little star,\nHow I wonder what you are!\n"+
+            "Up above the world so high,\nLike a diamond in the sky.\n"+
+            "Twinkle, twinkle, little star,\nHow I wonder what you are!"},
+  {id:"sg4", t:"Baa, Baa, Black Sheep", w:"Traditional",
+   pd:1, lx:"Baa, baa, black sheep,\nHave you any wool?\n"+
+            "Yes sir, yes sir,\nThree bags full.\n"+
+            "One for the master,\nOne for the dame,\n"+
+            "And one for the little boy\nWho lives down the lane."},
+  {id:"sg5", t:"Row, Row, Row Your Boat", w:"Traditional",
+   pd:1, lx:"Row, row, row your boat,\nGently down the stream.\n"+
+            "Merrily, merrily, merrily, merrily,\nLife is but a dream."},
+  {id:"sg6", t:"Head, Shoulders, Knees and Toes", w:"Traditional",
+   pd:1, lx:"Head, shoulders, knees and toes,\nKnees and toes.\n"+
+            "Head, shoulders, knees and toes,\nKnees and toes.\n"+
+            "And eyes and ears and mouth and nose,\n"+
+            "Head, shoulders, knees and toes,\nKnees and toes."},
+  {id:"sg7", t:"Incy Wincy Spider", w:"Traditional",
+   pd:1, lx:"Incy Wincy Spider climbed up the water spout.\n"+
+            "Down came the rain and washed the spider out.\n"+
+            "Out came the sunshine and dried up all the rain,\n"+
+            "So Incy Wincy Spider climbed up the spout again."}
 ];
 
 /* ==========================================================================

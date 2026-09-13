@@ -158,14 +158,23 @@ carrying `p:"en|3.5"` gets a practice button and feeds the daily set.
   so the card warns when a voice is missing and the game runs silent off the
   meaning on screen.
 
-- **Fun is the song words, and the words are not in the repo.** `SEED_SONGS`
-  in `data.js` carries a title, who it is by, and nothing else; the screen
-  builds a YouTube *search* out of that, never a video id — ids rot and land a
-  seven-year-old on somebody else's upload. The lyrics are somebody's copyright
-  and a home-school app is not a lyrics site, so they are pasted in on the
-  device by whoever has a copy. **Do not ship lyrics in `data.js`, and do not
-  fetch them.**
-  They live in `lyr:<id>`, deliberately *not* inside the song record:
+- **Fun is the song words, and it is where SC practises reading.** Every line is
+  its own button: tap it and it is read out slowly, and it stays marked so he can
+  look up from the screen and find his place again. "Read it to me" walks down a
+  line at a time and wraps back to the top. A boy of five decodes what he already
+  knows by heart — which is why the five traditional rhymes are on there, all of
+  them singable from memory and short enough to hold in one line.
+- **The words to anything still in copyright are not in the repo.** `SEED_SONGS`
+  in `data.js` carries a title and who it is by; only the out-of-copyright ones
+  carry words, in `lx` — five traditional nursery rhymes, old enough that there
+  is no author to have taken them from. For everything else the screen builds a
+  YouTube *search* out of the title, never a video id — ids rot and land a
+  seven-year-old on somebody else's upload. A song still in copyright is pasted
+  in on the device by whoever has a copy, and the read-along then works on it the
+  same as on the rhymes. **Do not ship copyrighted lyrics in `data.js`, do not
+  fetch them, and do not paste them in out of a chat either — the box on the
+  device is the way in, and it is one tap.**
+  Typed-in words live in `lyr:<id>`, deliberately *not* inside the song record:
   `mergeSeed()` replaces a seeded record whenever `data.js` changes it, so
   anything typed into one would be wiped by the next release. Nothing on this
   screen syncs — like the meal plan, each iPad has its own copy, and the panel

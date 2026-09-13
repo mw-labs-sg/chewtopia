@@ -392,10 +392,22 @@
   .songyt{flex:0 0 44px;height:44px;border-radius:14px;background:var(--bg);
     color:var(--coral);font-size:19px;text-decoration:none;display:flex;
     align-items:center;justify-content:center}
-  /* Big, and every line break kept: the words are read at arm's length off a
-     tablet propped against the fruit bowl, by two boys at once. */
-  .lyr{white-space:pre-wrap;font-size:19px;line-height:1.85;font-weight:600;
-    padding:10px 2px 4px}
+  /* One line, one button, because the line is the unit a five-year-old reads.
+     Big, well spaced, and wide enough that a finger tracking along it does not
+     land on the line below. */
+  .lyr{display:grid;gap:4px;padding:8px 0 4px}
+  .lyl{display:flex;align-items:center;gap:10px;width:100%;text-align:left;
+    border:0;border-radius:12px;padding:9px 11px;background:none;font:inherit;
+    font-size:19px;line-height:1.55;font-weight:600;color:var(--ink);
+    cursor:pointer;-webkit-appearance:none;appearance:none;
+    -webkit-tap-highlight-color:transparent}
+  .lyt{flex:1;min-width:0}
+  .lyk{flex:0 0 auto;font-size:13px;opacity:.32}
+  /* where he is. It stays put when he looks up from the screen. */
+  .lyl.on{background:#FFF1D6}
+  .lyl.on .lyk{opacity:.85}
+  .lyl:active{background:var(--bg)}
+  .lygap{height:10px}
   .lyred{width:100%;min-height:220px;font:inherit;font-size:15px;line-height:1.6}
   .cpips{display:flex;gap:8px;justify-content:center;margin:0 0 12px}
   .cpip{width:15px;height:15px;border-radius:50%;background:var(--line)}
@@ -1064,7 +1076,7 @@ body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;-
   </header>
   <nav class="tabs" id="tabs" aria-label="Sections"></nav>
   <main id="view" tabindex="-1"></main>
-  <p class="foot">Saved on this device · build 146</p>
+  <p class="foot">Saved on this device · build 147</p>
 </div>
 <!-- load order matters: data, then core, then screens, app last -->
 <!-- Pinned to an exact version with a hash to match: "@2" floats, so a bad
@@ -1074,10 +1086,10 @@ body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3"
         integrity="sha384-l8ah+VgaWtk1mvOe9VC+OirC6qHFF4yH7l7mKRidV9MSti3E9F463bMp6ZVN4kuC"
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script src="data.js?v=56"></script>
+<script src="data.js?v=57"></script>
 <script src="core.js?v=59"></script>
 <script src="timetable.js?v=6"></script>
 <script src="training.js?v=58"></script>
-<script src="app.js?v=109"></script>
+<script src="app.js?v=110"></script>
 </body>
 </html>

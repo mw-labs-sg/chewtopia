@@ -916,11 +916,14 @@ function wQuiz(){ wireClimbPanel(); }
    Big type, because the point of the screen is two boys reading it at arm's
    length on a tablet propped against the fruit bowl.
    ========================================================================== */
-var songOpen="", songEdit="", showSong=false;
+var songOpen="", songEdit="", showSong=false, songLine=-1;
 
 function songs(){ return SJ("songs", []); }
 function songWords(id){ return S("lyr:"+id, ""); }
 function saveWords(id, t){ W("lyr:"+id, String(t||"").slice(0, 8000)); }
+/* What to put on screen: whatever was typed in on this device, and otherwise
+   the words the app shipped — which only the out-of-copyright ones have. */
+function songText(x){ return songWords(x.id) || x.lx || ""; }
 /* A search, not a guess at a video id: an id rots and lands a seven-year-old
    on somebody else's upload, while a search for the title plus "official"
    puts the real one at the top and keeps working. */
@@ -929,6 +932,25 @@ function songLink(s){
   return "https://www.youtube.com/results?search_query="+
          encodeURIComponent((s.t+" "+by+" official song").replace(/\s+/g," ").trim());
 }
+/* One line, one button.
+
+   This is the reading part, and it is why the words are on a screen rather than
+   on the fridge: SC is five, he knows these songs by heart, and what he is
+   doing when he reads one is checking that the words he can already sing are
+   the shapes in front of him. When a line stops him he taps it and hears it,
+   without having to ask anybody, and the line he is on stays marked while he
+   works along it. */
+function lyricLines(x){
+  var t=songText(x);
+  if(!t) return "";
+  var s='<div class="lyr">';
+  t.split("\n").forEach(function(ln, i){
+    if(!ln.trim()){ s+='<div class="lygap"></div>'; return; }
+    s+='<button class="lyl'+(songLine===i?" on":"")+'" data-lysay="'+i+'">'+
+       '<span class="lyt">'+esc(ln)+'</span><span class="lyk">🔊</span></button>';
+  });
+  return s+'</div>';
+}
 
 function vFun(){
   var list=songs();
@@ -936,7 +958,7 @@ function vFun(){
     '<span class="side">the words, for singing along</span></h2>';
   if(!list.length) s+='<p class="empty">No songs yet.</p>';
   list.forEach(function(x){
-    var open=(songOpen===x.id), edit=(songEdit===x.id), w=songWords(x.id);
+    var open=(songOpen===x.id), edit=(songEdit===x.id), w=songText(x);
     s+='<div class="song'+(open?" open":"")+'">'+
        '<div class="songtop">'+
          '<button class="songnm" data-song="'+esc(x.id)+'" aria-expanded="'+(open?"true":"false")+'">'+
@@ -949,14 +971,18 @@ function vFun(){
     if(open){
       if(edit){
         s+='<textarea class="lyred" id="ly_'+esc(x.id)+'" spellcheck="false" '+
-           'placeholder="Paste or type the words here">'+esc(w)+'</textarea>'+
+           'placeholder="Paste or type the words here, one line at a time">'+
+           esc(w)+'</textarea>'+
            '<div class="btnrow">'+
              '<button class="btn go" data-lysave="'+esc(x.id)+'">Save the words</button>'+
              '<button class="btn soft" data-lycancel="1">Cancel</button>'+
            '</div>';
       } else if(w){
-        s+='<div class="lyr">'+esc(w)+'</div>'+
+        s+='<div class="tip" style="margin-top:8px">Tap a line to hear it.</div>'+
+           lyricLines(x)+
            '<div class="btnrow">'+
+             '<button class="btn go" data-lyread="'+esc(x.id)+'">'+
+               (songLine<0?"🔊 Read it to me":"🔊 Next line")+'</button>'+
              '<button class="btn soft" data-lyedit="'+esc(x.id)+'">Edit the words</button>'+
              '<button class="btn soft" data-songdel="'+esc(x.id)+'">Remove this song</button>'+
            '</div>';
@@ -971,9 +997,11 @@ function vFun(){
     }
     s+='</div>';
   });
-  s+='<div class="key">The words are kept on this device only — like the meal '+
-     'plan, they are not synced, so each iPad has its own copy. Nothing is '+
-     'shipped with the app: somebody has to paste them in.</div></div>';
+  s+='<div class="key">The five traditional ones came with the app, because they '+
+     'are old enough to belong to nobody. Anything still in copyright has no '+
+     'words here and will not get any: paste in what you have a copy of, and it '+
+     'stays on this device only — like the meal plan, songs are not synced, so '+
+     'each iPad has its own.</div></div>';
 
   if(showSong){
     s+='<div class="panel"><h2>Add a song</h2>'+
@@ -993,7 +1021,34 @@ function wFun(){
   document.querySelectorAll("[data-song]").forEach(function(b){
     b.onclick=function(){
       songOpen = (songOpen===b.dataset.song) ? "" : b.dataset.song;
-      songEdit=""; sfxTap(); render();
+      songEdit=""; songLine=-1; hush(); sfxTap(); render();
+    };
+  });
+  /* Tap a line, hear that line. Slower than talking, because he is following
+     it with his finger, and the line he tapped stays marked so he can look up
+     from the screen and find his place again. */
+  document.querySelectorAll("[data-lysay]").forEach(function(b){
+    b.onclick=function(){
+      var i=+b.dataset.lysay, x=null;
+      songs().forEach(function(y){ if(y.id===songOpen) x=y; });
+      if(!x) return;
+      songLine=i; render();
+      hush(); say(songText(x).split("\n")[i], 0.72);
+    };
+  });
+  /* The same thing without the hunting: it reads the next line down and moves
+     the mark, so a boy who cannot yet find his place can still keep going. */
+  document.querySelectorAll("[data-lyread]").forEach(function(b){
+    b.onclick=function(){
+      var x=null;
+      songs().forEach(function(y){ if(y.id===b.dataset.lyread) x=y; });
+      if(!x) return;
+      var lines=songText(x).split("\n"), i=songLine;
+      do { i++; } while(i<lines.length && !lines[i].trim());   /* skip the gaps */
+      if(i>=lines.length) i=0;                                 /* round to the top */
+      while(i<lines.length && !lines[i].trim()) i++;
+      songLine=i; render();
+      hush(); say(lines[i], 0.72);
     };
   });
   document.querySelectorAll("[data-lyedit]").forEach(function(b){
@@ -1006,7 +1061,7 @@ function wFun(){
     b.onclick=function(){
       var el=document.getElementById("ly_"+b.dataset.lysave);
       saveWords(b.dataset.lysave, el?el.value:"");
-      songEdit=""; sfxPop(); render();
+      songEdit=""; songLine=-1; sfxPop(); render();
     };
   });
   document.querySelectorAll("[data-songdel]").forEach(function(b){
