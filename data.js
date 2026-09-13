@@ -1035,6 +1035,17 @@ var SEED_EVENTS = [
      entry cannot be given by guessing. The hour is blocked out and the title says
      plainly that the name is missing, rather than the app inventing a class nobody
      named. Rename it and this comment goes with it. */
+  /* Nanyang Primary, September information sheet. Only the rows that are his:
+     P2, so the P6 study break and the PSLE written papers are somebody else's
+     term. Teachers' Day has been and gone, and the Term 4 calendar is a
+     document rather than a date. */
+  {id:"e53", t:"No school — PSLE Listening Comprehension", d:"2026-09-15", w:"tc", hol:1,
+   n:"Tuesday. P1 to P5 stay home while the P6 listening paper runs. Only children booked into Student Care go in — it opens as usual."},
+  {id:"e54", t:"Mid-Autumn celebration at school", d:"2026-09-18", time:"18:00", w:"tc",
+   n:"Friday evening, 6 to 8pm at Nanyang Primary, and families are invited — this is the one we go to together. Run with Bukit View, Northoaks and Lianhua Primary and the Farrer Holland Neighbourhood Committee. SC has his own celebration at the kindergarten the following Friday."},
+  {id:"e55", t:"Home-based learning — P2", d:"2026-09-28", d2:"2026-09-29", w:"tc",
+   n:"Monday and Tuesday, at home. Tasks come through SLS on the day, following his usual timetable, and Parents Gateway sends the assignments the evening before. If he has to go in for supervision instead: report 8.00am to the canteen, dismissed 1.30pm. Student Care runs in the afternoons either way."},
+
   {id:"e41", t:"Sunday 10am — invitation with no name on it", d:"2026-10-11", time:"10:00", w:"tc",
    n:"One hour, 10 to 11am. A Google Calendar invite organised by Chew to minwei.chew.sgp@gmail.com, and that is the whole of what came through — the forwarded copy started at “When” and had no title on it."}
 ];
