@@ -337,9 +337,14 @@
     box-shadow:0 0 0 3px #FFF1D6}
   /* his best ever, so this climb always has something on screen to beat */
   .crung.best{outline:2px dashed var(--grape);outline-offset:2px}
-  /* below where this climb started: never asked, so never green. Faded rather
-     than hidden, because the rungs he skipped are part of reading the run. */
-  .crung.skip{opacity:.4}
+  /* below where this run started: never asked, so never green. Hollow rather
+     than faded — at 40% opacity a pale grey rung on a white card was invisible,
+     and a ladder that appears to start at six is a ladder telling a lie. */
+  /* NOT .skip: that name is taken by the skip-to-content link at the top of
+     the page, which parks itself at left:-9999px — so every rung below the
+     start rung was being drawn ten thousand pixels off the side of the iPad. */
+  .crung.below{background:transparent;box-shadow:inset 0 0 0 2px var(--line);
+    color:var(--soft);opacity:.8}
   /* the tappable copy on Training, where a rung is a finger target and not a
      read-out — 26px is fine to look at and too small to hit on an iPad. */
   .clad.pick{gap:6px;margin-bottom:10px}
@@ -352,6 +357,24 @@
   .clevel{margin-top:14px;padding:13px;border-radius:14px;text-align:center;
     background:#FFF1D6;color:#8A6100;font-family:'Baloo 2',cursive;font-size:21px}
   .csent{margin-top:8px;font-weight:600}
+  /* ---- the answers you tap, on the science and 华文 ladders ---- */
+  /* One under the other rather than in a grid: a wrong answer picked because
+     two of them sat side by side is a wrong answer the game invented. */
+  .lopts{display:grid;gap:10px;margin-top:14px}
+  .lopt{font-family:inherit;font-size:17px;font-weight:700;line-height:1.35;
+    text-align:left;padding:14px 16px;border-radius:16px;cursor:pointer;
+    border:2px solid var(--line);background:var(--card);color:var(--ink);
+    -webkit-appearance:none;appearance:none;-webkit-tap-highlight-color:transparent}
+  .lopt:active{transform:translateY(1px)}
+  /* characters get the size they need to be read, and two to a row */
+  .lopts.big{grid-template-columns:1fr 1fr}
+  .lopts.big .lopt{font-family:'Noto Sans SC',serif;font-size:34px;
+    text-align:center;padding:16px 8px;letter-spacing:.05em}
+  .lopt.right{background:var(--lime);border-color:var(--lime);color:#fff}
+  .lopt.wrong{background:var(--coral);border-color:var(--coral);color:#fff}
+  /* the ones he did not pick stay legible but stop competing for his eye */
+  .lopt.dim{opacity:.4}
+  .lopt:disabled{cursor:default}
 
   /* ---- results ---- */
   .run{display:inline-flex;flex-direction:column;align-items:center;border-radius:11px;
@@ -957,7 +980,7 @@ body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;-
   </header>
   <nav class="tabs" id="tabs" aria-label="Sections"></nav>
   <main id="view" tabindex="-1"></main>
-  <p class="foot">Saved on this device · build 141</p>
+  <p class="foot">Saved on this device · build 142</p>
 </div>
 <!-- load order matters: data, then core, then screens, app last -->
 <!-- Pinned to an exact version with a hash to match: "@2" floats, so a bad
@@ -967,10 +990,10 @@ body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3"
         integrity="sha384-l8ah+VgaWtk1mvOe9VC+OirC6qHFF4yH7l7mKRidV9MSti3E9F463bMp6ZVN4kuC"
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script src="data.js?v=51"></script>
-<script src="core.js?v=55"></script>
+<script src="data.js?v=52"></script>
+<script src="core.js?v=56"></script>
 <script src="timetable.js?v=6"></script>
-<script src="training.js?v=54"></script>
-<script src="app.js?v=105"></script>
+<script src="training.js?v=55"></script>
+<script src="app.js?v=106"></script>
 </body>
 </html>

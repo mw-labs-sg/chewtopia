@@ -1591,3 +1591,179 @@ var SEED_ACTS = [
      night before. Sits before the school day rather than on top of PAL. */
   {id:"ta2", who:"tc", day:"Monday",    from:"07:00", to:"07:30", t:"\u5e26\u4e66\u6cd5\u5305 calligraphy bag"}
 ];
+
+/* ==========================================================================
+   THE SCIENCE LADDER — general science, graded by my own judgement.
+
+   NOT curriculum, and it cannot be: MOE primary science starts in P3, so
+   neither boy has a science syllabus yet and there is no school sheet for
+   this to come off. It is a general-knowledge ladder written for the game —
+   ten rungs, easiest first, each one a topic — so a P2 boy who likes animals
+   and volcanoes has somewhere to put that. Nothing here is marked against
+   anything, nothing joins his practice, and a low rung means nothing except
+   that the next question was harder than the last.
+
+   Each question is [question, right answer, other answers]. The right answer
+   is stored on its own rather than by index, because an index is the sort of
+   thing that survives an edit while quietly pointing at the wrong line.
+   ========================================================================== */
+var SCI_LADDER = {
+  1: ["Animals", [
+    ["Which of these animals lays eggs?","a chicken",["a dog","a cat"]],
+    ["How many legs does a spider have?","eight",["six","four"]],
+    ["Which animal breathes underwater using gills?","a fish",["a bird","a rabbit"]],
+    ["What do we call a baby frog?","a tadpole",["a puppy","a calf"]],
+    ["Which of these animals has feathers?","an owl",["a bat","a dolphin"]],
+    ["Which of these is a mammal?","a dolphin",["a shark","a crocodile"]]
+  ]],
+  2: ["Your body", [
+    ["Which part of your body pumps blood?","the heart",["the lungs","the stomach"]],
+    ["What do your lungs take in when you breathe?","air",["water","food"]],
+    ["Which part of your body do you smell with?","your nose",["your ear","your elbow"]],
+    ["Where does food go after you swallow it?","your stomach",["your heart","your brain"]],
+    ["Which part of you does your skull protect?","your brain",["your liver","your knee"]],
+    ["What do your teeth help you to do?","chew food",["see far away","hear sounds"]]
+  ]],
+  3: ["Plants", [
+    ["What do plants need to make their own food?","sunlight",["moonlight","darkness"]],
+    ["Which part of a plant takes in water from the soil?","the roots",["the leaves","the flower"]],
+    ["Which part of a plant makes most of its food?","the leaves",["the roots","the seeds"]],
+    ["What grows into a new plant?","a seed",["a stone","a grain of sand"]],
+    ["What do bees carry from flower to flower?","pollen",["water","soil"]],
+    ["Which of these foods comes from a plant?","rice",["milk","eggs"]]
+  ]],
+  4: ["Weather", [
+    ["What falls from clouds as drops of water?","rain",["sand","rocks"]],
+    ["Which instrument measures how hot or cold it is?","a thermometer",["a ruler","a clock"]],
+    ["What is the loud sound that follows lightning?","thunder",["a rainbow","a breeze"]],
+    ["Singapore's weather is hot and what else?","wet",["snowy","freezing"]],
+    ["What do we see when sunlight shines through raindrops?","a rainbow",["a shadow","a star"]],
+    ["What do we call a very strong storm with spinning winds?","a typhoon",["a drizzle","a mist"]]
+  ]],
+  5: ["Materials", [
+    ["Which of these is a metal?","iron",["wood","glass"]],
+    ["Which material lets you see straight through it?","glass",["wood","brick"]],
+    ["Which of these floats on water?","a cork",["a stone","a coin"]],
+    ["Which material would keep you driest in the rain?","plastic",["paper","cotton wool"]],
+    ["Which of these would a magnet pick up?","a steel nail",["a plastic straw","a wooden stick"]],
+    ["Why are tyres made of rubber?","it bends and grips",["it is see-through","it melts easily"]]
+  ]],
+  6: ["Earth and space", [
+    ["Which star gives the Earth its light and heat?","the Sun",["the Moon","Mars"]],
+    ["How long does the Earth take to travel once around the Sun?","one year",["one day","one week"]],
+    ["What travels around the Earth?","the Moon",["the Sun","Jupiter"]],
+    ["Which planet do we live on?","Earth",["Venus","Saturn"]],
+    ["Why is the sky dark at night?","our side of Earth faces away from the Sun",
+      ["the Sun switches off","clouds cover the Sun"]],
+    ["What do we call a huge group of stars?","a galaxy",["a crater","a puddle"]]
+  ]],
+  7: ["Forces", [
+    ["A push or a pull is called what?","a force",["a colour","a sound"]],
+    ["What pulls everything back down to the ground?","gravity",["sunlight","wind"]],
+    ["What makes it harder to slide a box across a rough floor?","friction",["gravity","magnetism"]],
+    ["A see-saw is an example of which simple machine?","a lever",["a pulley","a screw"]],
+    ["What do wheels make easier?","moving heavy things",["seeing in the dark","keeping warm"]],
+    ["Two magnets pushing each other apart are doing what?","repelling",["attracting","melting"]]
+  ]],
+  8: ["Light and sound", [
+    ["Light travels in what shape of path?","straight lines",["circles","zigzags"]],
+    ["What is made when an object blocks the light?","a shadow",["a rainbow","a cloud"]],
+    ["Sound is made by things that do what?","vibrate",["glow","freeze"]],
+    ["Which travels faster, light or sound?","light",["sound","they are the same"]],
+    ["What do we call sound bouncing back off a wall?","an echo",["a shadow","a ripple"]],
+    ["What does a mirror do to light?","reflects it",["soaks it up","eats it"]]
+  ]],
+  9: ["Heat and matter", [
+    ["What happens to ice when you heat it?","it melts",["it freezes","it grows"]],
+    ["Water turns into steam when it does what?","boils",["freezes","cools"]],
+    ["Which of these is a gas?","air",["wood","milk"]],
+    ["What is it called when water vapour turns back into water?","condensation",
+      ["evaporation","erosion"]],
+    ["Which spoon gets hot fastest in a hot drink?","a metal spoon",
+      ["a plastic spoon","a wooden spoon"]],
+    ["At what temperature does water freeze?","0 degrees Celsius",
+      ["50 degrees Celsius","100 degrees Celsius"]]
+  ]],
+  10: ["Living things", [
+    ["Which of these is not a living thing?","a rock",["a fern","a beetle"]],
+    ["Animals that eat only plants are called what?","herbivores",["carnivores","omnivores"]],
+    ["What do we call the place an animal lives in?","its habitat",["its skeleton","its shadow"]],
+    ["A butterfly starts its life as what?","a caterpillar",["a tadpole","a chick"]],
+    ["Which gas do plants take in from the air to make food?","carbon dioxide",
+      ["oxygen","helium"]],
+    ["What is usually at the start of a food chain?","a plant",["a lion","an eagle"]]
+  ]]
+};
+
+/* ==========================================================================
+   THE 华文 LADDER — hear the word, tap the characters.
+
+   NOT curriculum. The school's lists are HANZI, RECOG, TC_PINYIN, TC_TINGXIE
+   and SC_TINGXIE above, all off 南洋小学 sheets and all keyed by lesson. This
+   is not one of them: it is ordinary vocabulary sorted into ten rungs by my
+   own judgement of how hard each word is, so there is a Chinese game with a
+   top to climb towards. A boy who stalls on rung 7 has not failed 二年级
+   anything — his 听写 sheet is the thing that says how he is doing.
+
+   Each entry is [word, pinyin, what it means in English]. The wrong answers
+   on screen are the other words from the same rung, drawn at random, so every
+   character he is choosing between is one he has just as much business
+   knowing — a rung of easy distractors would make a hard word look easy.
+   ========================================================================== */
+var ZH_LADDER = {
+  1: ["\u6570\u5b57\u548c\u4eba", [
+    ["\u4e00","y\u012b","one"], ["\u4e8c","\u00e8r","two"], ["\u4e09","s\u0101n","three"],
+    ["\u4eba","r\u00e9n","a person"], ["\u5927","d\u00e0","big"], ["\u5c0f","xi\u01ceo","small"],
+    ["\u4e0a","sh\u00e0ng","up, above"], ["\u4e0b","xi\u00e0","down, below"]
+  ]],
+  2: ["\u5bb6\u4eba", [
+    ["\u7238\u7238","b\u00e0ba","dad"], ["\u5988\u5988","m\u0101ma","mum"],
+    ["\u54e5\u54e5","g\u0113ge","big brother"], ["\u5f1f\u5f1f","d\u00ecdi","little brother"],
+    ["\u59d0\u59d0","ji\u011bjie","big sister"], ["\u59b9\u59b9","m\u00e8imei","little sister"]
+  ]],
+  3: ["\u8eab\u4f53", [
+    ["\u624b","sh\u01d2u","a hand"], ["\u53e3","k\u01d2u","a mouth"], ["\u5934","t\u00f3u","a head"],
+    ["\u811a","ji\u01ceo","a foot"], ["\u5fc3","x\u012bn","a heart"], ["\u8033","\u011br","an ear"],
+    ["\u76ee","m\u00f9","an eye"], ["\u7259","y\u00e1","a tooth"]
+  ]],
+  4: ["\u5927\u81ea\u7136", [
+    ["\u5c71","sh\u0101n","a mountain"], ["\u6c34","shu\u01d0","water"], ["\u706b","hu\u01d2","fire"],
+    ["\u65e5","r\u00ec","the sun"], ["\u6708","yu\u00e8","the moon"], ["\u6728","m\u00f9","a tree"],
+    ["\u7530","ti\u00e1n","a field"], ["\u77f3","sh\u00ed","a stone"]
+  ]],
+  5: ["\u52a8\u7269", [
+    ["\u732b","m\u0101o","a cat"], ["\u72d7","g\u01d2u","a dog"], ["\u9e1f","ni\u01ceo","a bird"],
+    ["\u9c7c","y\u00fa","a fish"], ["\u9a6c","m\u01ce","a horse"], ["\u725b","ni\u00fa","a cow"],
+    ["\u7f8a","y\u00e1ng","a sheep"], ["\u866b","ch\u00f3ng","an insect"]
+  ]],
+  6: ["\u5b66\u6821", [
+    ["\u8001\u5e08","l\u01ceosh\u012b","a teacher"], ["\u5b66\u751f","xu\u00e9sh\u0113ng","a pupil"],
+    ["\u4e66","sh\u016b","a book"], ["\u7b14","b\u01d0","a pen"],
+    ["\u5b66\u6821","xu\u00e9xi\u00e0o","a school"], ["\u540c\u5b66","t\u00f3ngxu\u00e9","a classmate"],
+    ["\u529f\u8bfe","g\u014dngk\u00e8","homework"], ["\u6559\u5ba4","ji\u00e0osh\u00ec","a classroom"]
+  ]],
+  7: ["\u98df\u7269", [
+    ["\u7c73\u996d","m\u01d0f\u00e0n","rice"], ["\u9762\u5305","mi\u00e0nb\u0101o","bread"],
+    ["\u9e21\u86cb","j\u012bd\u00e0n","an egg"], ["\u725b\u5976","ni\u00fan\u01cei","milk"],
+    ["\u6c34\u679c","shu\u01d0gu\u01d2","fruit"], ["\u852c\u83dc","sh\u016bc\u00e0i","vegetables"],
+    ["\u9762\u6761","mi\u00e0nti\u00e1o","noodles"], ["\u6c64","t\u0101ng","soup"]
+  ]],
+  8: ["\u65f6\u95f4\u548c\u5730\u65b9", [
+    ["\u4eca\u5929","j\u012bnti\u0101n","today"], ["\u660e\u5929","m\u00edngti\u0101n","tomorrow"],
+    ["\u6628\u5929","zu\u00f3ti\u0101n","yesterday"], ["\u661f\u671f","x\u012bngq\u012b","a week"],
+    ["\u56fe\u4e66\u9986","t\u00fash\u016bgu\u01cen","a library"], ["\u533b\u9662","y\u012byu\u00e0n","a hospital"],
+    ["\u5546\u5e97","sh\u0101ngdi\u00e0n","a shop"], ["\u516c\u56ed","g\u014dngyu\u00e1n","a park"]
+  ]],
+  9: ["\u600e\u4e48\u505a\u4e8b", [
+    ["\u559c\u6b22","x\u01d0huan","to like"], ["\u9ad8\u5174","g\u0101ox\u00ecng","happy"],
+    ["\u5e2e\u52a9","b\u0101ngzh\u00f9","to help"], ["\u8ba4\u771f","r\u00e8nzh\u0113n","careful, in earnest"],
+    ["\u52aa\u529b","n\u01d4l\u00ec","hard-working"], ["\u5e72\u51c0","g\u0101nj\u00ecng","clean"],
+    ["\u5b89\u9759","\u0101nj\u00ecng","quiet"], ["\u70ed\u95f9","r\u00e8nao","lively, bustling"]
+  ]],
+  10: ["\u96be\u8bcd", [
+    ["\u52c7\u6562","y\u01d2ngg\u01cen","brave"], ["\u9a84\u50b2","ji\u0101o'\u00e0o","proud"],
+    ["\u4fdd\u62a4","b\u01ceoh\u00f9","to protect"], ["\u73af\u5883","hu\u00e1nj\u00ecng","the environment"],
+    ["\u5e86\u795d","q\u00ecngzh\u00f9","to celebrate"], ["\u89c2\u5bdf","gu\u0101nch\u00e1","to observe"],
+    ["\u5408\u4f5c","h\u00e9zu\u00f2","to work together"], ["\u7ecf\u9a8c","j\u012bngy\u00e0n","experience"]
+  ]]
+};

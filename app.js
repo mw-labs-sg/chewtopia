@@ -40,9 +40,9 @@ function render(){
   if(paper){ v.innerHTML=paperHTML(); wirePaper(); return; }
   if(climb){ v.innerHTML=climbHTML(); wireClimb(); return; }
   var V={home:vHome,schedule:vWeek,meals:vMealsGrow,forums:vForums,
-         practice:vTests,reading:vRead,links:vLinks};
+         practice:vTests,quiz:vQuiz,links:vLinks};
   var Wr={home:wHome,schedule:wWeek,meals:wMealsGrow,forums:wForums,
-          practice:wTests,reading:wRead,links:wLinks};
+          practice:wTests,quiz:wQuiz,links:wLinks};
   /* the child switch belongs inside the first panel, under its heading */
   var html=V[tab]();
   if(tab==="home"||tab==="schedule") html=html.replace("</h2>", "</h2>"+whoBar());
@@ -810,14 +810,15 @@ function wHome(){
 }
 
 /* ==========================================================================
-   READING — books finished, in either language, and the Spelling Climb
+   THE READING LOG — books finished, in either language.
 
-   The climb lives here rather than on Training because Training is the school's
-   lists and the climb is not one of them — and because at the bottom of that
-   screen nobody could find it. Both boys get a panel, same as the book log.
+   No longer a tab of its own: that tab is the Quiz screen now, and a list of
+   finished books is not a quiz. It draws at the foot of Training instead, which
+   is the other screen about how the boys are getting on, and it kept every book
+   either of them had logged — moving a panel must never cost the data in it.
    ========================================================================== */
 var showBook=false;
-function vRead(){
+function readPanels(){
   var s='<div class="panel"><h2><span class="em">\uD83D\uDCDA</span> Reading</h2><div class="duo">';
   shownKids().forEach(function(k){
     var all=books(k.id), m=booksSince(k.id,30);
@@ -857,11 +858,9 @@ function vRead(){
   } else {
     s+='<div class="panel"><button class="addlink" id="bShow">+ Finished a book</button></div>';
   }
-  /* One per boy. climbPanel() comes from training.js, which loads before this. */
-  shownKids().forEach(function(k){ s+=climbPanel(k.id); });
   return s;
 }
-function wRead(){
+function wireRead(){
   var sh=document.getElementById("bShow");
   if(sh) sh.onclick=function(){ showBook=true; render(); };
   var cx=document.getElementById("bCancel");
@@ -881,8 +880,22 @@ function wRead(){
       var p=b.dataset.bk.split(":"); delBook(p[0],p[1]); render();
     };
   });
-  wireClimbPanel();
 }
+
+/* ==========================================================================
+   QUIZ — the four ladders, and nothing else on the screen.
+
+   Spelling, maths, science and 华文. No TC/SC switch: both boys play these on
+   the same iPad and the best rung is whoever got there, so a "whose turn is it"
+   tap before a game would have bought nothing. Every panel is built by
+   climbPanel() in training.js, which loads before this file.
+   ========================================================================== */
+function vQuiz(){
+  var s="";
+  LADDERS.forEach(function(L){ s+=climbPanel(L.id); });
+  return s;
+}
+function wQuiz(){ wireClimbPanel(); }
 
 /* ==========================================================================
    PROGRESS — one matrix: the two boys across, the subjects down.

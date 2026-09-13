@@ -256,6 +256,9 @@ function vTests(){
   if(tKid()==="tc") s+=paperPanel();
   s+=weakPanel(tKid());
   if(tKid()==="tc") s+=charTable();
+  /* The reading log, which used to have the tab the quizzes now have. Books are
+     not a quiz, but they are how a boy is getting on, which is this screen. */
+  s+=readPanels();
 
   /* No voice picker. The ranking in bestVoice() already knows which is the good
      one — a modern neural voice, a woman, the right accent, and never one of
@@ -303,6 +306,7 @@ function wKidBar(){
 function wTests(){
   wKidBar();
   wResults();          /* the sync buttons now live on this screen */
+  wireRead();          /* the reading log at the foot of the screen */
   var cl=document.getElementById("clTog");
   if(cl) cl.onclick=function(){ W("charlist", charsOpen()?"off":"on"); sfxTap(); render(); };
   document.querySelectorAll("[data-weakgo]").forEach(function(b){
@@ -1439,36 +1443,44 @@ function doneHTML(){
 }
 
 /* ==========================================================================
-   THE SPELLING CLIMB — how long a word can he actually spell?
+   THE QUIZ LADDERS — four games, one engine.
 
-   Every other test in here asks a fixed list and hands back a mark out of ten.
-   This one asks the opposite question: not "did he learn this week's words"
-   but "where does he fall over". So it is a ladder, not a test. Level 3 is
-   three-letter words, level 20 is twenty, and the only way up is three right
-   in a row — one lucky guess must never promote him.
+   Every other test in this app asks a fixed list and hands back a mark out of
+   ten. A ladder asks the opposite question: not "did he learn this week's
+   words" but "how far up can he get before it stops him". Three right in a row
+   climbs a rung, three wrong on the same rung ends the run, and what it reports
+   is the rung he cleared — not a percentage, and not a pass.
 
-   The rung he starts on is his to pick, and the pick sticks per boy. Starting
-   every run at three was right once and wrong from the second run on: TC can
-   spell every three-letter word in the bank, so the first nine words of every
-   climb were typing practice, and the game was over before it reached anything
-   he might actually get wrong. Starting high costs him the rungs below — they
-   are never asked, so they never count as cleared, and the ladder draws them
-   faded rather than green.
+   Three misses are counted per rung, not per run: the lives refill on the way
+   up. A boy who trips once on rung 4 and once on rung 7 has not shown a
+   ceiling, and stopping him there would report one he does not have.
 
-   Three misses on a rung ends the climb, and the misses are counted per rung,
-   not per run: the lives refill on the way up. A boy who trips once on level 4
-   and once on level 7 has not shown a ceiling, and stopping him there would
-   report one he does not have. Three misses on the SAME rung is a ceiling, and
-   that is the number the run is really for.
+   The rung he starts on is his to pick and sticks per ladder on the device.
+   Starting every run at the bottom was right once and wrong from the second run
+   on: TC can spell every three-letter word in the bank, so nine words of typing
+   practice came before the ladder reached anything he might get wrong. Rungs
+   below the start are never asked, so they never count as cleared — the ladder
+   draws them faded, and the run records where it began.
 
-   Nothing missed here goes into the tricky-ones bank. A P2 boy handed
-   "extracurricular" has not got a weak word, he has run out of ladder, and
-   filling his daily practice with twenty-letter words would be a punishment
-   for climbing well.
+   NONE OF THE FOUR IS CURRICULUM, and that is the point of them. The school's
+   lists are on Training, marked out of ten, and a bad mark there means
+   something. Here a low rung means the next question was harder than the last
+   one, nothing joins the tricky-ones bank, and nothing feeds the daily set.
+
+   Neither is any of it split by boy. Both of them use the same iPad and play
+   these together, and asking "who is this" before a game bought nothing: the
+   run is saved against whoever the app is set to so the row has a child on it,
+   and what the panel shows is the best anyone has managed. A ladder is a family
+   high score, not a school record.
+
+   A ladder supplies what its rungs are called, what each rung asks, and where
+   its questions come from. The engine below knows nothing else about them.
    ========================================================================== */
-var CLIMB_LO=3, CLIMB_HI=20, CLIMB_ROW=3, CLIMB_LIVES=3;
-var CLIMB_TEST="Spelling climb";
+var CLIMB_ROW=3, CLIMB_LIVES=3;
 
+/* ---------- 1. the spelling ladder: words by how long they are ---------- */
+var CLIMB_LO=3, CLIMB_HI=20;          /* CLIMB_WORDS is keyed by word length */
+var CLIMB_TEST="Spelling climb";
 /* A name on every rung. "Level 8" is a school report; "you got to Cliff" is
    the bit a seven-year-old repeats at dinner, and the names climb into the
    sky the way the scene backdrops do. */
@@ -1481,83 +1493,237 @@ function climbTier(n){ return CLIMB_TIERS[n]||("Level "+n); }
    numWords(), not MA_ONES[n]: that array stops at nineteen, so the top rung
    was announcing itself as "20-letter words". */
 function climbLen(n){ return numWords(n)+"-letter words"; }
-function climbBest(kid){ var b=bestFor(CLIMB_TEST, kid); return b?b.score:0; }
-
-/* The rung this boy starts on, one setting per boy and kept on the device.
-   Deliberately not synced: which rung SC wants to start on today is a comfort
-   setting on the tablet in front of him, not a family record, and a stale value
-   arriving from the other device mid-week would move the bottom of his ladder
-   with nobody asking. Clamped on the way out as well as on the way in, because
-   a level saved before the ladder grew must not land off the end of it. */
-function climbFrom(kid){
-  var n=parseInt(S("climbfrom:"+kid, CLIMB_LO), 10);
-  if(!n || n<CLIMB_LO || n>CLIMB_HI) n=CLIMB_LO;
-  return n;
-}
-function setClimbFrom(kid, n){
-  n=Number(n);
-  if(!n || n<CLIMB_LO || n>CLIMB_HI) n=CLIMB_LO;
-  W("climbfrom:"+kid, String(n));
-}
-
 /* Only words that really are this long. The key in CLIMB_WORDS is the whole
    promise of the game, so anything filed under the wrong length is dropped
    rather than asked — one nine-letter word on the ten rung and the ladder is
    measuring nothing. */
 function climbBank(n){
   var a=(typeof CLIMB_WORDS!=="undefined" && CLIMB_WORDS[n]) ? CLIMB_WORDS[n] : [];
-  return a.filter(function(x){ return String(x[0]).length===n; });
+  return a.filter(function(x){ return String(x[0]).length===n; })
+          .map(function(x){ return {a:x[0], s:x[1]}; });
 }
 function climbWordCount(){
   var n=0;
   for(var i=CLIMB_LO;i<=CLIMB_HI;i++) n+=climbBank(i).length;
   return n;
 }
-/* Never the same word twice in one climb — until a rung runs out of fresh
-   ones, and then that rung starts over. Ending a run for lack of words would
-   look on the screen exactly like ending it for spelling them wrong. */
+
+/* ---------- 2. the maths ladder: one sum a rung, generated ---------- */
+/* Generated rather than listed, so it never runs out and never repeats itself
+   round a rung. Rungs 1 to 9 are P2 ground; from 10 up it is P3 and beyond and
+   the panel says so, the way MA_SETS labels its "reach" set "Next year". */
+var MA_RUNGS=["", "adding up to 10", "taking away within 10", "adding within 20",
+  "taking away within 20", "the 2, 5 and 10 times tables",
+  "the 3 and 4 times tables", "adding within 100", "taking away within 100",
+  "sharing equally", "adding within 1000", "taking away within 1000",
+  "two digits times one digit", "dividing two digits", "fractions of an amount",
+  "two steps at once"];
+var MA_TIERS=["", "Start", "Take away", "Twenty", "Back from twenty", "Tables",
+  "More tables", "Hundred", "Back from a hundred", "Sharing", "Thousand",
+  "Back from a thousand", "Long times", "Long division", "Fractions", "Two steps"];
+function maRungGen(n){
+  var a,b,c;
+  switch(n){
+    case 1:  a=rnd(1,9);   b=rnd(1,10-a);  return maQ(a+" + "+b, a+b);
+    case 2:  a=rnd(2,10);  b=rnd(1,a);     return maQ(a+" − "+b, a-b);
+    case 3:  a=rnd(3,18);  b=rnd(1,20-a);  return maQ(a+" + "+b, a+b);
+    case 4:  a=rnd(6,20);  b=rnd(1,a);     return maQ(a+" − "+b, a-b);
+    case 5:  a=maPick([2,5,10]); b=rnd(2,10); return maQ(a+" × "+b, a*b);
+    case 6:  a=maPick([3,4]);    b=rnd(2,10); return maQ(a+" × "+b, a*b);
+    case 7:  a=rnd(11,89); b=rnd(5,99-a);  return maQ(a+" + "+b, a+b);
+    case 8:  a=rnd(25,99); b=rnd(6,a-1);   return maQ(a+" − "+b, a-b);
+    case 9:  b=maPick([2,3,4,5,10]); c=rnd(2,10); return maQ((b*c)+" ÷ "+b, c);
+    case 10: a=rnd(120,880); b=rnd(30,999-a); return maQ(a+" + "+b, a+b);
+    case 11: a=rnd(220,999); b=rnd(40,a-10);  return maQ(a+" − "+b, a-b);
+    case 12: a=rnd(12,39);  b=rnd(3,9);    return maQ(a+" × "+b, a*b);
+    case 13: b=rnd(3,9); c=rnd(11,20);     return maQ((b*c)+" ÷ "+b, c);
+    case 14: b=maPick([2,3,4,5]); c=rnd(2,9); return maQ("1/"+b+" of "+(b*c), c);
+    default: a=rnd(4,9); b=rnd(4,9); c=rnd(6,40);
+             return maQ(a+" × "+b+" + "+c, a*b+c);
+  }
+}
+/* The sum twice: once as it is written and once as it is read out, because a
+   voice handed "7 × 8" says "seven ex eight" on half the tablets in the house.
+   Read out at all because both boys are quicker at hearing a sum than reading
+   one, and this ladder is not a reading test. */
+function maQ(q, a){
+  return {a:String(a), q:q, sy:q
+    .replace(/1\/(\d+) of/g, function(_,d){
+      return (d==="2"?"one half":d==="3"?"one third":d==="4"?"one quarter":"one fifth")+" of";
+    })
+    .replace(/\+/g," plus ").replace(/−/g," minus ")
+    .replace(/×/g," times ").replace(/÷/g," divided by ")};
+}
+
+/* ---------- 3 and 4: science and 华文, both off a bank, both tapped ---------- */
+/* The right answer shuffled in with the wrong ones, fresh every time it is
+   asked — a boy who remembers "it was the second one" has remembered nothing
+   worth having. */
+function ladShuffleIn(right, wrongs){ return shuffled([right].concat(wrongs)); }
+
+var LADDERS=[
+  { id:"spell", em:"🧗", name:"Spelling climb", test:CLIMB_TEST,
+    subject:"English", lo:CLIMB_LO, hi:CLIMB_HI, mode:"type", ph:"Type the word",
+    lts:true,               /* letter by letter: this is the one about spelling */
+    ask:"Word, then the sentence, then the word again",
+    blurb:"Three-letter words up to twenty. Each word is read out, then a "+
+      "sentence with the word in it, then the word again.",
+    note:"Ordinary English words, none of them off a school list — this one is "+
+      "just for the fun of it.",
+    tier:climbTier, rung:climbLen, bank:climbBank,
+    speak:function(it){ return [["Spell",0.92],[it.a+".",0.72],[it.s,0.86],
+                                ["Again.",0.92],[it.a+".",0.66]]; },
+    tell:function(it){ return [[it.a,0.6]]; },
+    after:function(it){ return '<div class="csent">'+esc(it.s)+'</div>'; } },
+
+  { id:"ma", em:"➗", name:"Maths climb", test:"Maths climb",
+    subject:"Maths", lo:1, hi:15, mode:"type", ph:"Answer", im:"numeric",
+    ask:"Work it out",
+    blurb:"Adding up to ten at the bottom, two steps at once at the top. Every "+
+      "sum is read out as well as written, and no two in a run are the same.",
+    note:"Rungs 1 to 9 are P2 ground. From 10 up it is P3 and beyond, so a "+
+      "short climb up there means nothing at all.",
+    tier:function(n){ return MA_TIERS[n]||("Level "+n); },
+    rung:function(n){ return MA_RUNGS[n]||("level "+n); },
+    gen:maRungGen,
+    q:function(it){ return it.q+" = ?"; },
+    speak:function(it){ return [["What is "+it.sy+"?",0.95]]; },
+    tell:function(it){ return [["The answer is "+it.a+".",0.9]]; } },
+
+  { id:"sci", em:"🔬", name:"Science quiz", test:"Science quiz",
+    subject:"Science", lo:1, hi:10, mode:"pick",
+    ask:"Tap the right answer",
+    blurb:"Animals at the bottom, food chains and condensation at the top — ten "+
+      "rungs, one topic each, and every question is read out.",
+    note:"Not school science: MOE starts science in P3, so neither boy has a "+
+      "syllabus for this yet. It is here because they like it.",
+    tier:function(n){ return (SCI_LADDER[n]&&SCI_LADDER[n][0])||("Level "+n); },
+    rung:function(n){ return String((SCI_LADDER[n]&&SCI_LADDER[n][0])||("level "+n)).toLowerCase(); },
+    bank:function(n){
+      var a=(typeof SCI_LADDER!=="undefined" && SCI_LADDER[n]) ? SCI_LADDER[n][1] : [];
+      return a.map(function(x){ return {a:x[1], q:x[0], w:x[2]}; });
+    },
+    dress:function(x){ return {a:x.a, q:x.q, c:ladShuffleIn(x.a, x.w)}; },
+    speak:function(it){ return [[it.q,0.95]]; },
+    tell:function(it){ return [[it.a,0.9]]; } },
+
+  { id:"zh", em:"汉", name:"华文 quiz", test:"华文 quiz",
+    subject:"华文", lo:1, hi:10, mode:"pick", big:true, optLang:"zh-CN",
+    ask:"Listen, then tap the word",
+    blurb:"The word is read out in Mandarin with its meaning on screen — tap the "+
+      "characters that say it. 一二三 at the bottom, 保护环境 at the top.",
+    note:"Not off a school sheet: his 听写 lists are on Training and those are "+
+      "the ones that count. The rungs here are my own idea of what is hard.",
+    tier:function(n){ return (ZH_LADDER[n]&&ZH_LADDER[n][0])||("Level "+n); },
+    rung:function(n){ return (ZH_LADDER[n]&&ZH_LADDER[n][0])||("level "+n); },
+    bank:function(n){
+      var a=(typeof ZH_LADDER!=="undefined" && ZH_LADDER[n]) ? ZH_LADDER[n][1] : [];
+      return a.map(function(x){ return {a:x[0], py:x[1], m:x[2]}; });
+    },
+    /* The wrong answers are the other words from the same rung, so every tile
+       on screen is one he has just as much business knowing. Distractors off an
+       easier rung would make a hard word look easy. */
+    dress:function(x, n){
+      var others=[], all=(ZH_LADDER[n]&&ZH_LADDER[n][1])||[];
+      all.forEach(function(y){ if(y[0]!==x.a) others.push(y[0]); });
+      return {a:x.a, py:x.py, m:x.m,
+              q:"Which one means “"+x.m+"”?",
+              c:ladShuffleIn(x.a, shuffled(others).slice(0,3))};
+    },
+    speak:function(it){ return [[it.a,0.72,"zh-CN"],[it.a,0.6,"zh-CN"]]; },
+    tell:function(it){ return [[it.a,0.6,"zh-CN"]]; },
+    after:function(it){ return '<div class="csent"><span lang="zh-CN">'+esc(it.py)+
+      '</span> · '+esc(it.m)+'</div>'; } }
+];
+
+function ladBy(id){
+  for(var i=0;i<LADDERS.length;i++) if(LADDERS[i].id===id) return LADDERS[i];
+  return LADDERS[0];
+}
+/* The rung this ladder starts on, kept on the device and per ladder. Not
+   synced: where to start on the tablet in front of you is a comfort setting,
+   not a family record, and a stale value arriving from the other device
+   mid-week would move the bottom of the ladder with nobody asking. Clamped on
+   the way out as well as in, because a rung saved before a ladder changed shape
+   must not land off the end of it. */
+function ladFrom(L){
+  var n=parseInt(S("qfrom:"+L.id, L.lo), 10);
+  if(!n || n<L.lo || n>L.hi) n=L.lo;
+  return n;
+}
+function setLadFrom(L, n){
+  n=Number(n);
+  if(!n || n<L.lo || n>L.hi) n=L.lo;
+  W("qfrom:"+L.id, String(n));
+}
+/* The highest rung anyone has cleared. Runs are saved against a child because
+   the results table has a column for one, but nothing on these screens asks
+   which boy is playing, so nothing here reads it back per boy either. */
+function ladBest(L){
+  var b=0;
+  KIDS.forEach(function(k){ var r=bestFor(L.test, k.id); if(r && r.score>b) b=r.score; });
+  return b;
+}
+function ladLast(L){
+  var l=null;
+  KIDS.forEach(function(k){ var r=lastFor(L.test, k.id); if(r && (!l || r.ts>l.ts)) l=r; });
+  return l;
+}
+
+/* Never the same question twice in one run — until a rung runs out of fresh
+   ones, and then that rung starts over. Ending a run for lack of questions
+   would look on the screen exactly like ending it for getting them wrong. */
 function climbPick(){
-  var q=climb, a=climbBank(q.lvl);
+  var q=climb, L=q.L;
+  if(L.gen){
+    /* a generated rung cannot run out, so all this does is keep the same sum
+       from turning up twice in one run */
+    for(var t=0;t<12;t++){
+      var g=L.gen(q.lvl);
+      if(!q.seen[g.q]){ q.seen[g.q]=1; return g; }
+    }
+    return L.gen(q.lvl);
+  }
+  var a=L.bank(q.lvl);
   if(!a.length) return null;
-  var fresh=a.filter(function(x){ return !q.seen[x[0]]; });
+  var fresh=a.filter(function(x){ return !q.seen[x.a]; });
   if(!fresh.length){
-    a.forEach(function(x){ delete q.seen[x[0]]; });
+    a.forEach(function(x){ delete q.seen[x.a]; });
     fresh=a;
   }
   var x=fresh[Math.floor(Math.random()*fresh.length)];
-  q.seen[x[0]]=1;
-  return {k:"spell", a:x[0], s:x[1]};
+  q.seen[x.a]=1;
+  return L.dress ? L.dress(x, q.lvl) : x;
 }
 
-function startClimb(kid, lvl){
-  kid=kid||who(); W("who", kid);
-  var from = lvl ? Number(lvl) : climbFrom(kid);
-  if(!from || from<CLIMB_LO || from>CLIMB_HI) from=CLIMB_LO;
-  setClimbFrom(kid, from);        /* tapping a rung and climbing sets it for next time */
-  climb={kid:kid, from:from, lvl:from, row:0, lives:CLIMB_LIVES, cleared:0,
+function startClimb(id, lvl){
+  var L=ladBy(id), from = lvl ? Number(lvl) : ladFrom(L);
+  if(!from || from<L.lo || from>L.hi) from=L.lo;
+  setLadFrom(L, from);      /* tapping a rung and starting sets it for next time */
+  climb={L:L, from:from, lvl:from, row:0, lives:CLIMB_LIVES, cleared:0,
          seen:{}, asked:0, right:0, missed:[], up:0, spoke:-1, msg:"",
-         wasBest:climbBest(kid),
+         wasBest:ladBest(L),
          it:null, graded:false, ok:false, given:"", done:false, saved:false};
   climb.it=climbPick();
-  if(!climb.it){ climb=null; alert("The climbing word list is missing."); return; }
+  if(!climb.it){ climb=null; alert("That ladder has no questions on it."); return; }
   render(); scrollTo(0,0);
 }
 
-/* The whole ladder, always every rung, so the top is visible from the bottom.
-   Used mid-climb and on the done screen, where "now" is nothing.
+/* The whole ladder, every rung, so the top is visible from the bottom — that is
+   most of the pull of the game.
 
    `from` is the rung the run began on. Rungs below it were never asked, so they
-   are drawn faded and not green — a boy who started at eight and cleared nine
+   are drawn faded and not green: a boy who started at eight and cleared nine
    has not climbed from three, and a row of green boxes underneath him would say
    he had. */
-function climbLadder(cleared, now, best, from){
-  from = from || CLIMB_LO;
+function climbLadder(L, cleared, now, best, from){
+  from = from || L.lo;
   var s='<div class="clad" aria-hidden="true">';
-  for(var n=CLIMB_LO;n<=CLIMB_HI;n++){
+  for(var n=L.lo;n<=L.hi;n++){
     var cls = (n>=from && n<=cleared) ? " done" : (n===now ? " now" : "");
-    if(n<from) cls+=" skip";
+    if(n<from) cls+=" below";
     if(best && n===best) cls+=" best";
-    s+='<span class="crung'+cls+'" title="'+esc(climbTier(n))+'">'+n+'</span>';
+    s+='<span class="crung'+cls+'" title="'+esc(L.tier(n))+'">'+n+'</span>';
   }
   return s+'</div>';
 }
@@ -1571,9 +1737,22 @@ function climbHearts(n){
   for(var i=0;i<CLIMB_LIVES;i++) s+= (i<n ? "❤️" : "🤍");
   return s;
 }
+/* The answers to tap. Shuffled once when the question is drawn, not here, so
+   they keep their order while the card is redrawn. */
+function climbOpts(q){
+  var it=q.it, s='<div class="lopts'+(q.L.big?" big":"")+'" role="group">';
+  for(var i=0;i<it.c.length;i++){
+    var o=it.c[i], cls="";
+    if(q.graded) cls = (o===it.a) ? " right" : (o===q.given ? " wrong" : " dim");
+    s+='<button type="button" class="lopt'+cls+'" data-opt="'+esc(o)+'"'+
+       (q.L.optLang?' lang="'+q.L.optLang+'"':'')+
+       (q.graded?' disabled':'')+'>'+esc(o)+'</button>';
+  }
+  return s+'</div>';
+}
 
 function climbHTML(){
-  var q=climb;
+  var q=climb, L=q.L;
   if(q.done) return climbDoneHTML();
   var it=q.it, left=CLIMB_ROW-q.row;
   var s='<div class="panel quizcard"><div class="qtop">'+
@@ -1584,44 +1763,54 @@ function climbHTML(){
         ' tries left">'+climbHearts(q.lives)+'</span>'+
     '</span></div>'+
     botSVG()+
-    climbLadder(q.cleared, q.lvl, q.wasBest, q.from)+
-    '<div class="kind">'+esc(climbTier(q.lvl))+' · level '+q.lvl+'</div>'+
-    '<div class="qq">'+esc(climbLen(q.lvl))+'</div>'+
+    climbLadder(L, q.cleared, q.lvl, q.wasBest, q.from)+
+    '<div class="kind">'+esc(L.tier(q.lvl))+' · level '+q.lvl+'</div>'+
+    '<div class="qq'+(L.q?" qw":"")+'">'+
+      esc(L.q ? L.q(it) : (it.q || L.rung(q.lvl)))+'</div>'+
     climbPips(q.row)+
-    '<div class="tip">Word, then the sentence, then the word again. '+
+    '<div class="tip">'+esc(L.ask)+'. '+
       (left<=0 ? "Up you go." : (left===1?"One more":left+" more")+" in a row to go up.")+
       '</div>'+
-    '<button class="btn play wide" id="cP">🔊 Play</button>'+
-    '<input type="text" id="ca" autocomplete="off" autocapitalize="none" '+
-      'autocorrect="off" spellcheck="false" placeholder="Type the word" '+
-      'style="margin-top:12px"'+
-      (q.graded?' disabled value="'+esc(q.given)+'"':'')+'>'+
-    '<div class="btnrow"><button class="btn go" id="cG">'+
+    '<button class="btn play wide" id="cP">🔊 '+
+      (L.mode==="pick"?"Say it again":"Play")+'</button>';
+  if(L.mode==="pick") s+=climbOpts(q);
+  else s+='<input type="text" id="ca" autocomplete="off" autocapitalize="none" '+
+      'autocorrect="off" spellcheck="false" inputmode="'+(L.im||"text")+'" '+
+      'placeholder="'+esc(L.ph)+'" style="margin-top:12px"'+
+      (q.graded?' disabled value="'+esc(q.given)+'"':'')+'>';
+  /* A tapped ladder needs no Check button — the tap is the answer — but it does
+     need the Next one once the answer is on screen. */
+  if(L.mode!=="pick" || q.graded){
+    s+='<div class="btnrow"><button class="btn go" id="cG">'+
       (q.graded ? ((q.lives<=0||q.up===2) ? "See how high →" : "Next") : "Check")+
       '</button></div>';
+  }
   if(q.graded){
     if(q.up===1) s+='<div class="clevel">⬆️ Level '+(q.lvl+1)+' · '+
-                    esc(climbTier(q.lvl+1))+' · '+esc(climbLen(q.lvl+1))+'</div>';
+                    esc(L.tier(q.lvl+1))+' · '+esc(L.rung(q.lvl+1))+'</div>';
     if(q.up===2) s+='<div class="clevel">🏆 Top of the ladder!</div>';
     s+='<div class="fb '+(q.ok?"ok":"no")+'" role="status" aria-live="polite">'+
        '<span class="big">'+esc(q.msg)+'</span>'+
-       '<b style="font-size:23px">'+esc(it.a)+'</b>'+
-       ltRow(it.a, q.given)+
-       '<div class="csent">'+esc(it.s)+'</div></div>';
+       '<b style="font-size:23px"'+(L.optLang?' lang="'+L.optLang+'"':'')+'>'+
+         esc(it.a)+'</b>'+
+       (L.lts ? ltRow(it.a, q.given) : "")+
+       (L.after?L.after(it):"")+'</div>';
   }
   return s+'</div>';
 }
 
-function climbGrade(){
-  var q=climb, el=document.getElementById("ca");
-  q.given = el ? el.value : "";
-  q.ok = clean(q.given)===clean(q.it.a);
+function climbGrade(val){
+  var q=climb, L=q.L;
+  if(q.graded) return;
+  if(L.mode==="pick") q.given = val||"";
+  else { var el=document.getElementById("ca"); q.given = el ? el.value : ""; }
+  q.ok = (L.mode==="pick") ? (q.given===q.it.a) : (clean(q.given)===clean(q.it.a));
   q.graded=true; q.asked++; q.up=0;
   if(q.ok){
     q.right++; q.row++;
     if(q.row>=CLIMB_ROW){
       q.cleared=q.lvl;                       /* three in a row is what clears it */
-      q.up = (q.lvl>=CLIMB_HI) ? 2 : 1;
+      q.up = (q.lvl>=L.hi) ? 2 : 1;
     }
     q.msg = q.up===2 ? "You cleared the whole ladder!"
           : q.up===1 ? "Three in a row!"
@@ -1643,7 +1832,8 @@ function climbGrade(){
   } else { sfxLose(); botReact("oops"); }
   hush();
   say(q.msg, 0.95);
-  if(!q.ok) say(q.it.a, 0.6);       /* the last thing he hears is the right word */
+  /* the last thing he hears is the right answer */
+  if(!q.ok) L.tell(q.it).forEach(function(p){ say(p[0], p[1], p[2]); });
 }
 
 function climbNext(){
@@ -1652,26 +1842,26 @@ function climbNext(){
   if(q.up===1){ q.lvl++; q.row=0; q.lives=CLIMB_LIVES; }
   q.up=0; q.graded=false; q.ok=false; q.given=""; q.msg="";
   q.it=climbPick();
-  if(!q.it) return climbFinish();   /* a rung with no words is the end of it */
+  if(!q.it) return climbFinish();   /* a rung with no questions is the end of it */
   render(); scrollTo(0,0);
 }
 function climbFinish(){
-  var q=climb;
+  var q=climb, L=q.L;
   q.done=true;
   if(!q.saved){
     q.saved=true;
-    /* One row per climb, like every other test, so it syncs with the rest and
-       the other device sees how high he got. The score is the rung he cleared
-       out of twenty — which is exactly why the climb has its own panel and
-       not a coloured box: 8 out of 20 is a good climb, and scoreCls() would
+    /* One row per run, like every other test, so it syncs with the rest and the
+       other device sees how high anyone got. The score is the rung cleared out
+       of the whole ladder — which is exactly why these have their own panels
+       and not coloured boxes: 8 out of 20 is a good climb, and scoreCls() would
        have painted it red.
 
-       `from` rides along, local only — the results table in Supabase has no
-       column for it — because it is what makes a saved row readable here:
-       level 9 off a start at 8 and level 9 off a start at 3 are not the same
-       climb. */
-    addResult({who:q.kid, subject:"English", code:"climb", test:CLIMB_TEST,
-               score:q.cleared, total:CLIMB_HI, from:q.from,
+       who() is on the row because the results table needs a child, not because
+       the ladder asked one. `from` rides along, local only, because it is what
+       makes a saved row readable: level 9 off a start at 8 and level 9 off a
+       start at 3 are not the same run. */
+    addResult({who:who(), subject:L.subject, code:"climb", test:L.test,
+               score:q.cleared, total:L.hi, from:q.from,
                missed:q.missed, ts:Date.now()});
     bumpStreak();
   }
@@ -1679,57 +1869,59 @@ function climbFinish(){
 }
 
 function climbDoneHTML(){
-  var q=climb, beat=q.cleared>q.wasBest;
+  var q=climb, L=q.L, beat=q.cleared>q.wasBest;
   if(!q.cheered){
     q.cheered=true;
-    sfxDone(); burst(q.cleared>=8?46:18);
+    sfxDone(); burst(q.cleared>=Math.round(L.hi*0.5)?46:18);
     say(q.cleared ? "You cleared level "+q.cleared+"." : "Good try. Have another go.", 0.95);
   }
   return '<div class="panel done">'+botSVG()+
-    '<div class="kind">Spelling climb · '+esc(pname(q.kid))+'</div>'+
+    '<div class="kind">'+esc(L.name)+'</div>'+
     '<div class="big">'+(q.cleared||"—")+'</div>'+
     '<div class="rk">'+(q.cleared
-      ? "Level "+q.cleared+" · "+esc(climbTier(q.cleared))
+      ? "Level "+q.cleared+" · "+esc(L.tier(q.cleared))
       : "No rung cleared this time")+'</div>'+
     '<div class="streakline">'+(q.cleared
-      ? esc(climbLen(q.cleared))+", three in a row"
-      : "Three "+esc(climbLen(q.from))+" in a row starts the climb")+'</div>'+
-    climbLadder(q.cleared, 0, q.wasBest, q.from)+
+      ? esc(L.rung(q.cleared))+", three in a row"
+      : "Three in a row on "+esc(L.rung(q.from))+" starts the climb")+'</div>'+
+    climbLadder(L, q.cleared, 0, q.wasBest, q.from)+
     /* Never silently — a big number off a high start is not a long climb, and
        the screen has to say which it was before anyone reads it as a best. */
-    (q.from>CLIMB_LO
+    (q.from>L.lo
       ? '<div class="streakline">Started at level '+q.from+' · '+
-        esc(climbTier(q.from))+'</div>' : '')+
-    /* "A new best — it was level 0" is what a first climb used to say. */
-    '<div class="streakline">'+(!q.wasBest ? "His first climb"
+        esc(L.tier(q.from))+'</div>' : '')+
+    /* "A new best — it was level 0" is what a first run used to say. */
+    '<div class="streakline">'+(!q.wasBest ? "First go at this one"
       : beat ? "🎉 A new best — it was level "+q.wasBest
       : "Best so far: level "+q.wasBest)+'</div>'+
-    '<div class="streakline">'+q.right+' of '+q.asked+' spelt right</div>'+
-    (q.missed.length?'<div class="again">Tripped on: <b>'+esc(q.missed.join(", "))+'</b></div>':'')+
+    '<div class="streakline">'+q.right+' of '+q.asked+' right</div>'+
+    (q.missed.length?'<div class="again"'+(L.optLang?' lang="'+L.optLang+'"':'')+
+      '>Tripped on: <b>'+esc(q.missed.join(", "))+'</b></div>':'')+
     '<div class="btnrow">'+
-      '<button class="btn go" id="cAgain">Climb again</button>'+
-      '<button class="btn soft" id="cBack">Back to reading</button>'+
+      '<button class="btn go" id="cAgain">Go again</button>'+
+      '<button class="btn soft" id="cBack">Back to the quizzes</button>'+
     '</div></div>';
 }
 
-function climbSay(it){
+function climbSpeak(it){
   hush();
-  say("Spell",0.92); say(it.a+".",0.72);
-  say(it.s,0.86);
-  say("Again.",0.92); say(it.a+".",0.66);
+  climb.L.speak(it).forEach(function(p){ say(p[0], p[1], p[2]); });
 }
 function wireClimb(){
-  var q=climb;
+  var q=climb, L=q.L;
   if(q.done){
-    document.getElementById("cAgain").onclick=function(){ hush(); newBuddy(); startClimb(q.kid); };
-    document.getElementById("cBack").onclick=function(){ newBuddy(); go("reading"); };
+    document.getElementById("cAgain").onclick=function(){ hush(); newBuddy(); startClimb(L.id); };
+    document.getElementById("cBack").onclick=function(){ newBuddy(); go("quiz"); };
     return;
   }
-  document.getElementById("cB").onclick=function(){ go("reading"); };
+  document.getElementById("cB").onclick=function(){ go("quiz"); };
   var p=document.getElementById("cP");
-  if(p) p.onclick=function(){ sfxTap(); climbSay(q.it); };
+  if(p) p.onclick=function(){ sfxTap(); climbSpeak(q.it); };
   var g=document.getElementById("cG");
   if(g) g.onclick=function(){ q.graded?climbNext():climbGrade(); };
+  document.querySelectorAll("[data-opt]").forEach(function(b){
+    b.onclick=function(){ if(!q.graded) climbGrade(b.dataset.opt); };
+  });
   var a=document.getElementById("ca");
   if(a && !q.graded){
     a.addEventListener("keydown",function(e){
@@ -1737,81 +1929,74 @@ function wireClimb(){
     });
     a.focus();
   }
-  /* Once per word, not once per draw — render() rebuilds this card whenever
+  /* Once per question, not once per draw — render() rebuilds this card whenever
      anything is tapped, and re-arming here restarted the word mid-sentence. */
   if(!q.graded && q.spoke!==q.asked){
     q.spoke=q.asked;
-    setTimeout(function(){ climbSay(q.it); }, 250);
+    setTimeout(function(){ climbSpeak(q.it); }, 250);
   }
 }
 
-/* The way in, on Reading — not Training, where it spent two builds being looked
-   for and not found. Training is a wall of coloured boxes for the school's lists,
-   and the climb is the one thing in the app that is not off a school list, so it
-   sat at the bottom of the longest screen looking like one more test. Reading is
-   the other English screen, it is short, and a game about how long a word he can
-   spell belongs next to what he has been reading.
+/* ==========================================================================
+   THE QUIZ SCREEN — the four panels, drawn by app.js's vQuiz().
 
-   Drawn once per boy, both of them, the way the book log above it is: each has
-   his own best rung, his own starting rung, and — because every word is drawn at
-   random — not the same words in the same order as the other, even on two
-   tablets side by side. */
-function climbPanel(kid){
-  var best=climbBest(kid), l=lastFor(CLIMB_TEST, kid), from=climbFrom(kid);
-  return '<div class="panel"><h2><span class="em">🧗</span> Spelling climb'+
-    '<span class="side '+whoCls(kid)+'">'+esc(pname(kid))+'</span></h2>'+
-    '<p class="empty" style="padding:0 0 12px">Three-letter words up to twenty. '+
-      'Each word is read out, then a sentence with the word in it, then the word '+
-      'again. Spell <b>three in a row</b> and every word gets a letter longer. '+
-      'Three misses on the same rung and the climb is over — how high he got is '+
-      'the whole answer.</p>'+
+   They have a tab of their own rather than a corner of Training because
+   Training is a wall of coloured boxes for the school's lists, and at the foot
+   of it the one thing in the app that is nobody's homework could not be found.
+   ========================================================================== */
+function climbPanel(id){
+  var L=ladBy(id), best=ladBest(L), l=ladLast(L), from=ladFrom(L);
+  return '<div class="panel"><h2><span class="em">'+L.em+'</span> '+esc(L.name)+
+    (best?'<span class="side">best level '+best+'</span>':'')+'</h2>'+
+    '<p class="empty" style="padding:0 0 12px">'+esc(L.blurb)+' Get <b>three in '+
+      'a row</b> and every rung gets harder. Three misses on the same rung ends '+
+      'the run — how high you got is the whole answer.</p>'+
     '<div class="key" style="margin:0 0 8px">Start on this rung — tap to change '+
       'it, and it stays put for next time.</div>'+
-    climbPicker(kid)+
-    '<button class="btn go wide" data-climb="'+kid+'">'+
-      (best?"Climb again from level ":"Start climbing at level ")+from+' →</button>'+
+    climbPicker(L)+
+    '<button class="btn go wide" data-climb="'+L.id+'">'+
+      (best?"Go again from level ":"Start at level ")+from+' →</button>'+
     '<div class="key">'+(best
-      ? "Best so far: level "+best+" · "+esc(climbTier(best))+" · "+
-        esc(climbLen(best))+(l?" · last go "+esc(dshort(l.ts)):"")
-      : "Not climbed yet. "+climbWordCount()+" words on the ladder, and none of "+
-        "them are off a school list — this one is just for the fun of it.")+
+      ? "Best so far: level "+best+" · "+esc(L.tier(best))+" · "+
+        esc(L.rung(best))+(l?" · last go "+esc(dshort(l.ts)):"")
+      : esc(L.note))+
     '</div></div>';
 }
 
-/* The same ladder, tappable: pick the rung the climb starts on. The same boxes
-   in the same order as the climb itself draws them, so "I got to twelve" and
-   "start me at twelve" are the same row on the screen — and bigger than the
-   ladder proper, because these ones get hit with a finger on an iPad. */
-function climbPicker(kid){
-  var sel=climbFrom(kid), best=climbBest(kid);
+/* The same ladder, tappable: pick the rung the run starts on. The same boxes in
+   the same order as the run itself draws them, so "I got to twelve" and "start
+   me at twelve" are the same row on the screen — and bigger than the ladder
+   proper, because these ones get hit with a finger on an iPad. */
+function climbPicker(L){
+  var sel=ladFrom(L), best=ladBest(L);
   var s='<div class="clad pick" role="group" aria-label="Starting level">';
-  for(var n=CLIMB_LO;n<=CLIMB_HI;n++){
+  for(var n=L.lo;n<=L.hi;n++){
     var cls = (best && n<=best) ? " done" : "";
     if(best && n===best) cls+=" best";
     /* .crung.now is declared after .crung.done in the stylesheet, so the rung
-       he is about to start on stays yellow even inside his cleared range. */
+       about to be started on stays yellow even inside the cleared range. */
     if(n===sel) cls+=" now";
-    s+='<button type="button" class="crung'+cls+'" data-cfrom="'+kid+':'+n+'" '+
+    s+='<button type="button" class="crung'+cls+'" data-cfrom="'+L.id+':'+n+'" '+
        'aria-pressed="'+(n===sel?"true":"false")+'" '+
-       'title="Level '+n+' · '+esc(climbTier(n))+' · '+esc(climbLen(n))+'">'+
+       'title="Level '+n+' · '+esc(L.tier(n))+' · '+esc(L.rung(n))+'">'+
        n+'</button>';
   }
   return s+'</div>';
 }
 
-/* Both of the panel's controls, wired by whichever screen drew it. */
+/* Both of a panel's controls, wired by whichever screen drew it. */
 function wireClimbPanel(){
-  /* Its own attribute, not data-t: the climb is not a code start() knows. */
+  /* Its own attribute, not data-t: a ladder is not a code start() knows. */
   document.querySelectorAll("[data-climb]").forEach(function(b){
     b.onclick=function(){ sfxTap(); startClimb(b.dataset.climb); };
   });
   /* Picking a rung only saves the setting and redraws — it does not start the
-     climb. Tapping along the ladder to see the tier names should not drop a boy
-     straight into twenty-letter words. */
+     run. Tapping along a ladder to see what the rungs are called should not
+     drop a boy straight into twenty-letter words. */
   document.querySelectorAll("[data-cfrom]").forEach(function(b){
     b.onclick=function(){
       var p=b.dataset.cfrom.split(":");
-      setClimbFrom(p[0], p[1]); sfxTap(); render();
+      setLadFrom(ladBy(p[0]), p[1]); sfxTap(); render();
     };
   });
 }

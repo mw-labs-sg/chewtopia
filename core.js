@@ -172,23 +172,28 @@ var DAYS = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunda
 var TABS = [["home","Upcoming","t1"],["schedule","Timetable","t2"],
             ["meals","Health","t3"],["forums","Forums","t7"],
             ["practice","Training","t4"],
-            ["reading","Reading","t6"],["links","School","t5"]];
+            ["quiz","Quiz","t6"],["links","School","t5"]];
 var tab="home", quiz=null, showAdd=false;
 /* The paper dictation sheet: not a quiz, because nothing on it is answered on
    the screen. Dad reads, he writes on paper, and there is no score to keep. */
 var paper=null;
-/* The spelling climb: a ladder rather than a test, so it keeps its own
-   state — there is no fixed list of items and no mark out of ten. */
+/* A run at one of the four quiz ladders — spelling, maths, science, 华文.
+   Its own state rather than quiz's, because a ladder has no fixed list of items
+   and no mark out of ten: it ends when he runs out of lives, and what it
+   reports is the rung he cleared. */
 var climb=null;
 /* Each tab gets a readable address, e.g. .../chewtopia/#meals, so a link can
    be bookmarked or sent straight to one screen. */
 var SLUGS = {home:"upcoming", schedule:"timetable", meals:"health",
-             forums:"forums", practice:"training", reading:"reading",
+             forums:"forums", practice:"training", quiz:"quiz",
              links:"school"};
 function tabFromHash(){
   var h=(location.hash||"").replace(/^#\/?/,"").toLowerCase();
   for(var k in SLUGS){ if(SLUGS[k]===h) return k; }
   if(h==="progress") return "practice";      /* old bookmarks still work */
+  /* #reading was a tab of its own until build 142. The book log it pointed at
+     is at the foot of Training now, so that is where the old address goes. */
+  if(h==="reading") return "practice";
   /* This screen has been called Meals, then Growth & Meals, then Health.
      Every address it has ever had still lands on it. */
   if(h==="meals"||h==="growth") return "meals";
