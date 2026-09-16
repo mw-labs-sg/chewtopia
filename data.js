@@ -1035,6 +1035,22 @@ var SEED_EVENTS = [
      entry cannot be given by guessing. The hour is blocked out and the title says
      plainly that the name is missing, rather than the app inventing a class nobody
      named. Rename it and this comment goes with it. */
+  /* Nanyang Primary, P2 English Term 4 spelling list — the cover sheet with his
+     name on it. It names the units and the list numbers and nothing else: the
+     words themselves are on the pages behind it, so TC_SPELL still stops at 3.6
+     and this event has no practice button. The moment the word page is
+     photographed, 4.1 goes into TC_SPELL and p:"en|4.1" goes on here.
+
+     Term 4 is Unit 11 The Feast (lists 4.1 and 4.2), Unit 12 Willy and Hugh
+     (4.3 and 4.4) and Unit 13 Postcards to David (4.5).
+
+     The date is his, not the school's: he said six days, counting from the
+     seventeenth, and no sheet in the house gives a date. Every Term 3 test was
+     a Tuesday, which would make it the 22nd — worth checking with him before
+     the weekend rather than finding out on the day. */
+  {id:"e56", t:"Spelling test — List 4.1", d:"2026-09-23", w:"tc",
+   n:"Unit 11, The Feast. He says six days from Thursday the 17th, so this is the Wednesday — but his Term 3 tests were all Tuesdays, so check whether it is the 22nd. The words are not in the app yet: the sheet on the fridge is the cover page, and the list itself is behind it. Photograph that page and it goes into Training with a practice button on this event."},
+
   /* Nanyang Primary, September information sheet. Only the rows that are his:
      P2, so the P6 study break and the PSLE written papers are somebody else's
      term. Teachers' Day has been and gone, and the Term 4 calendar is a
