@@ -68,6 +68,66 @@ var TC_SPELL = {
     ["dict","The boy tripped because he missed the ball.","The boy tripped because he missed the ball."],
     ["dict","He slid and fell as the wet grass was slippery.","He slid and fell as the wet grass was slippery."],
     ["dict","He clutched his leg as it was painful.","He clutched his leg as it was painful."]
+  ]],
+
+  /* Term 4, off the sheets that came home in the folder. Unit 11 is lists 4.1
+     and 4.2, Unit 12 is 4.3 and 4.4, Unit 13 is 4.5.
+
+     4.4 IS NOT HERE. The scan has four pages — 4.1, 4.2, 4.3 and 4.5 — and no
+     4.4, so Unit 12's second list is still on paper somewhere. It is not in
+     allCodes() and no event carries it, which is the honest state of things:
+     making up ten Willy-and-Hugh words would have him learning the wrong list
+     for a fortnight.
+
+     Two of the pages carry a date in his own hand: 30 Sept on 4.1 and 15 Oct
+     on 4.5. Those are on the calendar; 4.2 and 4.3 have no date on them and so
+     have no event. */
+  "4.1": ["Unit 11", [
+    ["spell","Tom thumped on the door impatiently with his hand.","thumped"],
+    ["spell","Jane could not wait to eat the delicious ham at the feast.","feast"],
+    ["spell","The sparrow flapped its wings and flew away quickly.","flapped"],
+    ["spell","We could see icicles hanging from the tree branches in winter.","branches"],
+    ["spell","My mother bakes appetising cakes.","appetising"],
+    ["spell","The baseball player swung at the ball but missed it.","swung"],
+    ["spell","The guests swayed to the beat of the music.","swayed"],
+    ["dict","Bob was cross with his brother for taking his toy.","Bob was cross with his brother for taking his toy."],
+    ["dict","Lisa is having a party this Saturday.","Lisa is having a party this Saturday."],
+    ["dict","I am excited to come for your birthday celebration.","I am excited to come for your birthday celebration."]
+  ]],
+  "4.2": ["Unit 11", [
+    ["spell","The teacher was angry with her students for yelling in the canteen.","angry"],
+    ["spell","The water pipe broke and water swooshed from it.","swooshed"],
+    ["spell","Jill was furious when Ken took her diary.","furious"],
+    ["spell","Fiona stamped her feet in frustration.","stamped her feet"],
+    ["spell","My grandmother looked fabulous in her glittery dress.","fabulous"],
+    ["spell","The clown danced and pranced around the guests.","pranced"],
+    ["dict","The buffet was lined with delicious dishes.","The buffet was lined with delicious dishes."],
+    ["dict","The room was decorated with balloons and streamers.","The room was decorated with balloons and streamers."],
+    ["dict","Please come dressed as your favourite book character.","Please come dressed as your favourite book character."]
+  ]],
+  "4.3": ["Unit 12", [
+    ["spell","I like to challenge myself to solve difficult problem sums.","myself"],
+    ["spell","Dan enjoys spending time by himself in the library.","himself"],
+    ["spell","It was raining cats and dogs, so Amy made herself a cup of hot chocolate.","herself"],
+    ["spell","We must clean up after ourselves during recess.","ourselves"],
+    ["spell","The scouts pitched the tents themselves without the teachers assistance.","themselves"],
+    ["spell","The bell rang and the students walked quickly to class.","quickly"],
+    ["spell","The sign read, Walk quietly along the corridors.","quietly"],
+    ["dict","Jane is a kind and helpful girl.","Jane is a kind and helpful girl."],
+    ["dict","He stopped in his tracks when he heard loud noises.","He stopped in his tracks when he heard loud noises."],
+    ["dict","Peter shouted, Stop hurting it!","Peter shouted, Stop hurting it!"]
+  ]],
+  "4.5": ["Unit 13", [
+    ["spell","The boy gazed at the clock, wishing time would pass quickly.","gazed at"],
+    ["spell","We climbed up Bukit Timah Hill yesterday.","climbed up"],
+    ["spell","He flashed a broad smile at the boy.","flashed"],
+    ["spell","She slept soundly after a long day out.","slept"],
+    ["spell","The man in crisp uniform strode in.","strode"],
+    ["spell","The boy dashed to the man in green uniform, his arms outstretched.","outstretched"],
+    ["spell","Dad! he cried excitedly.","excitedly"],
+    ["dict","Father gave him a bear hug and tousled his hair.","Father gave him a bear hug and tousled his hair."],
+    ["dict","David learnt about the adventures his father went on.","David learnt about the adventures his father went on."],
+    ["dict","Jill waited patiently at the door.","Jill waited patiently at the door."]
   ]]
 };
 
@@ -1035,21 +1095,16 @@ var SEED_EVENTS = [
      entry cannot be given by guessing. The hour is blocked out and the title says
      plainly that the name is missing, rather than the app inventing a class nobody
      named. Rename it and this comment goes with it. */
-  /* Nanyang Primary, P2 English Term 4 spelling list — the cover sheet with his
-     name on it. It names the units and the list numbers and nothing else: the
-     words themselves are on the pages behind it, so TC_SPELL still stops at 3.6
-     and this event has no practice button. The moment the word page is
-     photographed, 4.1 goes into TC_SPELL and p:"en|4.1" goes on here.
-
-     Term 4 is Unit 11 The Feast (lists 4.1 and 4.2), Unit 12 Willy and Hugh
-     (4.3 and 4.4) and Unit 13 Postcards to David (4.5).
-
-     The date is his, not the school's: he said six days, counting from the
-     seventeenth, and no sheet in the house gives a date. Every Term 3 test was
-     a Tuesday, which would make it the 22nd — worth checking with him before
-     the weekend rather than finding out on the day. */
-  {id:"e56", t:"Spelling test — List 4.1", d:"2026-09-23", w:"tc",
-   n:"Unit 11, The Feast. He says six days from Thursday the 17th, so this is the Wednesday — but his Term 3 tests were all Tuesdays, so check whether it is the 22nd. The words are not in the app yet: the sheet on the fridge is the cover page, and the list itself is behind it. Photograph that page and it goes into Training with a practice button on this event."},
+  /* Nanyang Primary, P2 English Term 4 spelling list. The words came off the
+     scan of the sheets themselves, the way every other list in TC_SPELL did.
+     Both dates are in his own hand at the top of the page — 30 Sept on 4.1
+     and 15 Oct on 4.5 — and are the only dates anywhere in the house: 4.2
+     and 4.3 have no date on them, and 4.4 is not in the scan at all, so
+     neither of those three has an event. */
+  {id:"e56", t:"Spelling test — List 4.1", d:"2026-09-30", w:"tc", p:"en|4.1",
+   n:"Unit 11, The Feast. The date is the one written on the sheet itself — he said six days from the 17th, which would have been the 23rd, so if the class has been told otherwise his word wins. Seven words and three dictation sentences, all in Training now."},
+  {id:"e57", t:"Spelling test — List 4.5", d:"2026-10-15", w:"tc", p:"en|4.5",
+   n:"Unit 13, Postcards to David. Dated on the sheet in his hand. Seven words and three dictation sentences."},
 
   /* Nanyang Primary, September information sheet. Only the rows that are his:
      P2, so the P6 study break and the PSLE written papers are somebody else's
