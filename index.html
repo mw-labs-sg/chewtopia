@@ -289,6 +289,16 @@
     background:var(--line);color:var(--ink);text-align:center}
   .lt.h{background:#7FD394;color:#12401F}
   .lt.s{background:#FF9A82;color:#5E1B0B}
+  /* a dictation sentence, marked as one sentence: what he got stays as it is,
+     what he missed is picked out in red, and anything he put in that does not
+     belong is struck through where he put it. Words, not letters — the
+     letters of a twelve-word sentence are unreadable as a row of chips. */
+  .wds{display:flex;flex-wrap:wrap;gap:5px 7px;justify-content:center;
+    margin-top:10px;font-size:19px;font-weight:700;line-height:1.6}
+  .wd{color:#5A2314}
+  .wd.miss{background:#FF9A82;color:#5E1B0B;border-radius:8px;padding:1px 7px}
+  .wd.extra{color:#B33A22;text-decoration:line-through;font-weight:600;opacity:.8}
+  .wdhint{margin-top:9px;font-size:14px;font-weight:600;opacity:.85}
   .pair{display:flex;gap:10px;margin-top:12px}
   .pair .f1{flex:1;min-width:140px}
   .done{text-align:center}
@@ -1074,7 +1084,7 @@ body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;-
   </header>
   <nav class="tabs" id="tabs" aria-label="Sections"></nav>
   <main id="view" tabindex="-1"></main>
-  <p class="foot">Saved on this device · build 152</p>
+  <p class="foot">Saved on this device · build 153</p>
 </div>
 <!-- load order matters: data, then core, then screens, app last -->
 <!-- Pinned to an exact version with a hash to match: "@2" floats, so a bad
@@ -1084,10 +1094,10 @@ body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3"
         integrity="sha384-l8ah+VgaWtk1mvOe9VC+OirC6qHFF4yH7l7mKRidV9MSti3E9F463bMp6ZVN4kuC"
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script src="data.js?v=60"></script>
+<script src="data.js?v=61"></script>
 <script src="core.js?v=59"></script>
 <script src="timetable.js?v=6"></script>
-<script src="training.js?v=59"></script>
+<script src="training.js?v=60"></script>
 <script src="app.js?v=111"></script>
 </body>
 </html>

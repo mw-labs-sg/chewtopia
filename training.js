@@ -994,6 +994,45 @@ function dictSlip(given, want){
   if(g.replace(/[.,!?;:']/g,"")===w.replace(/[.,!?;:']/g,"")) return "The words are right \u2014 check the punctuation.";
   return "";
 }
+/* A dictation sentence marked as ONE sentence: the one he was meant to write,
+   with the words he did not get picked out in red, and anything he put in that
+   does not belong struck through where he put it.
+
+   It used to print his sentence underneath the right one and leave a
+   seven-year-old to compare two lines of similar-looking text — which is
+   exactly the job he has just failed at. The single words have been marked
+   letter by letter since the beginning (ltRow, below); this is the same idea a
+   word at a time.
+
+   Aligned by longest common subsequence rather than word against word from the
+   left: one word missing near the start shifted everything after it, turned
+   the whole sentence red, and told him nothing about what he actually got
+   wrong. A dictation sentence is a dozen words at most, so the table costs
+   nothing. */
+function dictWords(s){
+  return cleanDict(s).split(" ").filter(function(x){ return x.length>0; });
+}
+function dictRow(want, got){
+  var A=dictWords(want), B=dictWords(got), n=A.length, m=B.length, i, j;
+  var L=[];
+  for(i=0;i<=n;i++){ L.push([]); for(j=0;j<=m;j++) L[i].push(0); }
+  for(i=n-1;i>=0;i--){
+    for(j=m-1;j>=0;j--){
+      L[i][j] = (A[i]===B[j]) ? L[i+1][j+1]+1 : Math.max(L[i+1][j], L[i][j+1]);
+    }
+  }
+  var out='<div class="wds">';
+  i=0; j=0;
+  while(i<n && j<m){
+    if(A[i]===B[j]){ out+='<span class="wd">'+esc(A[i])+'</span>'; i++; j++; }
+    else if(L[i+1][j]>=L[i][j+1]){ out+='<span class="wd miss">'+esc(A[i])+'</span>'; i++; }
+    else { out+='<span class="wd extra">'+esc(B[j])+'</span>'; j++; }
+  }
+  while(i<n){ out+='<span class="wd miss">'+esc(A[i])+'</span>'; i++; }
+  while(j<m){ out+='<span class="wd extra">'+esc(B[j])+'</span>'; j++; }
+  return out+'</div>';
+}
+
 function ltRow(t,g){ var h='<div class="lts">';
   t.split("").forEach(function(c,k){
     var ok=g[k]!==undefined&&g[k].toLowerCase()===c.toLowerCase();
@@ -1373,9 +1412,11 @@ function grade(forced){
   } else if(it.k==="dict"){
     right = cleanDict(given)===cleanDict(it.a);
     var slip = right ? "" : dictSlip(given, it.a);
-    detail = '<b>'+esc(it.a)+'</b>'+
-             (right?"":'<br>You wrote: '+(esc(String(given||"").trim())||"nothing")+
-                       (slip?'<br><i>'+esc(slip)+'</i>':""));
+    detail = right
+      ? '<b>'+esc(it.a)+'</b>'
+      : dictRow(it.a, given)+
+        (String(given||"").trim() ? "" : '<div class="wdhint">Nothing was written.</div>')+
+        (slip?'<div class="wdhint">'+esc(slip)+'</div>':"");
   } else { right=clean(given)===clean(it.a); detail=ltRow(it.a,given); }
 
   /* Keep what he actually put down, so the run can be looked at afterwards. */

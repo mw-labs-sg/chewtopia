@@ -1095,6 +1095,16 @@ var SEED_EVENTS = [
      entry cannot be given by guessing. The hour is blocked out and the title says
      plainly that the name is missing, rather than the app inventing a class nobody
      named. Rename it and this comment goes with it. */
+  /* ClassDojo, 2J, 14 September. Set for the PSLE listening-comprehension day
+     off and not done on the day, so it sits on the Saturday rather than on the
+     15th where it would have scrolled past as something already missed.
+
+     No practice button: picture graphs with scales is a P2 sub-strand that
+     MA_SETS has no set for, so there is nothing in Training to send him to. The
+     work is in SLS. */
+  {id:"e58", t:"SLS — Picture Graph with Scales", d:"2026-09-19", w:"tc",
+   n:"Mdm Leong set this on ClassDojo for the day off on the 15th, to revise picture graphs. Log in to SLS and finish it this weekend. Nothing to hand in on paper."},
+
   /* Nanyang Primary, P2 English Term 4 spelling list. The words came off the
      scan of the sheets themselves, the way every other list in TC_SPELL did.
      Both dates are in his own hand at the top of the page — 30 Sept on 4.1
