@@ -73,15 +73,14 @@ var TC_SPELL = {
   /* Term 4, off the sheets that came home in the folder. Unit 11 is lists 4.1
      and 4.2, Unit 12 is 4.3 and 4.4, Unit 13 is 4.5.
 
-     4.4 IS NOT HERE. The scan has four pages — 4.1, 4.2, 4.3 and 4.5 — and no
-     4.4, so Unit 12's second list is still on paper somewhere. It is not in
-     allCodes() and no event carries it, which is the honest state of things:
-     making up ten Willy-and-Hugh words would have him learning the wrong list
-     for a fortnight.
+     All five are here now. 4.4 was missing from the first scan and came in on
+     its own a day later, which is why it reads in a different hand above — the
+     four pages that came together carried no 4.4 between them.
 
      Two of the pages carry a date in his own hand: 30 Sept on 4.1 and 15 Oct
-     on 4.5. Those are on the calendar; 4.2 and 4.3 have no date on them and so
-     have no event. */
+     on 4.5. Those two are on the calendar; 4.2, 4.3 and 4.4 have no date
+     written on them and so have no event — they are in Training to practise,
+     not scheduled. */
   "4.1": ["Unit 11", [
     ["spell","Tom thumped on the door impatiently with his hand.","thumped"],
     ["spell","Jane could not wait to eat the delicious ham at the feast.","feast"],
@@ -116,6 +115,18 @@ var TC_SPELL = {
     ["dict","Jane is a kind and helpful girl.","Jane is a kind and helpful girl."],
     ["dict","He stopped in his tracks when he heard loud noises.","He stopped in his tracks when he heard loud noises."],
     ["dict","Peter shouted, Stop hurting it!","Peter shouted, Stop hurting it!"]
+  ]],
+  "4.4": ["Unit 12", [
+    ["spell","Peter thought, What can this toy do? It looks useless to me.","useless"],
+    ["spell","The animals should be able to roam about freely.","roam"],
+    ["spell","When Brenda saw the spider, she panicked.","panicked"],
+    ["spell","The sight of a flying cockroach is terrifying.","terrifying"],
+    ["spell","The bully sneered at the boy who was sitting alone.","sneered"],
+    ["spell","My grandfather looked pleased at how well his plants were growing.","pleased"],
+    ["spell","Oliver laughed at how silly he looked wearing mismatched socks.","laughed"],
+    ["dict","They threw stones mercilessly at the cat.","They threw stones mercilessly at the cat."],
+    ["dict","The poor animal whimpered softly.","The poor animal whimpered softly."],
+    ["dict","He walked up bravely and stopped the boys.","He walked up bravely and stopped the boys."]
   ]],
   "4.5": ["Unit 13", [
     ["spell","The boy gazed at the clock, wishing time would pass quickly.","gazed at"],
