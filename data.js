@@ -1064,8 +1064,14 @@ var SEED_EVENTS = [
 
   /* Also off that schedule: the kindergarten marks Children’s Day on the
      Thursday and closes on the Friday. */
-  {id:"e40", t:"Children’s Day celebration", d:"2026-10-01", w:"sc",
-   n:"Thursday, in school. The holiday itself is the next day."},
+  /* Filled out from the principal's letter of 24 September 2026. A carnival with
+     one parent per family staying the whole day, so this is one of ours as much
+     as his — hence the time on it, which is the 8.30am drop-off and not the
+     9.00am start. The venue is the Coronation Road campus and the parents' half
+     is in the Nanyang Indoor Sports Hall, which is why both addresses are here:
+     his own campus is 118 King's Road and that is not where to go. */
+  {id:"e40", t:"Children’s Day carnival", d:"2026-10-01", time:"08:30", w:"sc",
+   n:"Thursday, 9am to 2pm at Nanyang Kindergarten, 51 Coronation Road — not his own campus. Dressed as a favourite movie or cartoon character. Game stalls, movies, a photobooth and food. One parent or guardian per family comes for the whole day: drop him at Gate E by 8.30am (teachers are there from 8.15), park in the public car parks, then be at the Nanyang Indoor Sports Hall by 8.50 for a 9.00 start. Light breakfast at home first. No school bus at all that day, so both trips are on us. No parking in the school, none along Coronation Road or 52 King's Road, and no waiting about in the primary school compound. The programme comes nearer the day. The holiday itself is the next day."},
 
   /* Nanyang Kindergarten K2, Term 4 newsletter, 11 September 2026. The term’s
      calendar of events, and only the rows that are his. The theme (Save My
@@ -1074,15 +1080,30 @@ var SEED_EVENTS = [
 
      Rows already covered: Children’s Day on 1 and 2 October, which came off
      the pledge schedule, and Deepavali and Christmas, which are in SG_HOLIDAYS.
-     The 14 October learning journey is K2/1 and K2/2 and is not his — the
-     Term 4 pledge schedule he is on is headed K2/4, which puts him in the 15
-     October group. */
+     The newsletter had the learning journey on two days, 14 October for K2/1
+     and K2/2 and the 15th for the rest, which put him on the 15th — his pledge
+     schedule is headed K2/4. The principal's letter of 25 September has since
+     named one date, 14 October, to all of K2 parents with no class split, so
+     e44 is on the 14th now and says so. */
   {id:"e42", t:"Kindergarten reopens — Term 4", d:"2026-09-14", w:"sc",
    n:"Monday. His last term of K2. The theme is Save My Earth — land, air and water pollution, the 4Rs, and saving water and energy — with money and early multiplication and division in numeracy."},
   {id:"e43", t:"Mid-Autumn Festival celebration", d:"2026-09-25", w:"sc",
    n:"Friday, in school. The newsletter lists it and says nothing else — no costume, nothing to bring."},
-  {id:"e44", t:"Term 4 learning journey", d:"2026-10-15", w:"sc",
-   n:"Thursday, his group. K2/1 and K2/2 go on the Wednesday instead; he is K2/4, which is the class heading on his pledge schedule. Where they are going is not in the newsletter."},
+  /* Nanyang Kindergarten, letter from the principal 25 September 2026 — the
+     Term 4 learning journey, now with a place and a packing list. Dated the
+     14th, which is the only date in the letter and not the 15th the newsletter
+     had for his class; the letter goes to all of K2 and splits no classes, and
+     it is the newer of the two. If the class says the 15th after all, the date
+     is the only thing that moves — everything to pack stays the same. */
+  {id:"e44", t:"Learning journey — Tampines Park", d:"2026-10-14", w:"sc",
+   n:"Wednesday, during school hours. EcoTots Adventure: Sustainability @ Tampines Park, for the Save My Earth theme — black soldier fly larvae eating food waste, and why we throw less away. Breakfast and lunch are given. Wear the NYK polo and school shorts, and pack a cap, comfortable shoes, a water bottle, a raincoat and a mosquito repellent patch. Parents are strictly not allowed to come along. The newsletter had his class on Thursday the 15th and this letter says the 14th to all of K2 — worth one question to the teacher. A child not going stays home that day, as there are no lessons, but after-school enrichment still runs."},
+  /* The letter's own deadline, and the only thing it asks of us before the day.
+     The two links that answer it are in the e-mail and are not repeated here on
+     purpose: they are one tap each and they submit the answer, which is not
+     something to leave inside an app the boys hold. */
+  {id:"e59", t:"Reply for the learning journey", d:"2026-10-05", w:"sc",
+   n:"Monday. Allow or disallow the Tampines Park learning journey, by the two links in the principal's e-mail of 25 September from 118campus@nyk.edu.sg. Disallowing means he stays home on the day — there are no lessons — though after-school enrichment still runs."},
+
   {id:"e45", t:"K2 rehearsal at the kindergarten", d:"2026-10-16", w:"sc",
    n:"Friday, at NYK itself. The first of the graduation rehearsals; the November ones are all at Nanyang Girls’ High."},
   {id:"e46", t:"Nanyang Primary P5 engagement and school tour", d:"2026-11-10", w:"sc",
