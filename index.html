@@ -469,6 +469,15 @@
   /* 130px, not 158: on a phone the wider card fell to one per row and eight of
      them became a screen and a half of scrolling. */
   .qgrid{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(130px,1fr))}
+  /* The section headings on the Quiz tab. Baloo for the name, small grey for
+     what the section is, so a boy scanning for "science" hits one line rather
+     than reading eighteen cards. */
+  .qgrp{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:2px 10px;
+    font-family:'Baloo 2',cursive;font-size:20px;font-weight:700;
+    margin:20px 0 9px;padding-bottom:6px;border-bottom:2px solid var(--line)}
+  .qgrp:first-of-type{margin-top:8px}
+  .qgrp span{font-family:'Lexend',system-ui,sans-serif;font-size:12px;
+    font-weight:700;color:var(--soft);text-align:right;flex-shrink:0}
   .qcard{border:2px solid var(--line);border-radius:20px;padding:12px;
     background:var(--card);display:flex;flex-direction:column}
   /* the open one takes the whole row, because the rung picker needs the width */
@@ -1107,7 +1116,7 @@ body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;-
   </header>
   <nav class="tabs" id="tabs" aria-label="Sections"></nav>
   <main id="view" tabindex="-1"></main>
-  <p class="foot">Saved on this device · build 159</p>
+  <p class="foot">Saved on this device · build 160</p>
 </div>
 <!-- load order matters: data, then core, then screens, app last -->
 <!-- Pinned to an exact version with a hash to match: "@2" floats, so a bad
@@ -1120,7 +1129,7 @@ body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;-
 <script src="data.js?v=67"></script>
 <script src="core.js?v=62"></script>
 <script src="timetable.js?v=6"></script>
-<script src="training.js?v=63"></script>
+<script src="training.js?v=64"></script>
 <script src="app.js?v=112"></script>
 </body>
 </html>

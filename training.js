@@ -1697,7 +1697,7 @@ function qzLad(o){
   var B=o.bank;
   return { id:o.id, em:o.em, name:o.name, test:o.name, subject:o.subject,
     lo:1, hi:10, mode:"pick", ask:"Tap the answer, or 🔊 to hear one",
-    blurb:o.blurb, note:o.note,
+    blurb:o.blurb, note:o.note, grp:o.grp,
     tier:function(n){ return (B[n]&&B[n][0])||("Level "+n); },
     rung:function(n){ return String((B[n]&&B[n][0])||("level "+n)).toLowerCase(); },
     /* A third slot on the rung, optional: the name of the drawing in QPIC that
@@ -1723,6 +1723,9 @@ function langLad(o){
   return { id:o.id, em:o.em, name:o.name, test:o.name, subject:o.subject||o.name,
     lo:1, hi:10, mode:"pick", big:o.big, optLang:o.lang, voice:o.lang, vname:o.vname,
     ask:"Tap 🔊 to hear one, then tap the answer", blurb:o.blurb, note:o.note,
+    /* Every ladder this factory builds is a language, so the section it goes
+       in is not worth asking for: a new one needs a bank and one line. */
+    grp:"lang",
     tier:function(n){ return (B[n]&&B[n][0])||("Level "+n); },
     rung:function(n){ return (B[n]&&B[n][0])||("level "+n); },
     bank:function(n){
@@ -1752,7 +1755,7 @@ function langLad(o){
 }
 
 var LADDERS=[
-  { id:"spell", em:"🧗", name:"Spelling climb", test:CLIMB_TEST,
+  { id:"spell", grp:"core", em:"🧗", name:"Spelling climb", test:CLIMB_TEST,
     subject:"English", lo:CLIMB_LO, hi:CLIMB_HI, mode:"type", ph:"Type the word",
     lts:true,               /* letter by letter: this is the one about spelling */
     ask:"Word, then the sentence, then the word again",
@@ -1767,7 +1770,7 @@ var LADDERS=[
     tell:function(it){ return [[it.a,0.6]]; },
     after:function(it){ return '<div class="csent">'+esc(it.s)+'</div>'; } },
 
-  { id:"ma", em:"➗", name:"Maths climb", test:"Maths climb",
+  { id:"ma", grp:"core", em:"➗", name:"Maths climb", test:"Maths climb",
     subject:"Maths", lo:1, hi:15, mode:"pick",
     ask:"Tap the answer, or 🔊 to hear one",
     blurb:"Adding up to ten at the bottom, two steps at once at the top. Every "+
@@ -1781,13 +1784,13 @@ var LADDERS=[
     speak:function(it){ return [["What is "+it.sy+"?",0.95]]; },
     tell:function(it){ return [["The answer is "+it.a+".",0.9]]; } },
 
-  qzLad({ id:"sci", em:"🔬", name:"Science quiz", subject:"Science", bank:SCI_LADDER,
+  qzLad({ id:"sci", grp:"science", em:"🔬", name:"Science quiz", subject:"Science", bank:SCI_LADDER,
     blurb:"Animals at the bottom, food chains and condensation at the top — ten "+
       "rungs, one topic each, and every question is read out.",
     note:"Not school science: MOE starts science in P3, so neither boy has a "+
       "syllabus for this yet. It is here because they like it." }),
 
-  qzLad({ id:"body", em:"🫀", name:"Human body", subject:"Science", bank:BODY_LADDER,
+  qzLad({ id:"body", grp:"science", em:"🫀", name:"Human body", subject:"Science", bank:BODY_LADDER,
     blurb:"Ten rungs from the outside in: what you can see, then the senses, "+
       "bones, muscles, heart, lungs, food, brain, skin, and all of it at once.",
     note:"Not school science either, but it does go in order — a boy who gets "+
@@ -1797,19 +1800,19 @@ var LADDERS=[
      single rung each for animals, plants, forces and materials, which is a
      taster; these are the ladders for when the taster was not enough. Each
      one says on its own card that it is nobody's syllabus. */
-  qzLad({ id:"bio", em:"🐛", name:"Biology quiz", subject:"Science", bank:BIO_LADDER,
+  qzLad({ id:"bio", grp:"science", em:"🐛", name:"Biology quiz", subject:"Science", bank:BIO_LADDER,
     blurb:"Everything alive that is not him: animal groups at the bottom, then "+
       "plants, life cycles, habitats and food chains, up to cells and DNA.",
     note:"Not school science — MOE starts science in P3 — and not the human "+
       "body either, which has a ladder of its own." }),
 
-  qzLad({ id:"phy", em:"🧲", name:"Physics quiz", subject:"Science", bank:PHY_LADDER,
+  qzLad({ id:"phy", grp:"science", em:"🧲", name:"Physics quiz", subject:"Science", bank:PHY_LADDER,
     blurb:"Pushes and pulls, magnets, floating, light, sound and heat, then "+
       "circuits, energy, motion and the planets at the top.",
     note:"Rungs 1 to 6 are things he can try at the kitchen table. From 7 up it "+
       "is upper-primary at the earliest, so a short climb there means nothing." }),
 
-  qzLad({ id:"chem", em:"⚗️", name:"Chemistry quiz", subject:"Science", bank:CHEM_LADDER,
+  qzLad({ id:"chem", grp:"science", em:"⚗️", name:"Chemistry quiz", subject:"Science", bank:CHEM_LADDER,
     blurb:"What things are made of: materials and the three states at the "+
       "bottom, then melting, dissolving and sorting mixtures, up to atoms.",
     note:"Not school science either. Rung 8 says outright that we never taste "+
@@ -1818,7 +1821,7 @@ var LADDERS=[
   /* The one that is purely for fun, and the one they will actually open. It
      sits after the science ladders rather than first because the Quiz tab is
      read top to bottom and the treat goes after the vegetables. */
-  qzLad({ id:"pop", em:"🍿", name:"Films & games", subject:"Films & games",
+  qzLad({ id:"pop", grp:"fun", em:"🍿", name:"Films & games", subject:"Films & games",
     bank:POP_LADDER,
     blurb:"Mario and Disney at the bottom, then Pixar, KPop Demon Hunters, "+
       "Pokemon and Minecraft, up to who actually made all of it.",
@@ -1828,32 +1831,32 @@ var LADDERS=[
   /* The five general-knowledge ones. None is anybody's syllabus, and each
      says so on its own card; they are here because a boy who will not open
      a spelling list will open a quiz about flags. */
-  qzLad({ id:"geo", em:"🌍", name:"Flags & countries", subject:"Geography",
+  qzLad({ id:"geo", grp:"world", em:"🌍", name:"Flags & countries", subject:"Geography",
     bank:GEO_LADDER,
     blurb:"Flags and continents at the bottom, then capitals, our own "+
       "neighbours and famous places, up to what the stars on a flag mean.",
     note:"Our corner of the world is rung 4 rather than rung 9 on purpose — he "+
       "can see Johor from the top of a car park; Canberra he cannot." }),
 
-  qzLad({ id:"sport", em:"⚽", name:"Sports", subject:"Sport", bank:SPORT_LADDER,
+  qzLad({ id:"sport", grp:"world", em:"⚽", name:"Sports", subject:"Sport", bank:SPORT_LADDER,
     blurb:"How each game is played: football, swimming and badminton at the "+
       "bottom, then basketball, athletics and the Olympics, up to fair play.",
     note:"About the rules rather than the results — a quiz on last season's "+
       "table is wrong by the time anyone plays it." }),
 
-  qzLad({ id:"music", em:"🎷", name:"Music", subject:"Music", bank:MUSIC_LADDER,
+  qzLad({ id:"music", grp:"world", em:"🎷", name:"Music", subject:"Music", bank:MUSIC_LADDER,
     blurb:"Instruments and their families, loud and soft, beat and rhythm, "+
       "reading the stave, the orchestra, and who wrote what.",
     note:"How music works, never the words to any of it — the Fun screen holds "+
       "that line and so does this." }),
 
-  qzLad({ id:"art", em:"🎨", name:"Art", subject:"Art", bank:ART_LADDER,
+  qzLad({ id:"art", grp:"world", em:"🎨", name:"Art", subject:"Art", bank:ART_LADDER,
     blurb:"Colours and mixing at the bottom, then lines, materials and the "+
       "famous pictures, up to composition and the words artists use.",
     note:"Art at school is something he does rather than something he is "+
       "tested on. This is only the words for it." }),
 
-  qzLad({ id:"comp", em:"💻", name:"Computers", subject:"Computers",
+  qzLad({ id:"comp", grp:"world", em:"💻", name:"Computers", subject:"Computers",
     bank:COMP_LADDER,
     blurb:"The parts, files and folders, the internet, staying safe, coding, "+
       "what is inside, binary, and the people who built the first ones.",
@@ -2264,9 +2267,41 @@ function wireClimb(){
    ========================================================================== */
 var qopen="";                     /* which card has its levels showing */
 
+/* The Quiz tab in sections. Eighteen cards in one grid was a wall: every card
+   looks like every other card, so finding the science one meant reading all of
+   them. Grouped, the tab answers "what sort of quiz do you want" first and
+   "which one" second, which is the order a boy picks in.
+
+   Order is deliberate. The two that follow school come first, then the subjects
+   with the most ladders, then the languages, and the one that is purely for fun
+   last — the treat goes after the vegetables, the same reasoning that put it
+   after the science ladders in LADDERS itself. */
+var QUIZ_GROUPS = [
+  {id:"core",    t:"Words and numbers", s:"follows school"},
+  {id:"science", t:"Science",           s:"not on a syllabus yet"},
+  {id:"world",   t:"The wider world",   s:"general knowledge"},
+  {id:"lang",    t:"Languages",         s:"not taught at school"},
+  {id:"fun",     t:"Just for fun",      s:"nobody's homework"}
+];
 function quizCards(){
-  var s='<div class="qgrid">';
-  LADDERS.forEach(function(L){ s+=quizCard(L); });
+  var seen={}, s="";
+  QUIZ_GROUPS.forEach(function(g){
+    var list=LADDERS.filter(function(L){ return L.grp===g.id; });
+    if(!list.length) return;
+    list.forEach(function(L){ seen[L.id]=1; });
+    s+=quizGroup(g.t, g.s, list);
+  });
+  /* A ladder whose section nobody set still has to appear. A card that vanishes
+     because of a typo is a worse bug than a card under the wrong heading, and
+     the heading says plainly that something needs fixing. */
+  var left=LADDERS.filter(function(L){ return !seen[L.id]; });
+  if(left.length) s+=quizGroup("No section set", "add grp to these in LADDERS", left);
+  return s;
+}
+function quizGroup(title, sub, list){
+  var s='<h3 class="qgrp">'+esc(title)+'<span>'+esc(sub)+'</span></h3>'+
+        '<div class="qgrid">';
+  list.forEach(function(L){ s+=quizCard(L); });
   return s+'</div>';
 }
 function quizCard(L){
