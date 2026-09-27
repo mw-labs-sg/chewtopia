@@ -1156,8 +1156,35 @@ var SEED_EVENTS = [
    n:"Tuesday. P1 to P5 stay home while the P6 listening paper runs. Only children booked into Student Care go in — it opens as usual."},
   {id:"e54", t:"Mid-Autumn celebration at school", d:"2026-09-18", time:"18:00", w:"tc",
    n:"Friday evening, 6 to 8pm at Nanyang Primary, and families are invited — this is the one we go to together. Run with Bukit View, Northoaks and Lianhua Primary and the Farrer Holland Neighbourhood Committee. SC has his own celebration at the kindergarten the following Friday."},
-  {id:"e55", t:"Home-based learning — P2", d:"2026-09-28", d2:"2026-09-29", w:"tc",
-   n:"Monday and Tuesday, at home. Tasks come through SLS on the day, following his usual timetable, and Parents Gateway sends the assignments the evening before. If he has to go in for supervision instead: report 8.00am to the canteen, dismissed 1.30pm. Student Care runs in the afternoons either way."},
+  /* The two HBL days off the school's own timetable sheets, one per day. They
+     were a single two-day event saying the tasks would come through SLS; the
+     sheets have now come, and the days are not the same as each other — so
+     they are two events, because the boy doing Tuesday wants Tuesday's list
+     and not a wall of both.
+
+     The practice buttons are one each and both are off the sheet: 第十六课 on
+     the Monday, which is the lesson both Chinese tasks are on, and List 4.1 on
+     the Tuesday, which is the spelling the sheet tells him to study for. The
+     Tuesday maths is a worksheet on shapes and gets no button — shapes is a P2
+     sub-strand MA_SETS has no set for, the same as picture graphs, so there is
+     nothing in Training to send him to. */
+  {id:"e55", t:"HBL day 1 — Monday", d:"2026-09-28", w:"tc", p:"hz|第十六课",
+   n:"At home, following the school's timetable for the day. 7.30 Maths — MA worksheet, Review 6, pages 111 to 113, due 30 Sept. 8.30 华文 — 完成活动本16, pages 56 to 66, due 30 Sept. 10.30 LSP — Super Star Reader 10 and the Unit 12 Mastery Checklist, due 16 October (LSP students only). 11.00 PAL — the story reading and colouring worksheet that goes with PAL lesson 2. 12.30 English — Oral Poster: Toy Fair, due 30 Sept, answering the two questions on it: choice-making, and experience. Everything except the LSP reader goes back to school on the 30th. If he has to go in for supervision instead: report 8.00am to the canteen, dismissed 1.30pm. Student Care runs in the afternoons either way."},
+
+  {id:"e60", t:"HBL day 2 — Tuesday", d:"2026-09-29", w:"tc", p:"en|4.1",
+   n:"At home again, a different timetable from Monday's. 7.30 Maths — the worksheet on Shapes, due 30 Sept. 8.30 Art — Art Journal: finish the Snail Drawing and My Dream Pet, drawn and coloured, due next lesson. 9.30 and 10.30 华文 — 练习「我来说」16课. 11.30 LSP — Super Star Reader 11, due 16 October (LSP students only). 12.00 English — an English Journal entry on “A Party that I attended”, back to school on the 30th, and study for the spelling test on Wednesday the 30th. 1.00 PE — two worksheets, “How much sugar is in my drink?” and “My Healthy Meal & Sleep Log”, and those two are due today, the 29th, not the 30th."},
+
+  /* Everything the two days produce, in one place on the morning it is wanted.
+     A separate row from the spelling test that day: one is a thing to pack the
+     night before and the other is a thing he sits. */
+  {id:"e61", t:"HBL work back to school", d:"2026-09-30", w:"tc",
+   n:"Wednesday. In the bag: the maths Review 6 worksheet (pages 111–113), the Shapes worksheet, 活动本16 pages 56–66, the Toy Fair oral poster, and the English Journal entry about a party. The PE worksheets were due yesterday and the art journal is due at his next art lesson, not today. The LSP readers are not due until 16 October."},
+
+  /* Only his if he is in the Learning Support Programme — the sheet puts
+     "(For LSP students)" against both rows and nothing here says whether he
+     is one. Delete it in a tap if he is not. */
+  {id:"e62", t:"LSP readers due — if he is in LSP", d:"2026-10-16", w:"tc",
+   n:"Super Star Reader 10 and 11, and the Unit 12 Mastery Checklist, all set during the two HBL days and all due today. Marked “For LSP students” on both timetables, so this is only his if he is in the programme."},
 
   {id:"e41", t:"Sunday 10am — invitation with no name on it", d:"2026-10-11", time:"10:00", w:"tc",
    n:"One hour, 10 to 11am. A Google Calendar invite organised by Chew to minwei.chew.sgp@gmail.com, and that is the whole of what came through — the forwarded copy started at “When” and had no title on it."}
