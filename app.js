@@ -982,7 +982,8 @@ function vFun(){
            '</div>';
       } else {
         s+='<p class="empty" style="padding:10px 0">No words on this device yet. '+
-           'Tap ▶ to find the song, then paste the words in.</p>'+
+           'Paste them in below and they stay on this iPad. ▶ finds the song if '+
+           'you want to hear it while you type.</p>'+
            '<div class="btnrow">'+
              '<button class="btn go" data-lyedit="'+esc(x.id)+'">Add the words</button>'+
              '<button class="btn soft" data-songdel="'+esc(x.id)+'">Remove this song</button>'+
@@ -991,11 +992,10 @@ function vFun(){
     }
     s+='</div>';
   });
-  s+='<div class="key">The five traditional ones came with the app, because they '+
-     'are old enough to belong to nobody. Anything still in copyright has no '+
-     'words here and will not get any: paste in what you have a copy of, and it '+
-     'stays on this device only — like the meal plan, songs are not synced, so '+
-     'each iPad has its own.</div></div>';
+  s+='<div class="key">No song here comes with its words, and none will: they '+
+     'are all still in copyright, and this is not a lyrics site. Paste in what '+
+     'you have a copy of and it stays on this device only — like the meal plan, '+
+     'songs are not synced, so each iPad has its own.</div></div>';
 
   if(showSong){
     s+='<div class="panel"><h2>Add a song</h2>'+

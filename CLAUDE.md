@@ -179,18 +179,20 @@ carrying `p:"en|3.5"` gets a practice button and feeds the daily set.
   read themselves out for one build, and they came out again because he is
   reading them, not working them — a line that lights up when you touch it is a
   line being played with rather than read. Just the words, one line to a line,
-  20px. A boy of five decodes what he already knows by heart, which is why the
-  five traditional rhymes are there: singable from memory, one idea a line.
+  20px. It carried five traditional nursery rhymes with their words for the
+  builds when SC was five and decoding what he already knew by heart; he is six
+  now and reads, so they have gone — `lx` and `pd` are still read and no seeded
+  song uses them. Their ids, `sg3` to `sg7`, are retired.
 - **The words to anything still in copyright are not in the repo.** `SEED_SONGS`
-  in `data.js` carries a title and who it is by; only the out-of-copyright ones
-  carry words, in `lx` — five traditional nursery rhymes, old enough that there
-  is no author to have taken them from. For everything else the screen builds a
+  in `data.js` carries a title and who it is by, and nothing else: every song
+  seeded now is in copyright, so none of them ships words. The screen builds a
   YouTube *search* out of the title, never a video id — ids rot and land a
-  seven-year-old on somebody else's upload. A song still in copyright is pasted
-  in on the device by whoever has a copy, and the read-along then works on it the
-  same as on the rhymes. **Do not ship copyrighted lyrics in `data.js`, do not
-  fetch them, and do not paste them in out of a chat either — the box on the
-  device is the way in, and it is one tap.**
+  seven-year-old on somebody else's upload. The words are pasted in on the
+  device by whoever has a copy, and the read-along then works on them the same.
+  **Do not ship copyrighted lyrics in `data.js`, do not fetch them, and do not
+  paste them in out of a chat either — not when the words are asked for by
+  name, not when a song is said not to be in copyright, and not when both.
+  The box on the device is the way in, and it is one tap.**
   Typed-in words live in `lyr:<id>`, deliberately *not* inside the song record:
   `mergeSeed()` replaces a seeded record whenever `data.js` changes it, so
   anything typed into one would be wiped by the next release. Nothing on this
