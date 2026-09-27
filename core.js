@@ -1282,7 +1282,92 @@ var QPIC = {
     '<rect x="14" y="38" width="92" height="15" rx="7" fill="#F0A882"/>'+
     '<rect x="14" y="56" width="92" height="15" rx="7" fill="#D98F6E"/>'+
     '<path d="M44 22 q3 -13 13 -16" stroke="#8A5A3B" stroke-width="3.5" fill="none" stroke-linecap="round"/>'+
-    '<path d="M78 8 q7 8 0 13 q-7 -6 0 -13z" fill="#2F73E8"/>'
+    '<path d="M78 8 q7 8 0 13 q-7 -6 0 -13z" fill="#2F73E8"/>',
+
+  /* --- films and games. Every one of these is deliberately generic: a
+     controller rather than Mario, a microphone rather than the band, a
+     monster of our own rather than a Pokemon. Drawing somebody's character
+     into this repo would be copying their character, and the rule that keeps
+     song words out of data.js keeps their characters out of here. --- */
+  controller:
+    '<rect x="18" y="28" width="84" height="34" rx="17" fill="#5E7183"/>'+
+    '<circle cx="28" cy="58" r="13" fill="#5E7183"/><circle cx="92" cy="58" r="13" fill="#5E7183"/>'+
+    '<rect x="31" y="40" width="22" height="7" rx="2" fill="#E1EAF2"/>'+
+    '<rect x="38.5" y="32.5" width="7" height="22" rx="2" fill="#E1EAF2"/>'+
+    '<circle cx="80" cy="36" r="6" fill="#FF6F52"/>'+
+    '<circle cx="93" cy="45" r="6" fill="#FFB627"/>'+
+    '<circle cx="67" cy="45" r="6" fill="#4FB86B"/>',
+  castle:
+    '<rect x="22" y="36" width="76" height="38" fill="#BBD7FA"/>'+
+    '<rect x="12" y="28" width="20" height="46" fill="#9CC8F5"/>'+
+    '<rect x="88" y="28" width="20" height="46" fill="#9CC8F5"/>'+
+    '<rect x="46" y="20" width="28" height="54" fill="#DDF1FB"/>'+
+    '<path d="M12 28 L22 12 L32 28z" fill="#7C5CE0"/>'+
+    '<path d="M88 28 L98 12 L108 28z" fill="#7C5CE0"/>'+
+    '<path d="M46 20 L60 2 L74 20z" fill="#5B41B8"/>'+
+    '<path d="M54 74 v-16 a6 6 0 0 1 12 0 v16z" fill="#5E7183"/>'+
+    '<g fill="#FFB627"><circle cx="60" cy="34" r="4"/><circle cx="22" cy="44" r="3"/>'+
+      '<circle cx="98" cy="44" r="3"/></g>',
+  popcorn:
+    '<g fill="#FFF1CE"><circle cx="42" cy="30" r="10"/><circle cx="58" cy="23" r="11"/>'+
+      '<circle cx="75" cy="29" r="10"/><circle cx="50" cy="18" r="7"/>'+
+      '<circle cx="68" cy="16" r="7"/></g>'+
+    '<path d="M32 38 h54 l-6 38 a4 4 0 0 1 -4 3 h-34 a4 4 0 0 1 -4 -3z" fill="#FF6F52"/>'+
+    '<path d="M46 38 l-2 41 h8 l2 -41z" fill="#fff"/>'+
+    '<path d="M66 38 l2 41 h8 l-2 -41z" fill="#fff"/>',
+  mic:
+    '<ellipse cx="60" cy="74" rx="17" ry="5" fill="#5B41B8"/>'+
+    '<rect x="57" y="56" width="6" height="16" fill="#5B41B8"/>'+
+    '<path d="M38 36 a22 22 0 0 0 44 0" stroke="#5B41B8" stroke-width="4.5" fill="none" stroke-linecap="round"/>'+
+    '<rect x="49" y="8" width="22" height="38" rx="11" fill="#7C5CE0"/>'+
+    '<g stroke="#A78BFA" stroke-width="2.5" stroke-linecap="round"><path d="M53 18 h14 M53 26 h14 M53 34 h14"/></g>'+
+    '<g fill="#FFB627"><path d="M20 22 l3 -9 l3 9 l9 3 l-9 3 l-3 9 l-3 -9 l-9 -3z"/>'+
+      '<path d="M98 48 l2 -6 l2 6 l6 2 l-6 2 l-2 6 l-2 -6 l-6 -2z"/></g>',
+  monster:
+    '<path d="M40 24 L33 8 L50 16z" fill="#2E8B80"/>'+
+    '<path d="M80 24 L87 8 L70 16z" fill="#2E8B80"/>'+
+    '<ellipse cx="44" cy="70" rx="11" ry="6" fill="#2E8B80"/>'+
+    '<ellipse cx="76" cy="70" rx="11" ry="6" fill="#2E8B80"/>'+
+    '<circle cx="60" cy="42" r="27" fill="#3FB0A2"/>'+
+    '<circle cx="50" cy="38" r="8" fill="#fff"/><circle cx="70" cy="38" r="8" fill="#fff"/>'+
+    '<circle cx="51" cy="39" r="3.6" fill="#16222E"/><circle cx="71" cy="39" r="3.6" fill="#16222E"/>'+
+    '<path d="M50 54 q10 9 20 0" stroke="#16222E" stroke-width="3" fill="none" stroke-linecap="round"/>',
+  blocks:
+    '<rect x="24" y="42" width="24" height="24" fill="#4FB86B"/>'+
+    '<rect x="24" y="42" width="24" height="6" fill="#3E9B57"/>'+
+    '<rect x="48" y="42" width="24" height="24" fill="#C79A63"/>'+
+    '<rect x="48" y="42" width="24" height="6" fill="#A9743F"/>'+
+    '<rect x="72" y="42" width="24" height="24" fill="#9FB3C8"/>'+
+    '<rect x="72" y="42" width="24" height="6" fill="#7C8FA3"/>'+
+    '<rect x="36" y="18" width="24" height="24" fill="#FFB627"/>'+
+    '<rect x="36" y="18" width="24" height="6" fill="#E09A00"/>'+
+    '<rect x="60" y="18" width="24" height="24" fill="#2F73E8"/>'+
+    '<rect x="60" y="18" width="24" height="6" fill="#1E5FC4"/>',
+  ticket:
+    '<rect x="14" y="24" width="92" height="44" rx="8" fill="#FFB627"/>'+
+    '<circle cx="60" cy="24" r="7" fill="#F7FAFF"/><circle cx="60" cy="68" r="7" fill="#F7FAFF"/>'+
+    '<path d="M60 34 v24" stroke="#fff" stroke-width="2.5" stroke-dasharray="4 5"/>'+
+    '<path d="M36 34 l3.6 8.2 l8.9 .7 l-6.8 5.8 l2.1 8.7 l-7.8 -4.7 l-7.8 4.7 l2.1 -8.7 l-6.8 -5.8 l8.9 -.7z" fill="#fff"/>'+
+    '<g stroke="#fff" stroke-width="3.5" stroke-linecap="round"><path d="M74 40 h20 M74 48 h20 M74 56 h12"/></g>',
+  cape:
+    '<path d="M38 26 q22 -9 44 0 l9 44 q-31 11 -62 0z" fill="#FF6F52"/>'+
+    '<path d="M34 26 h52 v12 q0 13 -14 13 q-9 0 -12 -7 q-3 7 -12 7 q-14 0 -14 -13z" fill="#2F73E8"/>'+
+    '<ellipse cx="46" cy="36" rx="7.5" ry="5.5" fill="#fff"/>'+
+    '<ellipse cx="74" cy="36" rx="7.5" ry="5.5" fill="#fff"/>'+
+    '<path d="M60 58 l2.6 6 l6.4 .5 l-4.9 4.2 l1.5 6.3 l-5.6 -3.4 l-5.6 3.4 l1.5 -6.3 l-4.9 -4.2 l6.4 -.5z" fill="#FFB627"/>',
+  onigiri:
+    '<g fill="#F7B8C8"><circle cx="22" cy="20" r="5"/><circle cx="31" cy="13" r="4"/>'+
+      '<circle cx="98" cy="26" r="5"/><circle cx="105" cy="17" r="4"/></g>'+
+    '<path d="M60 14 q23 9 29 48 q-29 9 -58 0 q6 -39 29 -48z" fill="#FAFCFE" stroke="#D9E3EC" stroke-width="2.5"/>'+
+    '<rect x="44" y="44" width="32" height="20" rx="3" fill="#2A3B4D"/>'+
+    '<circle cx="51" cy="36" r="2.6" fill="#16222E"/><circle cx="69" cy="36" r="2.6" fill="#16222E"/>',
+  clapper:
+    '<rect x="18" y="34" width="84" height="38" rx="4" fill="#2A3B4D"/>'+
+    '<g stroke="#5E7183" stroke-width="3.5" stroke-linecap="round"><path d="M28 48 h64 M28 60 h42"/></g>'+
+    '<g transform="rotate(-7 60 26)">'+
+      '<rect x="18" y="18" width="84" height="16" rx="3" fill="#16222E"/>'+
+      '<g fill="#fff"><path d="M26 18 h9 l-7 16 h-9z"/><path d="M46 18 h9 l-7 16 h-9z"/>'+
+        '<path d="M66 18 h9 l-7 16 h-9z"/><path d="M86 18 h9 l-7 16 h-9z"/></g></g>'
 };
 /* No name, or a name nothing was drawn for, and the card simply has no picture
    — which is why every rung has to read on its own and a typo here is only

@@ -2398,6 +2398,140 @@ var CHEM_LADDER = {
 };
 
 /* ==========================================================================
+   THE FILMS AND GAMES LADDER — the one that is purely for fun.
+
+   NOT curriculum, and not pretending to be: no school sets homework on Mario.
+   It is here because they asked for it, and because a ladder full of things
+   they already love is the one they will play when they will not play any of
+   the others.
+
+   Ten rungs, easiest first and roughly by age: Mario and Disney at the bottom
+   because a boy of six knows them, the studios and who made what at the top.
+   Nothing above rung 7 assumes they have seen the film — a ladder ending is
+   how it says "not yet", and the card says so.
+
+   Every question is a fact ABOUT a film or a game — a name, a colour, a plot
+   point — never a line of dialogue and never a lyric. The pictures are the
+   same: a game controller for the Mario rung, a microphone for the K-pop one,
+   an original monster for the Pokémon one. Drawing somebody's character into
+   this repo would be copying their character, and the same care that keeps
+   song words out of data.js keeps them out of QPIC.
+   ========================================================================== */
+var POP_LADDER = {
+  1: ["Mario", [
+    ["What is Mario's job?","a plumber",["a dentist","a pilot"]],
+    ["What colour is Mario's cap?","red",["green","purple"]],
+    ["Who is Mario's brother?","Luigi",["Toad","Bowser"]],
+    ["Which princess does Mario keep having to rescue?","Princess Peach",
+      ["Princess Elsa","Princess Fiona"]],
+    ["Who is the big spiky turtle who causes all the trouble?","Bowser",
+      ["Yoshi","Donkey Kong"]],
+    ["What is the green dinosaur Mario rides called?","Yoshi",["Rex","Spike"]]
+  ], "controller"],
+  2: ["Disney", [
+    ["Which two sisters are in Frozen?","Elsa and Anna",
+      ["Ariel and Ursula","Moana and Maui"]],
+    ["What kind of animal is Simba in The Lion King?","a lion",["a tiger","a wolf"]],
+    ["In Moana, who is the demigod with the magic fish hook?","Maui",
+      ["Mufasa","Maleficent"]],
+    ["In Zootopia, what kind of animal is Judy Hopps?","a rabbit",["a fox","a sloth"]],
+    ["In The Little Mermaid, what is Ariel?","a mermaid",["a fairy","a dragon"]],
+    ["Which film has a snowman called Olaf in it?","Frozen",["Encanto","Zootopia"]]
+  ], "castle"],
+  3: ["Pixar", [
+    ["In Toy Story, what sort of toy is Woody?","a cowboy",["a robot","a dinosaur"]],
+    ["Who is the space ranger toy in Toy Story?","Buzz Lightyear",["Rex","Hamm"]],
+    ["In Finding Nemo, what kind of fish is Nemo?","a clownfish",["a shark","a whale"]],
+    ["In Cars, what is the red racing car called?","Lightning McQueen",
+      ["Mater","Sally"]],
+    ["In Up, how does Carl make his house fly?","with thousands of balloons",
+      ["with a jet engine","with magic beans"]],
+    ["In Inside Out, where do all the feelings live?","inside Riley's head",
+      ["in a toy box","under the sea"]]
+  ], "popcorn"],
+  4: ["KPop Demon Hunters", [
+    ["What is the girl group in KPop Demon Hunters called?","Huntr/x",
+      ["the Saja Boys","the Honmoon"]],
+    ["What do the three of them do when they are not on stage?","hunt demons",
+      ["bake cakes","drive taxis"]],
+    ["What is the rival boy band called?","the Saja Boys",["Huntr/x","the Sajas"]],
+    ["What is the magic barrier that keeps the demons out called?","the Honmoon",
+      ["the Golden Gate","the Moonbeam"]],
+    ["Which member of Huntr/x is hiding that she is part demon?","Rumi",
+      ["Mira","Zoey"]],
+    ["Which country is the film set in?","South Korea",["Japan","Singapore"]]
+  ], "mic"],
+  5: ["Pokemon", [
+    ["Which yellow Pokemon shoots lightning?","Pikachu",["Charmander","Squirtle"]],
+    ["What do trainers throw to catch a Pokemon?","a Poke Ball",
+      ["a fishing net","a lasso"]],
+    ["Who is the boy trainer in the cartoon with the cap?","Ash",
+      ["Brock","Professor Oak"]],
+    ["Charmander is which type of Pokemon?","fire",["water","grass"]],
+    ["Squirtle is which type of Pokemon?","water",["fire","electric"]],
+    ["What is Pikachu's most famous attack?","Thunderbolt",["Flamethrower","Surf"]]
+  ], "monster"],
+  6: ["Games", [
+    ["In Minecraft, what do you dig with?","a pickaxe",["a spoon","a pencil"]],
+    ["In Minecraft, which green creature creeps up and explodes?","a creeper",
+      ["a chicken","a cow"]],
+    ["What shape is almost everything in Minecraft?","a block",
+      ["a circle","a triangle"]],
+    ["In Angry Birds, what are you firing the birds at?","pigs",["cows","robots"]],
+    ["What is Roblox mostly made of?","games made by other players",
+      ["films","songs"]],
+    ["In Among Us, what do you call the one trying to trick everybody?","the impostor",
+      ["the plumber","the referee"]]
+  ], "blocks"],
+  7: ["DreamWorks", [
+    ["What kind of creature is Shrek?","an ogre",["a giant","a troll"]],
+    ["What is Shrek's talking donkey friend called?","Donkey",["Dobby","Doug"]],
+    ["In Kung Fu Panda, what is the panda called?","Po",["Pip","Bao"]],
+    ["In How to Train Your Dragon, what is Hiccup's dragon called?","Toothless",
+      ["Smaug","Fireball"]],
+    ["In Madagascar, which animal is Alex?","a lion",["a zebra","a penguin"]],
+    ["In Puss in Boots, what kind of animal is Puss?","a cat",["a dog","a bear"]]
+  ], "ticket"],
+  8: ["Superheroes", [
+    ["What does Spider-Man shoot out of his wrists?","webs",["fire","ice"]],
+    ["Which hero carries a round shield with a star on it?","Captain America",
+      ["Iron Man","Thor"]],
+    ["What colour does the Hulk go when he is angry?","green",["blue","gold"]],
+    ["In The Incredibles, what can Violet do?","turn invisible",
+      ["run very fast","stretch like elastic"]],
+    ["Which hero flies in a metal suit he built himself?","Iron Man",
+      ["Black Panther","Hawkeye"]],
+    ["Which city does Batman look after?","Gotham City",["Metropolis","Wakanda"]]
+  ], "cape"],
+  9: ["Ghibli and anime", [
+    ["In My Neighbour Totoro, what is Totoro?","a forest spirit",
+      ["a robot","a dragon"]],
+    ["In Spirited Away, what happens to Chihiro's parents?","they turn into pigs",
+      ["they turn into birds","they fall asleep"]],
+    ["Which Japanese studio made My Neighbour Totoro?","Studio Ghibli",
+      ["Pixar","Nintendo"]],
+    ["In Kiki's Delivery Service, what is Kiki?","a young witch",
+      ["a chef","a pilot"]],
+    ["What is Kiki's black cat called?","Jiji",["Jojo","Momo"]],
+    ["In Howl's Moving Castle, how does the castle get about?","it walks on legs",
+      ["it rolls on wheels","it floats on water"]]
+  ], "onigiri"],
+  10: ["Who made it", [
+    ["Which company makes the Mario games?","Nintendo",["Microsoft","Lego"]],
+    ["KPop Demon Hunters came out on which service?","Netflix",
+      ["Disney+","YouTube"]],
+    ["Which studio made Toy Story, the first film made all on computers?","Pixar",
+      ["DreamWorks","Studio Ghibli"]],
+    ["What do we call the people who speak the parts in a cartoon?","voice actors",
+      ["stunt doubles","the camera crew"]],
+    ["What is it called when models are moved a tiny bit at a time to make a film?",
+      "stop motion",["slow motion","fast forward"]],
+    ["Which studio has a boy fishing on the moon in its logo?","DreamWorks",
+      ["Pixar","Netflix"]]
+  ], "clapper"]
+};
+
+/* ==========================================================================
    THREE MORE LANGUAGES — Bahasa Indonesia, 日本語, 한국어.
 
    NOT curriculum, and nobody at either school teaches these. They are here

@@ -1815,6 +1815,16 @@ var LADDERS=[
     note:"Not school science either. Rung 8 says outright that we never taste "+
       "a chemical to test it, because that is exactly what a boy would go and do." }),
 
+  /* The one that is purely for fun, and the one they will actually open. It
+     sits after the science ladders rather than first because the Quiz tab is
+     read top to bottom and the treat goes after the vegetables. */
+  qzLad({ id:"pop", em:"🍿", name:"Films & games", subject:"Films & games",
+    bank:POP_LADDER,
+    blurb:"Mario and Disney at the bottom, then Pixar, KPop Demon Hunters, "+
+      "Pokemon and Minecraft, up to who actually made all of it.",
+    note:"Nobody's homework, and nothing above rung 7 assumes he has seen the "+
+      "film — a ladder running out is how it says “not yet”." }),
+
   langLad({ id:"zh", em:"汉", name:"华文 quiz", subject:"华文", bank:ZH_LADDER,
     lang:"zh-CN", vname:"Mandarin", big:true,
     blurb:"The word is read out in Mandarin with its meaning on screen — tap the "+
