@@ -1739,7 +1739,7 @@ var SCI_LADDER = {
     ["What do we call a baby frog?","a tadpole",["a puppy","a calf"]],
     ["Which of these animals has feathers?","an owl",["a bat","a dolphin"]],
     ["Which of these is a mammal?","a dolphin",["a shark","a crocodile"]]
-  ]],
+  ], "creatures"],
   2: ["Your body", [
     ["Which part of your body pumps blood?","the heart",["the lungs","the stomach"]],
     ["What do your lungs take in when you breathe?","air",["water","food"]],
@@ -1747,7 +1747,7 @@ var SCI_LADDER = {
     ["Where does food go after you swallow it?","your stomach",["your heart","your brain"]],
     ["Which part of you does your skull protect?","your brain",["your liver","your knee"]],
     ["What do your teeth help you to do?","chew food",["see far away","hear sounds"]]
-  ]],
+  ], "body"],
   3: ["Plants", [
     ["What do plants need to make their own food?","sunlight",["moonlight","darkness"]],
     ["Which part of a plant takes in water from the soil?","the roots",["the leaves","the flower"]],
@@ -1755,7 +1755,7 @@ var SCI_LADDER = {
     ["What grows into a new plant?","a seed",["a stone","a grain of sand"]],
     ["What do bees carry from flower to flower?","pollen",["water","soil"]],
     ["Which of these foods comes from a plant?","rice",["milk","eggs"]]
-  ]],
+  ], "plant"],
   4: ["Weather", [
     ["What falls from clouds as drops of water?","rain",["sand","rocks"]],
     ["Which instrument measures how hot or cold it is?","a thermometer",["a ruler","a clock"]],
@@ -1763,7 +1763,7 @@ var SCI_LADDER = {
     ["Singapore's weather is hot and what else?","wet",["snowy","freezing"]],
     ["What do we see when sunlight shines through raindrops?","a rainbow",["a shadow","a star"]],
     ["What do we call a very strong storm with spinning winds?","a typhoon",["a drizzle","a mist"]]
-  ]],
+  ], "cloud"],
   5: ["Materials", [
     ["Which of these is a metal?","iron",["wood","glass"]],
     ["Which material lets you see straight through it?","glass",["wood","brick"]],
@@ -1771,7 +1771,7 @@ var SCI_LADDER = {
     ["Which material would keep you driest in the rain?","plastic",["paper","cotton wool"]],
     ["Which of these would a magnet pick up?","a steel nail",["a plastic straw","a wooden stick"]],
     ["Why are tyres made of rubber?","it bends and grips",["it is see-through","it melts easily"]]
-  ]],
+  ], "materials"],
   6: ["Earth and space", [
     ["Which star gives the Earth its light and heat?","the Sun",["the Moon","Mars"]],
     ["How long does the Earth take to travel once around the Sun?","one year",["one day","one week"]],
@@ -1780,7 +1780,7 @@ var SCI_LADDER = {
     ["Why is the sky dark at night?","our side of Earth faces away from the Sun",
       ["the Sun switches off","clouds cover the Sun"]],
     ["What do we call a huge group of stars?","a galaxy",["a crater","a puddle"]]
-  ]],
+  ], "space"],
   7: ["Forces", [
     ["A push or a pull is called what?","a force",["a colour","a sound"]],
     ["What pulls everything back down to the ground?","gravity",["sunlight","wind"]],
@@ -1788,7 +1788,7 @@ var SCI_LADDER = {
     ["A see-saw is an example of which simple machine?","a lever",["a pulley","a screw"]],
     ["What do wheels make easier?","moving heavy things",["seeing in the dark","keeping warm"]],
     ["Two magnets pushing each other apart are doing what?","repelling",["attracting","melting"]]
-  ]],
+  ], "pushpull"],
   8: ["Light and sound", [
     ["Light travels in what shape of path?","straight lines",["circles","zigzags"]],
     ["What is made when an object blocks the light?","a shadow",["a rainbow","a cloud"]],
@@ -1796,7 +1796,7 @@ var SCI_LADDER = {
     ["Which travels faster, light or sound?","light",["sound","they are the same"]],
     ["What do we call sound bouncing back off a wall?","an echo",["a shadow","a ripple"]],
     ["What does a mirror do to light?","reflects it",["soaks it up","eats it"]]
-  ]],
+  ], "shadow"],
   9: ["Heat and matter", [
     ["What happens to ice when you heat it?","it melts",["it freezes","it grows"]],
     ["Water turns into steam when it does what?","boils",["freezes","cools"]],
@@ -1807,7 +1807,7 @@ var SCI_LADDER = {
       ["a plastic spoon","a wooden spoon"]],
     ["At what temperature does water freeze?","0 degrees Celsius",
       ["50 degrees Celsius","100 degrees Celsius"]]
-  ]],
+  ], "states"],
   10: ["Living things", [
     ["Which of these is not a living thing?","a rock",["a fern","a beetle"]],
     ["Animals that eat only plants are called what?","herbivores",["carnivores","omnivores"]],
@@ -1816,7 +1816,7 @@ var SCI_LADDER = {
     ["Which gas do plants take in from the air to make food?","carbon dioxide",
       ["oxygen","helium"]],
     ["What is usually at the start of a food chain?","a plant",["a lion","an eagle"]]
-  ]]
+  ], "foodchain"]
 };
 
 /* ==========================================================================
@@ -1912,7 +1912,7 @@ var BODY_LADDER = {
     ["What covers the outside of your whole body?","skin",["bone","hair"]],
     ["Which joint is in the middle of your arm?","the elbow",["the knee","the ankle"]],
     ["Which part of you do you hear with?","your ears",["your eyes","your nose"]]
-  ]],
+  ], "body"],
   2: ["The senses", [
     ["Which part of you tastes food?","your tongue",["your liver","your lungs"]],
     ["How many senses do we usually count?","five",["three","ten"]],
@@ -1920,7 +1920,7 @@ var BODY_LADDER = {
     ["Touch is felt through your what?","skin",["hair","nails"]],
     ["Which sense warns you that milk has gone off?","smell",["hearing","sight"]],
     ["Which part of you helps you keep your balance?","your inner ear",["your thumb","your tongue"]]
-  ]],
+  ], "senses"],
   3: ["Bones", [
     ["What is your skeleton made of?","bones",["muscles","blood"]],
     ["Which bones make a cage around your heart and lungs?","the ribs",["the knees","the fingers"]],
@@ -1928,7 +1928,7 @@ var BODY_LADDER = {
     ["Roughly how many bones does a grown-up have?","about 206",["about 50","about 1000"]],
     ["What are the bones running down your back called?","the spine",["the ribs","the hips"]],
     ["What do we call the place where two bones meet?","a joint",["a nerve","a muscle"]]
-  ]],
+  ], "bones"],
   4: ["Muscles", [
     ["What pulls on your bones so that you can move?","muscles",["skin","hair"]],
     ["Which muscle never stops working, day or night?","the heart",["the biceps","the jaw"]],
@@ -1936,7 +1936,7 @@ var BODY_LADDER = {
     ["What happens to a muscle you use a lot?","it gets stronger",["it turns to bone","it disappears"]],
     ["Which muscles do the work when you chew?","the jaw muscles",["the calf muscles","the neck muscles"]],
     ["Shivering when you are cold is your muscles doing what?","making heat",["going to sleep","growing"]]
-  ]],
+  ], "muscle"],
   5: ["Heart and blood", [
     ["What does your heart do?","pumps blood",["makes food","holds air"]],
     ["Where in your body is your heart?","in your chest",["in your head","in your knee"]],
@@ -1944,7 +1944,7 @@ var BODY_LADDER = {
     ["What are the tubes that carry blood around you called?","blood vessels",["nerves","tendons"]],
     ["Roughly how many times a minute does a child's heart beat?","about 90",["about 10","about 300"]],
     ["What is the beat you can feel in your wrist called?","your pulse",["your reflex","your breath"]]
-  ]],
+  ], "heart"],
   6: ["Breathing", [
     ["Which organs take in the air you breathe?","your lungs",["your kidneys","your liver"]],
     ["Which gas does your body need out of the air?","oxygen",["helium","neon"]],
@@ -1954,7 +1954,7 @@ var BODY_LADDER = {
       ["your lungs get smaller","your heart stops"]],
     ["Which of these keeps your lungs healthy?","exercise and clean air",
       ["breathing smoke","sitting all day"]]
-  ]],
+  ], "lungs"],
   7: ["Eating and digesting", [
     ["Where does digesting your food begin?","in your mouth",["in your stomach","in your toes"]],
     ["What breaks your food into small pieces first?","your teeth",["your ribs","your lungs"]],
@@ -1966,7 +1966,7 @@ var BODY_LADDER = {
       ["pump blood","hold air"]],
     ["Why does your body need you to drink water?","every part of it needs water",
       ["it makes bones harder","it makes hair grow"]]
-  ]],
+  ], "tummy"],
   8: ["Brain and nerves", [
     ["Which part of you is in charge of all the rest?","your brain",["your heart","your stomach"]],
     ["What carries messages between your body and your brain?","nerves",["veins","tendons"]],
@@ -1976,7 +1976,7 @@ var BODY_LADDER = {
       ["the skull","the lungs"]],
     ["Why does your body need sleep?","the brain and body rest and repair",
       ["so you stop breathing","so your hair grows"]]
-  ]],
+  ], "brain"],
   9: ["Teeth, skin and hair", [
     ["How many baby teeth does a child have?","twenty",["thirty-two","ten"]],
     ["What is the hard white outside of a tooth called?","enamel",["the root","the gum"]],
@@ -1985,7 +1985,7 @@ var BODY_LADDER = {
     ["Which of these keeps teeth healthy?","brushing twice a day",
       ["sweets at bedtime","never seeing a dentist"]],
     ["What are your hair and nails mostly made of?","keratin",["bone","muscle"]]
-  ]],
+  ], "skin"],
   10: ["All of it at once", [
     ["Which system carries blood around your body?","the circulatory system",
       ["the digestive system","the skeletal system"]],
@@ -1996,7 +1996,405 @@ var BODY_LADDER = {
     ["What does your immune system do?","fights germs",["digests food","makes bones"]],
     ["Which organs clean your blood and make urine?","the kidneys",["the lungs","the ears"]],
     ["What are all living things, including you, built from?","cells",["bricks","plastic"]]
-  ]]
+  ], "body"]
+};
+
+/* ==========================================================================
+   THE BIOLOGY LADDER — living things, ten rungs, easiest first.
+
+   NOT curriculum, the same as SCI_LADDER and BODY_LADDER above: MOE starts
+   science in P3, so there is no school sheet either boy could have this off.
+   It is here because they like animals, and because the science ladder has
+   one rung each for animals and plants and that was never going to be enough
+   for a boy who owns four books about frogs.
+
+   Where it meets the other two, it goes further rather than saying the same
+   thing again: BODY_LADDER is him, this one is everything else alive. Each
+   row is [question, the right answer, the other answers], and the third slot
+   on a rung names the drawing in QPIC that goes above the question.
+   ========================================================================== */
+var BIO_LADDER = {
+  1: ["Animal groups", [
+    ["Which group do animals with feathers belong to?","birds",["fish","insects"]],
+    ["How many legs does an insect have?","six",["eight","four"]],
+    ["Which group does a frog belong to?","amphibians",["mammals","reptiles"]],
+    ["Which of these animals is a reptile?","a snake",["a frog","a snail"]],
+    ["What do we call animals that feed their babies milk?","mammals",["birds","fish"]],
+    ["Which animal group has scales and breathes with gills?","fish",["birds","insects"]]
+  ], "creatures"],
+  2: ["Staying alive", [
+    ["Which of these does every living thing need?","water",["a television","money"]],
+    ["What do all land animals need to breathe?","air",["soil","sand"]],
+    ["Which of these is a sign that something is alive?","it grows",["it is heavy","it is shiny"]],
+    ["Why do animals need food?","it gives them energy",["it keeps them cool","it makes them shiny"]],
+    ["Which of these does a living thing not need?","a mobile phone",["air","water"]],
+    ["Living things make more of their own kind. What is that called?","reproducing",
+      ["reflecting","recycling"]]
+  ], "sprout"],
+  3: ["Plants", [
+    ["Which part of a plant holds it up and carries water to the leaves?","the stem",
+      ["the flower","the seed"]],
+    ["Which part of a plant makes the seeds?","the flower",["the roots","the stem"]],
+    ["What do most plants give out into the air in the daytime?","oxygen",["salt","smoke"]],
+    ["Which part of a plant is usually hidden under the soil?","the roots",
+      ["the flower","the leaves"]],
+    ["What does a cactus store inside its thick stem?","water",["milk","sand"]],
+    ["Which of these is a plant?","moss",["coral","a jellyfish"]]
+  ], "plant"],
+  4: ["Life cycles", [
+    ["What does a caterpillar turn into?","a butterfly",["a beetle","a spider"]],
+    ["What is the hard case a caterpillar makes around itself called?","a chrysalis",
+      ["a shell","a nest"]],
+    ["What hatches out of a hen's egg?","a chick",["a tadpole","a kitten"]],
+    ["A tadpole grows up into what?","a frog",["a fish","a snake"]],
+    ["What is the very first stage of a butterfly's life?","an egg",["a wing","a flower"]],
+    ["Which of these animals is born rather than hatched?","a kitten",["a crocodile","a turtle"]]
+  ], "butterfly"],
+  5: ["Habitats", [
+    ["Which animal is best suited to living in a hot desert?","a camel",
+      ["a polar bear","a penguin"]],
+    ["What kind of habitat is the forest at Bukit Timah?","a rainforest",
+      ["a desert","a snowfield"]],
+    ["Where would you find a crab living?","on the seashore",["in a cupboard","in the clouds"]],
+    ["Which habitat is home to a polar bear?","the frozen Arctic",["a rainforest","a desert"]],
+    ["Why can a fish not live on land?","it breathes with gills",
+      ["it is too heavy","it dislikes trees"]],
+    ["What happens to animals when their forest is cut down?","they lose their home",
+      ["they grow bigger","they turn into plants"]]
+  ], "habitat"],
+  6: ["Food chains", [
+    ["What do we call an animal that hunts other animals?","a predator",
+      ["a producer","a passenger"]],
+    ["What do we call the animal that is hunted?","the prey",["the pride","the plant"]],
+    ["Plants are called producers because they do what?","make their own food",
+      ["eat other animals","run the fastest"]],
+    ["What do we call an animal that eats both plants and meat?","an omnivore",
+      ["a herbivore","a carnivore"]],
+    ["What do we call the creatures that break down dead plants and animals?","decomposers",
+      ["composers","collectors"]],
+    ["In the chain grass, then rabbit, then fox — what does the rabbit eat?","grass",
+      ["the fox","nothing at all"]]
+  ], "foodchain"],
+  7: ["Built to survive", [
+    ["What is it called when an animal's colours help it hide?","camouflage",
+      ["a carousel","a calculation"]],
+    ["Why does a polar bear have such thick fur?","to keep its heat in",
+      ["to swim faster","to look taller"]],
+    ["What do some animals do all winter to save energy?","hibernate",
+      ["decorate","celebrate"]],
+    ["Why do some birds fly thousands of miles every year?","to find food and warmth",
+      ["to get lost","to grow new feathers"]],
+    ["A bird that cracks hard seeds most likely has what?","a short strong beak",
+      ["a long thin beak","no beak at all"]],
+    ["Why does a giraffe have such a long neck?","to reach leaves high up",
+      ["to run faster","to swim better"]]
+  ], "chameleon"],
+  8: ["Tiny living things", [
+    ["What are all living things built out of?","cells",["bricks","glass"]],
+    ["Which of these is too small to see without a microscope?","a bacterium",
+      ["an ant","a bean"]],
+    ["What makes bread dough rise?","yeast",["ice","sand"]],
+    ["Why do we wash our hands before eating?","to get rid of germs",
+      ["to make them soft","to make them cold"]],
+    ["Which part of a cell is in charge of it?","the nucleus",["the roof","the engine"]],
+    ["Are all germs harmful to us?","no, some of them help us",
+      ["yes, every single one","there is no such thing"]]
+  ], "cells"],
+  9: ["How plants feed", [
+    ["What is the name for the way a plant makes food out of sunlight?","photosynthesis",
+      ["photography","hibernation"]],
+    ["What green stuff inside a leaf traps the sunlight?","chlorophyll",["chalk","clay"]],
+    ["What does a plant make for itself when it photosynthesises?","sugar",["salt","soil"]],
+    ["Which gas does a plant give out while it is making food?","oxygen",
+      ["carbon dioxide","hydrogen"]],
+    ["Why are most leaves flat and wide?","to catch more sunlight",
+      ["to feel soft","to taste nice"]],
+    ["What happens to a plant shut in a dark cupboard for weeks?","it goes pale and dies",
+      ["it grows twice as fast","it turns into an animal"]]
+  ], "photo"],
+  10: ["Passed on", [
+    ["Why do children often look like their parents?","traits are passed on to them",
+      ["they copy them on purpose","they eat the same food"]],
+    ["What are the instructions inside every living cell called?","DNA",["DVD","ABC"]],
+    ["What do we call a kind of animal that has died out for ever?","extinct",
+      ["extra","excited"]],
+    ["What is left in old rock that tells us about ancient animals?","fossils",
+      ["footprints in sand","photographs"]],
+    ["Which animal did people breed dogs from?","the wolf",["the cat","the cow"]],
+    ["Animals that can have babies together belong to the same what?","species",
+      ["colour","country"]]
+  ], "dna"]
+};
+
+/* ==========================================================================
+   THE PHYSICS LADDER — forces, light, sound, heat, electricity and space.
+
+   NOT curriculum either, and the same warning as the rest: nothing here is
+   off a sheet and nothing is marked against anything. The science ladder has
+   a single rung for forces and one for light and sound; this is the ladder
+   for the boy who wanted to know what happens next.
+
+   Rungs 1 to 6 are things that can be tried at the kitchen table. From 7 up
+   it is upper-primary work at the earliest, so a short climb there means
+   nothing at all.
+   ========================================================================== */
+var PHY_LADDER = {
+  1: ["Pushes and pulls", [
+    ["Opening a door by tugging the handle uses what?","a force",["a sound","a shadow"]],
+    ["What happens to a ball if you kick it harder?","it goes further",
+      ["it goes slower","it disappears"]],
+    ["Which of these is a pull?","a dog tugging on its lead",
+      ["pressing a doorbell","clapping your hands"]],
+    ["What can a force do to a ball that is already rolling?","change its direction",
+      ["change its colour","change its name"]],
+    ["What do you do to a swing to get it going?","push it",["shout at it","paint it"]],
+    ["Squashing a lump of dough shows a force doing what?","changing its shape",
+      ["changing its taste","making it invisible"]]
+  ], "pushpull"],
+  2: ["Magnets", [
+    ["Which of these sticks to a magnet?","a paper clip",
+      ["a rubber band","a plastic ruler"]],
+    ["What are the two ends of a magnet called?","its poles",["its posts","its pipes"]],
+    ["What happens when you push two north poles together?","they push each other apart",
+      ["they stick together","they melt"]],
+    ["What happens when a north pole meets a south pole?","they pull together",
+      ["they push apart","they vanish"]],
+    ["Which of these metals is a magnet attracted to?","iron",["gold","copper"]],
+    ["Which way does a compass needle point?","north",["down","at the Sun"]]
+  ], "magnet"],
+  3: ["Floating and sinking", [
+    ["Why does a beach ball float?","it is full of air",
+      ["it is round","it is brightly coloured"]],
+    ["Which of these sinks in water?","a metal spoon",["a plastic bottle","a cork"]],
+    ["Ships are built of steel. Why do they still float?","they are hollow and full of air",
+      ["steel is lighter than water","they are painted"]],
+    ["What is the upward push of water on a floating thing called?","upthrust",
+      ["downforce","friction"]],
+    ["What happens to a stone dropped into a pond?","it sinks",["it floats","it flies"]],
+    ["Which floats, a ball of clay or the same clay shaped like a boat?","the boat shape",
+      ["the ball","neither of them"]]
+  ], "float"],
+  4: ["Light and shadows", [
+    ["Where does the Earth get nearly all its light from?","the Sun",
+      ["the Moon","street lamps"]],
+    ["What do we call a material you cannot see through at all?","opaque",
+      ["transparent","invisible"]],
+    ["When is your shadow longest?","when the Sun is low in the sky",
+      ["at midday","at midnight"]],
+    ["Why can you see yourself in a mirror?","light bounces off it into your eyes",
+      ["it is heavy","it is cold"]],
+    ["What happens to light when it passes from air into water?","it bends",
+      ["it stops dead","it turns green"]],
+    ["Which of these makes its own light?","a candle",["the Moon","a mirror"]]
+  ], "shadow"],
+  5: ["Sound", [
+    ["What does a guitar string do to make a sound?","it vibrates",["it glows","it freezes"]],
+    ["What do we call how loud a sound is?","its volume",["its colour","its weight"]],
+    ["What do we call how high or low a sound is?","its pitch",["its shadow","its width"]],
+    ["Can sound travel through empty space?","no, there is nothing to carry it",
+      ["yes, easily","only at night"]],
+    ["Why do you see lightning before you hear the thunder?","light travels faster than sound",
+      ["the thunder starts later","the sky is too far away"]],
+    ["What happens to a sound as you walk further away from it?","it gets quieter",
+      ["it gets louder","it changes colour"]]
+  ], "sound"],
+  6: ["Heat", [
+    ["What units do we measure temperature in here?","degrees Celsius",
+      ["centimetres","kilograms"]],
+    ["Which of these carries heat best?","a metal pan",
+      ["a wooden spoon","a woolly glove"]],
+    ["Why do we put on a jumper when it is cold?","it keeps our own heat in",
+      ["it makes heat of its own","it makes us shorter"]],
+    ["What happens to most things when you heat them?","they expand a little",
+      ["they shrink away to nothing","they turn blue"]],
+    ["Heat always moves from a hot thing to what?","a colder thing",
+      ["a hotter thing","nothing at all"]],
+    ["Why does a hot drink go cold on the table?","its heat spreads out into the room",
+      ["cold climbs up out of the table","the cup drinks it"]]
+  ], "thermo"],
+  7: ["Electricity", [
+    ["What must a circuit be before the bulb will light?","complete, with no gaps",
+      ["broken somewhere","upside down"]],
+    ["Which of these lets electricity pass through it?","copper wire",
+      ["a rubber glove","a plastic straw"]],
+    ["What pushes the electricity round a torch?","the battery",["the switch","the glass"]],
+    ["What does a switch do in a circuit?","breaks it open or joins it up",
+      ["heats it up","colours it in"]],
+    ["Why is a wire wrapped in plastic?","to keep the electricity safely inside",
+      ["to make it look pretty","to make it heavier"]],
+    ["Which of these is dangerous near electricity?","wet hands",
+      ["dry gloves","a plastic switch"]]
+  ], "circuit"],
+  8: ["Energy", [
+    ["What do we call energy from the wind and the sun?","renewable energy",
+      ["rubbish energy","returned energy"]],
+    ["What does a solar panel turn sunlight into?","electricity",["water","wood"]],
+    ["Energy is never really lost. What happens to it?","it changes into another kind",
+      ["it disappears for good","it gets eaten"]],
+    ["When you switch on a lamp, electrical energy becomes what?","light and heat",
+      ["sound and water","soil"]],
+    ["Which of these stores energy ready to be used?","a battery",["a mirror","a shadow"]],
+    ["Where does the energy in your dinner first come from?","the Sun",
+      ["the fridge","the cooker"]]
+  ], "windmill"],
+  9: ["Motion", [
+    ["Which force slows your bicycle when you stop pedalling?","friction",
+      ["magnetism","sunlight"]],
+    ["Why would you weigh less standing on the Moon?","the Moon's gravity is weaker",
+      ["the Moon is colder","you would be smaller there"]],
+    ["What do we call how fast something is going?","its speed",["its size","its weight"]],
+    ["On which surface would a toy car roll furthest?","smooth wood",
+      ["thick carpet","loose sand"]],
+    ["What happens to a rolling ball if nothing slows it down?","it keeps on going",
+      ["it stops at once","it turns round"]],
+    ["Why are brake pads made rough?","to make more friction",
+      ["to make less friction","to make the bicycle lighter"]]
+  ], "speed"],
+  10: ["Space", [
+    ["How many planets go round our Sun?","eight",["two","one hundred"]],
+    ["Which planet is closest to the Sun?","Mercury",["Earth","Neptune"]],
+    ["Why does the Moon seem to change shape?","we see different amounts of its lit half",
+      ["it really does melt away","clouds cover part of it"]],
+    ["What do we call a space rock burning up as a streak of light?","a meteor",
+      ["a planet","a cloud"]],
+    ["Which planet is famous for its rings?","Saturn",["Mars","Venus"]],
+    ["What keeps the planets going round the Sun?","gravity",["glue","magnets"]]
+  ], "space"]
+};
+
+/* ==========================================================================
+   THE CHEMISTRY LADDER — materials, states, mixtures and changes.
+
+   NOT curriculum, like every other ladder. It starts where a seven-year-old
+   already is — what things are made of and what happens when you heat them —
+   and it stops at the periodic table, which is where the pictures run out and
+   the arithmetic would start.
+
+   Nothing on this ladder asks him to do an experiment. Rung 8 says outright
+   that we do not taste things to test them, because a boy who has just been
+   asked what an acid tastes like is a boy about to go and find out.
+   ========================================================================== */
+var CHEM_LADDER = {
+  1: ["Everyday materials", [
+    ["What is a window usually made of?","glass",["wool","paper"]],
+    ["What is a jumper most likely made of?","wool",["steel","glass"]],
+    ["Why are saucepans made of metal?","metal carries heat well",
+      ["metal is see-through","metal is soft"]],
+    ["What is paper made from?","wood",["rocks","water"]],
+    ["Which of these bends easily without breaking?","rubber",["a brick","glass"]],
+    ["Which of these materials is waterproof?","plastic",["tissue paper","a sponge"]]
+  ], "materials"],
+  2: ["Solid, liquid, gas", [
+    ["Which of these is a solid?","a brick",["milk","steam"]],
+    ["Which of these is a liquid?","milk",["ice","wood"]],
+    ["What shape does a liquid take?","the shape of whatever it is poured into",
+      ["always a ball","always a cube"]],
+    ["Which of these can be squashed into a smaller space?","a gas",["a brick","water"]],
+    ["Which one keeps its own shape wherever you put it?","a solid",["a liquid","a gas"]],
+    ["What is the gas rising off boiling water called?","steam",["smoke","soot"]]
+  ], "states"],
+  3: ["Melting and freezing", [
+    ["What happens to chocolate left out in the sun?","it melts",
+      ["it freezes","it turns into a gas"]],
+    ["What do we call water once it has frozen?","ice",["steam","fog"]],
+    ["What is it called when a liquid turns into a solid?","freezing",
+      ["melting","boiling"]],
+    ["Which of these would melt if you heated it?","butter",["a stone","a brick"]],
+    ["Melting and freezing can both be undone. What kind of change is that?",
+      "a reversible change",["a permanent change","an impossible change"]],
+    ["What does an ice cube actually do to your drink?","it takes heat out of the drink",
+      ["it pours cold into the drink","it makes the drink heavier"]]
+  ], "melt"],
+  4: ["Water on the move", [
+    ["What is it called when a liquid turns into a gas?","evaporation",
+      ["condensation","freezing"]],
+    ["Why do wet clothes dry on a line?","the water evaporates into the air",
+      ["the water freezes","the sun eats it"]],
+    ["What are the drops that appear on a cold window called?","condensation",
+      ["evaporation","erosion"]],
+    ["At what temperature does water boil?","100 degrees Celsius",
+      ["0 degrees Celsius","40 degrees Celsius"]],
+    ["Where did the water in a cloud come from?","seas and rivers, by evaporating",
+      ["the sky makes it itself","the Moon"]],
+    ["Which of these dries a puddle up fastest?","a hot sunny day",
+      ["a cold night","being covered with a box"]]
+  ], "kettle"],
+  5: ["Mixing and dissolving", [
+    ["What happens to sugar stirred into hot tea?","it dissolves",
+      ["it burns","it freezes"]],
+    ["What do we call the liquid that something dissolves into?","the solvent",
+      ["the sponge","the sieve"]],
+    ["Which of these will not dissolve in water?","sand",["salt","sugar"]],
+    ["What makes sugar dissolve faster?","stirring it into warm water",
+      ["putting it in the fridge","leaving it perfectly still"]],
+    ["When salt dissolves, where has it gone?","it is still there, spread through the water",
+      ["it has vanished for good","it has turned into water"]],
+    ["What do you get if you mix oil and water?","two separate layers",
+      ["one clear drink","a solid lump"]]
+  ], "dissolve"],
+  6: ["Sorting a mixture", [
+    ["How would you get sand out of muddy water?","filter it",["drink it","freeze it"]],
+    ["How would you get the salt back out of salty water?","let the water evaporate away",
+      ["filter it","stir it harder"]],
+    ["How would you pick iron nails out of a bowl of rice?","with a magnet",
+      ["with a sieve","with a mirror"]],
+    ["What is a sieve good for separating?","big pieces from small ones",
+      ["salt from water","air from water"]],
+    ["What stays behind in the filter paper?","the bits that never dissolved",
+      ["the water","the air"]],
+    ["Which of these would separate stones from soil fastest?","a sieve",
+      ["a spoon","a straw"]]
+  ], "filter"],
+  7: ["Changes you cannot undo", [
+    ["What happens to paper when it burns?","it changes for ever into ash and smoke",
+      ["it turns back into paper","it freezes solid"]],
+    ["What do we call a change that cannot be undone?","an irreversible change",
+      ["a reversible change","a quiet change"]],
+    ["What makes iron go rusty?","air and water together",
+      ["ice and snow","loud noise"]],
+    ["Can you turn a boiled egg back into a raw one?","no, never",
+      ["yes, by cooling it","yes, by shaking it"]],
+    ["What do you see when vinegar meets baking soda?","lots of fizzing bubbles",
+      ["a solid block","nothing at all"]],
+    ["Baking a cake is which kind of change?","irreversible",
+      ["reversible","imaginary"]]
+  ], "candle"],
+  8: ["Acids and alkalis", [
+    ["What does an acid usually taste like?","sour",["sweet","salty"]],
+    ["Which of these is an acid?","lemon juice",["soap","pure water"]],
+    ["Which of these is an alkali?","soap",["vinegar","orange juice"]],
+    ["What do we use to find out whether something is an acid?","an indicator",
+      ["a ruler","a magnet"]],
+    ["What colour does red cabbage water go in an acid?","pink or red",
+      ["black","gold"]],
+    ["Why must we never taste a chemical to test it?","many of them are poisonous",
+      ["they all taste the same","they are always cold"]]
+  ], "ph"],
+  9: ["Atoms and molecules", [
+    ["What is everything in the world made of?","tiny particles",
+      ["tiny pictures","tiny letters"]],
+    ["What is the smallest piece of an element called?","an atom",["an acorn","an apple"]],
+    ["What do we call a group of atoms joined together?","a molecule",
+      ["a mountain","a machine"]],
+    ["How many hydrogen atoms are there in one water molecule?","two",["one","ten"]],
+    ["In which of these are the particles packed most tightly?","in a solid",
+      ["in a liquid","in a gas"]],
+    ["What are the particles in a gas doing?","whizzing about far apart",
+      ["sitting perfectly still","glued in a neat row"]]
+  ], "molecule"],
+  10: ["Elements and metals", [
+    ["What is the big table of all the elements called?","the periodic table",
+      ["the timetable","the dinner table"]],
+    ["Which gas in the air do we need in order to breathe?","oxygen",
+      ["helium","argon"]],
+    ["Which gas makes a party balloon float upwards?","helium",["oxygen","steam"]],
+    ["What is table salt made of?","sodium and chlorine",
+      ["sugar and sand","iron and gold"]],
+    ["Which metal is used for electrical wires because it carries electricity so well?",
+      "copper",["wood","rubber"]],
+    ["Which metal are drink cans made of because it is so light?","aluminium",
+      ["gold","lead"]]
+  ], "ptable"]
 };
 
 /* ==========================================================================

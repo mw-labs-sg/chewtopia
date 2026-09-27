@@ -1700,6 +1700,9 @@ function qzLad(o){
     blurb:o.blurb, note:o.note,
     tier:function(n){ return (B[n]&&B[n][0])||("Level "+n); },
     rung:function(n){ return String((B[n]&&B[n][0])||("level "+n)).toLowerCase(); },
+    /* A third slot on the rung, optional: the name of the drawing in QPIC that
+       goes with the topic. A bank that gives none simply has no pictures. */
+    pic:function(n){ return (B[n]&&B[n][2])||""; },
     bank:function(n){
       return ((B[n]&&B[n][1])||[]).map(function(x){ return {a:x[1], q:x[0], w:x[2]}; });
     },
@@ -1789,6 +1792,28 @@ var LADDERS=[
       "bones, muscles, heart, lungs, food, brain, skin, and all of it at once.",
     note:"Not school science either, but it does go in order — a boy who gets "+
       "to rung 8 has learnt something real about himself." }),
+
+  /* The three that go deeper than the science ladder does. That one has a
+     single rung each for animals, plants, forces and materials, which is a
+     taster; these are the ladders for when the taster was not enough. Each
+     one says on its own card that it is nobody's syllabus. */
+  qzLad({ id:"bio", em:"🐛", name:"Biology quiz", subject:"Science", bank:BIO_LADDER,
+    blurb:"Everything alive that is not him: animal groups at the bottom, then "+
+      "plants, life cycles, habitats and food chains, up to cells and DNA.",
+    note:"Not school science — MOE starts science in P3 — and not the human "+
+      "body either, which has a ladder of its own." }),
+
+  qzLad({ id:"phy", em:"🧲", name:"Physics quiz", subject:"Science", bank:PHY_LADDER,
+    blurb:"Pushes and pulls, magnets, floating, light, sound and heat, then "+
+      "circuits, energy, motion and the planets at the top.",
+    note:"Rungs 1 to 6 are things he can try at the kitchen table. From 7 up it "+
+      "is upper-primary at the earliest, so a short climb there means nothing." }),
+
+  qzLad({ id:"chem", em:"⚗️", name:"Chemistry quiz", subject:"Science", bank:CHEM_LADDER,
+    blurb:"What things are made of: materials and the three states at the "+
+      "bottom, then melting, dissolving and sorting mixtures, up to atoms.",
+    note:"Not school science either. Rung 8 says outright that we never taste "+
+      "a chemical to test it, because that is exactly what a boy would go and do." }),
 
   langLad({ id:"zh", em:"汉", name:"华文 quiz", subject:"华文", bank:ZH_LADDER,
     lang:"zh-CN", vname:"Mandarin", big:true,
@@ -1958,7 +1983,11 @@ function climbHTML(){
   var q=climb, L=q.L;
   if(q.done) return climbDoneHTML();
   var it=q.it, left=CLIMB_ROW-q.row;
-  var s='<div class="panel quizcard"><div class="qtop">'+
+  /* Drawn once, and it decides the card's own class: with a picture on it the
+     mascot shrinks, because two big drawings one above the other pushed the
+     answers off the bottom of a phone and the answers are the game. */
+  var pic = L.pic ? picSVG(L.pic(q.lvl)) : "";
+  var s='<div class="panel quizcard'+(pic?" haspic":"")+'"><div class="qtop">'+
     '<button class="btn soft" id="cB">&larr; Back</button>'+
     '<span class="hudchips">'+
       '<span class="hud">⬆️ '+q.lvl+'</span>'+
@@ -1968,6 +1997,10 @@ function climbHTML(){
     botSVG()+
     climbLadder(L, q.cleared, q.lvl, q.wasBest, q.from)+
     '<div class="kind">'+esc(L.tier(q.lvl))+' · level '+q.lvl+'</div>'+
+    /* The rung's own picture, above the question and the same for all six of
+       them, so it can set the scene without ever being part of the answer.
+       A ladder with no pictures asks for none and nothing moves. */
+    pic+
     '<div class="qq'+(L.q?" qw":"")+'">'+
       esc(L.q ? L.q(it) : (it.q || L.rung(q.lvl)))+'</div>'+
     climbPips(q.row)+
