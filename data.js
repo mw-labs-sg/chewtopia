@@ -3440,6 +3440,7 @@ var SEED_SONGS = [
      a lyrics site. The ▶ searches for the song; the words go in on the device,
      through "Add the words", and live in `lyr:<id>` on that iPad alone. */
   {id:"sg1", t:"Soda Pop",           w:"Saja Boys · KPop Demon Hunters"},
+  {id:"sg9", t:"Zoo",                w:"Shakira · Zootopia 2"},
   {id:"sg8", t:"Try Everything",     w:"Shakira · Zootopia"},
   {id:"sg2", t:"Revolting Children", w:"Matilda the Musical · Tim Minchin"}
 

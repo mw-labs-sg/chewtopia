@@ -924,13 +924,9 @@ function saveWords(id, t){ W("lyr:"+id, String(t||"").slice(0, 8000)); }
 /* What to put on screen: whatever was typed in on this device, and otherwise
    the words the app shipped — which only the out-of-copyright ones have. */
 function songText(x){ return songWords(x.id) || x.lx || ""; }
-/* A search, not a guess at a video id: an id rots and lands a seven-year-old
-   on somebody else's upload, while a search for the title plus "official"
-   puts the real one at the top and keeps working. */
-function songLink(s){
-  var by=String(s.w||"").split("·")[0].trim();
-  return "https://www.youtube.com/results?search_query="+
-         encodeURIComponent((s.t+" "+by+" official song").replace(/\s+/g," ").trim());
+function songById(id){
+  var a=songs().filter(function(x){ return x.id===id; });
+  return a.length ? a[0] : null;
 }
 /* Just the words, one line to a line, big enough to read off the table.
 
@@ -952,7 +948,7 @@ function lyricLines(x){
 function vFun(){
   var list=songs();
   var s='<div class="panel"><h2><span class="em">🎵</span> Songs'+
-    '<span class="side">the words, for singing along</span></h2>';
+    '<span class="side">the words, for reading along</span></h2>';
   if(!list.length) s+='<p class="empty">No songs yet.</p>';
   list.forEach(function(x){
     var open=(songOpen===x.id), edit=(songEdit===x.id), w=songText(x);
@@ -962,8 +958,6 @@ function vFun(){
            '<span class="st">'+esc(x.t)+'</span>'+
            '<span class="sw">'+esc(x.w||"")+'</span>'+
          '</button>'+
-         '<a class="songyt" href="'+esc(songLink(x))+'" target="_blank" '+
-           'rel="noopener" title="Find the official video">▶</a>'+
        '</div>';
     if(open){
       if(edit){
@@ -982,8 +976,7 @@ function vFun(){
            '</div>';
       } else {
         s+='<p class="empty" style="padding:10px 0">No words on this device yet. '+
-           'Paste them in below and they stay on this iPad. ▶ finds the song if '+
-           'you want to hear it while you type.</p>'+
+           'Paste them in and they stay on this iPad.</p>'+
            '<div class="btnrow">'+
              '<button class="btn go" data-lyedit="'+esc(x.id)+'">Add the words</button>'+
              '<button class="btn soft" data-songdel="'+esc(x.id)+'">Remove this song</button>'+
@@ -1014,8 +1007,17 @@ function vFun(){
 function wFun(){
   document.querySelectorAll("[data-song]").forEach(function(b){
     b.onclick=function(){
-      songOpen = (songOpen===b.dataset.song) ? "" : b.dataset.song;
-      songEdit=""; hush(); sfxTap(); render();
+      var id=b.dataset.song, opening=(songOpen!==id), x=songById(id);
+      songOpen = opening ? id : "";
+      /* A song with no words has exactly one useful thing to do, so opening it
+         lands straight in the box rather than on a sentence about the box.
+         Pasting the words is the whole way in now, so it is one tap. */
+      songEdit = (opening && x && !songText(x)) ? id : "";
+      hush(); sfxTap(); render();
+      if(songEdit){
+        var ta=document.getElementById("ly_"+songEdit);
+        if(ta) ta.focus();
+      }
     };
   });
   document.querySelectorAll("[data-lyedit]").forEach(function(b){
