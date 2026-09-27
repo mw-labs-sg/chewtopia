@@ -2532,6 +2532,679 @@ var POP_LADDER = {
 };
 
 /* ==========================================================================
+   THE FLAGS AND COUNTRIES LADDER — where things are and who lives there.
+
+   NOT curriculum. Social studies at Nanyang Primary is its own thing with its
+   own sheets, and this is not it: it is general knowledge, sorted into ten
+   rungs by my own judgement of how hard each one is.
+
+   Our own corner of the world is rung 4 rather than rung 9 on purpose. A boy
+   in Singapore can see Johor from the top of a car park; Canberra he cannot.
+   ========================================================================== */
+var GEO_LADDER = {
+  1: ["Flags you know", [
+    ["Which country's flag has a red maple leaf on it?","Canada",["Brazil","Kenya"]],
+    ["What two colours is the Singapore flag?","red and white",
+      ["green and gold","blue and yellow"]],
+    ["Which country's flag is a plain red circle on white?","Japan",["China","India"]],
+    ["How many stars are on the Singapore flag?","five",["three","ten"]],
+    ["Which country's flag is a white cross on red?","Switzerland",["Sweden","Spain"]],
+    ["What shape are nearly all flags?","a rectangle",["a circle","a triangle"]]
+  ], "flags"],
+  2: ["Continents and oceans", [
+    ["How many continents are there?","seven",["three","twelve"]],
+    ["Which continent is Singapore in?","Asia",["Europe","Africa"]],
+    ["Which is the largest ocean?","the Pacific",["the Atlantic","the Indian"]],
+    ["Which continent is covered in ice?","Antarctica",["Australia","South America"]],
+    ["Which continent has the Sahara Desert?","Africa",["Europe","North America"]],
+    ["Which continent is also a country all by itself?","Australia",["Africa","Asia"]]
+  ], "globe"],
+  3: ["Capital cities", [
+    ["What is the capital of Japan?","Tokyo",["Kyoto","Osaka"]],
+    ["What is the capital of France?","Paris",["Nice","Lyon"]],
+    ["What is the capital of England?","London",["Manchester","Liverpool"]],
+    ["What is the capital of China?","Beijing",["Shanghai","Guangzhou"]],
+    ["What is the capital of Malaysia?","Kuala Lumpur",["Johor Bahru","Penang"]],
+    ["What does the word capital mean here?","the city a country is run from",
+      ["the biggest building","the oldest street"]]
+  ], "citysky"],
+  4: ["Our neighbours", [
+    ["Which country is joined to Singapore by a causeway?","Malaysia",
+      ["Indonesia","Thailand"]],
+    ["Which country next to us is made of thousands of islands?","Indonesia",
+      ["Vietnam","Laos"]],
+    ["Bangkok is the capital of which country?","Thailand",["Cambodia","Myanmar"]],
+    ["Manila is the capital of which country?","the Philippines",["Brunei","Laos"]],
+    ["Hanoi is the capital of which country?","Vietnam",["Cambodia","Brunei"]],
+    ["What do we call the group of countries around us?","Southeast Asia",
+      ["Northern Europe","West Africa"]]
+  ], "map"],
+  5: ["Famous places", [
+    ["In which city would you find the Eiffel Tower?","Paris",["Rome","Berlin"]],
+    ["Which country has the Great Wall?","China",["Japan","Korea"]],
+    ["The Taj Mahal is in which country?","India",["Pakistan","Nepal"]],
+    ["Which city has the Statue of Liberty?","New York",["Los Angeles","Chicago"]],
+    ["The Pyramids were built in which country?","Egypt",["Greece","Turkey"]],
+    ["The Opera House with white sails like a ship is in which city?","Sydney",
+      ["Melbourne","Auckland"]]
+  ], "tower"],
+  6: ["Biggest and smallest", [
+    ["What is the highest mountain in the world?","Mount Everest",
+      ["Mount Fuji","Bukit Timah Hill"]],
+    ["Which is the largest country in the world?","Russia",["China","Canada"]],
+    ["Which is usually called the longest river in the world?","the Nile",
+      ["the Thames","the Singapore River"]],
+    ["Which is the largest hot desert?","the Sahara",["the Gobi","the Thar"]],
+    ["What is the highest hill in Singapore?","Bukit Timah Hill",
+      ["Mount Faber","Fort Canning Hill"]],
+    ["Which continent has the most people living on it?","Asia",
+      ["Antarctica","Australia"]]
+  ], "mountain"],
+  7: ["Harder capitals", [
+    ["What is the capital of Australia?","Canberra",["Sydney","Melbourne"]],
+    ["What is the capital of Canada?","Ottawa",["Toronto","Vancouver"]],
+    ["What is the capital of South Korea?","Seoul",["Busan","Incheon"]],
+    ["What is the capital of Egypt?","Cairo",["Luxor","Alexandria"]],
+    ["What is the capital of Italy?","Rome",["Milan","Venice"]],
+    ["What is the capital of New Zealand?","Wellington",["Auckland","Christchurch"]]
+  ], "pin"],
+  8: ["Money and language", [
+    ["What money is used in Japan?","the yen",["the euro","the pound"]],
+    ["What money is used in Britain?","the pound",["the dollar","the rupee"]],
+    ["Which language is spoken in Brazil?","Portuguese",["Spanish","Brazilian"]],
+    ["Singapore has four official languages. Which is one of them?","Tamil",
+      ["German","Russian"]],
+    ["Which language do the most people speak as their first language?","Chinese",
+      ["Dutch","Swedish"]],
+    ["What money is used in Malaysia?","the ringgit",["the baht","the peso"]]
+  ], "speech"],
+  9: ["On the map", [
+    ["Which imaginary line goes right round the middle of the Earth?","the equator",
+      ["the horizon","the timeline"]],
+    ["Is Singapore north or south of Malaysia?","south",["north","west"]],
+    ["Where is the sun in the morning?","in the east",
+      ["in the west","straight overhead"]],
+    ["What do we call land with water all the way round it?","an island",
+      ["a desert","a valley"]],
+    ["What do we call a very large area of land, like Africa?","a continent",
+      ["a country","a city"]],
+    ["What do we call a book full of maps?","an atlas",["an album","an anthem"]]
+  ], "compass"],
+  10: ["Flags in detail", [
+    ["How many stars are on the flag of the United States?","fifty",
+      ["thirteen","five"]],
+    ["What is in the middle of the South Korean flag?","a red and blue circle",
+      ["a gold star","a dragon"]],
+    ["The flag of Brazil is mostly which colour?","green",["red","purple"]],
+    ["Which flag is three crosses laid one over another?","the United Kingdom's",
+      ["Norway's","Greece's"]],
+    ["What is the group of stars on the Australian flag called?","the Southern Cross",
+      ["the Great Bear","the Milky Way"]],
+    ["What is the study of flags called?","vexillology",["geology","zoology"]]
+  ], "flagpole"]
+};
+
+/* ==========================================================================
+   THE SPORTS LADDER — how each game is played, not who won it.
+
+   NOT curriculum, and deliberately not about results either: a quiz on last
+   season's league table is out of date by the time anyone plays it, and a boy
+   who knows how many players are on a football pitch knows something that is
+   still true next year.
+
+   Badminton gets its own rung at 3 because it is the one on television here.
+   ========================================================================== */
+var SPORT_LADDER = {
+  1: ["Football", [
+    ["How many players from one team are on the pitch?","eleven",["five","twenty"]],
+    ["What do you call it when the ball goes into the net?","a goal",
+      ["a try","a basket"]],
+    ["Which player is allowed to pick the ball up?","the goalkeeper",
+      ["the striker","the defender"]],
+    ["What colour card sends a player off?","red",["yellow","blue"]],
+    ["How long is a normal football match?","90 minutes",
+      ["30 minutes","three hours"]],
+    ["What is the World Cup?","the biggest football competition",
+      ["a drinking cup","a kind of ball"]]
+  ], "football"],
+  2: ["Swimming", [
+    ["Which stroke do you swim lying on your back?","backstroke",
+      ["breaststroke","butterfly"]],
+    ["What do we call the strips a pool is divided into?","lanes",
+      ["roads","tracks"]],
+    ["Which stroke is named after an insect?","butterfly",
+      ["the frog stroke","the crab stroke"]],
+    ["What do swimmers wear to see underwater?","goggles",
+      ["sunglasses","a helmet"]],
+    ["Which stroke is usually the fastest?","freestyle",
+      ["breaststroke","backstroke"]],
+    ["How long is an Olympic swimming pool?","50 metres",
+      ["10 metres","500 metres"]]
+  ], "pool"],
+  3: ["Badminton", [
+    ["What do you hit over the net in badminton?","a shuttlecock",
+      ["a football","a puck"]],
+    ["What is a shuttlecock often made with?","feathers",["wool","paper"]],
+    ["How many players are on each side in singles?","one",["two","five"]],
+    ["What do you hit the shuttlecock with?","a racquet",["a bat","a club"]],
+    ["Which of these countries is famous for being strong at badminton?","Indonesia",
+      ["Iceland","Egypt"]],
+    ["What happens if the shuttlecock lands outside the lines?","the other side scores",
+      ["you score","nothing at all"]]
+  ], "racquet"],
+  4: ["Basketball", [
+    ["How many points is an ordinary basket worth?","two",["one","five"]],
+    ["What must you do to move with the ball?","bounce it",["carry it","kick it"]],
+    ["How many players from one team are on court?","five",["eleven","two"]],
+    ["What is the ring you throw the ball through called?","the hoop",
+      ["the post","the base"]],
+    ["How high off the ground is a basketball hoop?","about three metres",
+      ["about one metre","about ten metres"]],
+    ["What is it called when you move the ball by bouncing it along?","dribbling",
+      ["diving","drifting"]]
+  ], "hoop"],
+  5: ["Running and jumping", [
+    ["What do sprinters push off from at the start?","starting blocks",
+      ["a chair","a boat"]],
+    ["How far is a marathon?","about 42 kilometres",
+      ["about four kilometres","about 400 kilometres"]],
+    ["What do runners pass to each other in a relay?","a baton",
+      ["a ball","a hat"]],
+    ["What do long jumpers land in?","a sandpit",["a pool","a net"]],
+    ["What is the shortest sprint race at the Olympics?","100 metres",
+      ["one metre","1000 metres"]],
+    ["What do runners jump over in a hurdles race?","hurdles",
+      ["walls","rivers"]]
+  ], "stopwatch"],
+  6: ["Wheels", [
+    ["How many wheels does an ordinary bicycle have?","two",["three","four"]],
+    ["What should you always wear when cycling?","a helmet",["a crown","flippers"]],
+    ["What is the most famous bicycle race in the world?","the Tour de France",
+      ["the Tour de Sentosa","the Wheel Cup"]],
+    ["What do you push round with your feet on a bicycle?","the pedals",
+      ["the brakes","the bell"]],
+    ["What stops a bicycle?","the brakes",["the saddle","the basket"]],
+    ["How many wheels does a skateboard have?","four",["two","six"]]
+  ], "bike"],
+  7: ["The Olympics", [
+    ["How often are the Summer Olympics held?","every four years",
+      ["every year","every ten years"]],
+    ["What does the winner of an Olympic event get?","a gold medal",
+      ["a silver cup","a car"]],
+    ["Which medal is for second place?","silver",["gold","bronze"]],
+    ["Which medal is for third place?","bronze",["silver","gold"]],
+    ["Where were the very first Olympics held, long ago?","in Greece",
+      ["in China","in Brazil"]],
+    ["What is carried from country to country before the games?","a flame",
+      ["a flagpole","a boat"]]
+  ], "podium"],
+  8: ["Martial arts and gymnastics", [
+    ["What colour belt does a beginner usually wear in judo?","white",
+      ["black","gold"]],
+    ["What colour belt shows somebody is an expert?","black",["white","yellow"]],
+    ["Which martial art comes from Korea?","taekwondo",["judo","kung fu"]],
+    ["Which martial art comes from Japan?","judo",["taekwondo","capoeira"]],
+    ["What do gymnasts perform on that is long, narrow and high up?","the balance beam",
+      ["the running track","the swimming lane"]],
+    ["What is a forward roll?","rolling head over heels",
+      ["a jump into water","a kind of bread"]]
+  ], "belt"],
+  9: ["Bat and ball", [
+    ["In cricket, what are the three sticks behind the batter called?","the stumps",
+      ["the poles","the posts"]],
+    ["In baseball, what do you run round?","the bases",["the net","the hoop"]],
+    ["What is it called in baseball when you hit it out of the park?","a home run",
+      ["a goal","a knockout"]],
+    ["Which country did cricket come from?","England",["Brazil","Japan"]],
+    ["In cricket, what is the person who throws the ball called?","the bowler",
+      ["the pitcher","the server"]],
+    ["What is a cricket ball usually made of?","leather",["plastic","glass"]]
+  ], "bat"],
+  10: ["Rules and fair play", [
+    ["Who makes sure the rules are kept during a match?","the referee",
+      ["the coach","the crowd"]],
+    ["What do we call a game that ends level?","a draw",["a win","a foul"]],
+    ["What do we call the person who trains a team?","the coach",
+      ["the captain","the mascot"]],
+    ["What is a hat-trick?","three goals by the same player",
+      ["three players sent off","a magic trick at half time"]],
+    ["What is your personal best?","the best you have ever done yourself",
+      ["the world record","the team's score"]],
+    ["What do we call playing fairly and shaking hands afterwards?","sportsmanship",
+      ["showmanship","championship"]]
+  ], "trophy"]
+};
+
+/* ==========================================================================
+   THE MUSIC LADDER — instruments, how music is written, who wrote it.
+
+   NOT curriculum. Both schools do music and neither sets homework on it.
+
+   Not a word of any song is in here and none is coming: every question is
+   about how music works — what a stave is, which family a trumpet belongs to,
+   who wrote The Four Seasons — the same line the Fun screen holds. A quiz
+   question that needed a lyric to answer it would be a lyric in data.js.
+   ========================================================================== */
+var MUSIC_LADDER = {
+  1: ["Instruments", [
+    ["How many strings does an ordinary guitar have?","six",["two","twenty"]],
+    ["Which instrument has black and white keys?","the piano",
+      ["the flute","the drum"]],
+    ["What do you play a violin with?","a bow",["a hammer","a reed"]],
+    ["Which of these do you blow into?","the flute",["the harp","the cymbals"]],
+    ["What do you usually hit a drum with?","sticks",["a bow","a key"]],
+    ["Which instrument do you sit down and hold between your knees?","the cello",
+      ["the trumpet","the tambourine"]]
+  ], "guitar"],
+  2: ["Families of instruments", [
+    ["Which family does the violin belong to?","the strings",
+      ["the brass","the percussion"]],
+    ["Which family does the trumpet belong to?","the brass",
+      ["the strings","the woodwind"]],
+    ["Which family does the drum belong to?","the percussion",
+      ["the strings","the brass"]],
+    ["Which family does the flute belong to?","the woodwind",
+      ["the brass","the percussion"]],
+    ["What are brass instruments made of?","metal",["wood","glass"]],
+    ["How do you make a sound on a brass instrument?","buzz your lips into it",
+      ["pluck a string","hit it with a stick"]]
+  ], "trumpet"],
+  3: ["Loud, soft, high and low", [
+    ["What do we call how loud or soft music is?","the dynamics",
+      ["the tempo","the title"]],
+    ["Which instrument makes the lowest sounds?","the tuba",
+      ["the piccolo","the triangle"]],
+    ["Do big instruments usually make high or low sounds?","low",
+      ["high","no sound at all"]],
+    ["What is it called when music gets gradually louder?","a crescendo",
+      ["a chorus","a canyon"]],
+    ["Which end of a piano plays the high notes?","the right-hand end",
+      ["the left-hand end","the middle"]],
+    ["What do we call a silence written into a piece of music?","a rest",
+      ["a gap","a hole"]]
+  ], "dynamics"],
+  4: ["Beat and rhythm", [
+    ["What do we call the steady pulse you tap your foot to?","the beat",
+      ["the words","the colour"]],
+    ["What do we call how fast or slow a piece of music is?","the tempo",
+      ["the volume","the pitch"]],
+    ["What do we call a pattern of long and short sounds?","the rhythm",
+      ["the rainbow","the recipe"]],
+    ["How many beats are in most bars of pop music?","four",["one","nine"]],
+    ["What does a metronome do?","clicks out a steady beat",
+      ["plays a tune","records the music"]],
+    ["What do we call it when everybody claps together on the beat?","keeping time",
+      ["keeping score","keeping quiet"]]
+  ], "drum"],
+  5: ["Reading music", [
+    ["How many lines does a musical stave have?","five",["three","ten"]],
+    ["What are the round marks written on the stave called?","notes",
+      ["dots","letters"]],
+    ["How many letters are used to name the notes?","seven",
+      ["three","twenty-six"]],
+    ["What is the curly sign at the start of the stave called?","a clef",
+      ["a cliff","a claw"]],
+    ["What does a sharp sign do to a note?","makes it a little higher",
+      ["makes it louder","makes it shorter"]],
+    ["Where is a note written if it sounds higher?","further up the stave",
+      ["further down the stave","in the margin"]]
+  ], "stave"],
+  6: ["The orchestra", [
+    ["Who stands at the front and leads an orchestra?","the conductor",
+      ["the drummer","the singer"]],
+    ["Which family has the most players in an orchestra?","the strings",
+      ["the brass","the percussion"]],
+    ["What do the players read from while they play?","their music",
+      ["a newspaper","a map"]],
+    ["What do we call a large group of people singing together?","a choir",
+      ["a crowd","a class"]],
+    ["What is a long piece written for a whole orchestra often called?","a symphony",
+      ["a sandwich","a sonnet"]],
+    ["What does the conductor hold?","a baton",["a bat","a brush"]]
+  ], "violin"],
+  7: ["Voices", [
+    ["What do we call the highest singing voice?","soprano",["bass","tenor"]],
+    ["What do we call the lowest singing voice?","bass",["soprano","alto"]],
+    ["What is singing with no instruments at all called?","a cappella",
+      ["a capital","a carousel"]],
+    ["What do we call the main tune of a song?","the melody",
+      ["the medley","the mystery"]],
+    ["What do we call the part of a song that comes round again?","the chorus",
+      ["the verse","the ending"]],
+    ["What do we call notes sung together that sound good?","harmony",
+      ["history","hardware"]]
+  ], "mic"],
+  8: ["Music around the world", [
+    ["Which Scottish instrument has a bag you squeeze?","the bagpipes",
+      ["the banjo","the bongo"]],
+    ["Which country is K-pop from?","South Korea",["Japan","Thailand"]],
+    ["The steel drum comes from which part of the world?","the Caribbean",
+      ["the Arctic","the Sahara"]],
+    ["The erhu, which has two strings, is from which country?","China",
+      ["Brazil","Norway"]],
+    ["Which Indonesian orchestra is made mostly of gongs and metal keys?","the gamelan",
+      ["the gramophone","the gondola"]],
+    ["What is the Japanese instrument with thirteen strings called?","the koto",
+      ["the kazoo","the kalimba"]]
+  ], "globe"],
+  9: ["Composers", [
+    ["Who carried on writing music after he went deaf?","Beethoven",
+      ["Mozart","Bach"]],
+    ["Which composer was famous as a small child playing for kings?","Mozart",
+      ["Beethoven","Chopin"]],
+    ["Who wrote The Four Seasons?","Vivaldi",["Verdi","Handel"]],
+    ["Which country was Mozart born in?","Austria",["Australia","Argentina"]],
+    ["What do we call somebody who writes music?","a composer",
+      ["a conductor","a carpenter"]],
+    ["Who wrote the music for The Nutcracker?","Tchaikovsky",["Brahms","Schubert"]]
+  ], "piano"],
+  10: ["Making music", [
+    ["What do we call a piece of music written down in full?","the score",
+      ["the scoreboard","the sketch"]],
+    ["Where is music usually recorded?","in a studio",
+      ["in a stadium","in a station"]],
+    ["What do you sing into when you are recording?","a microphone",
+      ["a telescope","a kettle"]],
+    ["What is a cover version?","somebody else performing an existing song",
+      ["the front of a CD","the volume knob"]],
+    ["What do we call the words of a song?","the lyrics",
+      ["the labels","the letters"]],
+    ["What does live music mean?","played in front of you, not recorded",
+      ["music about animals","music played very loudly"]]
+  ], "headphones"]
+};
+
+/* ==========================================================================
+   THE ART LADDER — colour, shape, and the people who made the famous ones.
+
+   NOT curriculum. Art at school is something he does rather than something he
+   is tested on, and it should stay that way; this is the words for it.
+
+   Nothing here reproduces a painting. The rung about famous pictures asks who
+   painted what and what they are of, and its picture is an empty gold frame —
+   copying somebody's painting into this repo is copying their painting, the
+   same rule that keeps characters out of QPIC.
+   ========================================================================== */
+var ART_LADDER = {
+  1: ["Colours", [
+    ["How many colours are in a rainbow?","seven",["three","twelve"]],
+    ["Which of these is a primary colour?","blue",["green","orange"]],
+    ["What are the three primary colours?","red, yellow and blue",
+      ["red, green and grey","black, white and brown"]],
+    ["Which of these are called warm colours?","red, orange and yellow",
+      ["blue and grey","black and white"]],
+    ["Which colour sits opposite red on the colour wheel?","green",
+      ["purple","yellow"]],
+    ["What do we call colours like blue and grey?","cool colours",
+      ["hot colours","loud colours"]]
+  ], "palette"],
+  2: ["Mixing colours", [
+    ["What do you get if you mix red and yellow?","orange",["purple","green"]],
+    ["What do you get if you mix blue and yellow?","green",["orange","brown"]],
+    ["What do you get if you mix red and blue?","purple",["green","yellow"]],
+    ["What happens if you add white to a colour?","it gets lighter",
+      ["it gets darker","it disappears"]],
+    ["What happens if you add black to a colour?","it gets darker",
+      ["it gets lighter","it turns red"]],
+    ["What do you get if you mix all the paints together?","a muddy brown",
+      ["bright white","gold"]]
+  ], "paintpots"],
+  3: ["Lines and shapes", [
+    ["How many sides does a triangle have?","three",["four","five"]],
+    ["What do we call the line round the edge of a shape?","its outline",
+      ["its middle","its shadow"]],
+    ["What is a shape with four equal sides called?","a square",
+      ["a circle","a triangle"]],
+    ["What do we call a line that goes straight up and down?","vertical",
+      ["horizontal","diagonal"]],
+    ["What do we call a line that goes flat across?","horizontal",
+      ["vertical","curved"]],
+    ["What do we call a quick drawing made of lines only?","a sketch",
+      ["a statue","a stencil"]]
+  ], "shapes"],
+  4: ["Drawing and painting", [
+    ["What do you rub out a pencil line with?","an eraser",["a brush","a ruler"]],
+    ["What is the hairy end of a paintbrush called?","the bristles",
+      ["the handle","the ferrule"]],
+    ["What is the cloth stretched over a wooden frame to paint on?","canvas",
+      ["cardboard","carpet"]],
+    ["Which pencil makes the darkest line?","a soft one",
+      ["a hard one","they are the same"]],
+    ["What do artists mix their paints on?","a palette",
+      ["a pillow","a pencil case"]],
+    ["What are charcoal and pastels used for?","drawing",
+      ["eating","building"]]
+  ], "pencils"],
+  5: ["Famous pictures", [
+    ["Who painted the Mona Lisa?","Leonardo da Vinci",
+      ["Vincent van Gogh","Pablo Picasso"]],
+    ["Which painter cut off part of his own ear?","Van Gogh",
+      ["Monet","Michelangelo"]],
+    ["Which famous painting shows a woman with a mysterious smile?","the Mona Lisa",
+      ["The Scream","Sunflowers"]],
+    ["Who painted the ceiling of the Sistine Chapel?","Michelangelo",
+      ["Rembrandt","Raphael"]],
+    ["Which artist painted water lilies again and again?","Monet",
+      ["Picasso","Constable"]],
+    ["Which artist painted faces all jumbled up into flat shapes?","Picasso",
+      ["Monet","Turner"]]
+  ], "frame"],
+  6: ["Artists at work", [
+    ["What do we call a picture of a person?","a portrait",
+      ["a landscape","a still life"]],
+    ["What do we call a picture of the countryside?","a landscape",
+      ["a portrait","a still life"]],
+    ["What do we call a picture of objects like fruit on a table?","a still life",
+      ["a portrait","a landscape"]],
+    ["What is a picture an artist paints of themselves called?","a self-portrait",
+      ["a selfie stick","a mirror"]],
+    ["What is the wooden stand that holds a canvas called?","an easel",
+      ["an eagle","an elbow"]],
+    ["What do we call the person who sits still to be painted?","the model",
+      ["the manager","the mascot"]]
+  ], "easel"],
+  7: ["Sculpture and building", [
+    ["What do we call art you can walk all the way round?","sculpture",
+      ["a painting","a poster"]],
+    ["What are many statues carved out of?","stone",["paper","water"]],
+    ["What is the hot oven that clay pots are baked in called?","a kiln",
+      ["a kettle","a kitchen sink"]],
+    ["What do we call a picture made from small coloured tiles?","a mosaic",
+      ["a mosquito","a mobile"]],
+    ["Who designs buildings?","an architect",["an archer","an acrobat"]],
+    ["What do we call a very large painting made on a wall?","a mural",
+      ["a medal","a mirror"]]
+  ], "statue"],
+  8: ["Art around the world", [
+    ["Chinese painting is traditionally done with what?","ink and a brush",
+      ["crayons","spray paint"]],
+    ["What is the Japanese art of folding paper called?","origami",
+      ["karaoke","kirigami"]],
+    ["What is the art of patterning cloth with wax called here and in Indonesia?",
+      "batik",["bakso","bandung"]],
+    ["What do we call beautiful handwriting done as an art?","calligraphy",
+      ["cartography","choreography"]],
+    ["Aboriginal Australian paintings often use what?","dots",
+      ["glitter","glass beads"]],
+    ["What is a long Chinese painting that unrolls called?","a scroll",
+      ["a screen","a scrapbook"]]
+  ], "inkbrush"],
+  9: ["Making a picture", [
+    ["What do we call the part of a picture nearest to you?","the foreground",
+      ["the background","the underground"]],
+    ["What do we call the part furthest away?","the background",
+      ["the foreground","the playground"]],
+    ["Why do artists draw faraway things smaller?","to make them look far away",
+      ["to save paint","to be funny"]],
+    ["What is the line where the land meets the sky called?","the horizon",
+      ["the border","the hedge"]],
+    ["What do we call the light and dark that make something look round?","shading",
+      ["sharpening","shouting"]],
+    ["What do we call the way things are arranged in a picture?","the composition",
+      ["the collection","the conversation"]]
+  ], "canvas"],
+  10: ["Art words", [
+    ["What is a picture made by sticking on paper and scraps called?","a collage",
+      ["a cottage","a carriage"]],
+    ["What is a picture printed from a carved block of wood called?","a woodcut",
+      ["a woodchuck","a woodpecker"]],
+    ["What do we call art that is not a picture of anything real?","abstract art",
+      ["absent art","ancient art"]],
+    ["Who chooses and looks after the pictures in a gallery?","a curator",
+      ["a caretaker","a courier"]],
+    ["What do we call a picture printed in many identical copies?","a print",
+      ["a pint","a plant"]],
+    ["What do we call the way an artist's work looks, that makes it theirs?",
+      "their style",["their salary","their signature"]]
+  ], "collage"]
+};
+
+/* ==========================================================================
+   THE COMPUTERS LADDER — how the machine works and how to be safe on it.
+
+   NOT curriculum: Nanyang Primary does not examine this, and the good half of
+   it is not examinable anywhere. Rung 5 is the one that matters — passwords,
+   strangers, what to do when something online is upsetting — and it is at 5
+   rather than 9 so that a boy who stalls halfway up has still met it.
+
+   Rung 10 ends on the thing a computer cannot do, which is the right last
+   question for a ladder a child plays on a screen.
+   ========================================================================== */
+var COMP_LADDER = {
+  1: ["Parts of a computer", [
+    ["Which part of a computer do you look at?","the screen",
+      ["the keyboard","the mouse"]],
+    ["Which part do you type on?","the keyboard",["the screen","the printer"]],
+    ["What do you slide about to point and click?","the mouse",
+      ["the monitor","the modem"]],
+    ["What puts your work onto paper?","the printer",
+      ["the speaker","the webcam"]],
+    ["What comes out of the speakers?","sound",["pictures","paper"]],
+    ["What is a laptop?","a computer you can carry about",
+      ["a very large desk","a kind of printer"]]
+  ], "desktop"],
+  2: ["Going in and coming out", [
+    ["A keyboard is what kind of device?","an input device",
+      ["an output device","a broken device"]],
+    ["A screen is what kind of device?","an output device",
+      ["an input device","a storage device"]],
+    ["Which of these does both, in and out?","a touchscreen",
+      ["a mouse","a printer"]],
+    ["What does a microphone put into a computer?","sound",
+      ["pictures","paper"]],
+    ["What does a camera put into a computer?","pictures",
+      ["sound","electricity"]],
+    ["What do we call the information a computer is given?","input",
+      ["intake","income"]]
+  ], "mouse"],
+  3: ["Files and folders", [
+    ["What do we call one piece of work saved on a computer?","a file",
+      ["a folder","a shelf"]],
+    ["What do we keep files tidy inside?","folders",["boxes","drawers"]],
+    ["What must you do before closing your work?","save it",
+      ["delete it","print it"]],
+    ["What can happen if you do not save your work?","it can be lost",
+      ["it prints itself","it saves anyway"]],
+    ["Where does a deleted file go first?","the recycle bin",
+      ["the printer","the internet"]],
+    ["What do the letters at the end of a file's name tell you?",
+      "what kind of file it is",["who made it","how big the screen is"]]
+  ], "folder"],
+  4: ["The internet", [
+    ["What do we call a page you visit on the internet?","a website",
+      ["a bookshelf","a postcard"]],
+    ["What do you use to look something up on the internet?","a search engine",
+      ["a steam engine","a fire engine"]],
+    ["What connects a tablet to the internet without any wires?","wi-fi",
+      ["glue","a pencil"]],
+    ["What is an email?","a message sent over the internet",
+      ["a paper letter","a phone call"]],
+    ["What do we call the address of a website?","a URL",["an RSVP","a USB"]],
+    ["Is everything you read on the internet true?","no, it has to be checked",
+      ["yes, always","only on Mondays"]]
+  ], "wifi"],
+  5: ["Staying safe", [
+    ["What makes a good password?","one that is long and hard to guess",
+      ["your own name","1234"]],
+    ["Who should you tell your password to?","nobody except your parents",
+      ["your friends","anyone who asks"]],
+    ["What should you do if a stranger messages you online?","tell a grown-up",
+      ["reply to them","send them a photo"]],
+    ["Should you put your home address on a website?","no, never",
+      ["yes, always","only at night"]],
+    ["What do we call a message that tries to trick you out of your password?",
+      "phishing",["fishing","flossing"]],
+    ["If something online upsets you, what is the first thing to do?",
+      "close it and tell someone",["keep watching it","send it to a friend"]]
+  ], "padlock"],
+  6: ["Coding", [
+    ["What do we call a list of instructions for a computer?","a program",
+      ["a poem","a picture"]],
+    ["Does a computer do what you meant or what you said?","exactly what you said",
+      ["what you meant","whatever it likes"]],
+    ["What do we call a mistake in a program?","a bug",["a beetle","a blob"]],
+    ["What do we call hunting those mistakes down?","debugging",
+      ["defrosting","deleting"]],
+    ["What do we call telling a computer to repeat something?","a loop",
+      ["a line","a leap"]],
+    ["What does an “if” do in a program?","chooses what happens next",
+      ["stops the computer","prints the page"]]
+  ], "code"],
+  7: ["Inside the machine", [
+    ["What is the part that does all the thinking called?","the processor",
+      ["the printer","the plug"]],
+    ["What does a computer use to hold what it is working on right now?","memory",
+      ["the mouse","the monitor"]],
+    ["Where are your files kept while the computer is switched off?",
+      "on its storage drive",["in the memory","on the screen"]],
+    ["What do we call the parts you can actually touch?","hardware",
+      ["software","silverware"]],
+    ["What do we call the programs?","software",["hardware","homeware"]],
+    ["Why do computers have fans inside them?","to keep them cool",
+      ["to blow the dust in","to make music"]]
+  ], "chip"],
+  8: ["Computer numbers", [
+    ["How many different digits does a computer count with?","two",
+      ["ten","twenty-six"]],
+    ["Which two digits are they?","0 and 1",["1 and 2","A and B"]],
+    ["What do we call one of those digits?","a bit",["a bat","a byte"]],
+    ["How many bits make one byte?","eight",["two","one hundred"]],
+    ["What do we call one tiny dot on a screen?","a pixel",
+      ["a pickle","a parcel"]],
+    ["Which is bigger, a megabyte or a gigabyte?","a gigabyte",
+      ["a megabyte","they are the same"]]
+  ], "binary"],
+  9: ["People and history", [
+    ["Who is often called the first computer programmer?","Ada Lovelace",
+      ["Alan Turing","Bill Gates"]],
+    ["Which British mathematician helped break wartime codes?","Alan Turing",
+      ["Isaac Newton","Charles Babbage"]],
+    ["Who designed an early mechanical computer with cogs and gears?",
+      "Charles Babbage",["Ada Lovelace","Alan Turing"]],
+    ["What were the very first electronic computers like?","as big as a whole room",
+      ["as small as a watch","completely invisible"]],
+    ["What did early computers hold their programs on?","punched cards",
+      ["memory sticks","wi-fi"]],
+    ["When did computers start appearing in ordinary homes?","in the 1980s",
+      ["in the 1500s","last year"]]
+  ], "mainframe"],
+  10: ["Smart machines", [
+    ["What do the letters AI stand for?","artificial intelligence",
+      ["automatic internet","artistic imagination"]],
+    ["What is a robot?","a machine that can carry out tasks on its own",
+      ["a kind of animal","a type of hat"]],
+    ["How does a robot find out about the world around it?","with sensors",
+      ["with feelings","with dreams"]],
+    ["Can a computer be wrong?","yes, it certainly can",
+      ["no, never","only on Fridays"]],
+    ["What should you do with an answer a computer gives you?",
+      "check whether it makes sense",["believe it always","print it out"]],
+    ["What can people do that computers cannot?","care about somebody",
+      ["add up quickly","store a lot of information"]]
+  ], "robot"]
+};
+
+/* ==========================================================================
    THREE MORE LANGUAGES — Bahasa Indonesia, 日本語, 한국어.
 
    NOT curriculum, and nobody at either school teaches these. They are here

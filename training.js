@@ -1825,6 +1825,41 @@ var LADDERS=[
     note:"Nobody's homework, and nothing above rung 7 assumes he has seen the "+
       "film — a ladder running out is how it says “not yet”." }),
 
+  /* The five general-knowledge ones. None is anybody's syllabus, and each
+     says so on its own card; they are here because a boy who will not open
+     a spelling list will open a quiz about flags. */
+  qzLad({ id:"geo", em:"🌍", name:"Flags & countries", subject:"Geography",
+    bank:GEO_LADDER,
+    blurb:"Flags and continents at the bottom, then capitals, our own "+
+      "neighbours and famous places, up to what the stars on a flag mean.",
+    note:"Our corner of the world is rung 4 rather than rung 9 on purpose — he "+
+      "can see Johor from the top of a car park; Canberra he cannot." }),
+
+  qzLad({ id:"sport", em:"⚽", name:"Sports", subject:"Sport", bank:SPORT_LADDER,
+    blurb:"How each game is played: football, swimming and badminton at the "+
+      "bottom, then basketball, athletics and the Olympics, up to fair play.",
+    note:"About the rules rather than the results — a quiz on last season's "+
+      "table is wrong by the time anyone plays it." }),
+
+  qzLad({ id:"music", em:"🎷", name:"Music", subject:"Music", bank:MUSIC_LADDER,
+    blurb:"Instruments and their families, loud and soft, beat and rhythm, "+
+      "reading the stave, the orchestra, and who wrote what.",
+    note:"How music works, never the words to any of it — the Fun screen holds "+
+      "that line and so does this." }),
+
+  qzLad({ id:"art", em:"🎨", name:"Art", subject:"Art", bank:ART_LADDER,
+    blurb:"Colours and mixing at the bottom, then lines, materials and the "+
+      "famous pictures, up to composition and the words artists use.",
+    note:"Art at school is something he does rather than something he is "+
+      "tested on. This is only the words for it." }),
+
+  qzLad({ id:"comp", em:"💻", name:"Computers", subject:"Computers",
+    bank:COMP_LADDER,
+    blurb:"The parts, files and folders, the internet, staying safe, coding, "+
+      "what is inside, binary, and the people who built the first ones.",
+    note:"Rung 5 is staying safe — passwords, strangers, what to do when "+
+      "something upsets you — and it sits at 5 so a short climb still meets it." }),
+
   langLad({ id:"zh", em:"汉", name:"华文 quiz", subject:"华文", bank:ZH_LADDER,
     lang:"zh-CN", vname:"Mandarin", big:true,
     blurb:"The word is read out in Mandarin with its meaning on screen — tap the "+
@@ -1893,6 +1928,33 @@ function ladLast(L){
   var l=null;
   KIDS.forEach(function(k){ var r=lastFor(L.test, k.id); if(r && (!l || r.ts>l.ts)) l=r; });
   return l;
+}
+/* How many goes anyone has had on this ladder, both boys together, because the
+   ladder is not split by child and neither is the count. It is on the card
+   because "best 7" on its own never says whether that was a fluke or a habit,
+   and watching the number of goes climb beside the best is the thing that
+   makes a run feel like practice rather than a score. */
+function ladRuns(L){
+  var n=0;
+  KIDS.forEach(function(k){
+    n += runsFor(k.id).filter(function(r){ return r.test===L.test; }).length;
+  });
+  return n;
+}
+/* How high he has been, as a band to colour by. There is no red on this scale
+   and there is not going to be one: the score on a ladder is how far he
+   climbed, not a mark out of ten, and three rungs of the physics ladder is a
+   good morning's work for a boy in P2. scoreCls() would paint that red, which
+   is the whole reason these cards never used it. The scale runs from nothing
+   through to gold, and the top of the ladder is the only thing it celebrates. */
+function ladBand(best, L){
+  if(!best) return "";
+  if(best>=L.hi) return " top";
+  var f=(best-L.lo+1)/(L.hi-L.lo+1);
+  return f>=0.66 ? " p3" : f>=0.33 ? " p2" : " p1";
+}
+function ladPct(best, L){
+  return best ? Math.round(((best-L.lo+1)/(L.hi-L.lo+1))*100) : 0;
 }
 
 /* Never the same question twice in one run — until a rung runs out of fresh
@@ -2209,23 +2271,33 @@ function quizCards(){
 }
 function quizCard(L){
   var best=ladBest(L), from=ladFrom(L), l=ladLast(L), open=(qopen===L.id);
+  var runs=ladRuns(L), band=ladBand(best, L);
   var s='<div class="qcard'+(open?" open":"")+'">'+
     '<button class="qgo" data-climb="'+L.id+'">'+
       '<span class="qem">'+L.em+'</span>'+
       '<span class="qnm">'+esc(L.name)+'</span>'+
       '<span class="qsub">Level '+from+' · '+esc(L.tier(from))+'</span>'+
     '</button>'+
+    /* The best anyone has done, as a bar and a number he can watch move. The
+       whole ladder cleared is the one that gets a cup. */
+    '<div class="qbar'+band+'" role="img" aria-label="Best so far, '+best+
+      ' of '+L.hi+'"><i style="width:'+ladPct(best,L)+'%"></i></div>'+
     '<div class="qfoot">'+
-      '<span class="qbest">'+(best?"best "+best:"new")+'</span>'+
+      '<span class="qbest'+band+'">'+
+        (best ? (best>=L.hi?"🏆 ":"")+best+" / "+L.hi : "new")+'</span>'+
       '<button class="qlv" data-qopen="'+L.id+'" aria-expanded="'+(open?"true":"false")+'">'+
         (open?"Hide levels":"Levels")+'</button>'+
     '</div>';
   if(open){
     s+='<p class="empty" style="padding:10px 0">'+esc(L.blurb)+'</p>'+
        climbPicker(L)+
+       /* Best, last and how many goes, side by side. The last run is there so
+          that improving is something he can see between two numbers rather
+          than something anyone has to remember. */
        '<div class="key">'+(best
-         ? "Best so far: level "+best+" · "+esc(L.tier(best))+" · "+esc(L.rung(best))+
-           (l?" · last go "+esc(dshort(l.ts)):"")
+         ? "Best so far: level "+best+" of "+L.hi+" · "+esc(L.tier(best))+
+           (l ? " · last go reached "+l.score+", "+esc(dshort(l.ts)) : "")+
+           " · "+runs+(runs===1?" go":" goes")+" altogether"
          : esc(L.note))+'</div>';
     /* Said on the card rather than discovered mid-question: with no voice for
        the language the game still works off the meaning on screen, but nothing

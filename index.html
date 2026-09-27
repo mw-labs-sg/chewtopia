@@ -480,10 +480,25 @@
   .qem{font-size:34px;line-height:1.1}
   .qnm{font-family:'Baloo 2',cursive;font-size:19px;font-weight:700;text-align:center}
   .qsub{font-size:12px;font-weight:700;color:var(--soft);text-align:center}
-  .qfoot{display:flex;align-items:center;justify-content:space-between;gap:8px;
+  /* How high anyone has climbed. The scale runs from grey up to gold and has
+     no red anywhere on it, on purpose: the number is how far he got, not a
+     mark, and a low rung on a hard ladder is still a climb. See ladBand(). */
+  .qbar{height:7px;border-radius:999px;background:var(--line);overflow:hidden;
     margin-top:10px}
-  .qbest{font-size:11px;font-weight:800;color:var(--soft);text-transform:uppercase;
-    letter-spacing:.04em}
+  .qbar i{display:block;height:100%;border-radius:999px;background:var(--soft);
+    transition:width .35s ease}
+  .qbar.p1 i{background:#93B9EF}
+  .qbar.p2 i{background:var(--blue)}
+  .qbar.p3 i{background:var(--lime)}
+  .qbar.top i{background:var(--sun)}
+  .qfoot{display:flex;align-items:center;justify-content:space-between;gap:8px;
+    margin-top:8px}
+  .qbest{font-size:12px;font-weight:800;color:var(--soft);letter-spacing:.02em;
+    background:var(--bg);border-radius:999px;padding:4px 10px;white-space:nowrap}
+  .qbest.p1{color:#3A6FBF;background:#EAF2FE}
+  .qbest.p2{color:var(--tc-ink);background:var(--tc-bg)}
+  .qbest.p3{color:var(--lime-ink);background:var(--sc-bg)}
+  .qbest.top{color:var(--tang-deep);background:#FFF1CE}
   .qlv{font-size:12px;font-weight:800;border:0;border-radius:999px;cursor:pointer;
     padding:6px 11px;background:var(--bg);color:var(--blue);font-family:inherit;
     -webkit-appearance:none;appearance:none}
@@ -1092,7 +1107,7 @@ body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;-
   </header>
   <nav class="tabs" id="tabs" aria-label="Sections"></nav>
   <main id="view" tabindex="-1"></main>
-  <p class="foot">Saved on this device · build 158</p>
+  <p class="foot">Saved on this device · build 159</p>
 </div>
 <!-- load order matters: data, then core, then screens, app last -->
 <!-- Pinned to an exact version with a hash to match: "@2" floats, so a bad
@@ -1102,10 +1117,10 @@ body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3"
         integrity="sha384-l8ah+VgaWtk1mvOe9VC+OirC6qHFF4yH7l7mKRidV9MSti3E9F463bMp6ZVN4kuC"
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script src="data.js?v=66"></script>
-<script src="core.js?v=61"></script>
+<script src="data.js?v=67"></script>
+<script src="core.js?v=62"></script>
 <script src="timetable.js?v=6"></script>
-<script src="training.js?v=62"></script>
+<script src="training.js?v=63"></script>
 <script src="app.js?v=112"></script>
 </body>
 </html>
