@@ -1186,6 +1186,28 @@ var SEED_EVENTS = [
   {id:"e62", t:"LSP readers due — if he is in LSP", d:"2026-10-16", w:"tc",
    n:"Super Star Reader 10 and 11, and the Unit 12 Mastery Checklist, all set during the two HBL days and all due today. Marked “For LSP students” on both timetables, so this is only his if he is in the programme."},
 
+  /* Nanyang Primary, October information sheet NYPS2026/09/110, 28 Sep 2026.
+     Only the rows that are his: P2, so the P3 to P5 end-of-year examinations,
+     the P3 Di Zi Gui camp, the P6 HBL packages on the 12th to 14th and the P6
+     post-exam programme are all somebody else's October.
+
+     The clash in the note is the whole reason this event is worth having. SC's
+     kindergarten carnival the same morning wants one parent there from 8.30
+     until 2pm at Coronation Road, and TC comes out at 10.30 at King's Road. It
+     cannot be the same grown-up, and finding that out on the morning is too
+     late to fix it. */
+  {id:"e63", t:"Children’s Day at NYPS", d:"2026-10-01", w:"tc",
+   n:"Thursday. Dismissal is 10.30am — not the usual time, and SC's carnival runs to 2pm across town the same morning, so work out now who fetches whom. Theme is “Celebrate ME, Celebrate WE!”, with a carnival the PTA co-organises. No recess that day, so pack snacks. In a small bag: a water bottle, snacks, a Chinese book for silent reading, a card or board game to play with his class, and his donation for the Community Chest Children's Day Appeal. Envelopes are handed out and collected in school, and there is a PayNow QR on the letter if we would rather give that way. The next day, Friday the 2nd, is a school holiday."},
+
+  /* Off the same sheet's October table, which arrived scrambled: two rows of
+     dates and two of remarks, and it is not certain from the paste which goes
+     with which. This is the reading that matches how PSLE runs — everyone is
+     off while the papers are marked, and the P6 HBL days are P6's alone — but
+     it is worth one look at the Term 4 calendar on Parents Gateway before
+     anyone books anything around it. */
+  {id:"e64", t:"No school — PSLE marking", d:"2026-10-29", d2:"2026-10-30", w:"tc", hol:1,
+   n:"Thursday and Friday. The information sheet says all students are not required to come to school while the PSLE papers are marked. The same table also lists P6 home-based learning on the 12th to 14th, which is P6's own and does not affect him. If the two got swapped in the sheet, this is the one to check — the Term 4 calendar went out on Parents Gateway on 20 August and was updated on 16 September."},
+
   {id:"e41", t:"Sunday 10am — invitation with no name on it", d:"2026-10-11", time:"10:00", w:"tc",
    n:"One hour, 10 to 11am. A Google Calendar invite organised by Chew to minwei.chew.sgp@gmail.com, and that is the whole of what came through — the forwarded copy started at “When” and had no title on it."}
 ];
