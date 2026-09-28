@@ -1754,6 +1754,74 @@ function langLad(o){
       ? '<span lang="'+o.lang+'">'+esc(it.py)+'</span> · ' : '')+esc(it.m)+'</div>'; } };
 }
 
+/* ---------- telling the time ---------- */
+/* Indexed by hour mod 12, so midnight and noon come out as "twelve" rather
+   than the "zero" a bare number would give. */
+var CLOCK_HOURS=["twelve","one","two","three","four","five",
+                 "six","seven","eight","nine","ten","eleven"];
+function hourWord(h){ return CLOCK_HOURS[((h%12)+12)%12]; }
+/* The way it is actually said: "quarter past three", "twenty to five". The
+   word "minutes" goes back in only when the number is not a multiple of five,
+   because nobody says "twenty-three past four" but everybody says "five past". */
+function timeWords(h, m){
+  if(m===0)  return hourWord(h)+" o'clock";
+  if(m===15) return "quarter past "+hourWord(h);
+  if(m===30) return "half past "+hourWord(h);
+  if(m===45) return "quarter to "+hourWord(h+1);
+  var n = m<30 ? m : 60-m;
+  return numWords(n)+(n%5?" minutes ":" ")+
+         (m<30 ? "past "+hourWord(h) : "to "+hourWord(h+1));
+}
+/* Minutes since twelve and back again, so "an hour on" is an addition rather
+   than four lines of carrying. */
+function clockAt(t){ t=((t%720)+720)%720; return {h:Math.floor(t/60), m:t%60}; }
+/* What the hands are doing, in words, for the picture's label. It stops short
+   of naming the time: a boy who cannot see the screen should still have to
+   read the clock rather than be handed the answer he is about to tap. */
+function clockLabel(h, m){
+  return m===0
+    ? "a clock face, the short hand on "+hourWord(h)+" and the long hand on twelve"
+    : "a clock face, the short hand between "+hourWord(h)+" and "+hourWord(h+1)+
+      ", the long hand on the "+numWords(m)+" minute mark";
+}
+/* Wrong answers a boy would really give, never a random time: the hour one out
+   either way, past read as to, five minutes either side, and the two hands
+   read the wrong way round — which is the mistake this whole ladder exists to
+   put right, so it belongs on the screen as a tempting wrong answer. */
+function clockOpts(h, m){
+  var t=(h%12)*60+m, seen={}, out=[], cand=[clockAt(t+60), clockAt(t-60)];
+  seen[timeWords(h,m)]=1;
+  if(m!==0 && m!==30) cand.push({h:h%12, m:60-m});
+  if(m%5===0) cand.push({h:Math.floor(m/5), m:((h%12)*5)%60});
+  cand.push(clockAt(t+5), clockAt(t-5));
+  shuffled(cand).forEach(function(c){
+    if(out.length>=2) return;
+    var w=timeWords(c.h, c.m);
+    if(seen[w]) return;
+    seen[w]=1; out.push(w);
+  });
+  /* a time whose near misses collided — twelve o'clock has fewer neighbours */
+  for(var d=10; out.length<2; d+=10){
+    var c2=clockAt(t+d), w2=timeWords(c2.h, c2.m);
+    if(!seen[w2]){ seen[w2]=1; out.push(w2); }
+  }
+  return out;
+}
+/* Which minutes each rung is allowed to ask for. Rung 10 is null, meaning any
+   minute at all — that is the one the minute marks on the face are drawn for. */
+var CLOCK_MINS={
+  1:[0], 2:[30], 3:[0,30], 4:[15], 5:[45], 6:[15,45],
+  7:[5,10,20,25], 8:[35,40,50,55],
+  9:[0,5,10,15,20,25,30,35,40,45,50,55], 10:null
+};
+var CLOCK_TIERS={1:"O'clock", 2:"Half past", 3:"O'clock and half past",
+  4:"Quarter past", 5:"Quarter to", 6:"Quarter past and quarter to",
+  7:"Minutes past", 8:"Minutes to", 9:"Every five minutes", 10:"To the minute"};
+function clockGen(n){
+  var list=CLOCK_MINS[n], h=rnd(1,12), m=list?pick(list):rnd(1,59), a=timeWords(h,m);
+  return {a:a, q:h+":"+m, h:h, m:m, c:ladShuffleIn(a, clockOpts(h,m))};
+}
+
 var LADDERS=[
   { id:"spell", grp:"core", em:"🧗", name:"Spelling climb", test:CLIMB_TEST,
     subject:"English", lo:CLIMB_LO, hi:CLIMB_HI, mode:"type", ph:"Type the word",
@@ -1783,6 +1851,31 @@ var LADDERS=[
     q:function(it){ return it.q+" = ?"; },
     speak:function(it){ return [["What is "+it.sy+"?",0.95]]; },
     tell:function(it){ return [["The answer is "+it.a+".",0.9]]; } },
+
+  /* Generated rather than written out, like the maths climb: a clock has 720
+     faces before you even count the wrong answers, and no bank would hold
+     them. It also means he never gets the same time twice in a run.
+
+     This is for SC, who is six and learning to read a clock, which is why
+     rung 1 is nothing but o'clock and the minute marks only start mattering
+     at the top. TC can use it too — to the minute is P2 work. */
+  { id:"clock", grp:"core", em:"🕐", name:"Telling the time", test:"Telling the time",
+    subject:"Maths", lo:1, hi:10, mode:"pick",
+    ask:"The short blue hand is the hour, the long orange hand is the minutes",
+    blurb:"O'clock at the bottom, then half past, the quarters, five minutes "+
+      "at a time, and any minute at all at the top. A new clock face every "+
+      "question, so it is never the same one twice.",
+    note:"The wrong answers are the mistakes a child actually makes — the hour "+
+      "one out, past read as to, and the two hands read the wrong way round.",
+    tier:function(n){ return CLOCK_TIERS[n]||("Level "+n); },
+    rung:function(n){ return (CLOCK_TIERS[n]||("level "+n)).toLowerCase(); },
+    gen:clockGen,
+    /* The only drawing in the app that carries the question rather than
+       decorating it, which is why it is built from the item and not the rung. */
+    draw:function(it){ return clockSVG(it.h, it.m, clockLabel(it.h, it.m)); },
+    q:function(){ return "What time is it?"; },
+    speak:function(){ return [["What time is it?",0.95]]; },
+    tell:function(it){ return [["It is "+it.a+".",0.9]]; } },
 
   qzLad({ id:"sci", grp:"science", em:"🔬", name:"Science quiz", subject:"Science", bank:SCI_LADDER,
     blurb:"Animals at the bottom, food chains and condensation at the top — ten "+
@@ -2079,8 +2172,12 @@ function climbHTML(){
   var it=q.it, left=CLIMB_ROW-q.row;
   /* Drawn once, and it decides the card's own class: with a picture on it the
      mascot shrinks, because two big drawings one above the other pushed the
-     answers off the bottom of a phone and the answers are the game. */
-  var pic = L.pic ? picSVG(L.pic(q.lvl)) : "";
+     answers off the bottom of a phone and the answers are the game.
+
+     `draw` beats `pic` because they are different things. A `pic` is the rung's
+     topic and must never answer anything; a `draw` is built from this one item
+     and may well be the question itself, the way the clock face is. */
+  var pic = L.draw ? L.draw(it) : (L.pic ? picSVG(L.pic(q.lvl)) : "");
   var s='<div class="panel quizcard'+(pic?" haspic":"")+'"><div class="qtop">'+
     '<button class="btn soft" id="cB">&larr; Back</button>'+
     '<span class="hudchips">'+

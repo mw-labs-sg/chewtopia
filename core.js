@@ -1833,6 +1833,59 @@ function picSVG(name){
   return d ? '<svg class="qpic" viewBox="0 0 120 80" aria-hidden="true">'+d+'</svg>' : "";
 }
 
+/* ==========================================================================
+   THE CLOCK FACE — drawn fresh for every question, unlike everything in QPIC.
+
+   A rung picture illustrates the topic and must never answer the question.
+   This one IS the question: the hands are the thing being read, so it is
+   built per item from the hour and minute rather than per rung, and it is the
+   only drawing in the app that carries information.
+
+   That is also why it is not aria-hidden and gets a real label. A card that
+   fails to draw a QPIC picture loses nothing; a card that fails to draw this
+   has no question left, so the time goes into aria-label and a boy using a
+   screen reader is told it in words.
+
+   The two hands are made as unlike each other as a drawing can make them —
+   short, fat and blue against long, thin and orange — because "which hand is
+   which" is the whole of what a six-year-old gets wrong, and a clock with two
+   similar hands teaches him to guess.
+   ========================================================================== */
+function clockHand(len, deg, w, col){
+  var r = (deg - 90) * Math.PI / 180;
+  return '<path d="M60 60 L' + (60 + len * Math.cos(r)).toFixed(1) + ' ' +
+         (60 + len * Math.sin(r)).toFixed(1) + '" stroke="' + col +
+         '" stroke-width="' + w + '" stroke-linecap="round"/>';
+}
+function clockSVG(h, m, label){
+  var s = '<svg class="clockpic" viewBox="0 0 120 120" role="img" aria-label="' +
+          esc(label || "a clock face") + '">';
+  s += '<circle cx="60" cy="60" r="55" fill="#fff" stroke="#2F73E8" stroke-width="4"/>';
+  var i, r, x1, y1, x2, y2;
+  /* every minute gets a mark: without them the top rung, which asks for a time
+     to the exact minute, is a guess rather than a reading */
+  for(i = 0; i < 60; i++){
+    r = (i * 6 - 90) * Math.PI / 180;
+    var big = (i % 5 === 0), inner = big ? 45 : 48;
+    x1 = 60 + inner * Math.cos(r); y1 = 60 + inner * Math.sin(r);
+    x2 = 60 + 51 * Math.cos(r);    y2 = 60 + 51 * Math.sin(r);
+    s += '<path d="M' + x1.toFixed(1) + ' ' + y1.toFixed(1) + ' L' + x2.toFixed(1) +
+         ' ' + y2.toFixed(1) + '" stroke="' + (big ? "#16222E" : "#B8C9DA") +
+         '" stroke-width="' + (big ? 3 : 1.5) + '" stroke-linecap="round"/>';
+  }
+  for(i = 1; i <= 12; i++){
+    r = (i * 30 - 90) * Math.PI / 180;
+    s += '<text x="' + (60 + 36 * Math.cos(r)).toFixed(1) + '" y="' +
+         (60 + 36 * Math.sin(r)).toFixed(1) + '" text-anchor="middle" ' +
+         'dominant-baseline="central" font-size="13" font-weight="700" ' +
+         'fill="#16222E">' + i + '</text>';
+  }
+  s += clockHand(28, ((h % 12) + m / 60) * 30, 7.5, "#2F73E8");   /* hour, short and fat */
+  s += clockHand(44, m * 6, 4, "#FF6F52");                        /* minute, long and thin */
+  s += '<circle cx="60" cy="60" r="4.5" fill="#16222E"/>';
+  return s + '</svg>';
+}
+
 /* ---------- speech ---------- */
 var voices=[];
 function loadVoices(){ try{ voices=speechSynthesis.getVoices()||[]; }catch(e){ voices=[]; } }
