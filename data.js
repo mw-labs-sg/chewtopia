@@ -1137,16 +1137,22 @@ var SEED_EVENTS = [
   {id:"e58", t:"SLS — Picture Graph with Scales", d:"2026-09-19", w:"tc",
    n:"Mdm Leong set this on ClassDojo for the day off on the 15th, to revise picture graphs. Log in to SLS and finish it this weekend. Nothing to hand in on paper."},
 
-  /* Nanyang Primary, P2 English Term 4 spelling list. The words came off the
+  /* Nanyang Primary, P2 English Term 4 spelling lists. The words came off the
      scan of the sheets themselves, the way every other list in TC_SPELL did.
-     Both dates are in his own hand at the top of the page — 30 Sept on 4.1
-     and 15 Oct on 4.5 — and are the only dates anywhere in the house: 4.2
-     and 4.3 have no date on them, and 4.4 is not in the scan at all, so
-     neither of those three has an event. */
-  {id:"e56", t:"Spelling test — List 4.1", d:"2026-09-30", w:"tc", p:"en|4.1",
-   n:"Unit 11, The Feast. The date is the one written on the sheet itself — he said six days from the 17th, which would have been the 23rd, so if the class has been told otherwise his word wins. Seven words and three dictation sentences, all in Training now."},
+     Two dates were in his own hand at the top of a page, 30 September and 15
+     October, and both were taken to be the date of the list they were written
+     on. The 30th is not: that test is List 4.2, 4.1 having been and gone, and
+     the correction came from him.
+
+     So the 15 October one is read the same way and may be wrong the same way.
+     It is left where it is rather than guessed at — a date he wrote down is
+     better evidence than an off-by-one I assume from it — and e57 says so on
+     screen so that whoever reads it can check rather than trust. Lists 4.3 and
+     4.4 still have no date anywhere and so still have no event. */
+  {id:"e56", t:"Spelling test — List 4.2", d:"2026-09-30", w:"tc", p:"en|4.2",
+   n:"Wednesday, and Unit 11 again. Six words and three dictation sentences, all in Training under List 4.2. The HBL timetable for Tuesday sets aside time to study for it."},
   {id:"e57", t:"Spelling test — List 4.5", d:"2026-10-15", w:"tc", p:"en|4.5",
-   n:"Unit 13, Postcards to David. Dated on the sheet in his hand. Seven words and three dictation sentences."},
+   n:"Unit 13, Postcards to David. Seven words and three dictation sentences. Worth checking which list this one is: the date came off the top of the 4.5 sheet in his own hand, and the other date read that way turned out to belong to the next list along rather than the one it was written on. Ask him. TC_SPELL stops at 4.5, so if it turns out to be a later list the words are not in the app yet and the sheet needs scanning."},
 
   /* Nanyang Primary, September information sheet. Only the rows that are his:
      P2, so the P6 study break and the PSLE written papers are somebody else's
@@ -1171,8 +1177,8 @@ var SEED_EVENTS = [
   {id:"e55", t:"HBL day 1 — Monday", d:"2026-09-28", w:"tc", p:"hz|第十六课",
    n:"At home, following the school's timetable for the day. 7.30 Maths — MA worksheet, Review 6, pages 111 to 113, due 30 Sept. 8.30 华文 — 完成活动本16, pages 56 to 66, due 30 Sept. 10.30 LSP — Super Star Reader 10 and the Unit 12 Mastery Checklist, due 16 October (LSP students only). 11.00 PAL — the story reading and colouring worksheet that goes with PAL lesson 2. 12.30 English — Oral Poster: Toy Fair, due 30 Sept, answering the two questions on it: choice-making, and experience. Everything except the LSP reader goes back to school on the 30th. If he has to go in for supervision instead: report 8.00am to the canteen, dismissed 1.30pm. Student Care runs in the afternoons either way."},
 
-  {id:"e60", t:"HBL day 2 — Tuesday", d:"2026-09-29", w:"tc", p:"en|4.1",
-   n:"At home again, a different timetable from Monday's. 7.30 Maths — the worksheet on Shapes, due 30 Sept. 8.30 Art — Art Journal: finish the Snail Drawing and My Dream Pet, drawn and coloured, due next lesson. 9.30 and 10.30 华文 — 练习「我来说」16课. 11.30 LSP — Super Star Reader 11, due 16 October (LSP students only). 12.00 English — an English Journal entry on “A Party that I attended”, back to school on the 30th, and study for the spelling test on Wednesday the 30th. 1.00 PE — two worksheets, “How much sugar is in my drink?” and “My Healthy Meal & Sleep Log”, and those two are due today, the 29th, not the 30th."},
+  {id:"e60", t:"HBL day 2 — Tuesday", d:"2026-09-29", w:"tc", p:"en|4.2",
+   n:"At home again, a different timetable from Monday's. 7.30 Maths — the worksheet on Shapes, due 30 Sept. 8.30 Art — Art Journal: finish the Snail Drawing and My Dream Pet, drawn and coloured, due next lesson. 9.30 and 10.30 华文 — 练习「我来说」16课. 11.30 LSP — Super Star Reader 11, due 16 October (LSP students only). 12.00 English — an English Journal entry on “A Party that I attended”, back to school on the 30th, and study for the spelling test on Wednesday the 30th, which is List 4.2. 1.00 PE — two worksheets, “How much sugar is in my drink?” and “My Healthy Meal & Sleep Log”, and those two are due today, the 29th, not the 30th."},
 
   /* Everything the two days produce, in one place on the morning it is wanted.
      A separate row from the spelling test that day: one is a thing to pack the
