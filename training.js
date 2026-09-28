@@ -2353,7 +2353,18 @@ function quizCard(L){
    proper, because these ones get hit with a finger on an iPad. */
 function climbPicker(L){
   var sel=ladFrom(L), best=ladBest(L);
-  var s='<div class="clad pick" role="group" aria-label="Starting level">';
+  /* The same choice twice over, on purpose. The boxes say at a glance how far
+     up he has been — green for cleared, gold for his best — but a box is a
+     number and nothing else. The list underneath names every level, so
+     "somewhere about magnets" is findable without tapping ten boxes to read
+     their titles. Both write the same `qfrom`. */
+  var s='<select class="lvlsel" data-cpick="'+L.id+'" aria-label="Which level to start on">';
+  for(var m=L.lo;m<=L.hi;m++){
+    s+='<option value="'+m+'"'+(m===sel?' selected':'')+'>'+
+       'Level '+m+' — '+esc(L.tier(m))+(best&&m<=best?' ✓':'')+'</option>';
+  }
+  s+='</select>';
+  s+='<div class="clad pick" role="group" aria-label="Starting level">';
   for(var n=L.lo;n<=L.hi;n++){
     var cls = (best && n<=best) ? " done" : "";
     if(best && n===best) cls+=" best";
@@ -2387,6 +2398,13 @@ function wireClimbPanel(){
     b.onclick=function(){
       var p=b.dataset.cfrom.split(":");
       setLadFrom(ladBy(p[0]), p[1]); sfxTap(); render();
+    };
+  });
+  /* The list writes the same setting the boxes do, so the two can never drift
+     apart — whichever he used, the other redraws showing the same level. */
+  document.querySelectorAll("[data-cpick]").forEach(function(b){
+    b.onchange=function(){
+      setLadFrom(ladBy(b.dataset.cpick), b.value); sfxTap(); render();
     };
   });
 }
