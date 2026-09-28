@@ -1682,7 +1682,148 @@ var QPIC = {
     '<rect x="24" y="14" width="72" height="52" rx="13" fill="#CBD6E2" stroke="#9FB3C8" stroke-width="3"/>'+
     '<rect x="34" y="26" width="52" height="22" rx="11" fill="#2A3B4D"/>'+
     '<circle cx="48" cy="37" r="5.5" fill="#4FB86B"/><circle cx="72" cy="37" r="5.5" fill="#4FB86B"/>'+
-    '<rect x="46" y="55" width="28" height="5" rx="2.5" fill="#9FB3C8"/>'
+    '<rect x="46" y="55" width="28" height="5" rx="2.5" fill="#9FB3C8"/>',
+
+  /* --- history and geography --- */
+  /* --- history --- */
+  hourglass:
+    '<rect x="30" y="6" width="60" height="8" rx="3" fill="#C79A63"/>'+
+    '<rect x="30" y="66" width="60" height="8" rx="3" fill="#C79A63"/>'+
+    '<path d="M38 14 h44 l-22 26 l22 26 h-44 l22 -26z" fill="#EAF6FD" stroke="#9CD3F5" stroke-width="2.5"/>'+
+    '<path d="M42 18 h36 l-18 21z" fill="#FFB627"/>'+
+    '<path d="M60 44 l14 18 h-28z" fill="#FFB627"/>'+
+    '<path d="M60 40 v14" stroke="#FFB627" stroke-width="2.5"/>',
+  cave:
+    '<path d="M6 74 V38 a54 32 0 0 1 108 0 v36z" fill="#8A7360"/>'+
+    '<path d="M22 74 V44 a38 24 0 0 1 76 0 v30z" fill="#5C4A3C"/>'+
+    '<path d="M46 50 q-8 6 -2 14 q3 5 9 3 q7 -3 5 -10 q-2 -8 -12 -7z" fill="#E8D5BE"/>'+
+    '<g stroke="#E8D5BE" stroke-width="3" stroke-linecap="round">'+
+      '<path d="M44 52 l-8 -7 M45 62 l-9 3 M56 50 l3 -9 M60 58 l9 -4 M56 66 l4 8"/></g>'+
+    '<path d="M78 46 l14 22" stroke="#C79A63" stroke-width="3.5" stroke-linecap="round"/>'+
+    '<path d="M78 46 l-4 7 l8 -1z" fill="#E8D5BE"/>',
+  pyramid:
+    '<rect x="0" y="66" width="120" height="14" fill="#F3E3CE"/>'+
+    '<circle cx="100" cy="16" r="10" fill="#FFB627"/>'+
+    '<path d="M16 66 L46 16 L76 66z" fill="#E0C08A"/>'+
+    '<path d="M46 16 L46 66 L16 66z" fill="#C9A566"/>'+
+    '<path d="M74 66 L92 36 L110 66z" fill="#E0C08A"/>'+
+    '<path d="M92 36 L92 66 L74 66z" fill="#C9A566"/>',
+  column:
+    '<rect x="26" y="8" width="68" height="9" rx="2" fill="#DCE6F0"/>'+
+    '<rect x="30" y="17" width="60" height="7" rx="2" fill="#CBD6E2"/>'+
+    '<rect x="38" y="24" width="44" height="42" fill="#DCE6F0"/>'+
+    '<g stroke="#B8C9DA" stroke-width="2.5"><path d="M46 24 v42 M55 24 v42 M65 24 v42 M74 24 v42"/></g>'+
+    '<rect x="30" y="66" width="60" height="7" rx="2" fill="#CBD6E2"/>'+
+    '<rect x="24" y="73" width="72" height="7" rx="2" fill="#B8C9DA"/>',
+  harbour:
+    '<rect x="0" y="54" width="120" height="26" fill="#9CD3F5"/>'+
+    '<rect x="10" y="20" width="16" height="34" fill="#7C8FA3"/>'+
+    '<rect x="30" y="10" width="14" height="44" fill="#5E7183"/>'+
+    '<rect x="48" y="26" width="18" height="28" fill="#9FB3C8"/>'+
+    '<g fill="#FFB627"><rect x="14" y="26" width="4" height="5"/><rect x="34" y="16" width="4" height="5"/>'+
+      '<rect x="34" y="28" width="4" height="5"/><rect x="53" y="32" width="4" height="5"/></g>'+
+    '<path d="M74 44 h40 l-6 12 h-28z" fill="#FF6F52"/>'+
+    '<rect x="80" y="30" width="26" height="14" rx="2" fill="#E1EAF2"/>'+
+    '<path d="M0 62 q10 -5 20 0 t20 0 t20 0 t20 0 t20 0 t20 0" stroke="#fff" stroke-width="2.5" fill="none" opacity=".7"/>',
+  helmet:
+    '<path d="M30 34 a30 30 0 0 1 60 0 v26 a12 12 0 0 1 -12 12 h-36 a12 12 0 0 1 -12 -12z" fill="#CBD6E2" stroke="#9FB3C8" stroke-width="3"/>'+
+    '<rect x="38" y="38" width="44" height="7" rx="3" fill="#2A3B4D"/>'+
+    '<rect x="38" y="50" width="44" height="7" rx="3" fill="#2A3B4D"/>'+
+    '<path d="M60 4 v10" stroke="#9FB3C8" stroke-width="3"/>'+
+    '<path d="M60 4 q16 4 14 18 q-8 -8 -14 -6z" fill="#FF6F52"/>',
+  galleon:
+    '<rect x="0" y="58" width="120" height="22" fill="#9CD3F5"/>'+
+    '<path d="M60 8 V58" stroke="#8A5A3B" stroke-width="4"/>'+
+    '<path d="M62 12 q22 8 0 18z" fill="#F7FAFF" stroke="#CBD6E2" stroke-width="2"/>'+
+    '<path d="M58 34 q-24 8 0 18z" fill="#F7FAFF" stroke="#CBD6E2" stroke-width="2"/>'+
+    '<path d="M62 34 q24 8 0 18z" fill="#EAF2FB" stroke="#CBD6E2" stroke-width="2"/>'+
+    '<path d="M20 56 h80 l-12 16 h-56z" fill="#A9743F"/>'+
+    '<path d="M24 62 h72" stroke="#8A5A3B" stroke-width="3"/>'+
+    '<path d="M0 70 q10 -5 20 0 t20 0 t20 0 t20 0 t20 0 t20 0" stroke="#fff" stroke-width="2.5" fill="none" opacity=".7"/>',
+  cog:
+    '<g fill="#7C8FA3"><rect x="52" y="2" width="16" height="14" rx="3"/>'+
+      '<rect x="52" y="60" width="16" height="14" rx="3"/>'+
+      '<rect x="18" y="30" width="14" height="16" rx="3"/>'+
+      '<rect x="88" y="30" width="14" height="16" rx="3"/>'+
+      '<rect x="26" y="9" width="16" height="14" rx="3" transform="rotate(-45 34 16)"/>'+
+      '<rect x="78" y="9" width="16" height="14" rx="3" transform="rotate(45 86 16)"/>'+
+      '<rect x="26" y="53" width="16" height="14" rx="3" transform="rotate(45 34 60)"/>'+
+      '<rect x="78" y="53" width="16" height="14" rx="3" transform="rotate(-45 86 60)"/></g>'+
+    '<circle cx="60" cy="38" r="28" fill="#9FB3C8"/>'+
+    '<circle cx="60" cy="38" r="11" fill="#F2F7FC"/>',
+  plane:
+    '<path d="M4 44 L104 30 l12 6 l-12 6 L4 50z" fill="#E1EAF2" stroke="#B8C9DA" stroke-width="2.5"/>'+
+    '<path d="M46 40 L34 10 h10 l24 28z" fill="#2F73E8"/>'+
+    '<path d="M46 48 L34 74 h10 l24 -24z" fill="#2F73E8"/>'+
+    '<path d="M96 34 L88 18 h7 l12 15z" fill="#1E5FC4"/>'+
+    '<g fill="#9CD3F5"><circle cx="62" cy="44" r="3"/><circle cx="72" cy="43" r="3"/>'+
+      '<circle cx="82" cy="42" r="3"/></g>',
+  urn:
+    '<path d="M46 10 h28 v8 l-6 4 q18 8 18 28 q0 22 -26 22 q-26 0 -26 -22 q0 -20 18 -28 l-6 -4z" fill="#C79A63" stroke="#A9743F" stroke-width="2.5"/>'+
+    '<g stroke="#8A5A3B" stroke-width="2.5" fill="none"><path d="M40 44 h40 M44 56 h32"/></g>'+
+    '<path d="M60 36 l4 7 h-8z" fill="#8A5A3B"/>'+
+    '<path d="M94 8 L82 30" stroke="#B8C9DA" stroke-width="4" stroke-linecap="round"/>'+
+    '<path d="M82 30 q4 10 8 0z" fill="#5E7183"/>',
+
+  /* --- geography --- */
+  island:
+    '<rect x="0" y="46" width="120" height="34" fill="#9CD3F5"/>'+
+    '<ellipse cx="60" cy="52" rx="38" ry="12" fill="#EFE0BC"/>'+
+    '<ellipse cx="60" cy="49" rx="26" ry="8" fill="#DFF3E4"/>'+
+    '<path d="M58 48 V22" stroke="#A9743F" stroke-width="4" stroke-linecap="round"/>'+
+    '<g fill="#2C7A46"><path d="M58 22 q-18 -4 -22 8 q14 -2 22 -2z"/><path d="M58 22 q18 -4 22 8 q-14 -2 -22 -2z"/>'+
+      '<path d="M58 20 q-6 -14 -20 -14 q10 10 20 16z"/><path d="M58 20 q6 -14 20 -14 q-10 10 -20 16z"/></g>'+
+    '<path d="M0 60 q10 -5 20 0 t20 0 t20 0 t20 0 t20 0 t20 0" stroke="#fff" stroke-width="2.5" fill="none" opacity=".7"/>',
+  river:
+    '<rect x="0" y="0" width="120" height="80" fill="#DFF3E4"/>'+
+    '<path d="M46 0 q-14 22 4 34 q20 14 2 30 q-12 10 -6 16" stroke="#9CD3F5" stroke-width="18" fill="none" stroke-linecap="round"/>'+
+    '<path d="M46 0 q-14 22 4 34 q20 14 2 30 q-12 10 -6 16" stroke="#BDE4FA" stroke-width="9" fill="none" stroke-linecap="round"/>'+
+    '<g fill="#2C7A46"><circle cx="16" cy="20" r="8"/><circle cx="96" cy="16" r="9"/>'+
+      '<circle cx="104" cy="48" r="7"/><circle cx="18" cy="58" r="8"/></g>'+
+    '<g fill="#A9743F"><rect x="14" y="26" width="4" height="8"/><rect x="94" y="23" width="4" height="9"/>'+
+      '<rect x="102" y="53" width="4" height="7"/><rect x="16" y="64" width="4" height="8"/></g>',
+  volcano:
+    '<rect x="0" y="66" width="120" height="14" fill="#8A7360"/>'+
+    '<path d="M14 66 L44 22 h32 l30 44z" fill="#5C4A3C"/>'+
+    '<path d="M44 22 h32 l-6 8 h-20z" fill="#3E332A"/>'+
+    '<path d="M48 26 q6 12 12 0 q4 14 12 2 l6 38 h-36z" fill="#FF6F52"/>'+
+    '<path d="M52 30 q5 10 9 0 q3 11 9 2 l3 32 h-24z" fill="#FFB627"/>'+
+    '<g fill="#7C8FA3" opacity=".8"><circle cx="46" cy="12" r="8"/><circle cx="62" cy="6" r="9"/>'+
+      '<circle cx="78" cy="12" r="7"/></g>',
+  wave:
+    '<rect x="0" y="34" width="120" height="46" fill="#9CD3F5"/>'+
+    '<path d="M4 44 q22 -30 48 -8 q18 15 6 24 q-10 8 -18 -2 q-6 -8 2 -13 q7 -4 11 2 q-8 -2 -8 4" fill="#BDE4FA" stroke="#6FC2EE" stroke-width="2.5" stroke-linejoin="round"/>'+
+    '<path d="M0 68 q10 -5 20 0 t20 0 t20 0 t20 0 t20 0 t20 0" stroke="#fff" stroke-width="3" fill="none" opacity=".8"/>'+
+    '<path d="M96 52 q10 -12 18 0 q-9 10 -18 0z" fill="#FFE9D2" stroke="#F0C89A" stroke-width="2"/>'+
+    '<g stroke="#F0C89A" stroke-width="1.6"><path d="M99 50 l12 3 M101 46 l9 6"/></g>',
+  desert:
+    '<rect x="0" y="0" width="120" height="80" fill="#FFF1CE"/>'+
+    '<circle cx="98" cy="16" r="11" fill="#FFB627"/>'+
+    '<path d="M0 62 q26 -18 52 -2 q22 14 68 -4 v24 H0z" fill="#E0C08A"/>'+
+    '<path d="M0 72 q30 -10 60 0 q30 10 60 0 v8 H0z" fill="#C9A566"/>'+
+    '<rect x="34" y="34" width="11" height="34" rx="5" fill="#4FB86B"/>'+
+    '<path d="M39 48 h-10 a6 6 0 0 0 -6 6 v6" stroke="#4FB86B" stroke-width="7" fill="none" stroke-linecap="round"/>'+
+    '<path d="M40 42 h9 a6 6 0 0 1 6 6 v9" stroke="#4FB86B" stroke-width="7" fill="none" stroke-linecap="round"/>',
+  earthlayers:
+    '<circle cx="60" cy="40" r="36" fill="#9CD3F5"/>'+
+    '<path d="M60 4 a36 36 0 0 1 0 72z" fill="#4FB86B"/>'+
+    '<path d="M60 4 A36 36 0 0 0 60 76 A36 36 0 0 0 96 40z" fill="none"/>'+
+    '<path d="M60 12 a28 28 0 0 1 0 56z" fill="#E8B87A"/>'+
+    '<path d="M60 22 a18 18 0 0 1 0 36z" fill="#FF6F52"/>'+
+    '<path d="M60 32 a8 8 0 0 1 0 16z" fill="#FFD84D"/>'+
+    '<circle cx="60" cy="40" r="36" fill="none" stroke="#2F73E8" stroke-width="3"/>'+
+    '<path d="M60 4 V76" stroke="#2F73E8" stroke-width="2.5"/>',
+  umbrella:
+    '<g stroke="#2F73E8" stroke-width="4" stroke-linecap="round">'+
+      '<path d="M24 62 l-4 12"/><path d="M50 66 l-4 12"/><path d="M76 62 l-4 12"/><path d="M100 66 l-4 12"/></g>'+
+    '<path d="M12 42 a48 48 0 0 1 96 0 q-12 -8 -24 0 q-12 -8 -24 0 q-12 -8 -24 0 q-12 -8 -24 0z" fill="#FF6F52"/>'+
+    '<path d="M60 42 V64 a8 8 0 0 0 16 0" stroke="#5E7183" stroke-width="4" fill="none" stroke-linecap="round"/>'+
+    '<path d="M60 -2 V6" stroke="#5E7183" stroke-width="3"/>',
+  recycle:
+    '<g fill="#4FB86B">'+
+      '<path d="M60 8 l14 23 h-8.5 v11 h-11 v-11 h-8.5z"/>'+
+      '<path d="M60 8 l14 23 h-8.5 v11 h-11 v-11 h-8.5z" transform="rotate(120 60 44)"/>'+
+      '<path d="M60 8 l14 23 h-8.5 v11 h-11 v-11 h-8.5z" transform="rotate(240 60 44)"/></g>'
 };
 /* No name, or a name nothing was drawn for, and the card simply has no picture
    — which is why every rung has to read on its own and a typo here is only

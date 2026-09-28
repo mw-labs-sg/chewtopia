@@ -1863,6 +1863,25 @@ var LADDERS=[
     note:"Rung 5 is staying safe — passwords, strangers, what to do when "+
       "something upsets you — and it sits at 5 so a short climb still meets it." }),
 
+  qzLad({ id:"hist", grp:"world", em:"🏺", name:"History", subject:"History",
+    bank:HIST_LADDER,
+    blurb:"Then and now at the bottom, then the stone age, Egypt, Rome, "+
+      "Singapore's own story, castles, explorers, inventions and the last "+
+      "hundred years — up to how anybody knows any of it.",
+    note:"Singapore is level 5 rather than level 9 on purpose: Temasek and "+
+      "1965 are his own island, and he should meet that before he meets Rome." }),
+
+  /* The other half of the flags ladder. That one is countries and capitals;
+     this one is the planet they sit on. Where the two touch — oceans, maps —
+     the questions are different ones, checked by hand when a row is added. */
+  qzLad({ id:"geog", grp:"world", em:"🌋", name:"Geography", subject:"Geography",
+    bank:GEOG_LADDER,
+    blurb:"The Earth itself: land and water, weather, rivers, volcanoes, "+
+      "oceans, deserts and ice, maps, what is inside the planet, and climate.",
+    note:"Singapore's own geography runs all the way through rather than "+
+      "having a level — the monsoon, one degree off the equator, no water of "+
+      "its own. That is the geography he can feel." }),
+
   langLad({ id:"zh", em:"汉", name:"华文 quiz", subject:"华文", bank:ZH_LADDER,
     lang:"zh-CN", vname:"Mandarin", big:true,
     blurb:"The word is read out in Mandarin with its meaning on screen — tap the "+
