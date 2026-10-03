@@ -118,6 +118,22 @@ function rollingDays(n){
   for(var i=0;i<n;i++){ var x=new Date(d); x.setDate(d.getDate()+i); out.push(isoOf(x)); }
   return out;
 }
+/* Four weeks, then on to the end of whatever week the twenty-eighth day lands
+   in. The grid is grouped and labelled by week, so it has to end where a week
+   ends: stopping flat at 28 days printed the heading "Week of 26 Oct – 1 Nov"
+   above five of that week's seven days, and the SLS assignment due on the
+   Sunday dropped out of the grid entirely and turned up far below under
+   "After that" — beneath the very heading that said it was coming. A heading
+   that names a week nobody can see is worse than no heading. */
+function agendaDays(){
+  var out=rollingDays(AGENDA_DAYS);
+  var end=new Date(out[out.length-1]+"T00:00:00");
+  var over=(end.getDay()+6)%7;                 /* Monday 0 … Sunday 6 */
+  for(var i=1;i<=6-over;i++){
+    var x=new Date(end); x.setDate(end.getDate()+i); out.push(isoOf(x));
+  }
+  return out;
+}
 /* Which Monday a date belongs to, and what to call that week. */
 function mondayOf(isoStr){
   var d=new Date(isoStr+"T00:00:00");
@@ -605,10 +621,13 @@ function vHome(){
     .filter(function(e){ return f==="all" || !e.w || e.w===f; })
     .sort(function(a,b){ return evState(a).start-evState(b).start; });
 
-  var s='<div class="panel"><h2><span class="em">📅</span> What is coming'+
-        '<span class="side">next 4 weeks</span></h2>';
+  var days=agendaDays(), today=days[0], last=days[days.length-1];
 
-  var days=rollingDays(AGENDA_DAYS), today=days[0], last=days[days.length-1];
+  /* The window no longer ends on a fixed day, so it says where it ends rather
+     than claiming four weeks and quietly showing four and a bit. */
+  var s='<div class="panel"><h2><span class="em">📅</span> What is coming'+
+        '<span class="side">to '+esc(dday(last).slice(0,3)+" "+dnum(last)+" "+dmon(last))+
+        '</span></h2>';
   /* A trip that started before today still belongs on today, not off the top. */
   var byDay={}, later=[], laterDays=[];
   evs.forEach(function(e){
