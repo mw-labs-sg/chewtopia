@@ -1244,6 +1244,24 @@ var SEED_EVENTS = [
      because the only thing being asked of us is not to lose a coupon, and a
      reminder with no date on it is a reminder nobody ever sees. The real
      collection gets its own event once the school names a day. */
+  /* Off the SLS assignment card itself, which is the only place the status is:
+     open since 28 September at 1pm, closing 1 November at 6pm, and still
+     marked INCOMPLETE. Dated the close and not the open — an assignment with
+     five weeks on it is not a date until the week it runs out.
+
+     It is also the only thing outstanding in there. The assignment list holds
+     two and the other is the January onboarding guide for parents, closed on
+     6 February and overdue ever since, which is nobody's homework — so
+     this one event covers the whole of SLS rather than being the first of a
+     run.
+
+     No practice code. Touch typing is not a thing Training has at all, and the
+     digital citizenship half is a read-and-click module in SLS rather than a
+     list of questions, so there is nowhere to send him but SLS — the same as
+     e58. */
+  {id:"e69", t:"SLS due — Touch Typing and Digital Citizenship", d:"2026-11-01", time:"18:00", w:"tc",
+   n:"Sunday, and it closes at 6pm. Lesson 6 of the P2 module, open since 28 September and still showing as incomplete: the additional symbols, guided practice to get his accuracy and speed up, and the digital citizenship half — lines and shapes, sending e-mails, online communities, media, being kind online and off, and what to do when he sees a cyberbully. It is in SLS, so it needs the MIMS login and a keyboard rather than the iPad. Thursday and Friday the 29th and 30th are off school for the PSLE marking and are the obvious window: leaving it to the Sunday evening means finding out at five o'clock whether it is ten minutes of work or an hour."},
+
   {id:"e68", t:"Keep the bubble tea coupon somewhere safe", d:"2026-10-05", w:"tc",
    n:"Monday. The 《月下龙井》 coupon from the Mid-Autumn celebration still redeems a limited-edition magnetic badge, one badge a coupon. Collection at recess on 25 September was called off and no new date, time or place has been given; the school says the arrangements will be flexible so that every child holding a coupon gets one. Nothing to do today but find the coupon and put it where it will still be there."}
 ];
