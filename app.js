@@ -43,9 +43,18 @@ function render(){
          practice:vTests,berries:vBerries,quiz:vQuiz,fun:vFun,links:vLinks};
   var Wr={home:wHome,schedule:wWeek,meals:wMealsGrow,forums:wForums,
           practice:wTests,berries:wBerries,quiz:wQuiz,fun:wFun,links:wLinks};
-  /* the child switch belongs inside the first panel, under its heading */
+  /* The child switch is the Timetable's alone now. It was on Upcoming too, and
+     there it was asking a question the screen had already answered: the agenda
+     is a column per boy with his name over it, so Everyone / TC / SC sat
+     directly above a row that said TC and SC and did nothing the columns were
+     not doing. Worse, picking a boy there hid the other one's column while
+     leaving the heading in place.
+
+     The Timetable keeps it, because it genuinely has no columns: both boys at
+     once means each one squeezed down half the width of a period, and one boy
+     on his own is the only way to read a day properly. */
   var html=V[tab]();
-  if(tab==="home"||tab==="schedule") html=html.replace("</h2>", "</h2>"+whoBar());
+  if(tab==="schedule") html=html.replace("</h2>", "</h2>"+whoBar());
   v.innerHTML=html; Wr[tab]();
   document.querySelectorAll("[data-vw]").forEach(function(b){
     b.onclick=function(){ W("vwho", b.dataset.vw); sfxPop(); render(); };
@@ -160,9 +169,10 @@ function agLine(e){
   return s;
 }
 function agText(rows, laterMark, open, first, last){
-  var v=vwho();
-  var t="Chewtopia \u2014 Upcoming\n"+
-        "Showing: "+(v==="all"?"both boys":pname(v))+"\n"+
+  /* No "Showing:" line any more: the screen has no child filter, so it was a
+     constant, and a constant in a paste is a line nobody reads. Every event
+     line names its boy, which is the part that was ever in doubt. */
+  var t="Chewtopia \u2014 Upcoming \u2014 both boys\n"+
         "Window: "+txDate(first)+" to "+txDate(last)+"\n"+
         "Copied: "+txDate(isoOf(new Date()))+"\n";
   if(open.length){
@@ -692,9 +702,11 @@ function wLinks(){
 }
 
 function vHome(){
-  var f=vwho(), kids=shownKids();
+  var kids=shownKids();
+  /* Everything, both boys, always. Upcoming no longer reads vwho at all — it
+     is the Timetable's switch now, and a boy picked over there must not
+     quietly empty a column here. */
   var evs=SJ("events",[]).filter(function(e){ return !evState(e).gone; })
-    .filter(function(e){ return f==="all" || !e.w || e.w===f; })
     .sort(function(a,b){ return evState(a).start-evState(b).start; });
 
   var days=agendaDays(), today=days[0], last=days[days.length-1];
