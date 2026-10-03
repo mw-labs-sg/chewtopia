@@ -646,16 +646,25 @@
   .lnk.l-dojo .lnt,.lnk.l-dojo .lngo{color:var(--grape-ink)}
   .lnk.l-mims{border-color:#F5D2C6;background:var(--peach)}
   .lnk.l-mims .lnt,.lnk.l-mims .lngo{color:var(--tang)}
-  /* Open now — the tray above the agenda. Amber, because it is the one band
-     on this screen asking for something to be done today. */
-  .onow{border:2px solid #F5D2C6;background:var(--peach);border-radius:16px;
-    padding:10px 12px 12px;margin:0 0 12px}
-  .onh{display:flex;align-items:baseline;justify-content:space-between;gap:8px;
-    font-family:'Baloo 2',cursive;font-size:17px;font-weight:700;
-    color:var(--tang-deep);margin:0 0 8px}
-  .onh i{font-style:normal;font-size:12px;font-weight:700;color:var(--tang);opacity:.85}
-  .onow .evc{margin:0 0 8px}
-  .onow .evc:last-child{margin-bottom:0}
+  /* Open now — the first rows of the agenda rather than a tray above it, so
+     each one sits in its own boy's column. Amber on the band, because it is
+     the one heading here asking for something to be done today; the chip keeps
+     his colour, because the column is still his.
+
+     One line, and the note left off altogether. As a full card it was a
+     paragraph at the very top of the screen and pushed this week off the
+     bottom of the phone, which is the opposite of what a reminder is for —
+     the whole card is still on the day it is due. */
+  .agwk.opn{color:var(--tang-deep)}
+  .agwk.opn i{color:var(--tang)}
+  .evo{background:var(--bg);border-radius:10px;padding:7px 10px;margin-bottom:6px;
+    line-height:1.45}
+  .evo:last-child{margin-bottom:0}
+  .evo .evt{display:inline;font-size:13.5px}
+  .evo .evw{display:inline;margin:0 0 0 6px;white-space:nowrap}
+  .evo.e-tc{background:var(--tc-bg)}
+  .evo.e-sc{background:var(--sc-bg)}
+  .evo.e-all{background:var(--all-bg)}
   /* Two of these sit side by side at the foot of Upcoming now, and with no
      padding between them they read as one run of words: "+ Add something⧉
      Copy as text". A gap, and a rule between them, so they are two. */
@@ -1148,7 +1157,7 @@ body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;-
   </header>
   <nav class="tabs" id="tabs" aria-label="Sections"></nav>
   <main id="view" tabindex="-1"></main>
-  <p class="foot">Saved on this device · build 172</p>
+  <p class="foot">Saved on this device · build 173</p>
 </div>
 <!-- load order matters: data, then core, then screens, app last -->
 <!-- Pinned to an exact version with a hash to match: "@2" floats, so a bad
@@ -1158,10 +1167,10 @@ body[data-scene="volcano"]{--c1:#D4611E;--c2:#C43F2D;--c3:#D99A12;--c4:#A8452F;-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3"
         integrity="sha384-l8ah+VgaWtk1mvOe9VC+OirC6qHFF4yH7l7mKRidV9MSti3E9F463bMp6ZVN4kuC"
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script src="data.js?v=77"></script>
+<script src="data.js?v=78"></script>
 <script src="core.js?v=64"></script>
 <script src="timetable.js?v=6"></script>
 <script src="training.js?v=67"></script>
-<script src="app.js?v=115"></script>
+<script src="app.js?v=116"></script>
 </body>
 </html>

@@ -109,6 +109,18 @@ function evCard(e){
     '</div>';
 }
 
+/* The same event on one line, for the Open now rows at the top of the grid.
+   No note, no buttons: the whole card is still there on the day it is due, and
+   a paragraph at the top pushed the week itself off the screen. The note rides
+   along as a title so a long press still gives it without a tap going
+   anywhere. */
+function evOne(e){
+  return '<div class="evo e-'+(e.w||"all")+'"'+(e.n?' title="'+esc(e.n)+'"':'')+'>'+
+    '<span class="evt">'+esc(e.t)+'</span>'+
+    '<span class="evw">due '+esc(dfull(e.d))+(e.time?' \u00b7 '+esc(e.time):'')+'</span>'+
+    '</div>';
+}
+
 /* Work that was set before today and is not done yet. An SLS assignment opens
    weeks before it closes, and on a four-week grid it reads as something to
    worry about later right up until the evening it is due. e.from is the day it
@@ -692,16 +704,7 @@ function vHome(){
   var s='<div class="panel"><h2><span class="em">📅</span> What is coming'+
         '<span class="side">to '+esc(dday(last).slice(0,3)+" "+dnum(last)+" "+dmon(last))+
         '</span></h2>';
-  /* Anything already set and not done, in a tray of its own above the grid. It
-     stays on its own day further down as well — the deadline is still the
-     deadline — but a thing that could be done this afternoon should not have
-     to be scrolled to. */
   var open=evs.filter(isOpen);
-  if(open.length){
-    s+='<div class="onow"><div class="onh">Open now'+
-       '<i>'+open.length+(open.length===1?" thing":" things")+' set and not done</i></div>'+
-       open.map(evCard).join("")+'</div>';
-  }
 
   /* A trip that started before today still belongs on today, not off the top. */
   var byDay={}, later=[], laterDays=[], txRows=[], laterMark=-1;
@@ -717,6 +720,29 @@ function vHome(){
   s+='<div class="agenda'+(kids.length===1?" solo":"")+'">'+
      '<span class="agh"></span>'+
      kids.map(function(k){ return '<span class="agh '+whoCls(k.id)+'">'+esc(pname(k.id))+'</span>'; }).join("");
+
+  /* Anything already set and not done goes in first, as rows of the grid and
+     not a tray above it: one line in the boy's own column, under his own
+     heading, so it reads the way every other row on this screen reads and
+     there is no second layout to learn. It stays on its own day further down
+     as well — the deadline is still the deadline — but a thing that could be
+     done this afternoon should not have to be scrolled to. */
+  if(open.length){
+    s+='<span class="agwk opn">Open now<i>'+open.length+
+       (open.length===1?" thing":" things")+' set and not done</i></span>'+
+       '<span class="agd sp"></span>';
+    kids.forEach(function(k){
+      s+='<span class="agc">'+
+         open.filter(function(e){ return e.w===k.id; }).map(evOne).join("")+'</span>';
+    });
+    /* Nothing open is anybody's-and-everybody's today, but a form for the
+       household would be, and it belongs on a row rather than nowhere. */
+    var bothOpen=open.filter(function(e){ return !e.w; });
+    if(bothOpen.length){
+      s+='<span class="agd sp"></span><span class="agc both">'+
+         bothOpen.map(evOne).join("")+'</span>';
+    }
+  }
 
   /* Every chip gets its month, not just the row where the month turns over:
      one printed at the top of a run means scrolling to "5 Sat" tells you

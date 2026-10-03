@@ -1265,7 +1265,7 @@ var SEED_EVENTS = [
      digital citizenship half is a read-and-click module in SLS rather than a
      list of questions, so there is nowhere to send him but SLS — the same as
      e58. */
-  {id:"e69", t:"SLS due — Touch Typing and Digital Citizenship", d:"2026-11-01", time:"18:00", w:"tc",
+  {id:"e69", t:"SLS — Touch Typing and Digital Citizenship", d:"2026-11-01", time:"18:00", w:"tc",
    from:"2026-09-28",
    n:"Sunday, and it closes at 6pm. Lesson 6 of the P2 module, open since 28 September and still showing as incomplete: the additional symbols, guided practice to get his accuracy and speed up, and the digital citizenship half — lines and shapes, sending e-mails, online communities, media, being kind online and off, and what to do when he sees a cyberbully. It is in SLS, so it needs the MIMS login and a keyboard rather than the iPad. Thursday and Friday the 29th and 30th are off school for the PSLE marking and are the obvious window: leaving it to the Sunday evening means finding out at five o'clock whether it is ten minutes of work or an hour."},
 
