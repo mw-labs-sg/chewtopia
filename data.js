@@ -77,10 +77,16 @@ var TC_SPELL = {
      its own a day later, which is why it reads in a different hand above — the
      four pages that came together carried no 4.4 between them.
 
-     Two of the pages carry a date in his own hand: 30 Sept on 4.1 and 15 Oct
-     on 4.5. Those two are on the calendar; 4.2, 4.3 and 4.4 have no date
-     written on them and so have no event — they are in Training to practise,
-     not scheduled. */
+     All five are dated now, and not off the sheets: Ms Huang put the term's
+     five spelling dates on ClassDojo on 17 September, and the five lists fall
+     into them in order — 4.1 on 22 Sept, 4.2 on the 30th, 4.3 on 15 Oct, 4.4
+     on the 20th and 4.5 on 3 Nov. That order is anchored at both ends: that
+     the 30th is 4.2 came from him, and 4.5 is Unit 13, which comes last.
+
+     So neither date in his own hand was the date of the sheet it was written
+     on — 30 Sept was on 4.1 and belongs to 4.2, and 15 Oct was on 4.5 and
+     belongs to 4.3. A date he copies off the board is the next test, not the
+     page he writes it on; the teacher's own list is what the events use. */
   "4.1": ["Unit 11", [
     ["spell","Tom thumped on the door impatiently with his hand.","thumped"],
     ["spell","Jane could not wait to eat the delicious ham at the feast.","feast"],
@@ -1137,22 +1143,27 @@ var SEED_EVENTS = [
   {id:"e58", t:"SLS — Picture Graph with Scales", d:"2026-09-19", w:"tc",
    n:"Mdm Leong set this on ClassDojo for the day off on the 15th, to revise picture graphs. Log in to SLS and finish it this weekend. Nothing to hand in on paper."},
 
-  /* Nanyang Primary, P2 English Term 4 spelling lists. The words came off the
-     scan of the sheets themselves, the way every other list in TC_SPELL did.
-     Two dates were in his own hand at the top of a page, 30 September and 15
-     October, and both were taken to be the date of the list they were written
-     on. The 30th is not: that test is List 4.2, 4.1 having been and gone, and
-     the correction came from him.
+  /* Nanyang Primary, P2 English — the whole Term 4 spelling run, off Ms
+     Huang's ClassDojo post of 17 September, which simply lists the dates:
+     week 2 Tue 22 Sept, week 3 Wed 30 Sept, week 5 Thu 15 Oct, week 6 Tue
+     20 Oct, week 8 Tue 3 Nov. Two tests, a week off, two tests, a week off,
+     one test — and she says that shape is what the HBL days and the PSLE
+     marking days left her, not the usual rhythm.
 
-     So the 15 October one is read the same way and may be wrong the same way.
-     It is left where it is rather than guessed at — a date he wrote down is
-     better evidence than an off-by-one I assume from it — and e57 says so on
-     screen so that whoever reads it can check rather than trust. Lists 4.3 and
-     4.4 still have no date anywhere and so still have no event. */
+     That settles the one thing e57 asked on screen to be checked, and the
+     answer was the one it feared: 15 October is List 4.3, not 4.5. The five
+     lists fall into the five dates in order, anchored at both ends by his own
+     correction that the 30th is 4.2 and by 4.5 being Unit 13, which comes
+     last. 22 September was List 4.1 and has been and gone, so it gets no
+     event; the three still ahead are here. */
   {id:"e56", t:"Spelling test — List 4.2", d:"2026-09-30", w:"tc", p:"en|4.2",
    n:"Wednesday, and Unit 11 again. Six words and three dictation sentences, all in Training under List 4.2. The HBL timetable for Tuesday sets aside time to study for it."},
-  {id:"e57", t:"Spelling test — List 4.5", d:"2026-10-15", w:"tc", p:"en|4.5",
-   n:"Unit 13, Postcards to David. Seven words and three dictation sentences. Worth checking which list this one is: the date came off the top of the 4.5 sheet in his own hand, and the other date read that way turned out to belong to the next list along rather than the one it was written on. Ask him. TC_SPELL stops at 4.5, so if it turns out to be a later list the words are not in the app yet and the sheet needs scanning."},
+  {id:"e57", t:"Spelling test — List 4.3", d:"2026-10-15", w:"tc", p:"en|4.3",
+   n:"Thursday of week 5, and the first half of Unit 12. Seven words and three dictation sentences, in Training under List 4.3. Five of the seven are the reflexive pronouns — myself, himself, herself, ourselves, themselves — so they are one thing learnt rather than five, and the other two are quickly and quietly. This was down as List 4.5 before, off a date in his own hand; the teacher's own list has it as 4.3."},
+  {id:"e66", t:"Spelling test — List 4.4", d:"2026-10-20", w:"tc", p:"en|4.4",
+   n:"Tuesday of week 6, and the second half of Unit 12. Seven words and three dictation sentences, in Training under List 4.4: useless, roam, panicked, terrifying, sneered, pleased, laughed."},
+  {id:"e67", t:"Spelling test — List 4.5", d:"2026-11-03", w:"tc", p:"en|4.5",
+   n:"Tuesday of week 8. Unit 13, Postcards to David — seven words and three dictation sentences, in Training under List 4.5. The last one on the list Ms Huang gave, and the last list the sheets go up to, so anything after this needs a new sheet scanned."},
 
   /* Nanyang Primary, September information sheet. Only the rows that are his:
      P2, so the P6 study break and the PSLE written papers are somebody else's
@@ -1215,7 +1226,26 @@ var SEED_EVENTS = [
    n:"Thursday and Friday. The information sheet says all students are not required to come to school while the PSLE papers are marked. The same table also lists P6 home-based learning on the 12th to 14th, which is P6's own and does not affect him. If the two got swapped in the sheet, this is the one to check — the Term 4 calendar went out on Parents Gateway on 20 August and was updated on 16 September."},
 
   {id:"e41", t:"Sunday 10am — invitation with no name on it", d:"2026-10-11", time:"10:00", w:"tc",
-   n:"One hour, 10 to 11am. A Google Calendar invite organised by Chew to minwei.chew.sgp@gmail.com, and that is the whole of what came through — the forwarded copy started at “When” and had no title on it."}
+   n:"One hour, 10 to 11am. A Google Calendar invite organised by Chew to minwei.chew.sgp@gmail.com, and that is the whole of what came through — the forwarded copy started at “When” and had no title on it."},
+
+  /* Nanyang Primary 华文部, letter from 刘朝, 华文部主任. The carnival
+     itself carries no date — only the passport deadline does, and that is the
+     half of it that is ours to do, so that is what the event is. The night is
+     the prize for having done it, which is why it is in the note rather than
+     on a day of its own: a date we have not been given cannot go on the
+     calendar, and the thing to act on is three weeks of reading anyway. */
+  {id:"e65", t:"阅读护照 due — the Reading Carnival turns on it", d:"2026-10-23", w:"tc",
+   n:"Friday, and the last day to hand the 阅读护照 in. P1 to P3 have to have finished B本, where P4 and P5 need 40 points, and the children who have get an invitation card from their teacher for 阅读嘉年华 — 童话之夜, a Fairytale Night with 绘本 activities, carnival games and food in the evening. No date for the night itself yet. So the thing to do is look now at how much of B本 is left: three weeks of Chinese reading is doable, the Friday it is due is not."},
+
+  /* Mdm Ling on ClassDojo, 24 September. The magnetic badge that came free
+     with every bubble tea coupon was to be collected at recess on the 25th,
+     and that has been put off with no new date given. So this date is ours
+     and not the school's — the next school day, the way e28 sits on one —
+     because the only thing being asked of us is not to lose a coupon, and a
+     reminder with no date on it is a reminder nobody ever sees. The real
+     collection gets its own event once the school names a day. */
+  {id:"e68", t:"Keep the bubble tea coupon somewhere safe", d:"2026-10-05", w:"tc",
+   n:"Monday. The 《月下龙井》 coupon from the Mid-Autumn celebration still redeems a limited-edition magnetic badge, one badge a coupon. Collection at recess on 25 September was called off and no new date, time or place has been given; the school says the arrangements will be flexible so that every child holding a coupon gets one. Nothing to do today but find the coupon and put it where it will still be there."}
 ];
 
 /* ==========================================================================
@@ -1271,7 +1301,17 @@ var SCHOOL_LINKS = [
      the next. Only the stable part is kept, which lands on the same page. */
   {id:"mims", t:"MIMS", cn:"",
    s:"The MOE sign-in behind SLS, iCON and the school forms.",
-   u:"https://idp.mims.moe.gov.sg/nidp/app/login?id=mims", k:"mims"}
+   u:"https://idp.mims.moe.gov.sg/nidp/app/login?id=mims", k:"mims"},
+  /* 文萃, off Ms Lee 李老师's ClassDojo post of 22 September. A standing
+     invitation with no deadline anywhere on it, so it is a site and not an
+     event: Term 4 is exam season and she asks the children to read what their
+     classmates wrote, as preparation for the 口试 and the 作文. The 投稿 form
+     is the other link in that post and is deliberately not here — it submits
+     a piece of writing under his name, and that is not something to leave one
+     tap away inside an app the boys hold. */
+  {id:"wencui", t:"Wencui", cn:"文萃",
+   s:"The school’s own writing magazine — compositions by its pupils. Reading them is practice for the 口试 and the 作文.",
+   u:"https://go.gov.sg/nanyang-wencui", k:"wencui"}
 ];
 
 /* ==========================================================================
