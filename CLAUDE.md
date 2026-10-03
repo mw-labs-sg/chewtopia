@@ -277,6 +277,20 @@ holds: a typo there is only cosmetic, so nothing else would catch it.
   comment above it (see `第十四课` in `TC_TINGXIE`).
 - Give every new `SEED_EVENTS` / `SEED_ACTS` entry a fresh id. Anything deleted
   in the app stays deleted via `seedgone`.
+- **`from:` on an event is the day the work was *set*, not the day it is due.**
+  Once that day has passed, `isOpen()` lifts the card into the **Open now**
+  tray above the agenda and the card reads "open since 28 Sep" instead of "in
+  29 days". Give it to anything that can be done the moment it is handed out —
+  an SLS task, a form, a worksheet — and never to a thing that happens on its
+  day, which is every trip, test and celebration in the file. It is why an
+  assignment set in September stopped looking like a November problem.
+- **Upcoming writes its own plain-text copy, in `agText()` / `agLine()`.** The
+  agenda is a CSS grid — date in one cell, a column per boy — so selecting it
+  and pasting it anywhere collapses the columns and loses which boy a card
+  belonged to; pasted into a chat assistant it put TC's events under SC. Every
+  copied line carries the date and the name in words instead. Anything new on
+  an event card has to be added to `agLine()` as well, or it will be on the
+  screen and missing from the paste.
 - Failures must be visible. Say what went wrong rather than showing a number
   that never moves.
 

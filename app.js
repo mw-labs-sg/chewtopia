@@ -89,7 +89,13 @@ function evCard(e){
   return '<div class="evc e-'+(e.w||"all")+(st.live?" live":"")+(e.hol?" hol":"")+
     (isTest(e)&&!e.hol?" tst":"")+'">'+
     '<span class="evt">'+esc(e.t)+'</span>'+
-    '<span class="evw">'+(st.live?(e.d2?"On now":"Today"):evWhen(e))+
+    '<span class="evw">'+
+      /* An assignment is not a date in the future, it is work sitting there
+         now. e.from is the day it was set, and once that day has passed the
+         card leads with it — "open since 28 Sep" says do it, where "in 29
+         days" says there is plenty of time. */
+      (isOpen(e)?'open since '+dfull(e.from)+' \u00b7 due '+evWhen(e)
+                :(st.live?(e.d2?"On now":"Today"):evWhen(e)))+
       (e.time?' \u00b7 '+e.time:'')+
       (e.d2?' \u00b7 to '+dnum(e.d2)+' '+dmon(e.d2):'')+'</span>'+
     (e.n?'<span class="nt">'+esc(e.n)+'</span>':'')+
@@ -102,6 +108,64 @@ function evCard(e){
     (fromSeed(e.id)?'':'<button class="x" data-del="'+e.id+'" title="Remove">&times;</button>')+
     '</div>';
 }
+
+/* Work that was set before today and is not done yet. An SLS assignment opens
+   weeks before it closes, and on a four-week grid it reads as something to
+   worry about later right up until the evening it is due. e.from is the day it
+   was set; while that day has passed, the thing is outstanding now. */
+function isOpen(e){
+  return !!(e.from && daysTo(e.from)<=0 && !evState(e).gone);
+}
+
+/* ---------- copying the agenda out ---------- */
+/* The grid copies badly, and badly in the one way that matters. It is a CSS
+   grid — the date is one cell and each boy is a column — so selecting it and
+   pasting it elsewhere collapses the columns into a single run with nothing
+   left to say whose card was whose. Pasted into a chat assistant it put TC's
+   events under SC and had to be corrected twice.
+
+   So the panel writes its own copy, in which every line carries the date and
+   the name in words and nothing at all depends on where it sat on screen.
+   What is on the screen is what it copies: the same child filter, the same
+   window, the same "After that". */
+function txDate(i){
+  return new Date(i+"T00:00:00")
+    .toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short",year:"numeric"});
+}
+function agLine(e){
+  var bits=[];
+  if(e.time) bits.push("at "+e.time);
+  if(e.d2)   bits.push("to "+txDate(e.d2));
+  if(e.from) bits.push("set "+txDate(e.from));
+  if(e.hol)  bits.push("no school");
+  var s="- ["+(e.w?pname(e.w):"Both boys")+"] "+e.t+
+        (bits.length?" ("+bits.join("; ")+")":"")+"\n";
+  if(e.url) s+="  link: "+e.url+"\n";
+  /* The note is most of why anyone pastes this anywhere, so it goes in whole
+     rather than trimmed to a preview. Its own newlines come out, because one
+     line per event is what keeps the paste readable. */
+  if(e.n)   s+="  "+String(e.n).replace(/\s+/g," ")+"\n";
+  return s;
+}
+function agText(rows, laterMark, open, first, last){
+  var v=vwho();
+  var t="Chewtopia \u2014 Upcoming\n"+
+        "Showing: "+(v==="all"?"both boys":pname(v))+"\n"+
+        "Window: "+txDate(first)+" to "+txDate(last)+"\n"+
+        "Copied: "+txDate(isoOf(new Date()))+"\n";
+  if(open.length){
+    t+="\nOPEN NOW \u2014 set already, not done\n";
+    open.forEach(function(e){ t+=agLine(e); });
+  }
+  if(!rows.length) t+="\nNothing on in this window.\n";
+  rows.forEach(function(r,i){
+    if(i===laterMark) t+="\nAFTER THAT \u2014 past the window above\n";
+    t+="\n"+txDate(r[0])+"\n";
+    r[1].forEach(function(e){ t+=agLine(e); });
+  });
+  return t;
+}
+var agendaCopy="";
 
 /* ---------- the rolling window ---------- */
 /* Four weeks, every single day, so a quiet fortnight reads as a quiet fortnight
@@ -628,8 +692,19 @@ function vHome(){
   var s='<div class="panel"><h2><span class="em">📅</span> What is coming'+
         '<span class="side">to '+esc(dday(last).slice(0,3)+" "+dnum(last)+" "+dmon(last))+
         '</span></h2>';
+  /* Anything already set and not done, in a tray of its own above the grid. It
+     stays on its own day further down as well — the deadline is still the
+     deadline — but a thing that could be done this afternoon should not have
+     to be scrolled to. */
+  var open=evs.filter(isOpen);
+  if(open.length){
+    s+='<div class="onow"><div class="onh">Open now'+
+       '<i>'+open.length+(open.length===1?" thing":" things")+' set and not done</i></div>'+
+       open.map(evCard).join("")+'</div>';
+  }
+
   /* A trip that started before today still belongs on today, not off the top. */
-  var byDay={}, later=[], laterDays=[];
+  var byDay={}, later=[], laterDays=[], txRows=[], laterMark=-1;
   evs.forEach(function(e){
     var key = e.d < today ? today : e.d;
     if(key>last){
@@ -655,6 +730,10 @@ function vHome(){
   var lastMon="";
   function dayRows(list, d){
     var out="", has=!!(list&&list.length), mon=d.slice(0,7);
+    /* The text copy is collected by the same call that draws the row, so the
+       two cannot drift apart. Empty days are a screen thing — they are how a
+       quiet week is seen to be quiet — and are no use at all in a paste. */
+    if(has) txRows.push([d, list]);
     if(lastMon && mon!==lastMon) out+='<span class="agmo"></span>';
     lastMon=mon;
     /* a day off colours its own date too, so no-school days can be counted
@@ -710,6 +789,7 @@ function vHome(){
        screen. There are rarely more than a handful of real dates this far
        out, and the twenty-odd holidays behind them are what needed capping,
        not these. */
+    laterMark=txRows.length;
     var show=(doing.length?doing:laterDays).slice(0,8);
     var shown={}; show.forEach(function(d){ shown[d]=1; });
     var rest=laterDays.filter(function(d){ return !shown[d]; });
@@ -726,6 +806,7 @@ function vHome(){
     }
   }
   s+='</div>';
+  agendaCopy=agText(txRows, laterMark, open, today, last);
 
   if(showAdd){
     var opts='<option value="">Everyone</option>'+KIDS.map(function(k){
@@ -739,6 +820,15 @@ function vHome(){
        '<div class="btnrow"><button class="btn go" id="eAdd">Add</button>'+
        '<button class="btn soft" id="eCancel">Cancel</button></div>';
   } else s+='<button class="addlink" id="eShow">+ Add something</button>';
+
+  /* Tapping it fills the box as well as the clipboard. The clipboard only
+     works on a secure page and these iPads open the app over plain http on the
+     home network, so there has to be something to select by hand when the
+     write is refused — a button that silently does nothing is worse than no
+     button. */
+  s+='<button class="addlink" id="agCopy">\u29c9 Copy as text</button>'+
+     '<span class="cpmsg" id="agCopyMsg"></span>'+
+     '<textarea id="agTx" class="cell cptx" spellcheck="false"></textarea>';
 
   return s+'</div>'+todayFood();
 }
@@ -811,6 +901,34 @@ function wHome(){
       start(b.dataset.go);
     };
   });
+  var cp=document.getElementById("agCopy");
+  if(cp) cp.onclick=function(){
+    var box=document.getElementById("agTx"), msg=document.getElementById("agCopyMsg");
+    if(!box) return;
+    box.value=agendaCopy;
+    box.style.display="block";
+    function said(t){ if(msg) msg.textContent=t; }
+    /* Selected either way, so a refused write still leaves it ready to copy by
+       hand. iOS ignores select() often enough to be worth doing both. */
+    try{ box.focus(); box.select(); box.setSelectionRange(0, agendaCopy.length); }catch(err){}
+    var lines=agendaCopy.split("\n").length;
+    function won(){ said("Copied \u2014 "+lines+" lines."); }
+    function ouch(){ said("Could not reach the clipboard \u2014 it is selected below, copy it by hand."); }
+    /* execCommand first, old and deprecated as it is. It runs inside the tap
+       that called it, which is the only thing either path really needs, and it
+       works on an old iPad over plain http where navigator.clipboard is either
+       missing or refused outright. The modern API is the fallback, not the
+       other way round \u2014 and by the time its promise rejects the tap is over,
+       so there is nothing left to try after it. */
+    var ok=false; try{ ok=document.execCommand("copy"); }catch(err2){}
+    if(ok){ won(); return; }
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(agendaCopy).then(won, ouch);
+      return;
+    }
+    ouch();
+  };
+
   var sh=document.getElementById("eShow");
   if(sh) sh.onclick=function(){ showAdd=true; render(); };
   var cx=document.getElementById("eCancel");

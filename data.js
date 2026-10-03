@@ -1255,11 +1255,18 @@ var SEED_EVENTS = [
      this one event covers the whole of SLS rather than being the first of a
      run.
 
+     from: is the day it was set, and it is what puts the card in the Open now
+     tray at the top of Upcoming rather than leaving it a month down the grid.
+     Give it to anything that can be done the moment it is handed out — an SLS
+     task, a form, a worksheet — and not to a thing that happens on its day,
+     which is every trip, test and celebration in this file.
+
      No practice code. Touch typing is not a thing Training has at all, and the
      digital citizenship half is a read-and-click module in SLS rather than a
      list of questions, so there is nowhere to send him but SLS — the same as
      e58. */
   {id:"e69", t:"SLS due — Touch Typing and Digital Citizenship", d:"2026-11-01", time:"18:00", w:"tc",
+   from:"2026-09-28",
    n:"Sunday, and it closes at 6pm. Lesson 6 of the P2 module, open since 28 September and still showing as incomplete: the additional symbols, guided practice to get his accuracy and speed up, and the digital citizenship half — lines and shapes, sending e-mails, online communities, media, being kind online and off, and what to do when he sees a cyberbully. It is in SLS, so it needs the MIMS login and a keyboard rather than the iPad. Thursday and Friday the 29th and 30th are off school for the PSLE marking and are the obvious window: leaving it to the Sunday evening means finding out at five o'clock whether it is ten minutes of work or an hour."},
 
   {id:"e68", t:"Keep the bubble tea coupon somewhere safe", d:"2026-10-05", w:"tc",
