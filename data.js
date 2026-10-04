@@ -451,10 +451,15 @@ var HANZI = {
    Section (二) 填写字词: a sentence with the tested characters knocked out.
    s   the sentence, □ where a character is missing
    a   the missing characters, in order
-   Read off the workbook and checked against the 生字表. Lessons 13 and 14 use
-   every character on their 我会写 list exactly once; 18 and 19 do not, because
-   the school's own sentences do not — 18 reaches for 干 and 馆 off the 我会认
-   list, and 19 never tests 重 or 猜. Left as the school wrote them.
+   Read off the workbook and checked against the 生字表. Lessons 13, 14 and 16
+   use every character on their 我会写 list exactly once; 18 and 19 do not,
+   because the school's own sentences do not — 18 reaches for 干 and 馆 off the
+   我会认 list, and 19 never tests 重 or 猜. Left as the school wrote them.
+
+   Only section (二) is here. Section (一) 汉语拼音 gives the sentence in pinyin
+   with the tested characters left as bare brackets and no sound for them at
+   all — they are heard, not read — which is a dictation and not something a
+   screen can set. Item 9 on every sheet is an empty grid for the same reason.
    ========================================================================== */
 var TC_TINGXIE = {
   /* Keyed by lesson so it lines up with HANZI and RECOG on the 生字表 grid. */
@@ -476,6 +481,20 @@ var TC_TINGXIE = {
     ["弟弟和妹妹为了一个玩具□□起来。", "争吵"],
     ["他跌倒了，□上受了点□。", "脸伤"],
     ["只要多练习，你就□写好这些字。", "能"]
+  ],
+  /* 第十六课 — off the school's own 听写 16 page (workbook pp. 32–33), the
+     scan that came home on 4 October. Section (二) is items 3 to 8 on the
+     sheet, in the sheet's own order. The thirteen gaps are the thirteen
+     characters of its 我会写 list, each used once, which is how the real
+     sheets for 13 and 14 read too — that is what makes it a lesson's 听写
+     rather than a page of sentences. */
+  "第十六课": [
+    ["那本书叔叔已经□过两□了。", "借次"],
+    ["姐姐最喜欢听这□□语歌。", "首英"],
+    ["我们都不□□小猫去了哪里。", "知道"],
+    ["小云的□□一□完，同学们立刻给她拍手。", "故事讲"],
+    ["爸爸的箱子里有各种各□的工□，让人感到好奇。", "样具"],
+    ["哥哥一句□也没说，一□不响地出门了。", "话声"]
   ],
   "第十八课": [
     ["小丽把故事书放回□□的书架上。", "干净"],
@@ -1158,8 +1177,19 @@ var SEED_EVENTS = [
      event; the three still ahead are here. */
   {id:"e56", t:"Spelling test — List 4.2", d:"2026-09-30", w:"tc", p:"en|4.2",
    n:"Wednesday, and Unit 11 again. Six words and three dictation sentences, all in Training under List 4.2. The HBL timetable for Tuesday sets aside time to study for it."},
-  {id:"e57", t:"Spelling test — List 4.3", d:"2026-10-15", w:"tc", p:"en|4.3",
-   n:"Thursday of week 5, and the first half of Unit 12. Seven words and three dictation sentences, in Training under List 4.3. Five of the seven are the reflexive pronouns — myself, himself, herself, ourselves, themselves — so they are one thing learnt rather than five, and the other two are quickly and quietly. This was down as List 4.5 before, off a date in his own hand; the teacher's own list has it as 4.3."},
+  /* 4.3 has moved to Tuesday 6 October, told to us directly rather than off a
+     sheet. That is two moves for one test — it was down as 4.5 on 15 October
+     off a date in his own hand, became 4.3 on the 15th off Ms Huang's list,
+     and is now 4.3 on the 6th — and the newest of the three wins, as it has
+     each time.
+
+     What it does not explain is the 15th. Ms Huang's September list has a
+     spelling test that day and this was it, so either the whole Term 4 run
+     has slid a week earlier, or the 15th is now 4.4 and 4.4 is not on the
+     20th. Both are guesses and neither is here: 4.4 and 4.5 stay where her
+     list put them, and the note on this one says what to ask. */
+  {id:"e57", t:"Spelling test — List 4.3", d:"2026-10-06", w:"tc", p:"en|4.3",
+   n:"Tuesday, and the first half of Unit 12. Seven words and three dictation sentences, in Training under List 4.3. Five of the seven are the reflexive pronouns — myself, himself, herself, ourselves, themselves — so they are one thing learnt rather than five, and the other two are quickly and quietly. One thing to check: Ms Huang's September list had this test on Thursday the 15th. If the 15th is still a spelling day it is a different list now, and the rest of the term may have moved with it."},
   {id:"e66", t:"Spelling test — List 4.4", d:"2026-10-20", w:"tc", p:"en|4.4",
    n:"Tuesday of week 6, and the second half of Unit 12. Seven words and three dictation sentences, in Training under List 4.4: useless, roam, panicked, terrifying, sneered, pleased, laughed."},
   {id:"e67", t:"Spelling test — List 4.5", d:"2026-11-03", w:"tc", p:"en|4.5",
@@ -1268,6 +1298,20 @@ var SEED_EVENTS = [
   {id:"e69", t:"SLS — Touch Typing and Digital Citizenship", d:"2026-11-01", time:"18:00", w:"tc",
    from:"2026-09-28",
    n:"Sunday, and it closes at 6pm. Lesson 6 of the P2 module, open since 28 September and still showing as incomplete: the additional symbols, guided practice to get his accuracy and speed up, and the digital citizenship half — lines and shapes, sending e-mails, online communities, media, being kind online and off, and what to do when he sees a cyberbully. It is in SLS, so it needs the MIMS login and a keyboard rather than the iPad. Thursday and Friday the 29th and 30th are off school for the PSLE marking and are the obvious window: leaving it to the Sunday evening means finding out at five o'clock whether it is ten minutes of work or an hour."},
+
+  /* Told to us directly, and then the sheet itself came: 听写 16, 第十六课, on
+     Thursday 8 October. It fits the school's own rhythm — spelling is a
+     Tuesday and 听写 is a Thursday, the way e21 ran — and 第十六课 is also
+     the lesson the HBL timetable of 28 September had the class on, so the
+     guess that was in this note before turns out to have been one lesson too
+     far ahead. Which is why it was a note and not a button.
+
+     The button is tx, not hz: this is the one event in the file where the
+     school's own sheet is in the app, so he can practise the page he will
+     actually sit rather than the 生字 list behind it. e21 points at hz only
+     because no sheet for 第十四课 ever came home. */
+  {id:"e70", t:"华文听写 — 第十六课", d:"2026-10-08", w:"tc", p:"tx|第十六课",
+   n:"Thursday. 听写 16, workbook pages 32 and 33. The practice button is the sheet itself — section (二), the six sentences with the characters knocked out, tapped back into the gaps. Its thirteen gaps are the whole 我会写 list for the lesson, each character once: 声 英 具 话 讲 知 借 故 道 次 事 首 样. Section (一) is the pinyin half and is not in the app, because the tested characters are read out rather than printed — that half has to be done off the paper with somebody reading it, and so does the sentence in the empty grid at the end."},
 
   {id:"e68", t:"Keep the bubble tea coupon somewhere safe", d:"2026-10-05", w:"tc",
    n:"Monday. The 《月下龙井》 coupon from the Mid-Autumn celebration still redeems a limited-edition magnetic badge, one badge a coupon. Collection at recess on 25 September was called off and no new date, time or place has been given; the school says the arrangements will be flexible so that every child holding a coupon gets one. Nothing to do today but find the coupon and put it where it will still be there."}
