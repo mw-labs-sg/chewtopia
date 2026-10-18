@@ -383,107 +383,70 @@ function growList(who){
   return SJ(growKey(who),[]).slice().sort(function(a,b){
     return a.d < b.d ? -1 : a.d > b.d ? 1 : 0; });
 }
-function growDays(iso){ return Math.round(new Date(iso+"T00:00:00")/86400000); }
-function isoFromDays(n){
-  var d=new Date(n*86400000);
-  return d.getUTCFullYear()+"-"+String(d.getUTCMonth()+1).padStart(2,"0")+
-         "-"+String(d.getUTCDate()).padStart(2,"0");
-}
+/* Which of the two is being shown. A view preference, so it lives on the
+   device and is not synced — one grown-up looking at heights should not move
+   the other one's screen. */
+function growShow(){ return S("growshow","h")==="w" ? "w" : "h"; }
+function growUnit(f){ return f==="w" ? "kg" : "cm"; }
+
 /* The chart lines read from the same two tokens as every tinted box, so a
    boy cannot be one colour on his card and another on his line. */
 function kidCol(id){ return id==="tc" ? "var(--tc-ink)" : "var(--sc-ink)"; }
 
-/* One chart per boy, carrying both his numbers.
+/* One measurement at a time, as a horizontal bar per reading, oldest at the
+   top so the bars lengthen as you read down.
 
-   Weight and height cannot share a scale - he is 18kg and 113cm, so on one
-   axis the weight line is flat against the floor - so each gets its own: kg
-   down the left in his colour, cm down the right in grey, both normalised to
-   their own range so each line uses the full height of the box. The two are
-   told apart by more than colour, since colour alone fails on a printout and
-   for anyone colour-blind: weight is solid, height is dashed, and each line
-   carries its unit at the end.
+   This replaced a line chart carrying weight and height together on two
+   normalised axes. "Sharing a chart is the point", the comment here used to
+   say, and on paper it is — weight and height moving together is growth. It
+   did not survive contact with two readings. Because each line was stretched
+   to its own range, a half-kilo down and a centimetre up drew as two lines
+   crossing in the middle of the box, which looks like a meaningful event and
+   is nothing but the scaling. The right-hand axis printed "130" twice. Two
+   normalised axes need more readings than these boys will ever have between
+   one doctor and the next.
 
-   Sharing a chart is the point. Weight and height moving together is growth;
-   one moving without the other is the thing worth noticing, and that only
-   shows when they are drawn over each other.
+   So: one measure, bars, and the number on every row. Nothing is inferred
+   from a crossing because nothing crosses.
 
-   Returns "" when there is nothing to draw. */
-function growChart(who){
-  var W=320, H=150, L=34, R=32, T=14, B=20;
-  var rows=growList(who);
-
-  function build(field){
-    var pts=[], lo=null, hi=null;
-    rows.forEach(function(r){
-      var v=parseFloat(r[field]); if(isNaN(v)) return;
-      pts.push({x:growDays(r.d), y:v});
-      if(lo===null||v<lo) lo=v;
-      if(hi===null||v>hi) hi=v;
-    });
-    if(!pts.length) return null;
-    var pad=(hi-lo)*0.15 || Math.max(hi*0.04, 0.5);
-    return {pts:pts, y0:lo-pad, y1:hi+pad};
-  }
-  var wS=build("w"), hS=build("h");
-  if(!wS && !hS) return "";
-
-  /* one x scale for both, so a weight and a height taken the same morning sit
-     in the same column even when only one of them was recorded */
-  var loX=null, hiX=null;
-  [wS,hS].forEach(function(se){
-    if(!se) return;
-    se.pts.forEach(function(p){
-      if(loX===null||p.x<loX) loX=p.x;
-      if(hiX===null||p.x>hiX) hiX=p.x;
-    });
+   The bars do NOT start at zero, because 129cm and 130cm are the same bar if
+   they do. They start below the smallest reading and the footer says where —
+   a truncated axis is fine when it is declared and dishonest when it is not,
+   and the declaration is the whole reason that line is there. */
+function growBars(who, f){
+  var rows=growList(who).filter(function(r){
+    var v=parseFloat(r[f]); return !isNaN(v);
   });
-  if(hiX===loX){ loX-=7; hiX+=7; }   /* one reading would give a box no wider than a dot */
+  if(!rows.length) return "";
 
-  function px(x){ return L + (x-loX)/(hiX-loX)*(W-L-R); }
-  function py(se,v){ return T + (1-(v-se.y0)/(se.y1-se.y0))*(H-T-B); }
+  var vals=rows.map(function(r){ return parseFloat(r[f]); });
+  var lo=Math.min.apply(null, vals), hi=Math.max.apply(null, vals);
+  /* One reading, or several identical ones, has no spread to scale against,
+     so invent a sensible one rather than dividing by zero. */
+  var span=(hi-lo) || (f==="w" ? 1 : 2);
+  var unit=(f==="w" ? 0.5 : 1);
+  var base=Math.floor((lo-span)/unit)*unit;
+  var top=hi+span*0.15;
+  if(top<=base) top=base+unit;
 
   var col=kidCol(who);
-  var g='<svg class="gch" viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none" '+
-        'role="img" aria-label="'+esc(pname(who))+', weight and height over time">';
-
-  /* three lines across, with kg on the left and cm on the right against the
-     same three heights - each column reading its own scale */
-  for(var i=0;i<3;i++){
-    var f=i/2, yy=T+(1-f)*(H-T-B);
-    g+='<line class="ggl" x1="'+L+'" y1="'+yy.toFixed(1)+'" x2="'+(W-R)+'" y2="'+yy.toFixed(1)+'"/>';
-    if(wS) g+='<text class="gyl" style="fill:'+col+'" x="'+(L-5)+'" y="'+(yy+3).toFixed(1)+'">'+
-              (wS.y0+(wS.y1-wS.y0)*f).toFixed(1)+'</text>';
-    if(hS) g+='<text class="gyl r" x="'+(W-R+5)+'" y="'+(yy+3).toFixed(1)+'">'+
-              (hS.y0+(hS.y1-hS.y0)*f).toFixed(0)+'</text>';
-  }
-  if(wS) g+='<text class="gun" style="fill:'+col+'" x="'+(L-5)+'" y="'+(T-4)+'">kg</text>';
-  if(hS) g+='<text class="gun r" x="'+(W-R+5)+'" y="'+(T-4)+'">cm</text>';
-
-  g+='<text class="gxl" x="'+L+'" y="'+(H-5)+'">'+esc(dfull(isoFromDays(loX)))+'</text>'+
-     '<text class="gxl end" x="'+(W-R)+'" y="'+(H-5)+'">'+esc(dfull(isoFromDays(hiX)))+'</text>';
-
-  function draw(se, cls, stroke){
-    if(!se) return;
-    var d=se.pts.map(function(p){ return px(p.x).toFixed(1)+","+py(se,p.y).toFixed(1); }).join(" ");
-    if(se.pts.length>1)
-      g+='<polyline class="gln '+cls+'" points="'+d+'" style="stroke:'+stroke+'"/>';
-    se.pts.forEach(function(p){
-      g+='<circle class="gdot" cx="'+px(p.x).toFixed(1)+'" cy="'+py(se,p.y).toFixed(1)+
-         '" r="3" style="fill:'+stroke+'"/>';
-    });
-  }
-  draw(wS, "w", col);
-  draw(hS, "h", "var(--soft)");
-  return g+'</svg>';
+  var s='<div class="gbars">';
+  rows.forEach(function(r, i){
+    var v=parseFloat(r[f]);
+    var pc=Math.max(2, Math.min(100, (v-base)/(top-base)*100));
+    var prev=i ? parseFloat(rows[i-1][f]) : null;
+    var dd=(prev===null || isNaN(prev)) ? null : v-prev;
+    s+='<div class="gbr">'+
+       '<span class="gbd">'+esc(dfull(r.d))+'</span>'+
+       '<span class="gbt"><i style="width:'+pc.toFixed(1)+'%;background:'+col+'"></i></span>'+
+       '<span class="gbv" style="color:'+col+'">'+v.toFixed(1)+
+         (dd===null ? '' : '<u>'+(dd>=0?"+":"\u2212")+Math.abs(dd).toFixed(1)+'</u>')+
+       '</span></div>';
+  });
+  return s+'</div><p class="gbfoot">Bars start at '+base.toFixed(1)+' '+
+         growUnit(f)+', not zero — otherwise every reading draws the same bar.</p>';
 }
 
-/* One panel, the boys side by side inside it, and a single form above them.
-
-   They were a panel each, stacked, which pushed SC below the fold on a tablet
-   and meant scrolling to compare two numbers taken the same morning. Side by
-   side is the whole point of having two of them. This reuses the .duo/.kidbox
-   pair the Reading tab already uses for exactly this, rather than inventing a
-   second way of putting the boys next to each other. */
 function growCard(k){
   var l=growList(k.id), last=l[l.length-1], prev=l[l.length-2];
   var s='<div class="kidbox"><div class="kidname '+whoCls(k.id)+'">'+esc(pname(k.id))+
@@ -510,17 +473,15 @@ function growCard(k){
        (bmi?' \u00b7 BMI '+bmi.toFixed(1):'')+'</div>';
   }
 
-  var ch=growChart(k.id);
+  var f=growShow(), ch=growBars(k.id, f);
   if(ch){
-    var anyW=l.some(function(r){ return r.w!==""&&r.w!=null; }),
-        anyH=l.some(function(r){ return r.h!==""&&r.h!=null; });
-    /* the key names only what is drawn: a morning where only the scale came
-       out leaves a weight line and no height one */
-    s+='<div class="gwrap"><h3>'+
-       (anyW&&anyH ? "Weight and height" : anyW ? "Weight" : "Height")+'<em>'+
-       (anyW?'<span class="lg w" style="border-top-color:'+kidCol(k.id)+'"></span>kg':'')+
-       (anyH?'<span class="lg h"></span>cm':'')+
-       '</em></h3>'+ch+'</div>';
+    s+='<div class="gwrap"><h3>'+(f==="w"?"Weight":"Height")+
+       '<em>'+growUnit(f)+'</em></h3>'+ch+'</div>';
+  } else if(l.length){
+    /* He has been measured, just not this way: a morning where only the scale
+       came out leaves a weight and no height. Say which is missing rather
+       than an empty box. */
+    s+='<p class="empty">No '+(f==="w"?"weights":"heights")+' written down yet.</p>';
   } else {
     s+='<p class="empty">Nothing weighed yet.</p>';
   }
@@ -540,6 +501,7 @@ function growCard(k){
 }
 
 function vGrow(){
+  var f=growShow();
   var opts=KIDS.map(function(k){
     return '<option value="'+k.id+'"'+(k.id===who()?" selected":"")+'>'+
            esc(pname(k.id))+'</option>'; }).join("");
@@ -554,6 +516,15 @@ function vGrow(){
            '<input type="number" id="gCm" step="0.1" min="0" max="250" placeholder="cm" inputmode="decimal">'+
            '<button class="btn go" id="gAdd">Add</button>'+
          '</div><div class="hint" id="gMsg"></div>'+
+         /* One toggle for both boys, not one each: the cards sit side by side
+            and are read against each other, so two of them on different
+            measures is a comparison nobody meant to make. */
+         '<div class="gtog" role="group" aria-label="Which measurement to show">'+
+           '<button type="button" class="gtb'+(f==="h"?" on":"")+'" data-gshow="h"'+
+             (f==="h"?' aria-pressed="true"':' aria-pressed="false"')+'>Height</button>'+
+           '<button type="button" class="gtb'+(f==="w"?" on":"")+'" data-gshow="w"'+
+             (f==="w"?' aria-pressed="true"':' aria-pressed="false"')+'>Weight</button>'+
+         '</div>'+
          '<div class="gduo">'+shownKids().map(growCard).join("")+'</div></div>';
 }
 
@@ -583,6 +554,9 @@ function wGrow(){
     WJ(growKey(w), a);
     sfxPop(); render();
   };
+  document.querySelectorAll("[data-gshow]").forEach(function(b){
+    b.onclick=function(){ W("growshow", b.dataset.gshow); sfxTap(); render(); };
+  });
   document.querySelectorAll("[data-gdel]").forEach(function(x){
     x.onclick=function(){
       var w=x.dataset.gwho, id=x.dataset.gdel, k=growKey(w);
