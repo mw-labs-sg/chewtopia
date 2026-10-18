@@ -1190,8 +1190,22 @@ var SEED_EVENTS = [
      list put them, and the note on this one says what to ask. */
   {id:"e57", t:"Spelling test — List 4.3", d:"2026-10-06", w:"tc", p:"en|4.3",
    n:"Tuesday, and the first half of Unit 12. Seven words and three dictation sentences, in Training under List 4.3. Five of the seven are the reflexive pronouns — myself, himself, herself, ourselves, themselves — so they are one thing learnt rather than five, and the other two are quickly and quietly. One thing to check: Ms Huang's September list had this test on Thursday the 15th. If the 15th is still a spelling day it is a different list now, and the rest of the term may have moved with it."},
-  {id:"e66", t:"Spelling test — List 4.4", d:"2026-10-20", w:"tc", p:"en|4.4",
-   n:"Tuesday of week 6, and the second half of Unit 12. Seven words and three dictation sentences, in Training under List 4.4: useless, roam, panicked, terrifying, sneered, pleased, laughed."},
+  /* Which list this one is has an open question behind it, and the question
+     is on the card rather than only in here, because the boy revising the
+     night before is the person it costs.
+
+     Ms Huang's September list had five dates: 22 Sept, 30 Sept, 15 Oct,
+     20 Oct, 3 Nov. 4.1 and 4.2 went on the first two, confirmed. Then 4.3
+     moved to Tuesday the 6th, which is not on her list at all. If that was an
+     extra date rather than a moved one, the 15th was 4.4 and today is 4.5.
+     Nobody has been able to say whether a test happened on the 15th.
+
+     So it stays 4.4, which is what her list says and the only sourced answer
+     there is, and the note names 4.5 as the other possibility. Both are in
+     Training and the words for each are ten minutes apart — the cheap
+     insurance is reading the note, not guessing the list. */
+  {id:"e66", t:"Spelling test — List 4.4 (check which list)", d:"2026-10-20", w:"tc", p:"en|4.4",
+   n:"Tuesday of week 6, and the second half of Unit 12. Seven words and three dictation sentences, in Training under List 4.4: useless, roam, panicked, terrifying, sneered, pleased, laughed. Worth one question to him first, though: 4.3 was sat on Tuesday the 6th and Ms Huang's September list had it down for Thursday the 15th, so if a test did happen on the 15th then that one was 4.4 and today is 4.5. List 4.5 is in Training too — Unit 13, Postcards to David — so either way the words are there."},
   {id:"e67", t:"Spelling test — List 4.5", d:"2026-11-03", w:"tc", p:"en|4.5",
    n:"Tuesday of week 8. Unit 13, Postcards to David — seven words and three dictation sentences, in Training under List 4.5. The last one on the list Ms Huang gave, and the last list the sheets go up to, so anything after this needs a new sheet scanned."},
 
