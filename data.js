@@ -1037,7 +1037,36 @@ var SEED_EVENTS = [
    n:"From October the school sends every announcement, letter and consent form through the Parents Gateway app, not by email. Get it onto the phone before then so nothing is missed.",
    url:"https://pg.moe.edu.sg"},
   {id:"e32", t:"P1 Orientation Day", d:"2026-11-20", w:"sc",
-   n:"Physical orientation at Nanyang Primary for him and a parent, Friday afternoon. Times and the rest come closer to the date, through Parents Gateway. The kindergarten has its graduation closure the same day — read that one before committing to a time."},
+   n:"Physical orientation at Nanyang Primary for him and a parent, Friday afternoon. The school's welcome e-mail confirms the date and says the details come closer to it. The kindergarten has its graduation closure the same day — read that one before committing to a time."},
+
+  /* Nanyang Primary's P1 2027 welcome e-mail. The orientation in it was
+     already e32, off the earlier letter; the rest of this block is what the
+     e-mail and two of its attachments add.
+
+     The uniform vendor's letter has real dates in it, so e72 and e74 use the
+     vendor's and not ours. The eGIRO guide has none at all — it is a table
+     of contents and three banks — so e75's date is ours and says so. The
+     2027 P1 Information Booklet has still not been read and is not in
+     References/; if it carries dates of its own they are not in this file.
+
+     The ordering of these three is the point of having them separately. The
+     house colour cannot be known before the end of November (e73) and one of
+     the seven things on the vendor's P1 list is a House T-shirt in that
+     colour, so the order cannot sensibly go in until it has arrived — and
+     the vendor wants it in by 15 December. That is a fortnight of slack
+     between two dates neither of us set, which is exactly the kind of thing
+     that is obvious in October and lost in December. */
+  {id:"e73", t:"P1 class and house colour should arrive", d:"2026-11-30", w:"sc",
+   n:"By the end of November the school e-mails his class and his house colour — Yellow, Blue, Green or Red. Two things about how it comes: it is e-mail, not Parents Gateway, and it goes only to the parent who registered him in the P1 exercise. So it is that one inbox to watch, and if nothing has arrived by today it is worth chasing rather than assuming it is late."},
+
+  {id:"e72", t:"Order his P1 uniform", d:"2026-12-01", w:"sc",
+   n:"Tuesday, and dated the day after the house colour is due, because one of the seven items needs it. Shanghai School Uniforms, shanghai-uniforms.sg, the school's own vendor. Their recommended P1 set: 2 sets of uniform, 2 polo shirts, 2 PE shorts, 1 House T-shirt, 3 pairs of white socks with the school logo, 1 pair of white shoes. Home delivery is $10 a trip under 10kg and takes up to 10 working days between November and February, which is why this is not left to the middle of December. Smart Locker self-collection at 63 Ubi Avenue 1 is free but strictly to the slot booked. Nothing can be tried on — the hub does not allow it — so the sizes are a guess either way, and walk-ins there are by online appointment only."},
+
+  {id:"e74", t:"Uniform — last day the vendor encourages", d:"2026-12-15",
+   n:"Tuesday. Shanghai Uniforms asks for year-end orders in by today so they arrive before school reopens; the window itself runs 1 November to 31 December and January orders are online only. This is both boys, not just the P1 one — the year-end sale is all levels, and TC grows too. One thing to check on their own letter before relying on it: it lists the Ubi hub as closed ‘18 to 25 Dec 2025’, a year out of date in a 2026/27 notice, so if the hub is wanted rather than delivery, ring 6747 8037 first."},
+
+  {id:"e75", t:"Set up eGIRO for school fees", d:"2026-12-01", w:"sc",
+   n:"The direct debit the school fees come out of. The guide that came with the welcome e-mail is dated September 2026 and covers DBS, OCBC and UOB — it is done through the bank’s own login rather than on a form, so it needs whoever holds that account. No deadline came with it and the booklet has not been read, so this date is ours: the same day as the uniform, and a month before he starts, on the grounds that a direct debit set up in January is a direct debit set up late."},
 
 
   /* From the K2 parents' WhatsApp group, read off the thread rather than from
