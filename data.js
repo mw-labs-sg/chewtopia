@@ -1060,13 +1060,35 @@ var SEED_EVENTS = [
    n:"By the end of November the school e-mails his class and his house colour — Yellow, Blue, Green or Red. Two things about how it comes: it is e-mail, not Parents Gateway, and it goes only to the parent who registered him in the P1 exercise. So it is that one inbox to watch, and if nothing has arrived by today it is worth chasing rather than assuming it is late."},
 
   {id:"e72", t:"Order his P1 uniform", d:"2026-12-01", w:"sc",
-   n:"Tuesday, and dated the day after the house colour is due, because one of the seven items needs it. Shanghai School Uniforms, shanghai-uniforms.sg, the school's own vendor. Their recommended P1 set: 2 sets of uniform, 2 polo shirts, 2 PE shorts, 1 House T-shirt, 3 pairs of white socks with the school logo, 1 pair of white shoes. Home delivery is $10 a trip under 10kg and takes up to 10 working days between November and February, which is why this is not left to the middle of December. Smart Locker self-collection at 63 Ubi Avenue 1 is free but strictly to the slot booked. Nothing can be tried on — the hub does not allow it — so the sizes are a guess either way, and walk-ins there are by online appointment only."},
+   n:"Tuesday, and dated the day after the house colour is due, because one of the seven items needs it. Shanghai School Uniforms, shanghai-uniforms.sg, the school's own vendor. Their recommended P1 set: 2 sets of uniform, 2 polo shirts, 2 PE shorts, 1 House T-shirt, 3 pairs of white socks, 1 pair of white canvas shoes. The socks are the one thing the two documents disagree on — the vendor says socks with the school logo and the booklet says socks with no logo — so the booklet wins here, being the school's own, but it is worth one question. Shoes are white canvas, plain or with the NYPS logo and nothing else. Measure with an inch tape and not a 市寸 one: the polo size is the shoulder width doubled plus four. Home delivery is $10 a trip under 10kg and takes up to 10 working days between November and February, which is why this is not left to the middle of December. Smart Locker self-collection at 63 Ubi Avenue 1 is free but strictly to the slot booked. Nothing can be tried on, so the sizes are a measurement rather than a fitting. Name tags are a different shop: Stitchwerkz, nametags.stitchwerkz.sg/nyps."},
 
   {id:"e74", t:"Uniform — last day the vendor encourages", d:"2026-12-15",
-   n:"Tuesday. Shanghai Uniforms asks for year-end orders in by today so they arrive before school reopens; the window itself runs 1 November to 31 December and January orders are online only. This is both boys, not just the P1 one — the year-end sale is all levels, and TC grows too. One thing to check on their own letter before relying on it: it lists the Ubi hub as closed ‘18 to 25 Dec 2025’, a year out of date in a 2026/27 notice, so if the hub is wanted rather than delivery, ring 6747 8037 first."},
+   n:"Tuesday. Shanghai Uniforms asks for year-end orders in by today so they arrive before school reopens; the window itself runs 1 November to 31 December and January orders are online only. This is both boys, not just the P1 one — the year-end sale is all levels, and TC grows too. One thing to check on their own letter before relying on it: it lists the Ubi hub as closed ‘18 to 25 Dec 2025’, a year out of date in a 2026/27 notice, so if the hub is wanted rather than delivery, ring 6747 8037 first — or the office on 6352 2741."},
 
-  {id:"e75", t:"Set up eGIRO for school fees", d:"2026-12-01", w:"sc",
-   n:"The direct debit the school fees come out of. The guide that came with the welcome e-mail is dated September 2026 and covers DBS, OCBC and UOB — it is done through the bank’s own login rather than on a form, so it needs whoever holds that account. No deadline came with it and the booklet has not been read, so this date is ours: the same day as the uniform, and a month before he starts, on the grounds that a direct debit set up in January is a direct debit set up late."},
+  {id:"e75", t:"School money — eGIRO and Edusave", d:"2026-12-01", w:"sc",
+   n:"Two separate set-ups, both his own. eGIRO is the direct debit the fees come out of, at moe.gov.sg/financial-matters/fees/egiro — do it on a desktop, through the bank’s own login rather than on a form, so it needs whoever holds the account. The bill reference is Sebastian’s own UIN, which is the part worth knowing: TC’s GIRO does not cover him and never will. Two kinds of account are refused outright and need a paper form instead — an OCBC joint account, and any joint account needing two signatories. The guide covers DBS, OCBC and UOB. Separately, the Edusave standing order goes through the Student Finance System with Singpass. No deadline came with either, so this date is ours: a month before he starts, on the grounds that a direct debit set up in January is set up late.",
+   url:"https://www.moe.gov.sg/financial-matters/fees/egiro"},
+
+  /* The 2027 P1 Information Booklet, read at last. Three things in it have
+     dates and are below; the uniform and eGIRO entries above have been
+     corrected from it rather than duplicated.
+
+     Everything else in the booklet is reference rather than a date — the
+     7.30 assembly, recess at nine, the snack at noon, silent reading in
+     Chinese on odd weeks and English on even ones, PE attire on PE days, the
+     house T-shirt on Fridays, no trolley bags, and the school, bookshop and
+     student care numbers. None of that is in the app anywhere yet. It wants
+     a panel of its own rather than a note nobody can find, and that is a
+     thing to build rather than to smuggle into an event. */
+  {id:"e76", t:"Student Details Form — window open", d:"2026-11-30", d2:"2026-12-31", w:"sc",
+   n:"Open from today until the last day of December, at pg.moe.edu.sg/forms/sdf. Either parent can submit it, which makes it the one piece of P1 paperwork that does not have to wait for a particular person.",
+   url:"https://pg.moe.edu.sg/forms/sdf"},
+
+  {id:"e77", t:"First day of P1", d:"2027-01-04", time:"07:30", w:"sc",
+   n:"Monday. Report by 7.30am at the canteen; flag raising is 7.30. Car drop-off is Gate A to the Meeting Point or Gate E to the sheltered driveway, between 6.30 and 7.20, and it needs the school car decal. Today is the only day a parent can walk him in past the gate — from the 5th nobody goes beyond it. He wears the lanyard name card every day this month: it comes in the welcome bag on 20 November, or the Annex insert can be printed at home, and the back wants both parents’ emergency numbers and the dismissal routine ticked. Pick-up is the thing to plan rather than discover: he comes out of Side Gate A between 1.25 and 2.15, and TC — P3 by then — comes out of Gate B between 1.30 and 2.15. Two gates, overlapping windows, one of us."},
+
+  {id:"e78", t:"Health and dental consent", d:"2027-01-11", w:"sc",
+   n:"Through HPB’s Child Consent Portal, which opens to P1 parents in January. The booklet gives the month and no day, so this Monday is ours — a week in, once the first week has stopped being the first week."},
 
 
   /* From the K2 parents' WhatsApp group, read off the thread rather than from
