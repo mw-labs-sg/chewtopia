@@ -28,7 +28,7 @@ Load order matters and is fixed in `index.html`:
 
 | File | What it holds |
 |---|---|
-| `data.js` | **The only file you normally edit.** Kids, word banks, timetables, meals, seed events, Supabase keys. |
+| `data.js` | **The only file you normally edit.** Kids, word banks, timetables, meals, seed events, growth readings, Supabase keys. |
 | `core.js` | Storage helpers (`S/W/SJ/WJ`), dates, scores, streaks, all Supabase sync, sound, speech, the weak-items bank, the mascot SVGs and the quiz pictures (`QPIC`, `picSVG()`). |
 | `timetable.js` | The Timetable tab: the weekly grid, school hours, after-school activities. |
 | `training.js` | The Training tab: test list, maths generators, the quiz engine (`start` → `quizHTML` → `grade` → `next`), and the twenty-one quiz ladders — `LADDERS`, then `startClimb` → `climbGrade` → `climbNext`, whose panels are drawn on the Quiz tab by `app.js`. |
@@ -55,7 +55,8 @@ account; sign-in takes a bare name and `asEmail()` appends `@chewtopia.family`.
   test_code, test_name, score, total, completed_at`).
 - **`state`** — key/value for everything else, one row per `(user_id, k)`.
   See `supabase-state.sql`. Keys are in `STATE_KEYS`: `weak:tc`, `weak:sc`,
-  `books:tc`, `books:sc`, `events`, `acts`, `seedgone` — plus `struck`, which
+  `books:tc`, `books:sc`, `events`, `acts`, `seedgone`, `grow:tc`, `grow:sc`
+  — plus `struck`, which
   is not in that list because it is a map, not a list, and is pushed by hand.
 
 Sync model: **merge, never overwrite.** `cloudSync()` pulls then pushes.
@@ -277,6 +278,14 @@ holds: a typo there is only cosmetic, so nothing else would catch it.
   comment above it (see `第十四课` in `TC_TINGXIE`).
 - Give every new `SEED_EVENTS` / `SEED_ACTS` entry a fresh id. Anything deleted
   in the app stays deleted via `seedgone`.
+- **A weight or a height can be added from here, not only on the iPad.**
+  `SEED_GROW` in `data.js` is a flat list of `{id, who, d, w, h}` and
+  `seedGrow()` merges it into `grow:<who>`, which *is* synced. It skips a row
+  whose id is in `seedgone` or struck, and skips any day that child already
+  has a reading for — so what was typed on a device always wins over what is
+  seeded here. Say in the comment where the numbers came from: the August pair
+  were read off photographs of the scale and the wall rule and say which digit
+  was in doubt, which is the only reason anyone could check them later.
 - **`from:` on an event is the day the work was *set*, not the day it is due.**
   Once that day has passed, `isOpen()` lifts the card into the **Open now**
   tray above the agenda and the card reads "open since 28 Sep" instead of "in

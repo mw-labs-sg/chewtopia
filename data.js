@@ -1858,7 +1858,26 @@ var SEED_GROW = [
      just under the 130 mark, which is what 129 looks like. A better shot than
      SC's - the rule and the boy are in the same plane and the whole scale is
      in frame, so this one did not have to be taken on trust. */
-  {id:"gtc-20260830", who:"tc", d:"2026-08-30", w:23.7, h:129}
+  {id:"gtc-20260830", who:"tc", d:"2026-08-30", w:23.7, h:129},
+
+  /* 18 October 2026, both boys. These two came in as numbers rather than as
+     photographs, which is the one way they are weaker than the August pair:
+     nothing here was read off a display or a rule by anybody but the person
+     who typed them, so there is no second look available if one turns out
+     odd. Recorded as given.
+
+     Both are taller and both are lighter than seven weeks ago — TC 23.7 to
+     23.2 and 129 to 130, SC 18.5 to 18.2 and 113 to 115. That is written down
+     and not interpreted, which is the rule this whole screen is built on: the
+     app has no growth reference charts off any sheet, and a judgement invented
+     here would be worse than none. It is on the chart; the reading of it
+     belongs to a doctor.
+
+     SC's 113 in August was the reading flagged as uncertain, taken off a
+     photograph with the boy near the lens and the rule back on the wall. 115
+     now is consistent with it, which is weak corroboration and not proof. */
+  {id:"gtc-20261018", who:"tc", d:"2026-10-18", w:23.2, h:130},
+  {id:"gsc-20261018", who:"sc", d:"2026-10-18", w:18.2, h:115}
 
 ];
 
