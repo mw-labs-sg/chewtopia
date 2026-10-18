@@ -1252,8 +1252,20 @@ var SEED_EVENTS = [
      off while the papers are marked, and the P6 HBL days are P6's alone — but
      it is worth one look at the Term 4 calendar on Parents Gateway before
      anyone books anything around it. */
-  {id:"e64", t:"No school — PSLE marking", d:"2026-10-29", d2:"2026-10-30", w:"tc", hol:1,
-   n:"Thursday and Friday. The information sheet says all students are not required to come to school while the PSLE papers are marked. The same table also lists P6 home-based learning on the 12th to 14th, which is P6's own and does not affect him. If the two got swapped in the sheet, this is the one to check — the Term 4 calendar went out on Parents Gateway on 20 August and was updated on 16 September."},
+  /* The swap this note worried about looks like it happened. Mdm Leong posted
+     on ClassDojo on Monday 12 October: "For these few days of PSLE marking,
+     the children are to complete a worksheet on Money." A class teacher does
+     not set days of work that way for a week the children are in school, so
+     the marking days were the 12th to the 14th — the pair the information
+     sheet had down as P6 home-based learning.
+
+     Which leaves these two in real doubt, and a wrong day off is a day a
+     grown-up either books leave for nothing or finds out about at the gate.
+     The date is not changed on a deduction from one ClassDojo post: whoever
+     knows whether the boys were home on the 12th settles it in a sentence,
+     and the note says so on screen until they do. */
+  {id:"e64", t:"No school — PSLE marking (check this one)", d:"2026-10-29", d2:"2026-10-30", w:"tc", hol:1,
+   n:"Thursday and Friday — and worth confirming before anything is planned around it. The October information sheet's table arrived scrambled, with two rows of dates against two of remarks: all students off for the PSLE marking, and P6 home-based learning on the 12th to 14th. Mdm Leong's ClassDojo post of 12 October sets a Money worksheet “for these few days of PSLE marking”, which puts the marking on the 12th to the 14th and these two days back with P6, who are nothing to do with him. If that is right there is school as usual on the 29th and 30th. The Term 4 calendar on Parents Gateway is the thing to look at — it went out on 20 August and was updated on 16 September."},
 
   {id:"e41", t:"Sunday 10am — invitation with no name on it", d:"2026-10-11", time:"10:00", w:"tc",
    n:"One hour, 10 to 11am. A Google Calendar invite organised by Chew to minwei.chew.sgp@gmail.com, and that is the whole of what came through — the forwarded copy started at “When” and had no title on it."},
@@ -1310,6 +1322,15 @@ var SEED_EVENTS = [
      school's own sheet is in the app, so he can practise the page he will
      actually sit rather than the 生字 list behind it. e21 points at hz only
      because no sheet for 第十四课 ever came home. */
+  /* Mdm Leong on ClassDojo, 12 October: a worksheet on Money for the PSLE
+     marking days. Those days have gone, and so has the worksheet, but money
+     is what the class is on — so this sits on the next school day with a
+     practice button rather than nowhere, exactly the way e28 sits on one for
+     fractions. Being dated is also what puts it in reach of the Today button
+     on Training, which pulls from whatever is coming up. */
+  {id:"e71", t:"Maths — Money", d:"2026-10-19", w:"tc", p:"ma|money",
+   n:"Monday. Mdm Leong set a worksheet on Money over the PSLE marking days; this is the same ground in Training — dollars and cents, and working out the change. The worksheet itself went back with him, so there is nothing to hand in here."},
+
   {id:"e70", t:"华文听写 — 第十六课", d:"2026-10-08", w:"tc", p:"tx|第十六课",
    n:"Thursday. 听写 16, workbook pages 32 and 33. The practice button is the sheet itself — section (二), the six sentences with the characters knocked out, tapped back into the gaps. Its thirteen gaps are the whole 我会写 list for the lesson, each character once: 声 英 具 话 讲 知 借 故 道 次 事 首 样. Section (一) is the pinyin half and is not in the app, because the tested characters are read out rather than printed — that half has to be done off the paper with somebody reading it, and so does the sentence in the empty grid at the end."},
 
