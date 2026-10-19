@@ -139,6 +139,23 @@ function tColumn(kid, subj){
         out+=tCell(kid, "zh|"+k, k, k, SC_TINGXIE[k].length+" words");
       });
     }
+    /* The 词表 column came off this screen and stays off — "Lesson 12",
+       "复习 12 字" and "第十二课 词表" were three overlapping takes on one
+       lesson. The 听说剧场 lists are not that: they are a lesson's own
+       vocabulary off the picture spread, nothing else covers them, and they
+       are the reason this section is back at all. */
+    if(kid==="tc"){
+      var tsj=Object.keys(TC_PINYIN).filter(function(k){
+        return k.indexOf("\u542c\u8bf4\u5267\u573a")>=0; });
+      if(tsj.length){
+        out+='<div class="mxtag">\u542c\u8bf4\u5267\u573a</div>';
+        tsj.forEach(function(k){
+          out+=tCell(kid, "zh|"+k, k.split(" ")[0], "\u6c49\u8bed\u62fc\u97f3 "+k,
+                     TC_PINYIN[k].length+" \u8bcd\u8bed");
+        });
+      }
+    }
+
     /* 我会认 and 我会写 cover the same lessons, so they go side by side:
        one row per lesson, read it on the left, write it on the right. */
     if(kid==="tc"){
@@ -448,6 +465,11 @@ var MA_SETS = [
   ["money",   "Money",            "Dollars, cents and change"],
   ["time",    "Time",             "To the minute, and how long"],
   ["measure", "Measuring",        "Length, mass and volume"],
+  /* Not P2, and labelled so on purpose. He has a drill book at home that runs
+     2 to 9 a table at a time, forty to a page and timed \u2014 additional work
+     rather than the school's, which is why 6 to 9 stay out of the P2 set and
+     keep a box reading Next year. A poor score here is a boy meeting sevens,
+     not a boy falling behind. */
   ["reach",   "Next year",        "P3 tables \u2014 6, 7, 8 and 9"]
 ];
 function maName(k){
@@ -577,7 +599,13 @@ function maTimes(){
   switch(rnd(1,4)){
     case 1: return maQ(maPick([0,1]) ? t+" \u00d7 "+n : n+" \u00d7 "+t, t*n);
     case 2: return maQ((t*n)+" \u00f7 "+t, n);
-    case 3: return maQ("What goes in the blank?  "+t+" \u00d7 ___ = "+(t*n), n, {w:1});
+    /* The blank goes on either side now. His drill book writes it
+       ___ \u00d7 3 = 27 and this only ever wrote 3 \u00d7 ___ = 27, which is the easier
+       half: with the table named in front of you, you can count up to the
+       answer. Put the blank first and there is nothing to count from until
+       27 has been recognised as a three. */
+    case 3: return maQ("What goes in the blank?  "+
+      (maPick([0,1]) ? t+" \u00d7 ___ = "+(t*n) : "___ \u00d7 "+t+" = "+(t*n)), n, {w:1});
     default:
       return maQ(t+" \u00d7 "+n+" = "+(t*n)+".  So what is "+(t*n)+" \u00f7 "+n+"?", t, {w:1});
   }
@@ -743,7 +771,8 @@ function maReach(){
   switch(rnd(1,3)){
     case 1: return maQ(maPick([0,1]) ? t+" \u00d7 "+n : n+" \u00d7 "+t, t*n);
     case 2: return maQ((t*n)+" \u00f7 "+t, n);
-    default: return maQ("What goes in the blank?  "+t+" \u00d7 ___ = "+(t*n), n, {w:1});
+    default: return maQ("What goes in the blank?  "+
+      (maPick([0,1]) ? t+" \u00d7 ___ = "+(t*n) : "___ \u00d7 "+t+" = "+(t*n)), n, {w:1});
   }
 }
 
@@ -907,8 +936,11 @@ function dueCodes(kid){
 function allCodes(kid){
   var out=[];
   if(hasSubj(kid,"en")) Object.keys(kid==="tc"?TC_SPELL:SC_SPELL).forEach(function(k){ out.push((kid==="tc"?"en|":"es|")+k); });
-  /* TC's 词表 lists are off the screen, so they stay out of the daily set too. */
+  /* TC's three 词表 lists are off the screen, so they stay out of the daily
+     set too. The 听说剧场 ones are on it, so they are in. */
   if(kid!=="tc") Object.keys(SC_TINGXIE).forEach(function(k){ out.push("zh|"+k); });
+  if(kid==="tc") Object.keys(TC_PINYIN).forEach(function(k){
+    if(k.indexOf("\u542c\u8bf4\u5267\u573a")>=0) out.push("zh|"+k); });
   if(kid==="tc") Object.keys(HANZI).forEach(function(k){
     out.push("rn|"+k); out.push("hz|"+k);   /* the sheets are parked: see tColumn */
   });

@@ -270,6 +270,84 @@ var RECOG = {
 };
 
 var TC_PINYIN = {
+  /* 听说剧场 — the picture spreads at the head of each lesson, off the 二年级
+     高级华文 textbook itself: 第十七课 夜市真热闹 (pp. 80–81), 第十八课 新加坡真
+     好玩 (pp. 92–93) and 第十九课 我们的生活少不了水 (pp. 104–105). Every word on
+     those pages, in the order the page prints them.
+
+     These are 词语 and not 生字, which is why the whole word sits in the first
+     slot rather than one character: bdMasked gaps every character of it, so
+     he taps 水 龙 头 in order rather than being handed two of the three. The
+     tone slot is empty on purpose — pinyinMark leaves a phrase alone rather
+     than guessing which syllable a single tone belongs to, so the pinyin is
+     stored the way the book prints it, marks and all, and is shown whole.
+
+     Unlike the three 词表 boxes above, these are on the Training column and
+     in allCodes(): they are a lesson's vocabulary rather than three
+     overlapping takes on the same characters, and the 生字表 does not cover
+     them. */
+  "第十七课 听说剧场": [
+    ["小吃摊","小吃摊","xiǎochī tān","","snack stalls"],
+    ["饮料摊","饮料摊","yǐnliào tān","","drinks stall"],
+    ["嘟嘟糕","嘟嘟糕","dūdū gāo","","tutu kueh"],
+    ["炸鸡翅","炸鸡翅","zhá jīchì","","fried chicken wings"],
+    ["烤香肠","烤香肠","kǎo xiāngcháng","","grilled sausage"],
+    ["烤肉串","烤肉串","kǎo ròuchuàn","","grilled meat skewers"],
+    ["爆米花","爆米花","bàomǐhuā","","popcorn"],
+    ["棉花糖","棉花糖","miánhuātáng","","candy floss"],
+    ["游戏摊","游戏摊","yóuxì tān","","game stalls"],
+    ["夹娃娃机","夹娃娃机","jiā wáwa jī","","claw machine"],
+    ["套圈圈","套圈圈","tào quānquān","","ring toss"],
+    ["射气球","射气球","shè qìqiú","","balloon darts"],
+    ["游乐园","游乐园","yóulèyuán","","funfair"],
+    ["飞天椅","飞天椅","fēitiān yǐ","","swing ride"],
+    ["摩天轮","摩天轮","mótiānlún","","Ferris wheel"],
+    ["碰碰车","碰碰车","pèngpengchē","","bumper cars"],
+    ["小火车","小火车","xiǎo huǒchē","","little train"],
+    ["充气城堡","充气城堡","chōngqì chéngbǎo","","bouncy castle"]
+  ],
+  "第十八课 听说剧场": [
+    ["逛游园会","逛游园会","guàng yóuyuánhuì","","to go round a carnival"],
+    ["参观胡姬花园","参观胡姬花园","cānguān Hújī Huāyuán","","visit the Orchid Garden"],
+    ["听音乐会","听音乐会","tīng yīnyuèhuì","","go to a concert"],
+    ["看音乐喷泉","看音乐喷泉","kàn yīnyuè pēnquán","","watch the musical fountain"],
+    ["坐缆车","坐缆车","zuò lǎnchē","","ride the cable car"],
+    ["拍照","拍照","pāizhào","","take photos"],
+    ["看飞禽表演","看飞禽表演","kàn fēiqín biǎoyǎn","","watch the bird show"],
+    ["裕华园","裕华园","Yùhuá Yuán","","the Chinese Garden"],
+    ["植物园","植物园","zhíwùyuán","","the Botanic Gardens"],
+    ["圣淘沙","圣淘沙","Shèngtáoshā","","Sentosa"],
+    ["飞禽公园","飞禽公园","fēiqín gōngyuán","","Bird Paradise"],
+    ["河川生态园","河川生态园","héchuān shēngtài yuán","","River Wonders"],
+    ["鱼尾狮公园","鱼尾狮公园","Yúwěishī Gōngyuán","","Merlion Park"],
+    ["滨海湾花园","滨海湾花园","Bīnhǎiwān Huāyuán","","Gardens by the Bay"],
+    ["东海岸公园","东海岸公园","Dōnghǎi'àn Gōngyuán","","East Coast Park"],
+    ["星耀樟宜","星耀樟宜","Xīngyào Zhāngyí","","Jewel Changi"],
+    ["观赏植物","观赏植物","guānshǎng zhíwù","","to look at the plants"],
+    ["看擎天树灯光秀","看擎天树灯光秀","kàn qíngtiānshù dēngguāng xiù","","watch the Supertree light show"],
+    ["坐摩天观景轮","坐摩天观景轮","zuò mótiān guānjǐng lún","","ride the Singapore Flyer"],
+    ["捡贝壳","捡贝壳","jiǎn bèiké","","collect shells"],
+    ["玩泥沙","玩泥沙","wán níshā","","play in the sand"],
+    ["堆沙堡","堆沙堡","duī shābǎo","","build a sandcastle"]
+  ],
+  "第十九课 听说剧场": [
+    ["水龙头","水龙头","shuǐlóngtóu","","tap"],
+    ["水管","水管","shuǐguǎn","","water pipe"],
+    ["水箱","水箱","shuǐxiāng","","water tank"],
+    ["饮水机","饮水机","yǐnshuǐjī","","water cooler"],
+    ["水桶","水桶","shuǐtǒng","","bucket"],
+    ["水槽","水槽","shuǐcáo","","sink"],
+    ["热水壶","热水壶","rèshuǐhú","","kettle"],
+    ["蓄水池","蓄水池","xùshuǐchí","","reservoir"],
+    ["水沟","水沟","shuǐgōu","","drain"],
+    ["泡咖啡","泡咖啡","pào kāfēi","","to make coffee"],
+    ["做冰块","做冰块","zuò bīngkuài","","to make ice cubes"],
+    ["冲马桶","冲马桶","chōng mǎtǒng","","to flush the toilet"],
+    ["养鱼","养鱼","yǎng yú","","to keep fish"],
+    ["煮饭","煮饭","zhǔ fàn","","to cook rice"],
+    ["洗菜","洗菜","xǐ cài","","to wash vegetables"],
+    ["洗地板","洗地板","xǐ dìbǎn","","to wash the floor"]
+  ],
   "Lesson 12": [
     ["永","永远","yong","3","forever"], ["轻","轻轻","qing","1","light / gently"],
     ["命","生命","ming","4","life"],   ["百","一百","bai","3","hundred"],
