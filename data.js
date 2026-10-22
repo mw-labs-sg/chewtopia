@@ -1272,8 +1272,20 @@ var SEED_EVENTS = [
    n:"Friday. The term calendar says “K2 Graduation Ceremony cum Concert Closure” and no more. Whether that is the school closing after the concert or a second part of the ceremony is worth asking now rather than that week, because P1 orientation at Nanyang Primary is the same afternoon."},
   {id:"e51", t:"Year-end holiday camp", d:"2026-11-23", d2:"2026-11-25", w:"sc",
    n:"Monday to Wednesday, inside the school holidays. The newsletter does not say whether it has to be signed up for, or what it costs."},
-  {id:"e52", t:"K2 overnight camp", d:"2026-11-26", d2:"2026-11-27", w:"sc",
-   n:"Thursday and Friday, straight after the holiday camp, and his last thing as a kindergarten child. Nothing yet on what to pack."},
+  /* Nanyang Kindergarten, principal's letter of 19 October 2026 — the overnight
+     camp now has its times, its fee and what he wears. The brochure, programme
+     sheet and packing list the letter encloses did not come with it, so the
+     only packing here is the two things the letter itself names. */
+  {id:"e52", t:"K2 overnight camp", d:"2026-11-26", d2:"2026-11-27", time:"14:00", w:"sc",
+   n:"Thursday to Friday, straight after the holiday camp, and his last thing as a kindergarten child. Report 2pm on the Thursday at 118 King's Road, picked up 10am on the Friday from the same place. He comes dressed in the NYK polo T-shirt and red shorts with comfortable shoes, and brings a water bottle and a jacket — they go to VroomTown Driving City, which is indoors and cold. Entrance fees, transport, buffet dinner, supper and buffet breakfast are all in the $230. A brochure, a programme sheet and a packing list are meant to come with the letter; ask for them if they do not arrive, because an overnight bag is more than a water bottle. General Office 6466 3375, 118campus@nyk.edu.sg."},
+  /* The letter's deadline. Registration opened the day the letter came, so
+     from: lifts it into the Open now tray rather than leaving it a fortnight
+     down the grid — it is a form, and the money goes with it.
+     No url: the letter's link is the word "HERE" in the e-mail, which carries
+     no address to copy. */
+  {id:"e79", t:"Register for the K2 overnight camp", d:"2026-11-02", time:"16:00", w:"sc",
+   from:"2026-10-19",
+   n:"Monday, and it closes at 4pm sharp — the letter says late submissions will not be accepted, because of the logistics. $230 payable in full on registering and non-refundable. The link is in the principal's e-mail of 19 October from 118campus@nyk.edu.sg."},
 
   /* A Google Calendar invitation off our own family calendar: Sunday 11 October,
      10 to 11am, organised by Chew. The forwarded mail began at “When”,
