@@ -4304,6 +4304,106 @@ var TL_LADDER = {
   ]]
 };
 
+/* French, the sixth language, and the first one on here that is not read as it
+   is spelt. Bahasa and Tagalog leave the middle column empty because the
+   spelling is the pronunciation; Chinese, Japanese and Korean fill it with a
+   romanisation of another alphabet. French needs it for a third reason — the
+   letters are ones he can already read and they lie to him. "beaucoup" and
+   "aujourd'hui" are the whole difficulty of the language, and a boy who sounds
+   them out in English gets them wrong every time.
+
+   So the middle column here is a respelling for an English reader, written for
+   this app: bonjour as bohn-ZHOOR, with the stressed part in capitals. It is
+   not IPA and it is not a transcription a French teacher would accept — it is
+   the nearest an English-speaking seven-year-old can get by reading, and the
+   speaker on each tile is what he should trust over it.
+
+   Nouns carry their article, because in French the article is half the word:
+   "le chat", not "chat". That also means every wrong answer on an animal rung
+   begins le or la, so the article is never the giveaway.
+
+   Nobody teaches this at either school, like the other five. Same ten rungs
+   and same six words a rung, and no two words on a rung mean the same thing,
+   or the question would have two right answers. */
+var FR_LADDER = {
+  1: ["Salutations", [
+    ["bonjour","bohn-ZHOOR","hello"],
+    ["merci","mehr-SEE","thank you"],
+    ["au revoir","oh ruh-VWAHR","goodbye"],
+    ["oui","WEE","yes"],
+    ["non","NOHN","no"],
+    ["s'il vous plaît","seel voo PLEH","please"]
+  ]],
+  2: ["Les nombres", [
+    ["un","UHN","one"], ["deux","DUH","two"], ["trois","TRWAH","three"],
+    ["quatre","KATR","four"], ["cinq","SANK","five"], ["dix","DEESS","ten"]
+  ]],
+  3: ["La famille", [
+    ["la mère","la MEHR","mother"],
+    ["le père","luh PEHR","father"],
+    ["le frère","luh FREHR","a brother"],
+    ["la sœur","la SUR","a sister"],
+    ["la famille","la fa-MEE-yuh","family"],
+    ["le bébé","luh bay-BAY","the baby"]
+  ]],
+  4: ["Les animaux", [
+    ["le chat","luh SHA","a cat"],
+    ["le chien","luh SHYAN","a dog"],
+    ["l'oiseau","lwah-ZOH","a bird"],
+    ["le poisson","luh pwah-SOHN","a fish"],
+    ["le cheval","luh shuh-VAL","a horse"],
+    ["la vache","la VASH","a cow"]
+  ]],
+  5: ["La nourriture", [
+    ["le pain","luh PAN","bread"],
+    ["le lait","luh LAY","milk"],
+    ["l'eau","LOH","water"],
+    ["un œuf","uhn UHF","an egg"],
+    ["le fromage","luh fro-MAHZH","cheese"],
+    ["la pomme","la POM","an apple"]
+  ]],
+  6: ["L'école", [
+    ["le maître","luh METR","a teacher"],
+    ["le livre","luh LEEVR","a book"],
+    ["l'école","lay-KOL","a school"],
+    ["l'ami","la-MEE","a friend"],
+    ["le crayon","luh kray-YOHN","a pencil"],
+    ["la classe","la KLAHSS","the classroom"]
+  ]],
+  7: ["Les lieux", [
+    ["la maison","la may-ZOHN","a house"],
+    ["le parc","luh PARK","a park"],
+    ["l'hôpital","loh-pee-TAL","a hospital"],
+    ["le magasin","luh ma-ga-ZAN","a shop"],
+    ["le marché","luh mar-SHAY","a market"],
+    ["la bibliothèque","la bee-blee-oh-TEK","a library"]
+  ]],
+  8: ["Le temps", [
+    ["aujourd'hui","oh-zhoor-DWEE","today"],
+    ["demain","duh-MAN","tomorrow"],
+    ["hier","ee-YEHR","yesterday"],
+    ["le matin","luh ma-TAN","morning"],
+    ["la nuit","la NWEE","night"],
+    ["tous les jours","too lay ZHOOR","every day"]
+  ]],
+  9: ["Les verbes", [
+    ["manger","mahn-ZHAY","to eat"],
+    ["boire","BWAHR","to drink"],
+    ["dormir","dor-MEER","to sleep"],
+    ["aller","a-LAY","to go"],
+    ["lire","LEER","to read"],
+    ["écrire","ay-KREER","to write"]
+  ]],
+  10: ["Les adjectifs", [
+    ["grand","GRAHN","big"],
+    ["petit","puh-TEE","small"],
+    ["nouveau","noo-VOH","new"],
+    ["heureux","uh-RUH","happy"],
+    ["difficile","dee-fee-SEEL","difficult"],
+    ["rapide","ra-PEED","fast"]
+  ]]
+};
+
 /* ==========================================================================
    FUN — the songs the boys want the words to.
 

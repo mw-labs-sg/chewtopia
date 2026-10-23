@@ -1747,9 +1747,9 @@ function qzLad(o){
    one he has just as much business knowing — distractors off an easier rung
    would make a hard word look easy.
 
-   Nothing here is written in the Latin alphabet except Bahasa Indonesia, which
-   is why `big` is a flag and not the rule: 재미있다 needs the size, "membaca"
-   needs the width. */
+   Chinese, Japanese and Korean need the extra size and Bahasa, Tagalog and
+   French do not, which is why `big` is a flag and not the rule: 재미있다 needs
+   the size, "membaca" needs the width. */
 function langLad(o){
   var B=o.bank;
   return { id:o.id, em:o.em, name:o.name, test:o.name, subject:o.subject||o.name,
@@ -2019,7 +2019,7 @@ var LADDERS=[
     blurb:"Bahasa Indonesia, six words a rung: halo and terima kasih at the "+
       "bottom, verbs and adjectives at the top.",
     note:"Nobody teaches this at either school. It is read exactly as it is "+
-      "spelt, which makes it the gentlest of the four languages to start on." }),
+      "spelt, which makes it the gentlest of the six languages to start on." }),
 
   langLad({ id:"ja", em:"あ", name:"日本語 quiz", subject:"日本語",
     bank:JA_LADDER, lang:"ja-JP", vname:"Japanese", big:true,
@@ -2040,7 +2040,18 @@ var LADDERS=[
     blurb:"Hangul read out in Korean — 안녕하세요 at the bottom, 어렵다 at the "+
       "top — with how it sounds shown after each answer.",
     note:"Nobody teaches this at either school. If the tablet has no Korean "+
-      "voice the words stay silent rather than being read in an English one." })
+      "voice the words stay silent rather than being read in an English one." }),
+
+  langLad({ id:"fr", em:"🇫🇷", name:"Français quiz", subject:"Français",
+    bank:FR_LADDER, lang:"fr-FR", vname:"French",
+    blurb:"French, six words a rung: bonjour and merci at the bottom, verbs "+
+      "and adjectives at the top. Nouns come with le or la, because in French "+
+      "the article is half the word.",
+    note:"Nobody teaches this at either school. It is the one language on here "+
+      "written in letters he can already read that are not the sounds he would "+
+      "make of them, so each answer shows a respelling too — bonjour as "+
+      "bohn-ZHOOR. Trust the speaker over the respelling: it is only the "+
+      "nearest an English reader gets." })
 ];
 
 function ladBy(id){

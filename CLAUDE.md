@@ -3,7 +3,7 @@
 A home-school app for two boys in Singapore: TC (Nanyang Primary, P2) and SC
 (Nanyang Kindergarten, K2). Upcoming dates, the school timetable, meals, a
 reading log, the spelling / 华文 / maths practice that gets sat on an iPad, the
-twenty-one quiz ladders they play for fun, and the words to whatever they are singing
+twenty-two quiz ladders they play for fun, and the words to whatever they are singing
 this month.
 
 ## Stack
@@ -31,7 +31,7 @@ Load order matters and is fixed in `index.html`:
 | `data.js` | **The only file you normally edit.** Kids, word banks, timetables, meals, seed events, growth readings, Supabase keys. |
 | `core.js` | Storage helpers (`S/W/SJ/WJ`), dates, scores, streaks, all Supabase sync, sound, speech, the weak-items bank, the mascot SVGs and the quiz pictures (`QPIC`, `picSVG()`). |
 | `timetable.js` | The Timetable tab: the weekly grid, school hours, after-school activities. |
-| `training.js` | The Training tab: test list, maths generators, the quiz engine (`start` → `quizHTML` → `grade` → `next`), and the twenty-one quiz ladders — `LADDERS`, then `startClimb` → `climbGrade` → `climbNext`, whose panels are drawn on the Quiz tab by `app.js`. |
+| `training.js` | The Training tab: test list, maths generators, the quiz engine (`start` → `quizHTML` → `grade` → `next`), and the twenty-two quiz ladders — `LADDERS`, then `startClimb` → `climbGrade` → `climbNext`, whose panels are drawn on the Quiz tab by `app.js`. |
 | `app.js` | `render()`, the tab router, and Upcoming / Meals / Berries / Quiz / Fun / School, plus the reading log that Training draws. Loads last and boots the app. |
 
 `render()` redraws the whole `#view` from scratch on every state change. There
@@ -113,7 +113,7 @@ carrying `p:"en|3.5"` gets a practice button and feeds the daily set.
   is the answer, so there is no Check button until it is marked, and `it.kind`
   is what the card calls the question.
 
-- **The twenty-one quiz ladders are not curriculum**, and each says so at the top of
+- **The twenty-two quiz ladders are not curriculum**, and each says so at the top of
   its own bank. They are the Quiz tab, a card each, built by `quizCards()` out
   of the `LADDERS` array in `training.js`, **in five sections** — `QUIZ_GROUPS`
   gives the order and the headings, and every ladder carries a `grp` naming one
@@ -129,10 +129,14 @@ carrying `p:"en|3.5"` gets a practice button and feeds the daily set.
   `sci` (`SCI_LADDER`, ten topics), `body` (`BODY_LADDER`, ten rungs from the
   outside in), `bio` (`BIO_LADDER`, everything alive that is not him), `phy`
   (`PHY_LADDER`) and `chem` (`CHEM_LADDER`) — MOE starts science in P3, so
-  there is no sheet any of those could come off — `pop` (`POP_LADDER`, films and games, the one that is purely for fun), five general-knowledge ones — `geo` (`GEO_LADDER`), `sport` (`SPORT_LADDER`), `music` (`MUSIC_LADDER`), `art` (`ART_LADDER`), `comp` (`COMP_LADDER`), `hist` (`HIST_LADDER`) and `geog` (`GEOG_LADDER`, the planet itself, where `geo` is the countries on it) — and five languages: `zh`
-  (`ZH_LADDER`), `id` (`ID_LADDER`), `ja` (`JA_LADDER`), `tl` (`TL_LADDER`) and
-  `ko` (`KO_LADDER`), which nobody teaches at either school.
-  Two factories build eighteen of them. `qzLad()` takes a bank of questions with
+  there is no sheet any of those could come off — `pop` (`POP_LADDER`, films and games, the one that is purely for fun), seven general-knowledge ones — `geo` (`GEO_LADDER`), `sport` (`SPORT_LADDER`), `music` (`MUSIC_LADDER`), `art` (`ART_LADDER`), `comp` (`COMP_LADDER`), `hist` (`HIST_LADDER`) and `geog` (`GEOG_LADDER`, the planet itself, where `geo` is the countries on it) — and six languages: `zh`
+  (`ZH_LADDER`), `id` (`ID_LADDER`), `ja` (`JA_LADDER`), `tl` (`TL_LADDER`),
+  `ko` (`KO_LADDER`) and `fr` (`FR_LADDER`), which nobody teaches at either
+  school. French is the one written in letters he can already read that are not
+  the sounds he would make of them, so its middle column is a respelling for an
+  English reader (bonjour as bohn-ZHOOR) rather than a romanisation — written
+  for the app, and the speaker on the tile is what overrules it.
+  Two factories build nineteen of them. `qzLad()` takes a bank of questions with
   their answers written out; `langLad()` takes a bank of `[word, how it sounds,
   what it means]` and asks which one means the English. A new subject or a new
   language is a bank in `data.js` and one line in `LADDERS`.

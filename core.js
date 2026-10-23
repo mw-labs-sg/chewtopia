@@ -1971,7 +1971,8 @@ function say(t,rate,lang){
   if(!window.speechSynthesis || !snd()) return;
   lang=lang||"en-GB";
   var cn = lang.indexOf("zh")===0;
-  /* Any language that is not English, now that there are four of them. */
+  /* Any language that is not English — there are six ladders of them now, so
+     this is a test on the tag and never a list to keep up to date. */
   var foreign = lang.indexOf("en")!==0;
   var u=new SpeechSynthesisUtterance(t), v=bestVoice(lang);
   /* An English voice reading Chinese is worse than silence: it teaches the
